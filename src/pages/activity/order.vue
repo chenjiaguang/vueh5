@@ -58,15 +58,28 @@
           <div @click="form.userInfo.sex = 2" class="sexual-option fl clearfix"><i class="iconfont fl" :class="{'icon-quan': form.userInfo.sex.toString() === '1', 'icon-quanzi': form.userInfo.sex.toString() === '2'}"></i>女</div>
         </div>
       </div>
+      <div class="header pay-header">选择支付方式</div>
+      <div class="pay-way">
+        <div class="pay-way-item clearfix" @click="changePayWay(1)"><i class="iconfont icon-weixinzhifu fl" style="color: #09bb07;"></i>微信支付<i class="iconfont fr" :class="{'icon-gou': form.payWay.toString() === '1', 'icon-quan': form.payWay.toString() === '2'}"></i></div>
+        <div class="pay-way-item clearfix" @click="changePayWay(2)"><i class="iconfont icon-zhifubaozhifu fl" style="color: #00a0e8;"></i>支付宝支付<i class="iconfont fr" :class="{'icon-gou': form.payWay.toString() === '2', 'icon-quan': form.payWay.toString() === '1'}"></i></div>
+      </div>
+      <div class="agreement-box clearfix" @click.stop="changeAgreement">
+        <i class="iconfont fl" style="width: 4.95%" :class="{'icon-gou': form.agreement, 'icon-quan': !form.agreement}"></i>
+        <div class="fl" style="width: 95.05%">我同意<span @click.stop="goAgreement" style="color: #1EB0FD">《范团活动参与协议》</span>并已确认活动真实性，同意支付 报名费用。</div>
+      </div>
     </div>
-    <div class="fixed-button" :style="{backgroundColor: BuyStatus.toString() === '0' ? '#ff3f53' : '#bbbbbb'}">{{submitBtnText[BuyStatus.toString()]}}</div>
+    <div class="fixed-button">
+      <span style="vertical-align: middle">合计</span>
+      <span class="should-pay-amount">&yen;{{shouldPay}}</span>
+      <div @click="goSuccess" class="btn-submit" :style="{backgroundColor: shouldPay.toString() === '0' ? '#bbbbbb' : '#ff3f53'}">确认报名</div>
+    </div>
   </div>
 </template>
 
 <style scoped>
   .activity-detail{
     width:100%;
-    padding-bottom: 130px;
+    padding-bottom: 160px;
   }
   .info-container{
     padding: 0 4%;
@@ -137,6 +150,9 @@
     font-weight: 600;
     padding: 34px 0 40px;
   }
+  .pay-header{
+    padding: 54px 0 20px;
+  }
   .ticket-item{
     background-color: #F3F3F3;
     min-height: 74px;
@@ -148,7 +164,7 @@
     color: #333;
   }
   .disabled-ticket{
-    color:#666;
+    color:#BBBBBB;
   }
   .selected-ticket{
     background-color: #1EB0FD;
@@ -189,6 +205,7 @@
     display: block;
     width: 48px;
     height: 56px;
+    font-size: 28px;
     left: 0;
     top: 0;
     text-align: center;
@@ -199,6 +216,7 @@
     display: block;
     width: 48px;
     height: 56px;
+    font-size: 28px;
     right: 0;
     top: 0;
     text-align: center;
@@ -297,28 +315,104 @@
     width: 130px;
     margin-right: 22px;
   }
-  .icon-quan{
+  .user-info-item .icon-quan{
     font-size: 40px;
     margin-right: 20px;
     color: #bbb;
   }
-  .icon-quanzi{
+  .user-info-item .icon-quanzi{
     font-size: 40px;
     margin-right: 20px;
+    color: #1EB0FD;
+  }
+  .pay-way-item{
+    height: 110px;
+    line-height: 110px;
+    position: relative;
+    font-size: 32px;
+  }
+  .pay-way-item:before{
+    content: "";
+    display: block;
+    width: 200%;
+    height: 2px;
+    background-color: #bbb;
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    transform: scale(0.5);
+    transform-origin: 0 100%;
+  }
+  .pay-way-item .icon-quan{
+    font-size: 40px;
+    color: #E1E1E1;
+    vertical-align: middle;
+  }
+  .pay-way-item .icon-gou{
+    font-size: 40px;
+    color: #1EB0FD;
+    vertical-align: middle;
+  }
+  .icon-weixinzhifu, .icon-zhifubaozhifu{
+    font-size: 50px;
+    vertical-align: middle;
+    margin-right: 26px;
+  }
+  .agreement-box{
+    font-size: 24px;
+    line-height: 38px;
+    margin-top: 17px;
+  }
+  .agreement-box .icon-quan{
+    font-size: 24px;
+    line-height: 36px;
+    color: #BBBBBB;
+  }
+  .agreement-box .icon-gou{
+    font-size: 24px;
+    line-height: 36px;
     color: #1EB0FD;
   }
   .fixed-button{
     height: 100px;
     width: 100%;
-    background-color: #ff3f53;
-    font-size: 30px;
-    color: #fff;
+    box-sizing: border-box;
+    background-color: #ffffff;
+    font-size: 24px;
     font-weight: 600;
     line-height: 100px;
-    text-align: center;
+    padding-left: 30px;
     position: fixed;
     left: 0;
     bottom: 0;
+  }
+  .fixed-button:before{
+    content: "";
+    display: block;
+    width: 200%;
+    height: 2px;
+    background-color: #bbb;
+    position: absolute;
+    left: 0;
+    top: 0;
+    transform: scale(0.5);
+    transform-origin: 0 0;
+  }
+  .should-pay-amount{
+    margin-left: 20px;
+    font-size: 40px;
+    color: #ff3f53;
+    vertical-align: middle;
+  }
+  .btn-submit{
+    width: 255px;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    right: 0;
+    text-align: center;
+    font-size: 30px;
+    color: #fff;
   }
 </style>
 
@@ -339,13 +433,15 @@
             {
               id: 1,
               name: 'A类票(单人票)',
+              price: 2,
               amount: 10,
-              selected: true,
+              selected: false,
               putAmount: 1
             },
             {
               id: 2,
               name: 'B类票(单人票)',
+              price: 2.11,
               amount: 99,
               selected: false,
               putAmount: 1
@@ -353,6 +449,7 @@
             {
               id: 3,
               name: 'B类票(单人票+午饭)不含晚餐宵夜',
+              price: 13.27,
               amount: 0,
               selected: false,
               putAmount: 1
@@ -360,6 +457,7 @@
             {
               id: 4,
               name: 'B类票(单人票+午饭)不含晚餐宵夜',
+              price: 55,
               amount: 77,
               selected: false,
               putAmount: 1
@@ -367,17 +465,11 @@
           ],
           userInfo: {
             sex: 1 // 1代表男，2代表女
-          }
+          },
+          payWay: 1, // 1表示微信支付，2表示支付宝支付
+          agreement: true
         },
-        showMore: false, // 显示更多
-        contentWrapperHeight: null,
-        submitBtnText: {
-          0: '购票',
-          1: '已停止购票',
-          2: '活动已下线',
-          3: '票已售罄'
-        },
-        BuyStatus: 0 // 0 可购买
+        toastNum: 5
       }
     },
     methods: {
@@ -404,33 +496,29 @@
         }
         selected.putAmount += 1
       },
-      goMap (option) { // option: lng, lat, title
-        if (!option.lng || !option.lat) { // 未传入经纬度则返回
+      changePayWay (way) {
+        if (this.form.payWay.toString() === way.toString()) {
           return false
         }
-        this.$router.push({name: 'mapPage', query: { lng: option.lng, lat: option.lat, title: option.title || '' }})
+        this.form.payWay = way
       },
-      changeShowContext () {
-        if (!this.showMore) {
-          let wrapperHeight = this.$refs['contentContainer'].offsetHeight
-          let headerHeight = this.$refs['contentHeader'].offsetHeight
-          let contentHeight = this.$refs['contentContext'].offsetHeight
-          let btnHeight = this.$refs['contentBtn'].offsetHeight
-          this.$refs['contentContainer'].style.height = headerHeight + contentHeight + btnHeight + 'px'
-          this.showMore = true
-          if (this.contentWrapperHeight) {
-            return false
-          }
-          this.contentWrapperHeight = wrapperHeight
-        } else {
-          this.$refs['contentContainer'].style.height = this.contentWrapperHeight + 'px'
-          this.showMore = false
-        }
+      changeAgreement () {
+        this.form.agreement = !this.form.agreement
+      },
+      goAgreement () {
+        this.$router.push({path: '/agreement', query: {type: 'activity'}})
+      },
+      goSuccess () {
+        this.$router.replace('/activity/success')
       }
     },
     computed: {
-      selectedTicket: function () {
+      selectedTicket () {
         return this.form.ticket.filter(item => item.selected)[0]
+      },
+      shouldPay () {
+        let selected = this.form.ticket.filter(item => item.selected)[0]
+        return selected && parseFloat((parseFloat(selected.putAmount) * parseFloat(selected.price)).toFixed(2)) || 0
       }
     }
   }
