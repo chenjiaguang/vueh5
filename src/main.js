@@ -8,10 +8,14 @@ import 'lib-flexible/flexible'
 
 Vue.config.productionTip = false
 
-new Vue({
+let Router = new Vue({
   el: '#app',
   router,
   store,
   components: { App },
   template: '<App/>'
+})
+
+Vue.use({
+  Router
 })

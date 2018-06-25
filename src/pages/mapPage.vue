@@ -74,15 +74,13 @@ export default {
   mounted () {
     window.initMap = () => {
       let {lng, lat, title} = this.$route.query
-      console.log('lng, lat, title', lng, lat, title)
       let position = [lng, lat]  // 简写
       this.map = new AMap.Map('map-container')
-      console.log(111)
-      AMap.plugin(['AMap.Geocoder', 'AMap.Driving', 'AMap.Geolocation'],() => { // 异步加载插件
+      AMap.plugin(['AMap.Geocoder', 'AMap.Driving', 'AMap.Geolocation'], () => { // 异步加载插件
         let geocoder = new AMap.Geocoder({
           radius: 1000,
-          extensions: "all"
-        });
+          extensions: 'all'
+        })
         geocoder.getAddress(position, (status, result) => {
           console.log('status', status, result)
           if (status === 'complete' && result.info === 'OK') {
@@ -121,7 +119,7 @@ export default {
                         let endPos = new AMap.LngLat(lng, lat)
                         let driving = new AMap.Driving({
                           map: this.map,
-                          panel: "panel"
+                          panel: 'panel'
                         });
                         // 根据起终点经纬度规划驾车导航路线
                         driving.search(startPos, endPos);
@@ -136,19 +134,19 @@ export default {
             const InfoInstance = Info(result.regeocode.formattedAddress).$mount()
             const InfoDom = InfoInstance.$el
             let infoWindow = new AMap.InfoWindow({
-              isCustom: true,  //使用自定义窗体
-              content: InfoDom,  //传入 dom 对象，或者 html 字符串
+              isCustom: true,  // 使用自定义窗体
+              content: InfoDom,  // 传入 dom 对象，或者 html 字符串
               offset: new AMap.Pixel(16, -50)
-            });
-            infoWindow.open(this.map, marker.getPosition());
+            })
+            infoWindow.open(this.map, marker.getPosition())
           }
-        });
-        geocoder.getLocation('海南省海口市观澜湖新城', function(status, result) {
+        })
+        geocoder.getLocation('海南省海口市观澜湖新城', function (status, result) {
           if (status === 'complete' && result.info === 'OK') {
             console.log('result2', result)
           }
-        });
-      });
+        })
+      })
       this.map.setZoom(13)
       this.map.setCenter(position)
     }

@@ -1,7 +1,7 @@
 <template>
   <div class="ticket-wrapper">
     <div class="ticket-body">
-      <div class="ticket-code-image" :style="{backgroundImage: 'url(' + codeImage + ')'}"></div>
+      <img class="ticket-code-image" :src="codeImage" @load="enAbleDownload" />
       <div class="ticket-tip">请在活动现场出示电子票</div>
       <div class="ticket-status">{{statusText[ticket.status]}}</div>
       <div class="activity-content">
@@ -27,7 +27,7 @@
       </div>
     </div>
     <div class="ticket-attention">
-      <div class="save-ticket" @click="saveCodeImage">保存电子票到相册</div>
+      <div class="save-ticket" :class="{canDownload: canDownload}" @click="downloadIamge('测试下载图片')">保存电子票到相册</div>
       <div class="ticketing-time">出票时间：{{ticket.time}}</div>
       <div class="attention-header">注意事项</div>
       <div class="attention-item">1.请保存电子票，在活动现场向主办方出示</div>
@@ -48,13 +48,15 @@
   export default {
     data () {
       return {
-        codeImage: 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1528464076920&di=98a89a0348db6b4f778d02bdf4dc0ea4&imgtype=0&src=http%3A%2F%2Fsrc.house.sina.com.cn%2Fimp%2Fimp%2Fdeal%2F86%2F68%2F4%2Fe51eac8a98c2bd65c6b68bae86c_p1_mk1_wm35.gif',
+        canDownload: false,
+        codeImage: '/static/测试保存.png',
         ticket: {
           name: '五月二十八号晚八点A类团体套票',
           price: 65,
           time: '2018-01-05 18:56',
           amount: 3,
-          status: 1 // 1表示待验票
+          status: 1, // 1表示待验票
+          downloadImage: '/static/测试保存.png'
         },
         activity: {
           address: '观澜湖新城',
@@ -66,11 +68,40 @@
       }
     },
     methods: {
-      saveCodeImage () { // 保存二维码图片
-        console.log('保存二维码图片')
+      enAbleDownload () {
+        this.canDownload = true
       },
       openFantTuanC () { // 打开范团app或下载
         console.log('打开范团app或下载')
+      },
+      downloadIamge (name) {
+        console.log('触发了保存')
+        let image = new Image()
+        // 解决跨域 Canvas 污染问题
+        image.setAttribute('crossOrigin', 'anonymous')
+        image.onload = function () {
+          let canvas = document.createElement('canvas')
+          canvas.width = image.width
+          canvas.height = image.height
+
+          let context = canvas.getContext('2d')
+          context.drawImage(image, 0, 0, image.width, image.height)
+          let url = canvas.toDataURL('image/png')
+
+          // 生成一个a元素
+          let a = document.createElement('a')
+          // 创建一个单击事件
+          let event = new MouseEvent('click')
+
+          // 将a的download属性设置为我们想要下载的图片名称，若name不存在则使用‘下载图片名称’作为默认名称
+          a.download = name || '下载图片名称'
+          // 将生成的URL设置为a.href属性
+          a.href = url
+          // 触发a的单击事件
+          a.dispatchEvent(event)
+        }
+
+        image.src = this.ticket.downloadImage
       }
     },
     created () {
@@ -83,6 +114,8 @@
       } else { // params无活动id时，尝试从缓存中获取，缓存中也没有时显示获取不到电子票
         ticketId = this.$store.state.activityTicket.ticketId
       }
+      // 使用ticketId
+      console.log(ticketId)
     }
   }
 </script>
@@ -102,6 +135,7 @@
     margin-bottom: 30px;
   }
   .ticket-code-image{
+    display:block;
     width: 300px;
     height: 300px;
     background-position: center;
@@ -109,6 +143,7 @@
     background-repeat:no-repeat;
     margin: 60px auto 0;
     position: relative;
+    -webkit-touch-callout:default;
   }
   .ticket-code-image:before{
     content: "";
@@ -196,11 +231,28 @@
     height: 90px;
     line-height: 90px;
     font-size: 34px;
-    color: #1EB0FD;
+    color: #BBBBBB;
     text-align: center;
     position: relative;
   }
+  .save-ticket.canDownload{
+    color: #1EB0FD;
+  }
   .save-ticket:before{
+    content: "";
+    display: block;
+    width: 200%;
+    height: 200%;
+    position: absolute;
+    left: 0;
+    top: 0;
+    box-sizing: border-box;
+    border: 2px solid #BBBBBB;
+    transform: scale(0.5);
+    transform-origin: 0 0;
+    border-radius: 12px;
+  }
+  .save-ticket.canDownload:before{
     content: "";
     display: block;
     width: 200%;

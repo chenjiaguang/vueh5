@@ -315,10 +315,10 @@ export default {
       this.$router.push({name: 'mapPage', query: { lng: option.lng, lat: option.lat, title: option.title || '' }})
     },
     goOrder () {
-      if (this.BuyStatus.toString() !== '0'){
+      if (this.BuyStatus.toString() !== '0') {
         return false
       }
-      this.$router.push({name: 'ActivityOrder', params: { activityId: 11}})
+      this.$router.push({name: 'ActivityOrder', params: {activityId: 11}})
     },
     changeShowContext () {
       if (!this.showMore) {

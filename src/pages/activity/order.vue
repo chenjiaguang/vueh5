@@ -27,9 +27,13 @@
         <div class="addition-right fr clearfix">
           剩余{{selectedTicket.amount}}张
           <div class="ticket-changer fr">
-            <i class="minus-icon iconfont icon-jian" @click="minus" :style="{color: selectedTicket.putAmount <= 1 ? '#999' : '#333'}"><div class="minus-icon-line"></div></i>
+            <i class="minus-icon iconfont icon-jian" @click="minus" :style="{color: selectedTicket.putAmount <= 1 ? '#999' : '#333'}">
+              <span class="minus-icon-line"></span>
+            </i>
             {{selectedTicket.putAmount}}
-            <i class="add-icon iconfont icon-jia" @click="add" :style="{color: selectedTicket.putAmount >= parseInt(selectedTicket.amount) ? '#999' : '#333'}"><div class="add-icon-line"></div></i>
+            <i class="add-icon iconfont icon-jia" @click="add" :style="{color: selectedTicket.putAmount >= Number(selectedTicket.amount) ? '#999' : '#333'}">
+              <span class="add-icon-line"></span>
+            </i>
           </div>
         </div>
       </div>
@@ -37,31 +41,33 @@
       <div class="user-info">
         <div class="user-info-item clearfix">
           <div class="user-left fl"><i class="require-icon iconfont icon-xinghao"></i>姓名</div>
-          <input class="user-full-input fl" />
+          <input class="user-full-input fl" v-model="form.userInfo.name" />
         </div>
         <div class="user-info-item clearfix">
           <div class="user-left fl"><i class="require-icon iconfont icon-xinghao"></i>手机</div>
-          <input class="phone-input fl" type="number" />
+          <input class="phone-input fl" type="number" v-model="form.userInfo.phone" />
           <div class="get-code-btn fl">获取验证码</div>
         </div>
         <div class="user-info-item clearfix">
           <div class="user-left fl"><i class="require-icon iconfont icon-xinghao"></i>验证码</div>
-          <input class="user-full-input fl" type="number" />
+          <input class="user-full-input fl" type="number" v-model="form.userInfo.code" />
         </div>
         <div class="user-info-item clearfix">
           <div class="user-left fl"><i class="require-icon iconfont icon-xinghao"></i>身份证号</div>
-          <input class="user-full-input fl" type="number" />
+          <input class="user-full-input fl" type="number" v-model="form.userInfo.idCard" />
         </div>
         <div class="user-info-item clearfix">
           <div class="user-left fl"><i class="require-icon iconfont icon-xinghao"></i>性别</div>
-          <div @click="form.userInfo.sex = 1" class="sexual-option fl clearfix"><i class="iconfont fl" :class="{'icon-quanzi': form.userInfo.sex.toString() === '1', 'icon-quan': form.userInfo.sex.toString() === '2'}"></i>男</div>
-          <div @click="form.userInfo.sex = 2" class="sexual-option fl clearfix"><i class="iconfont fl" :class="{'icon-quan': form.userInfo.sex.toString() === '1', 'icon-quanzi': form.userInfo.sex.toString() === '2'}"></i>女</div>
+          <div @click="form.userInfo.sex = 1" class="sexual-option fl clearfix"><i class="iconfont fl" :class="{'icon-quanzi': form.userInfo.sex.toString() === '1', 'icon-quan': form.userInfo.sex.toString() !== '1'}"></i>男</div>
+          <div @click="form.userInfo.sex = 2" class="sexual-option fl clearfix"><i class="iconfont fl" :class="{'icon-quanzi': form.userInfo.sex.toString() === '2', 'icon-quan': form.userInfo.sex.toString() !== '2'}"></i>女</div>
         </div>
       </div>
-      <div class="header pay-header">选择支付方式</div>
-      <div class="pay-way">
-        <div class="pay-way-item clearfix" @click="changePayWay(1)"><i class="iconfont icon-weixinzhifu fl" style="color: #09bb07;"></i>微信支付<i class="iconfont fr" :class="{'icon-gou': form.payWay.toString() === '1', 'icon-quan': form.payWay.toString() === '2'}"></i></div>
-        <div class="pay-way-item clearfix" @click="changePayWay(2)"><i class="iconfont icon-zhifubaozhifu fl" style="color: #00a0e8;"></i>支付宝支付<i class="iconfont fr" :class="{'icon-gou': form.payWay.toString() === '2', 'icon-quan': form.payWay.toString() === '1'}"></i></div>
+      <div class="pay-way-box" v-if="shouldPay && shouldPay.toString() !== '0'">
+        <div class="header pay-header">选择支付方式</div>
+        <div class="pay-way">
+          <div class="pay-way-item clearfix" @click="changePayWay(1)" v-if="form.payWay.toString() === '1'"><i class="iconfont icon-weixinzhifu fl" style="color: #09bb07;"></i>微信支付<i class="iconfont fr" :class="{'icon-gou': form.payWay.toString() === '1', 'icon-quan': form.payWay.toString() === '2'}"></i></div>
+          <div class="pay-way-item clearfix" @click="changePayWay(2)" v-if="form.payWay.toString() === '2'"><i class="iconfont icon-zhifubaozhifu fl" style="color: #00a0e8;"></i>支付宝支付<i class="iconfont fr" :class="{'icon-gou': form.payWay.toString() === '2', 'icon-quan': form.payWay.toString() === '1'}"></i></div>
+        </div>
       </div>
       <div class="agreement-box clearfix" @click.stop="changeAgreement">
         <i class="iconfont fl" style="width: 4.95%" :class="{'icon-gou': form.agreement, 'icon-quan': !form.agreement}"></i>
@@ -71,7 +77,7 @@
     <div class="fixed-button">
       <span style="vertical-align: middle">合计</span>
       <span class="should-pay-amount">&yen;{{shouldPay}}</span>
-      <div @click="goSuccess" class="btn-submit" :style="{backgroundColor: shouldPay.toString() === '0' ? '#bbbbbb' : '#ff3f53'}">确认报名</div>
+      <div @click="orderSubmit" class="btn-submit" :style="{backgroundColor: (shouldPay.toString() === '0' || !form.agreement) ? '#bbbbbb' : '#ff3f53'}">确认报名</div>
     </div>
   </div>
 </template>
@@ -423,6 +429,7 @@
     data () {
       return {
         activity: {
+          id: '676',
           title: '三月不减肥，四月徒伤悲 | 节后甩肉计划第一期 正式启动！羽毛球篇',
           address: '海口市龙华区滨海大道百方大厦15楼b',
           date: '01-03 18:30 至 05-06 18:30',
@@ -464,12 +471,15 @@
             }
           ],
           userInfo: {
-            sex: 1 // 1代表男，2代表女
+            name: '',
+            phone: '',
+            code: '',
+            idCard: '',
+            sex: 0 // 1代表男，2代表女
           },
-          payWay: 1, // 1表示微信支付，2表示支付宝支付
+          payWay: this.$browserUA.isWeixin() ? 1 : 2, // 1表示微信支付，2表示支付宝支付
           agreement: true
-        },
-        toastNum: 5
+        }
       }
     },
     methods: {
@@ -496,6 +506,63 @@
         }
         selected.putAmount += 1
       },
+      startCounting (callback) {
+        if (this.countNum >= 0) { // 还在显示倒计时
+          return false
+        }
+        this.countNum = 59
+        this.timer && clearInterval(this.timer)
+        this.timer = setInterval(() => {
+          let text = '重新获取' + (this.countNum > 9 ? this.countNum : '0' + this.countNum) + ''
+          this.setState({
+            btnText: text
+          })
+          this.countNum -= 1
+          if (this.countNum < 0) {
+            clearInterval(this.timer)
+            this.setState({
+              btnText: '获取验证码'
+            }, () => {
+              callback && callback()
+            })
+          }
+        }, 1000)
+      },
+      sendCode () {
+        let {phone} = this.props
+        if (!/^1[34578][0-9]\d{8}$/.test(phone)) { // 输入的不是手机号
+          this.$toast('请输入正确手机号')
+          return false
+        }
+        let rData = {
+          phone: phone,
+          purpose: 'changePhone'
+        }
+        this.setState({
+          disabledBtn: true
+        })
+        this.$ajax(_Api + '/jv/sms/send', rData).then(res => {
+          // 请求成功
+          if (res && Boolean(res.error) && res.msg) {
+            this.$toast(res.msg)
+            this.setState({
+              disabledBtn: false
+            })
+          } else if (res && !Boolean(res.error)) {
+            this.$toast('验证码已发送，请注意查收')
+            this.startCounting(() => {
+              this.setState({
+                disabledBtn: false
+              })
+            })
+          }
+        }).catch(err => {
+          // 获取失败
+          this.setState({
+            disabledBtn: false
+          })
+        })
+      },
       changePayWay (way) {
         if (this.form.payWay.toString() === way.toString()) {
           return false
@@ -508,6 +575,43 @@
       goAgreement () {
         this.$router.push({path: '/agreement', query: {type: 'activity'}})
       },
+      orderPay (successCallback) {
+        let flat = false
+        if (flat) {
+          successCallback && successCallback()
+        }
+      },
+      completeOrder () { // 完成订单
+        console.log('完成订单')
+      },
+      orderSubmit () { // 验证并提交订单
+        let {selectedTicket} = this
+        let {payWay, agreement, shouldPay} = this.form
+        let {id} = this.activity
+        let {name, phone, code, idCard, sex} = this.form.userInfo
+        let toastObject = {
+          selectedTicket: !selectedTicket && '请选择购买的票',
+          name: !name && '请输入正确的姓名',
+          phone: !phone && '请输入正确的手机号码',
+          code: !code && '请输入正确的验证码',
+          idCard: !idCard && '请输入正确的身份证号',
+          sex: (!sex || sex.toString() === '0') && '请选择你的性别'
+        }
+        if (!(id.toString() && agreement)) { // 活动id必须存在,需同意范团活动参与协议
+          return false
+        }
+        for (let item in toastObject) {
+          if (toastObject[item]) { // 有一项出错，停止提交并提示
+            this.$toast(toastObject[item])
+            return false
+          }
+        }
+        if (shouldPay && shouldPay.toString() !== '0' && payWay && payWay.toString() !== '0') { // 金额不为0时，支付
+          this.orderPay(this.completeOrder)
+        } else { // 金额为零时直接验证
+          this.completeOrder()
+        }
+      },
       goSuccess () {
         this.$router.replace('/activity/success')
       }
@@ -518,7 +622,7 @@
       },
       shouldPay () {
         let selected = this.form.ticket.filter(item => item.selected)[0]
-        return selected && parseFloat((parseFloat(selected.putAmount) * parseFloat(selected.price)).toFixed(2)) || 0
+        return (selected && Number((Number(selected.putAmount) * Number(selected.price)).toFixed(2))) || 0
       }
     }
   }
