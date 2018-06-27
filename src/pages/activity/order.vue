@@ -1,7 +1,7 @@
 <template>
   <div class="activity-detail">
-    <div class="activity-container">
-      <div class="info-container">
+    <div class="activity-container" v-if="activity.id">
+      <div class="info-container" :class="{'no-tags': activity.tags.length === 0}">
         <div class="info-title">{{activity.title}}</div>
         <div class="info-item clearfix">
           <div class="fl left">地点：</div>
@@ -12,12 +12,12 @@
           <div class="fl right">{{activity.date}}</div>
         </div>
       </div>
-      <div class="tag-container clearfix">
+      <div class="tag-container clearfix" v-if="activity.tags && activity.tags.length > 0">
         <div class="fl tag-item" v-for="(item, idx) in activity.tags" :key="idx">{{item}}<div class="tag-border"></div></div>
       </div>
       <div class="color-block"></div>
     </div>
-    <div class="form-wrapper">
+    <div class="form-wrapper" v-if="activity.id">
       <div class="header">选择票种</div>
       <div class="ticket-wrapper clearfix">
         <div class="ticket-item fl" @click="selectTicket(item)" :class="{'disabled-ticket' : !item.amount || item.amount.toString() === '0', 'selected-ticket': item.selected}" v-if="form.ticket && form.ticket[0]" v-for="item in form.ticket" :key="item.id">{{item.name}}</div>
@@ -37,26 +37,26 @@
           </div>
         </div>
       </div>
-      <div class="header">报名人信息</div>
+      <div class="header info-header">报名人信息</div>
       <div class="user-info">
-        <div class="user-info-item clearfix">
+        <div class="user-info-item clearfix" v-if="form.userInfo.needName">
           <div class="user-left fl"><i class="require-icon iconfont icon-xinghao"></i>姓名</div>
           <input class="user-full-input fl" v-model="form.userInfo.name" />
         </div>
         <div class="user-info-item clearfix">
           <div class="user-left fl"><i class="require-icon iconfont icon-xinghao"></i>手机</div>
           <input class="phone-input fl" type="number" v-model="form.userInfo.phone" />
-          <div class="get-code-btn fl">获取验证码</div>
+          <div class="get-code-btn fl" :class="{'get-code-btn-disabled': disabledSend}" @click="!disabledSend && sendCode()">{{btnText}}</div>
         </div>
         <div class="user-info-item clearfix">
           <div class="user-left fl"><i class="require-icon iconfont icon-xinghao"></i>验证码</div>
           <input class="user-full-input fl" type="number" v-model="form.userInfo.code" />
         </div>
-        <div class="user-info-item clearfix">
+        <div class="user-info-item clearfix" v-if="form.userInfo.needIdCard">
           <div class="user-left fl"><i class="require-icon iconfont icon-xinghao"></i>身份证号</div>
           <input class="user-full-input fl" type="number" v-model="form.userInfo.idCard" />
         </div>
-        <div class="user-info-item clearfix">
+        <div class="user-info-item clearfix" v-if="form.userInfo.needSex">
           <div class="user-left fl"><i class="require-icon iconfont icon-xinghao"></i>性别</div>
           <div @click="form.userInfo.sex = 1" class="sexual-option fl clearfix"><i class="iconfont fl" :class="{'icon-quanzi': form.userInfo.sex.toString() === '1', 'icon-quan': form.userInfo.sex.toString() !== '1'}"></i>男</div>
           <div @click="form.userInfo.sex = 2" class="sexual-option fl clearfix"><i class="iconfont fl" :class="{'icon-quanzi': form.userInfo.sex.toString() === '2', 'icon-quan': form.userInfo.sex.toString() !== '2'}"></i>女</div>
@@ -88,12 +88,17 @@
     padding-bottom: 160px;
   }
   .info-container{
-    padding: 0 4%;
+    padding: 0 4% 0;
+  }
+  .info-container.no-tags{
+    padding-bottom: 18px;
   }
   .info-title{
     padding: 26px 0 6px;
     font-size: 32px;
     line-height: 46px;
+    min-height: 92px;
+    box-sizing: content-box;
   }
   .info-item{
     position: relative;
@@ -118,7 +123,7 @@
   .tag-item{
     margin: 6px;
     height: 40px;
-    line-height: 40px;
+    line-height: 42px;
     font-size: 24px;
     color: #666;
     padding: 0 14px;
@@ -155,6 +160,9 @@
     line-height: 44px;
     font-weight: 600;
     padding: 34px 0 40px;
+  }
+  .info-header{
+    padding-bottom: 14px;
   }
   .pay-header{
     padding: 54px 0 20px;
@@ -294,13 +302,16 @@
     line-height: 52px;
   }
   .get-code-btn{
-    width: 29%;
+    width: 32%;
     color: #1EB0FD;
     text-align: center;
     position: relative;
   }
+  .get-code-btn-disabled{
+    color: #999;
+  }
   .phone-input{
-    width: 44.2%;
+    width: 41.2%;
     height: 100%;
     font-size: 32px;
     line-height: 52px;
@@ -429,60 +440,71 @@
     data () {
       return {
         activity: {
-          id: '676',
-          title: '三月不减肥，四月徒伤悲 | 节后甩肉计划第一期 正式启动！羽毛球篇',
-          address: '海口市龙华区滨海大道百方大厦15楼b',
-          date: '01-03 18:30 至 05-06 18:30',
-          tags: ['不可退票', '费用中包含保险', '更多tag', '更多tag', '更多tag', '更多tag']
+          id: '',
+          title: '',
+          address: '',
+          date: '',
+          tags: []
         },
         form: {
-          ticket: [
-            {
-              id: 1,
-              name: 'A类票(单人票)',
-              price: 2,
-              amount: 10,
-              selected: false,
-              putAmount: 1
-            },
-            {
-              id: 2,
-              name: 'B类票(单人票)',
-              price: 2.11,
-              amount: 99,
-              selected: false,
-              putAmount: 1
-            },
-            {
-              id: 3,
-              name: 'B类票(单人票+午饭)不含晚餐宵夜',
-              price: 13.27,
-              amount: 0,
-              selected: false,
-              putAmount: 1
-            },
-            {
-              id: 4,
-              name: 'B类票(单人票+午饭)不含晚餐宵夜',
-              price: 55,
-              amount: 77,
-              selected: false,
-              putAmount: 1
-            }
-          ],
+          ticket: [],
           userInfo: {
+            needName: false,
+            needIdCard: false,
+            needSex: false,
             name: '',
             phone: '',
             code: '',
             idCard: '',
-            sex: 0 // 1代表男，2代表女
+            sex: 0 // 0表示未选，1表示男，2表示女
           },
-          payWay: this.$browserUA.isWeixin() ? 1 : 2, // 1表示微信支付，2表示支付宝支付
+          payWay: 1, // 1表示微信支付，2表示支付宝支付     如果微信内则微信支付，否则支付宝支付:this.$browserUA.isWeixin() ? 1 : 2
           agreement: true
-        }
+        },
+        timer: null,
+        countNum: -1,
+        btnText: '获取验证码',
+        counting: false,
+        submitting: false
       }
     },
     methods: {
+      fetchActivity () {
+        let rData = {
+          id: this.$route.query.id
+        }
+        this.$ajax('/jv/qz/v21/activity', {data: rData}).then(res => { // 获取活动数据
+          this.activity.id = res.data.id
+          this.activity.title = res.data.title
+          this.activity.address = res.data.address_text
+          this.activity.date = res.data.time_text
+          this.activity.deadline = res.data.deadline
+          this.form.ticket = res.data.activity_fees.map((item, idx) => {
+            return {
+              id: item.id,
+              name: item.name,
+              price: item.prices,
+              amount: item.last_num,
+              selected: false,
+              max: item.max,
+              putAmount: 1
+            }
+          })
+          let tagsArr = []
+          if (res.data.insurance) {
+            tagsArr.push('费用中包含保险')
+          }
+          if (!res.data.refund) {
+            tagsArr.push('不可退票')
+          }
+          this.activity.tags = tagsArr
+          this.form.userInfo.needName = res.data.nead_name
+          this.form.userInfo.needIdCard = res.data.nead_idcard
+          this.form.userInfo.needSex = res.data.nead_sex
+        }).catch(err => {
+          console.log('获取数据失败')
+        })
+      },
       selectTicket (item) {
         let currentId = this.selectedTicket ? this.selectedTicket.id : null
         if (item.id === currentId ||  item.amount <= 0) {
@@ -513,23 +535,18 @@
         this.countNum = 59
         this.timer && clearInterval(this.timer)
         this.timer = setInterval(() => {
-          let text = '重新获取' + (this.countNum > 9 ? this.countNum : '0' + this.countNum) + ''
-          this.setState({
-            btnText: text
-          })
+          let text = '重新获取(' + (this.countNum > 9 ? this.countNum : '0' + this.countNum) + ')'
+          this.btnText = text
           this.countNum -= 1
           if (this.countNum < 0) {
             clearInterval(this.timer)
-            this.setState({
-              btnText: '获取验证码'
-            }, () => {
-              callback && callback()
-            })
+            this.btnText = '获取验证码'
+            callback && callback()
           }
         }, 1000)
       },
       sendCode () {
-        let {phone} = this.props
+        let {phone} = this.form.userInfo
         if (!/^1[34578][0-9]\d{8}$/.test(phone)) { // 输入的不是手机号
           this.$toast('请输入正确手机号')
           return false
@@ -538,29 +555,24 @@
           phone: phone,
           purpose: 'changePhone'
         }
-        this.setState({
-          disabledBtn: true
-        })
-        this.$ajax(_Api + '/jv/sms/send', rData).then(res => {
+        this.counting = true
+        let _this = this
+        this.$ajax('/jv/sms/send', {data: rData}).then(res => {
           // 请求成功
+          console.log('发送成功了')
           if (res && Boolean(res.error) && res.msg) {
             this.$toast(res.msg)
-            this.setState({
-              disabledBtn: false
-            })
+            this.counting = false
           } else if (res && !Boolean(res.error)) {
             this.$toast('验证码已发送，请注意查收')
             this.startCounting(() => {
-              this.setState({
-                disabledBtn: false
-              })
+              _this.counting = false
             })
           }
         }).catch(err => {
           // 获取失败
-          this.setState({
-            disabledBtn: false
-          })
+          console.log('发送失败了')
+          _this.counting = false
         })
       },
       changePayWay (way) {
@@ -575,11 +587,18 @@
       goAgreement () {
         this.$router.push({path: '/agreement', query: {type: 'activity'}})
       },
-      orderPay (successCallback) {
-        let flat = false
-        if (flat) {
-          successCallback && successCallback()
+      orderPay (res, successCallback) {
+        if (this.$browserUA.isWeixin()) { // 微信内置浏览器内
+          this.publicAccountPay(res, successCallback)
+        } else {
+          this.otherWebPay(res, successCallback)
         }
+      },
+      otherWebPay (res, successCallback) { // 微信外支付
+        successCallback && successCallback()
+      },
+      publicAccountPay (res, successCallback) { // 微信内支付
+        successCallback && successCallback()
       },
       completeOrder () { // 完成订单
         console.log('完成订单')
@@ -606,11 +625,21 @@
             return false
           }
         }
-        if (shouldPay && shouldPay.toString() !== '0' && payWay && payWay.toString() !== '0') { // 金额不为0时，支付
-          this.orderPay(this.completeOrder)
-        } else { // 金额为零时直接验证
-          this.completeOrder()
+        let rData = {
+
         }
+        this.submitting = true
+        this.$ajax('/activity/order', {data: rData}).then(res => { // 请求后端下单接口,接受返回参数,如果有error,则提示，无error，则判断是否应调起支付
+          this.submitting = false
+          let flag = false // 判断是否需支付,(res返回的参数)
+          if (flag) {
+            this.orderPay(res, this.goSuccess)
+          } else {
+            this.goSuccess()
+          }
+        }).catch(err => {
+          this.submitting = false
+        })
       },
       goSuccess () {
         this.$router.replace('/activity/success')
@@ -623,7 +652,13 @@
       shouldPay () {
         let selected = this.form.ticket.filter(item => item.selected)[0]
         return (selected && Number((Number(selected.putAmount) * Number(selected.price)).toFixed(2))) || 0
+      },
+      disabledSend () {
+        return !/^1[34578][0-9]\d{8}$/.test(this.form.userInfo.phone) || this.counting
       }
+    },
+    created () {
+      this.fetchActivity()
     }
   }
 </script>

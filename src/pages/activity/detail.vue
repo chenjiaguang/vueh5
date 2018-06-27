@@ -2,7 +2,7 @@
   <div class="activity-detail">
     <div class="image-container" :style="{backgroundImage: 'url(' + activity.banner + ')'}"></div>
     <div class="activity-container">
-      <div class="info-container">
+      <div class="info-container" v-if="activity.id">
         <div class="info-title">{{activity.title}}</div>
         <div class="info-item clearfix">
           <div class="fl left">主办方</div>
@@ -11,8 +11,8 @@
         </div>
         <div class="info-item clearfix" @click="activity.address && activity.address.coordinate && goMap(activity.address.coordinate)">
           <div class="fl left">地点</div>
-          <div class="location-text fl" :style="{width: activity.address.coordinate ? '63.76%' : 'auto'}">{{activity.address.title || '线上活动'}}</div>
-          <i class="location-sign fr iconfont icon-location" v-if="activity.address.title && activity.address.coordinate"></i>
+          <div class="location-text fl" :style="{width: activity.address.coordinate ? '63.76%' : 'auto'}">{{activity.address.title}}</div>
+          <i class="location-sign fr iconfont icon-location" v-if="activity.address.title && activity.address.coordinate && activity.address.coordinate.lng && activity.address.coordinate.lat"></i>
         </div>
         <div class="info-item clearfix">
           <div class="fl left">时间</div>
@@ -31,24 +31,25 @@
       <div class="tag-container clearfix">
         <div class="fl tag-item" v-for="(item, idx) in activity.tags" :key="idx">{{item}}<div class="tag-border"></div></div>
       </div>
-      <div ref="contentContainer" class="content-container">
+      <div ref="contentContainer" class="content-container" v-if="activity.content && activity.content.length > 0">
         <div ref="contentHeader" class="header">活动介绍</div>
         <div ref="contentContext" class="content-context">
-          <p>工作两周，假期里养的肉都下去了么？如果没有，那就 来找点乐子吧！ 不想养膘？ 打球去吧！ 不想无所事事？ 打球去吧！</p>
-          <img :src="activity.banner" />
-          <p>羽毛球比赛即将于三月中旬举行，该比赛注重同学们的 身心健康发展，旨在宽阔学生们的业余活动，望大家踊 跃参与。 主办单位：中国工商银行广东省分行 报名时间：近期 比赛时间：三月</p>
+          <template v-for="(item, idx) in activity.content">
+            <p :key="idx" v-if="item.type === '1'">{{item.content}}</p>
+            <img :key="idx" v-else-if="item.type === '2'" :src="item.content.image" />
+          </template>
         </div>
-        <div ref="contentBtn" class="show-hide-btn" @click="changeShowContext"><span class="show-hide-text">{{showMore ? '收起' : '查看更多图文详情'}}<i class="pull-sign iconfont icon-pull_down" :style="{transform: showMore ? 'scale(0.25) rotate(180deg)' : 'scale(0.25) rotate(0)'}"></i></span></div>
+        <div v-if="contentWrapperHeight && contentWrapperHeight > halfScreenHeight" ref="contentBtn" class="show-hide-btn" @click="changeShowContext"><span class="show-hide-text">{{showMore ? '收起' : '查看更多图文详情'}}<i class="pull-sign iconfont icon-pull_down" :style="{transform: showMore ? 'scale(0.25) rotate(180deg)' : 'scale(0.25) rotate(0)'}"></i></span></div>
       </div>
     </div>
-    <div class="join-wrapper">
+    <div class="join-wrapper" v-if="activity.join && activity.join.length > 0">
       <div class="color-block"></div>
       <div class="join-header">已经报名的小伙伴({{activity.join.length}})</div>
       <div class="join-partner clearfix">
-        <div class="join-avatar fl" v-for="(item, idx) in activity.join" :key="idx" :style="{backgroundImage: 'url(' + item + ')'}"></div>
+        <div class="join-avatar fl" v-for="(item, idx) in activity.join" :key="item.uid" :style="{backgroundImage: 'url(' + item.avatar + ')'}"></div>
       </div>
     </div>
-    <div @click="goOrder" class="fixed-button" :style="{backgroundColor: BuyStatus.toString() === '0' ? '#ff3f53' : '#bbbbbb'}">{{submitBtnText[BuyStatus.toString()]}}</div>
+    <div @click="goOrder" class="fixed-button" :style="{backgroundColor: activity.statusText === '购票' ? '#ff3f53' : '#bbbbbb'}">{{activity.statusText}}</div>
   </div>
 </template>
 
@@ -72,7 +73,7 @@
     background-repeat: no-repeat;
   }
   .info-container, .content-container{
-    padding: 0 4%;
+    padding: 30px 4% 0;
   }
   .location-text, .sponsor-text{
     overflow: hidden;
@@ -91,11 +92,8 @@
     font-size:28px;
     line-height: 46px;
     position: relative;
-    padding-bottom:84px;
     overflow: hidden;
-    transition: height 500ms;
-    box-sizing: border-box;
-    height: 700px;
+    transition: height 300ms;
   }
   .info-title{
     padding: 26px 0 38px;
@@ -131,13 +129,13 @@
     color: #ff3f53;
   }
   .tag-container{
-    margin: 0 24px 90px;
+    margin: 0 24px 0;
     padding: 24px 0;
   }
   .tag-item{
     margin: 6px;
     height: 40px;
-    line-height: 40px;
+    line-height: 42px;
     font-size: 24px;
     color: #666;
     padding: 0 14px;
@@ -163,7 +161,7 @@
   .content-context img{
     display: block;
     margin: 21px 0;
-    max-width: 100%;
+    width: 100%;
   }
   .show-hide-btn{
     width: 92%;
@@ -190,6 +188,7 @@
     background-color: #e5e5e5;
   }
   .show-hide-text{
+    display: inline-block;
     position: relative;
     padding-right:35px;
   }
@@ -197,7 +196,7 @@
     position: absolute;
     right: 0;
     top: 50%;
-    margin-top: -36px;
+    margin-top: -38px;
     margin-right: -24px;
     display: block;
     width: 72px;
@@ -206,7 +205,7 @@
     font-size:72px;
     color: #333;
     transform-origin: 50% 50%;
-    transition: all 500ms;
+    transition: all 300ms;
 
   }
   .join-partner{
@@ -245,10 +244,6 @@
     left: 0;
     bottom: 0;
   }
-  #map-container {width:300px; height: 180px; display: none}
-  #map-container.show{
-    display: block;
-  }
 </style>
 
 <script>
@@ -258,84 +253,119 @@ export default {
   data () {
     return {
       activity: {
-        banner: 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1528197427182&di=60534aa9b92ce3b295cc8ce42acbcd3f&imgtype=0&src=http%3A%2F%2Fimg.zcool.cn%2Fcommunity%2F0158d9594a60f2a8012193a3624461.jpg%401280w_1l_2o_100sh.jpg',
-        title: '三月不减肥，四月徒伤悲 | 节后甩肉计划第一期 正式启动！羽毛球篇',
+        id: '',
+        banner: '',
+        title: '',
         sponsor: { // 主办方
-          name: '海口禹讯信息技术有限公司',
-          tel: 17508959493
+          name: '',
+          tel: ''
         },
         address: {
-          title: '海口市龙华区滨海大道百方大厦15楼b',
+          title: '',
           coordinate: {
-            lng: 110.33283799999998,
-            lat: 19.913631,
-            title: '北京'
+            lng: '',
+            lat: ''
           }
         },
-        date: '01-03 18:30 至 05-06 18:30',
-        cost: 0,
-        deadline: '02-15 18:30',
-        tags: ['不可退票', '费用中包含保险', '更多tag', '更多tag', '更多tag', '更多tag'],
-        join: [
-          'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1528197427182&di=60534aa9b92ce3b295cc8ce42acbcd3f&imgtype=0&src=http%3A%2F%2Fimg.zcool.cn%2Fcommunity%2F0158d9594a60f2a8012193a3624461.jpg%401280w_1l_2o_100sh.jpg',
-          'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1528197427182&di=60534aa9b92ce3b295cc8ce42acbcd3f&imgtype=0&src=http%3A%2F%2Fimg.zcool.cn%2Fcommunity%2F0158d9594a60f2a8012193a3624461.jpg%401280w_1l_2o_100sh.jpg',
-          'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1528197427182&di=60534aa9b92ce3b295cc8ce42acbcd3f&imgtype=0&src=http%3A%2F%2Fimg.zcool.cn%2Fcommunity%2F0158d9594a60f2a8012193a3624461.jpg%401280w_1l_2o_100sh.jpg',
-          'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1528197427182&di=60534aa9b92ce3b295cc8ce42acbcd3f&imgtype=0&src=http%3A%2F%2Fimg.zcool.cn%2Fcommunity%2F0158d9594a60f2a8012193a3624461.jpg%401280w_1l_2o_100sh.jpg',
-          'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1528197427182&di=60534aa9b92ce3b295cc8ce42acbcd3f&imgtype=0&src=http%3A%2F%2Fimg.zcool.cn%2Fcommunity%2F0158d9594a60f2a8012193a3624461.jpg%401280w_1l_2o_100sh.jpg',
-          'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1528197427182&di=60534aa9b92ce3b295cc8ce42acbcd3f&imgtype=0&src=http%3A%2F%2Fimg.zcool.cn%2Fcommunity%2F0158d9594a60f2a8012193a3624461.jpg%401280w_1l_2o_100sh.jpg',
-          'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1528197427182&di=60534aa9b92ce3b295cc8ce42acbcd3f&imgtype=0&src=http%3A%2F%2Fimg.zcool.cn%2Fcommunity%2F0158d9594a60f2a8012193a3624461.jpg%401280w_1l_2o_100sh.jpg',
-          'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1528197427182&di=60534aa9b92ce3b295cc8ce42acbcd3f&imgtype=0&src=http%3A%2F%2Fimg.zcool.cn%2Fcommunity%2F0158d9594a60f2a8012193a3624461.jpg%401280w_1l_2o_100sh.jpg',
-          'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1528197427182&di=60534aa9b92ce3b295cc8ce42acbcd3f&imgtype=0&src=http%3A%2F%2Fimg.zcool.cn%2Fcommunity%2F0158d9594a60f2a8012193a3624461.jpg%401280w_1l_2o_100sh.jpg',
-          'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1528197427182&di=60534aa9b92ce3b295cc8ce42acbcd3f&imgtype=0&src=http%3A%2F%2Fimg.zcool.cn%2Fcommunity%2F0158d9594a60f2a8012193a3624461.jpg%401280w_1l_2o_100sh.jpg',
-          'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1528197427182&di=60534aa9b92ce3b295cc8ce42acbcd3f&imgtype=0&src=http%3A%2F%2Fimg.zcool.cn%2Fcommunity%2F0158d9594a60f2a8012193a3624461.jpg%401280w_1l_2o_100sh.jpg',
-          'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1528197427182&di=60534aa9b92ce3b295cc8ce42acbcd3f&imgtype=0&src=http%3A%2F%2Fimg.zcool.cn%2Fcommunity%2F0158d9594a60f2a8012193a3624461.jpg%401280w_1l_2o_100sh.jpg',
-          'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1528197427182&di=60534aa9b92ce3b295cc8ce42acbcd3f&imgtype=0&src=http%3A%2F%2Fimg.zcool.cn%2Fcommunity%2F0158d9594a60f2a8012193a3624461.jpg%401280w_1l_2o_100sh.jpg',
-          'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1528197427182&di=60534aa9b92ce3b295cc8ce42acbcd3f&imgtype=0&src=http%3A%2F%2Fimg.zcool.cn%2Fcommunity%2F0158d9594a60f2a8012193a3624461.jpg%401280w_1l_2o_100sh.jpg',
-          'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1528197427182&di=60534aa9b92ce3b295cc8ce42acbcd3f&imgtype=0&src=http%3A%2F%2Fimg.zcool.cn%2Fcommunity%2F0158d9594a60f2a8012193a3624461.jpg%401280w_1l_2o_100sh.jpg',
-          'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1528197427182&di=60534aa9b92ce3b295cc8ce42acbcd3f&imgtype=0&src=http%3A%2F%2Fimg.zcool.cn%2Fcommunity%2F0158d9594a60f2a8012193a3624461.jpg%401280w_1l_2o_100sh.jpg',
-          'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1528197427182&di=60534aa9b92ce3b295cc8ce42acbcd3f&imgtype=0&src=http%3A%2F%2Fimg.zcool.cn%2Fcommunity%2F0158d9594a60f2a8012193a3624461.jpg%401280w_1l_2o_100sh.jpg'
-        ]
+        date: '',
+        cost: '',
+        deadline: '',
+        tags: [],
+        join: [],
+        statusText: '',
+        ticket: []
       },
       showMore: false, // 显示更多
       contentWrapperHeight: null,
-      submitBtnText: {
-        0: '购票',
-        1: '已停止购票',
-        2: '活动已下线',
-        3: '票已售罄'
-      },
-      BuyStatus: 0 // 0 可购买
+      halfScreenHeight: parseInt(window.innerHeight * 0.5),
     }
   },
   methods: {
+    fetchActivity () {
+      let rData = {
+        id: this.$route.query.id
+      }
+      this.$ajax('/jv/qz/v21/activity', {data: rData}).then(res => { // 获取活动数据
+        this.activity.id = res.data.id
+        this.activity.banner = res.data.covers[0].compress
+        let largeBanner = new Image()
+        largeBanner.src = res.data.covers[0].url
+        largeBanner.onload = () => {
+          this.activity.banner = res.data.covers[0].url
+        }
+        this.activity.title = res.data.title
+        this.activity.sponsor.name = res.data.oid
+        this.activity.sponsor.tel = res.data.phone
+        this.activity.address.title = res.data.address_text
+        this.activity.address.coordinate.lng = res.data.longitude
+        this.activity.address.coordinate.lat = res.data.latitude
+        this.activity.date = res.data.time_text
+        this.activity.cost = res.data.money
+        this.activity.deadline = res.data.deadline
+        this.activity.content = res.data.content.filter(item => item.type.toString() !== '0').map(item => {
+          return {
+            type: item.type,
+            content: item.type.toString() === '1' ? item.content : {
+              image: item.imageUrl,
+              description: item.des
+            },
+            width: item.width,
+            height: item.height
+          }
+        })
+        this.activity.join = res.data.joined_users
+        this.activity.statusText = res.data.status_text
+        let tagsArr = []
+        if (res.data.insurance) {
+          tagsArr.push('费用中包含保险')
+        }
+        if (!res.data.refund) {
+          tagsArr.push('不可退票')
+        }
+        this.activity.tags = tagsArr
+      }).catch(err => {
+        console.log('获取数据失败')
+      })
+    },
     goMap (option) { // option: lng, lat, title
+      console.log('goMap', option)
       if (!option.lng || !option.lat) { // 未传入经纬度则返回
         return false
       }
       this.$router.push({name: 'mapPage', query: { lng: option.lng, lat: option.lat, title: option.title || '' }})
     },
     goOrder () {
-      if (this.BuyStatus.toString() !== '0') {
-        return false
-      }
-      this.$router.push({name: 'ActivityOrder', params: {activityId: 11}})
+//      if (this.activity.statusText !== '购票') {
+//        return false
+//      }
+      this.$router.push({name: 'ActivityOrder', query: {id: this.$route.query.id}})
     },
     changeShowContext () {
       if (!this.showMore) {
-        let wrapperHeight = this.$refs['contentContainer'].offsetHeight
         let headerHeight = this.$refs['contentHeader'].offsetHeight
         let contentHeight = this.$refs['contentContext'].offsetHeight
         let btnHeight = this.$refs['contentBtn'].offsetHeight
         this.$refs['contentContainer'].style.height = headerHeight + contentHeight + btnHeight + 'px'
         this.showMore = true
-        if (this.contentWrapperHeight) {
-          return false
-        }
-        this.contentWrapperHeight = wrapperHeight
       } else {
         this.$refs['contentContainer'].style.height = this.contentWrapperHeight + 'px'
         this.showMore = false
       }
+    }
+  },
+  created () {
+    this.fetchActivity()
+  },
+  updated () {
+    if (!this.$refs['contentContainer']) {
+      return false
+    }
+    let wrapperHeight = this.$refs['contentContainer'].offsetHeight
+    if (!this.contentWrapperHeight) {
+      this.contentWrapperHeight = wrapperHeight
+    }
+    if (wrapperHeight > this.halfScreenHeight && !this.showMore) { // 大于半屏且处于隐藏状态
+      this.$refs['contentContainer'].style.height = this.halfScreenHeight + 'px'
     }
   }
 }

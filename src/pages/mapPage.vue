@@ -30,7 +30,7 @@ export default {
     }
   },
   methods: {
-    showMap (lng, lat, title) {
+    showMap (lng, lat) {
       if (!this.map) { // 未初始化完成时不能调用地图相关api
         return false
       }
@@ -38,8 +38,7 @@ export default {
       this.map.setCenter(position)
       // 将创建的点标记添加到已有的地图实例：
       let marker = new AMap.Marker({
-        position: new AMap.LngLat(lng, lat), // 经纬度对象，也可以是经纬度构成的一维数组[116.39, 39.9]
-        title: title || 'title'
+        position: new AMap.LngLat(lng, lat) // 经纬度对象，也可以是经纬度构成的一维数组[116.39, 39.9]
       })
       this.map.add(marker)
       this.show = !this.show

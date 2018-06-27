@@ -1,14 +1,16 @@
 import axios from 'axios'
 
+axios.defaults.method = 'post'
 axios.interceptors.request.use(function (config) {
   if (!config.data) config.data = {}
   // 在发送请求之前做些什么
   if (config.data instanceof FormData) {
-    config.data.append('token', window.localStorage.token || '')
+    config.data.append('token', config.data.token || window.localStorage.token || '')
   } else {
     config.data = JSON.parse(JSON.stringify(config.data))
     config.data.token = config.data.token || window.localStorage.token || ''
   }
+  config.headers.token = 'lcaKiq5GIC_FHqubOBcI6FUKaL8N171U'
   return config
 }, function (error) {
   // 对请求错误做些什么
@@ -21,16 +23,12 @@ axios.interceptors.response.use(function (res) {
     window.localStorage.token = ''
     window.location.reload()
   }
-  // if (res.data.error && res.data.error.toString() !== '403') {
-  //   window.alert(res.data.msg)
-  // }
   // 如果用于下载文件时，返回整个对象，否则直接返回对象的数据部分
-  // if (res.config.responseType === 'blob') {
-  //   return res
-  // } else {
-  //   return res.data
-  // }
-  return res
+  if (res.config.responseType === 'blob') {
+    return res
+  } else {
+    return res.data
+  }
 }, function (error) {
   // 对响应错误做点什么
   window.alert(error.message)

@@ -10,7 +10,11 @@ module.exports = {
     // Paths
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
-    proxyTable: {},
+    proxyTable: [{
+      context: ['/jv', '/login', '/logout', 'uimage', '/upload', '/article', '/news', '/default', '/circle', '/dynamic', '/manager', '/user', '/check', '/special'],
+      target: 'http://fanttest.fantuanlife.com',
+      changeOrigin: true
+    }],
 
     // Various Dev Server settings
     host: '0.0.0.0', // can be overwritten by process.env.HOST
