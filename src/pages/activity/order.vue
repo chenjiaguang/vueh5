@@ -553,7 +553,7 @@
         }
         let rData = {
           phone: phone,
-          purpose: 'changePhone'
+          purpose: 'normal'
         }
         this.counting = true
         let _this = this
@@ -607,14 +607,14 @@
         let {selectedTicket} = this
         let {payWay, agreement, shouldPay} = this.form
         let {id} = this.activity
-        let {name, phone, code, idCard, sex} = this.form.userInfo
+        let {name, needName, phone, code, idCard, needIdCard, sex, needSex} = this.form.userInfo
         let toastObject = {
           selectedTicket: !selectedTicket && '请选择购买的票',
-          name: !name && '请输入正确的姓名',
+          name: !name && needName && '请输入正确的姓名',
           phone: !phone && '请输入正确的手机号码',
           code: !code && '请输入正确的验证码',
-          idCard: !idCard && '请输入正确的身份证号',
-          sex: (!sex || sex.toString() === '0') && '请选择你的性别'
+          idCard: !idCard && needIdCard && '请输入正确的身份证号',
+          sex: (!sex || sex.toString() === '0') && needSex && '请选择你的性别'
         }
         if (!(id.toString() && agreement)) { // 活动id必须存在,需同意范团活动参与协议
           return false
@@ -626,10 +626,35 @@
           }
         }
         let rData = {
-
+          aid: this.$route.query.id,
+          feeId: selectedTicket.id,
+          num: selectedTicket.putAmount,
+          name: name,
+          sex: sex,
+          idCard: idCard,
+          phone: phone
         }
         this.submitting = true
-        this.$ajax('/activity/order', {data: rData}).then(res => { // 请求后端下单接口,接受返回参数,如果有error,则提示，无error，则判断是否应调起支付
+        this.$ajax('/jv/qz/v21/apply', {data: rData}).then(res => { // 请求后端下单接口,接受返回参数,如果有error,则提示，无error，则判断是否应调起支付
+          console.log('applyres', res)
+          this.applySuccess(res)
+          return false
+          this.submitting = false
+          let flag = false // 判断是否需支付,(res返回的参数)
+          if (flag) {
+            this.orderPay(res, this.goSuccess)
+          } else {
+            this.goSuccess()
+          }
+        }).catch(err => {
+          this.submitting = false
+        })
+      },
+      applySuccess (res) {
+        console.log('applyres', res)
+        this.$ajax('/jv/qz/v21/activity/weixin/JSAPI/pay/' + res.data.checkcode, {method: 'get'}).then(res => {
+          console.log('applySuccessres', res)
+          return false
           this.submitting = false
           let flag = false // 判断是否需支付,(res返回的参数)
           if (flag) {
