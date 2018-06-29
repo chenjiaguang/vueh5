@@ -651,20 +651,7 @@
         })
       },
       applySuccess (res) {
-        console.log('applyres', res)
-        this.$ajax('/jv/qz/v21/activity/weixin/JSAPI/pay/' + res.data.checkcode, {method: 'get'}).then(res => {
-          console.log('applySuccessres', res)
-          return false
-          this.submitting = false
-          let flag = false // 判断是否需支付,(res返回的参数)
-          if (flag) {
-            this.orderPay(res, this.goSuccess)
-          } else {
-            this.goSuccess()
-          }
-        }).catch(err => {
-          this.submitting = false
-        })
+        this.$ajax('/jv/qz/v21/activity/weixin/JSAPI/pay/' + res.data.checkcode, {method: 'get'})
       },
       goSuccess () {
         this.$router.replace('/activity/success')
@@ -683,6 +670,7 @@
       }
     },
     created () {
+
       this.fetchActivity()
     }
   }
