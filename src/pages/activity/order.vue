@@ -651,11 +651,11 @@
         })
       },
       applySuccess (res) {
-        window.location.href = '/jv/qz/v21/activity/weixin/JSAPI/pay/' + res.data.checkcode
-        return false
         this.$ajax('/jv/qz/v21/activity/weixin/JSAPI/pay/' + res.data.checkcode, {method: 'get'}).then(res => {
+          alert('成功')
           console.log('第二步成功', res)
         }).catch(err => {
+          alert('失败')
           console.log('第二步失败', err)
         })
       },
