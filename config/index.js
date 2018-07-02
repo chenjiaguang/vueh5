@@ -8,7 +8,7 @@ module.exports = {
   dev: {
 
     // Paths
-    assetsSubDirectory: 'cwebassets',
+    assetsSubDirectory: 'static',
     assetsPublicPath: './',
     proxyTable: [{
       context: ['/jv', '/login', '/logout', 'uimage', '/upload', '/article', '/news', '/default', '/circle', '/dynamic', '/manager', '/user', '/check', '/special'],
@@ -53,7 +53,7 @@ module.exports = {
 
     // Paths
     assetsRoot: path.resolve(__dirname, '../dist'),
-    assetsSubDirectory: 'cwebassets',
+    assetsSubDirectory: 'static',
     assetsPublicPath: './',
 
     /**
