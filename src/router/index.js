@@ -68,7 +68,7 @@ const router = new Router({
   ],
   hashbang: false,
   history: true,
-  mode: 'history'
+  mode: 'hash'
 })
 
 router.beforeEach((to, from, next) => {

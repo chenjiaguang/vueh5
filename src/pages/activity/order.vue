@@ -651,7 +651,11 @@
         })
       },
       applySuccess (res) {
-        this.$ajax('/jv/qz/v21/activity/weixin/JSAPI/pay/' + res.data.checkcode, {method: 'get'})
+        this.$ajax('/jv/qz/v21/activity/weixin/JSAPI/pay/' + res.data.checkcode, {method: 'get'}).then(res => {
+          console.log('第二步成功', res)
+        }).catch(err => {
+          console.log('第二步失败', err)
+        })
       },
       goSuccess () {
         this.$router.replace('/activity/success')
