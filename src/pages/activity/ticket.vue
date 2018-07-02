@@ -49,14 +49,14 @@
     data () {
       return {
         canDownload: false,
-        codeImage: '/static/测试保存.png',
+        codeImage: '/cwebassets/测试保存.png',
         ticket: {
           name: '五月二十八号晚八点A类团体套票',
           price: 65,
           time: '2018-01-05 18:56',
           amount: 3,
           status: 1, // 1表示待验票
-          downloadImage: '/static/测试保存.png'
+          downloadImage: '/cwebassets/测试保存.png'
         },
         activity: {
           address: '观澜湖新城',
