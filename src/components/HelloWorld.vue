@@ -94,7 +94,7 @@ export default {
   methods: {
     goActivity () {
       console.log('goActivity')
-      this.$router.push('/activity/detail')
+      this.$router.push({name: 'ActivityDetail', query: {id: 20}})
     }
   }
 }

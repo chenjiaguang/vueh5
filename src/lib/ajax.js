@@ -21,7 +21,6 @@ axios.interceptors.response.use(function (res) {
   // 如果返回403错误，则清空登录状态
   if (res.data.error && res.data.error.toString() === '403') {
     window.localStorage.token = ''
-    window.location.reload()
   }
   // 如果用于下载文件时，返回整个对象，否则直接返回对象的数据部分
   if (res.config.responseType === 'blob') {

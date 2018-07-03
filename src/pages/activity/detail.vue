@@ -285,7 +285,7 @@ export default {
       let rData = {
         id: this.$route.query.id
       }
-      this.$ajax('/jv/qz/v21/activity', {data: rData}).then(res => { // 获取活动数据
+      this.$ajax('/jv/anonymous/qz/v21/activity', {data: rData}).then(res => { // 获取活动数据
         this.activity.id = res.data.id
         this.activity.banner = res.data.covers[0].compress
         let largeBanner = new Image()

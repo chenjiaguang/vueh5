@@ -473,7 +473,7 @@
         let rData = {
           id: this.$route.query.id
         }
-        this.$ajax('/jv/qz/v21/activity', {data: rData}).then(res => { // 获取活动数据
+        this.$ajax('/jv/anonymous/qz/v21/activity', {data: rData}).then(res => { // 获取活动数据
           this.activity.id = res.data.id
           this.activity.title = res.data.title
           this.activity.address = res.data.address_text
@@ -636,27 +636,27 @@
         }
         this.submitting = true
         this.$ajax('/jv/qz/v21/apply', {data: rData}).then(res => { // 请求后端下单接口,接受返回参数,如果有error,则提示，无error，则判断是否应调起支付
-          console.log('applyres', res)
-          this.applySuccess(res)
-          return false
           this.submitting = false
-          let flag = false // 判断是否需支付,(res返回的参数)
-          if (flag) {
-            this.orderPay(res, this.goSuccess)
-          } else {
-            this.goSuccess()
+          console.log('orderSubmit', res)
+          if (res && Boolean(res.error) && res.msg) {
+            this.$toast(res.msg)
+          } else if (res && !Boolean(res.error)) {
+            if (res.data && res.data.needToPlay) {
+              if (typeof WeixinJSBridge == "undefined") { // 不允许调用微信公众号支付,其他浏览器
+                console.log('ressss', res)
+              } else { // 允许调用微信公众号支付,微信浏览器
+                let _href = 'http://fanttest.fantuanlife.com/jv/qz/v21/activity/weixin/JSAPI/pay/' + res.data.checkcode
+                window.location.href = _href
+              }
+              
+              return false
+              this.orderPay(res, this.goSuccess)
+            } else {
+              this.goSuccess()
+            }
           }
         }).catch(err => {
           this.submitting = false
-        })
-      },
-      applySuccess (res) {
-        this.$ajax('/jv/qz/v21/activity/weixin/JSAPI/pay/' + res.data.checkcode, {method: 'get'}).then(res => {
-          alert('成功')
-          console.log('第二步成功', res)
-        }).catch(err => {
-          alert('失败')
-          console.log('第二步失败', err)
         })
       },
       goSuccess () {
@@ -676,7 +676,6 @@
       }
     },
     created () {
-
       this.fetchActivity()
     }
   }

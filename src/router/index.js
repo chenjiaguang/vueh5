@@ -3,6 +3,7 @@ import Router from 'vue-router'
 import HelloWorld from '@/components/HelloWorld'
 import ActivityDetail from '@/pages/activity/detail'
 import ActivityOrder from '@/pages/activity/order'
+import WebPay from '@/pages/activity/webPay'
 import ActivitySuccess from '@/pages/activity/success'
 import ActivityTicket from '@/pages/activity/ticket'
 import MapPage from '@/pages/mapPage'
@@ -19,7 +20,7 @@ const router = new Router({
     },
     {
       path: '/activity/detail',
-      name: 'activityDetail',
+      name: 'ActivityDetail',
       component: ActivityDetail,
       meta: {
         title: '范团活动'
@@ -31,6 +32,14 @@ const router = new Router({
       component: ActivityOrder,
       meta: {
         title: '提交订单'
+      }
+    },
+    {
+      path: '/webPay', // 微信外h5支付回调页面
+      name: 'WebPay',
+      component: WebPay,
+      meta: {
+        title: '订单支付'
       }
     },
     {

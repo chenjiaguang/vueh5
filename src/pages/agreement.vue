@@ -4,6 +4,7 @@
 
 <style scoped>
   .agreement-wrapper{
+    background: red;
     width: 100%;
     height: auto;
     box-sizing: border-box;

@@ -41,13 +41,18 @@
       有范又有趣的海南生活圈
       <div class="open-btn" @click="openFantTuanC">立即打开</div>
     </div>
+    <weixin :show="showWeixinTip" @changeShow="showHideTip" />
   </div>
 </template>
 
 <script>
+import download from '@/lib/download.js'
+import Weixin from '@/components/Weixin.vue'
+import Vue from 'vue';
   export default {
     data () {
       return {
+        showWeixinTip: false,
         canDownload: false,
         codeImage: '/cwebassets/测试保存.png',
         ticket: {
@@ -67,12 +72,23 @@
         }
       }
     },
+    components: { Weixin },
     methods: {
       enAbleDownload () {
         this.canDownload = true
       },
       openFantTuanC () { // 打开范团app或下载
         console.log('打开范团app或下载')
+        let browserInfo = download.browserInfo()
+        if (browserInfo.isWeixin) { // 微信内置浏览器
+          this.showWeixinTip = true
+        } else {
+          download.click()
+        }
+        this.showWeixinTip = true
+      },
+      showHideTip () {
+        this.showWeixinTip = !this.showWeixinTip
       },
       downloadIamge (name) {
         console.log('触发了保存')
