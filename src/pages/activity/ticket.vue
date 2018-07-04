@@ -83,7 +83,6 @@ import Vue from 'vue';
         } else {
           download.click()
         }
-        this.showWeixinTip = true
       },
       showHideTip () {
         this.showWeixinTip = !this.showWeixinTip
