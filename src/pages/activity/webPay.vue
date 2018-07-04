@@ -1,13 +1,14 @@
 <template>
-  <keep-alive>
-    <div class="success-wrapper">
-      <i class="success-icon iconfont icon-success"></i>
-      <div class="success-header">测试支付页面</div>
-      <div v-for="(value, key) in query" :key="key">
-        {{ key }}: {{ value }}
-      </div>
+  <div class="success-wrapper" v-if="query.from === 'MWEB' || (query.from === 'JSAPI' && payResult !== 'SUCCESS')">
+    <i class="success-icon iconfont icon-success"></i>
+    <div class="success-header">请确认是否完成支付</div>
+    <div @click="complete" class="complete-btn">已完成支付</div>
+    <div @click="rePay">未完成，重新支付</div>
+    <div>客服电话：<a href="tel:4006806307">400-680-6307</a></div>
+    <div v-for="(value, key) in query" :key="key">
+      {{ key }}: {{ value }}
     </div>
-  </keep-alive>
+  </div>
 </template>
 
 <script>
@@ -15,6 +16,50 @@
     data () {
       return {
         query: this.$route.query
+      }
+    },
+    methods: {
+      rePay () { // 重新支付
+        if (typeof WeixinJSBridge == "undefined") { // 不允许调用微信公众号支付,其他浏览器
+          let _rData = {
+            checkcode: this.$route.query.checkcode,
+            payType: '1',
+            tradeType: 'MWEB'
+          }
+          this.$ajax('/jv/qz/v21/activity/pay', {data: _rData}).then(res => {
+            console.log('微信外h5 res', res)
+            if (res && Boolean(res.error) && res.msg) {
+              this.$toast(res.msg)
+            } else if (res && !Boolean(res.error)) { // _todo 商家存在未配置的参数,请联系商家解决
+              let _href = res.data.mweb_url
+              window.location.href = _href
+            }
+          }).catch(err => {
+            console.log('微信外h5 err', err)
+          })
+        } else { // 允许调用微信公众号支付,微信浏览器
+          let _href = 'http://fanttest.fantuanlife.com/jv/qz/v21/activity/weixin/JSAPI/pay/' + this.$route.query.checkcode
+          window.location.href = _href
+        }
+      },
+      complete () { // 完成订单，跳转票据二维码页面
+        this.$router.replace({name: 'ActivitySuccess', query: {checkcode: this.$route.query.checkcode}})
+      }
+    },
+    created () {
+      let {from, payResult, checkcode} = this.$route.query // from: JSAPI(微信公众号支付)、MWEB(微信h5支付)、APP（微信app支付）
+      if (from === 'JSAPI') { // 微信公众号支付
+        if (payResult === 'FAIL' || payResult === 'CANCEL') { // 未完成支付的逻辑,支付失败时提示，用户取消则不做任何提示
+          payResult === 'FAIL' && this.$toast('未完成支付')
+        } else if (payResult === 'SUCCESS') { // 完成支付立即跳转成功页面
+          this.complete()
+        }
+      } else if (from === 'MWEB') { // 微信h5支付，不做任何操作
+        if (payResult === 'SUCCESS') {
+          this.complete()
+        }
+      } else if (from === 'APP') { // 微信app支付，不做任何操作
+
       }
     }
   }
@@ -42,4 +87,15 @@
       text-align: center;
     }
   }
+  .complete-btn{
+      width: 80%;
+      height: 80px;
+      line-height: 80px;
+      font-size: 30px;
+      color: #fff;
+      background-color: #1EB0FD;
+      border-radius: 6px;
+      text-align: center;
+      margin: 0 auto;
+    }
 </style>

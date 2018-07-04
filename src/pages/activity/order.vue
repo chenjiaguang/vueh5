@@ -643,7 +643,22 @@
           } else if (res && !Boolean(res.error)) {
             if (res.data && res.data.needToPlay) {
               if (typeof WeixinJSBridge == "undefined") { // 不允许调用微信公众号支付,其他浏览器
-                console.log('ressss', res)
+                let _rData = {
+                  checkcode: res.data.checkcode,
+                  payType: '1',
+                  tradeType: 'MWEB'
+                }
+                this.$ajax('/jv/qz/v21/activity/pay', {data: _rData}).then(res => {
+                  console.log('微信外h5 res', res)
+                  if (res && Boolean(res.error) && res.msg) {
+                    this.$toast(res.msg)
+                  } else if (res && !Boolean(res.error)) { // _todo 商家存在未配置的参数,请联系商家解决
+                    let _href = res.data.mweb_url
+                    window.location.href = _href
+                  }
+                }).catch(err => {
+                  console.log('微信外h5 err', err)
+                })
               } else { // 允许调用微信公众号支付,微信浏览器
                 let _href = 'http://fanttest.fantuanlife.com/jv/qz/v21/activity/weixin/JSAPI/pay/' + res.data.checkcode
                 window.location.href = _href
