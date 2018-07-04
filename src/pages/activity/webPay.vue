@@ -32,14 +32,14 @@
               this.$toast(res.msg)
             } else if (res && !Boolean(res.error)) {
               let _href = res.data.mweb_url
-              window.location.href = _href
+              window.location.replace(_href)
             }
           }).catch(err => {
             console.log('微信外h5 err', err)
           })
         } else { // 允许调用微信公众号支付,微信浏览器
           let _href = 'http://fanttest.fantuanlife.com/jv/qz/v21/activity/weixin/JSAPI/pay/' + this.$route.query.checkcode
-          window.location.href = _href
+          window.location.replace(_href)
         }
       },
       complete () { // 完成订单，跳转票据二维码页面

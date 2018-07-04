@@ -30,7 +30,7 @@
       </div>
     </div>
     <div class="ticket-attention">
-      <div class="save-ticket" :class="{canDownload: canDownload}" @click="downloadIamge('范团活动电子票')">保存电子票到相册</div>
+      <a class="save-ticket" :href="ticket.downloadImage" :class="{canDownload: canDownload}">保存电子票到相册</a>
       <div class="ticketing-time">出票时间：{{ticket.time}}</div>
       <div class="attention-header">注意事项</div>
       <div class="attention-item">1.请保存电子票，在活动现场向主办方出示</div>
@@ -196,7 +196,7 @@ import Vue from 'vue';
     left: 0;
     transform: scale(0.5);
     transform-origin: 0 0;
-    border: 2px solid #E5E5E5;
+    border: 3px solid #E5E5E5;
     border-radius: 10px;
   }
   .ticket-tip{
@@ -217,7 +217,7 @@ import Vue from 'vue';
     position: absolute;
     width: 200%;
     height: 0;
-    border-top: 2px dashed #E5E5E5;
+    border-top: 3px dashed #E5E5E5;
     left: 0;
     bottom: 0;
     transform: scale(0.5);
@@ -269,6 +269,7 @@ import Vue from 'vue';
     background-color: #fff;
   }
   .save-ticket{
+    display: block;
     height: 90px;
     line-height: 90px;
     font-size: 34px;
@@ -288,7 +289,7 @@ import Vue from 'vue';
     left: 0;
     top: 0;
     box-sizing: border-box;
-    border: 2px solid #BBBBBB;
+    border: 3px solid #BBBBBB;
     transform: scale(0.5);
     transform-origin: 0 0;
     border-radius: 12px;
@@ -302,7 +303,7 @@ import Vue from 'vue';
     left: 0;
     top: 0;
     box-sizing: border-box;
-    border: 2px solid #1EB0FD;
+    border: 3px solid #1EB0FD;
     transform: scale(0.5);
     transform-origin: 0 0;
     border-radius: 12px;
