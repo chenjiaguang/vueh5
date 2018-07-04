@@ -1,11 +1,14 @@
 <template>
   <div class="ticket-wrapper">
     <div class="ticket-body">
-      <img class="ticket-code-image" :src="codeImage" @load="enAbleDownload" />
+      <div class="ticket-code-image-box">
+        <img class="ticket-code-image1" :src="codeImage" />
+        <img class="ticket-code-image2" :src="ticket.downloadImage" @load="enAbleDownload" />
+      </div>
       <div class="ticket-tip">请在活动现场出示电子票</div>
-      <div class="ticket-status">{{statusText[ticket.status]}}</div>
+      <div class="ticket-status">{{ticket.statusText}}</div>
       <div class="activity-content">
-        <div class="activity-title">我是活动的标题，最多三十字，两行可以换 行的啦啦啦啦</div>
+        <div class="activity-title">{{activity.title}}</div>
         <div class="activity-content-item clearfix">
           <div class="left fl">地点：</div>
           <div class="right fl">{{activity.address}}</div>
@@ -16,18 +19,18 @@
         </div>
         <div class="activity-content-item clearfix">
           <div class="left fl">票种：</div>
-          <div class="right fl">{{ticket.name}}&nbsp;&nbsp;x{{ticket.amount && ticket.amount.toString() !== '0' ? ticket.amount : '免费'}}</div>
+          <div class="right fl">{{ticket.feeName || '免费'}}</div>
         </div>
         <div class="activity-content-item clearfix">
           <div class="left fl">票价：</div>
-          <div class="right fl">&yen;{{ticket.price}}</div>
+          <div class="right fl" style="color:#ff3f53;">{{ticket.price.toString() === '0' ? '免费' : '&yen;' + ticket.price}}</div>
         </div>
         <div class="left-sign"></div>
         <div class="right-sign"></div>
       </div>
     </div>
     <div class="ticket-attention">
-      <div class="save-ticket" :class="{canDownload: canDownload}" @click="downloadIamge('测试下载图片')">保存电子票到相册</div>
+      <div class="save-ticket" :class="{canDownload: canDownload}" @click="downloadIamge('范团活动电子票')">保存电子票到相册</div>
       <div class="ticketing-time">出票时间：{{ticket.time}}</div>
       <div class="attention-header">注意事项</div>
       <div class="attention-item">1.请保存电子票，在活动现场向主办方出示</div>
@@ -35,9 +38,7 @@
       <div class="attention-item">3.暂不支持退票，有需要请联系主办方</div>
     </div>
     <div class="fixed-button">
-      <div class="van-logo-box">
-        <i class="iconfont icon-van_logo"></i>
-      </div>
+      <img src="/cwebassets/image/van_logo.png" class="van-logo" />
       有范又有趣的海南生活圈
       <div class="open-btn" @click="openFantTuanC">立即打开</div>
     </div>
@@ -54,21 +55,18 @@ import Vue from 'vue';
       return {
         showWeixinTip: false,
         canDownload: false,
-        codeImage: '/cwebassets/测试保存.png',
+        codeImage: '',
         ticket: {
-          name: '五月二十八号晚八点A类团体套票',
-          price: 65,
-          time: '2018-01-05 18:56',
-          amount: 3,
-          status: 1, // 1表示待验票
-          downloadImage: '/cwebassets/测试保存.png'
+          price: 0,
+          time: '',
+          statusText: '',
+          downloadImage: '',
+          feeName: ''
         },
         activity: {
-          address: '观澜湖新城',
-          time: '01-03 18:30 至 05-06 18:30'
-        },
-        statusText: {
-          1: '待验'
+          title: '',
+          address: '',
+          time: ''
         }
       }
     },
@@ -110,7 +108,7 @@ import Vue from 'vue';
           let event = new MouseEvent('click')
 
           // 将a的download属性设置为我们想要下载的图片名称，若name不存在则使用‘下载图片名称’作为默认名称
-          a.download = name || '下载图片名称'
+          a.download = name || '范团活动电子票'
           // 将生成的URL设置为a.href属性
           a.href = url
           // 触发a的单击事件
@@ -121,17 +119,30 @@ import Vue from 'vue';
       }
     },
     created () {
-      let ticketId = ''
-      if (this.$route.params && this.$route.params.id) { // params中存在id时，把它存到缓存中, 并且拉取信息
-        ticketId = this.$route.params.id
-        this.$store.commit('activityTicket/saveId', {
-          ticketId: this.$route.params.id
-        })
-      } else { // params无活动id时，尝试从缓存中获取，缓存中也没有时显示获取不到电子票
-        ticketId = this.$store.state.activityTicket.ticketId
+      let checkcode = this.$route.query.checkcode
+      if (checkcode) { // 存在checkcode时，把它存到缓存中, 并且拉取信息
+      let rData = {
+        checkcode: checkcode
       }
-      // 使用ticketId
-      console.log(ticketId)
+       this.$ajax('/jv/qz/v21/activityapplyinfo', {data: rData}).then(res => {
+        if (res && Boolean(res.error) && res.msg) {
+          this.$toast(res.msg)
+        } else if (res && !Boolean(res.error)) {
+          console.log('获取成功', res)
+          this.codeImage = res.data.QRCode
+          this.ticket.downloadImage = res.data.ticket_image
+          this.ticket.statusText = res.data.state_text
+          this.ticket.feeName = res.data.fee_name
+          this.ticket.price = res.data.total_prices
+          this.ticket.time = res.data.time
+          this.activity.title = res.data.activity.title
+          this.activity.address = res.data.activity.address_text
+          this.activity.time = res.data.activity.time_text
+        }
+       }).catch(err => {
+        console.log('获取失败', err)
+       })
+      }
     }
   }
 </script>
@@ -150,16 +161,31 @@ import Vue from 'vue';
     text-align: center;
     margin-bottom: 30px;
   }
-  .ticket-code-image{
-    display:block;
+  .ticket-code-image-box{
     width: 300px;
     height: 300px;
-    background-position: center;
-    background-size: contain;
-    background-repeat:no-repeat;
-    margin: 60px auto 0;
     position: relative;
+    margin: 60px auto 0;
+  }
+  .ticket-code-image1{
+    display:block;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+  }
+  .ticket-code-image2{
+    display:block;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
     -webkit-touch-callout:default;
+    z-index: 2;
+    opacity: 0;
   }
   .ticket-code-image:before{
     content: "";
@@ -307,38 +333,26 @@ import Vue from 'vue';
     font-size: 32px;
     color: #fff;
     background-color: rgba(38,38,38,0.75);
-    .van-logo-box{
+    .van-logo{
+      display: block;
       width: 88px;
       height: 88px;
-      border-radius: 12px;
-      position: absolute;
+      position:absolute;
       left: 30px;
-      top: 20px;
-      background-color: #FF3F53;
-      .icon-van_logo{
-        display:block;
-        width: 110px;
-        height: 110px;
-        font-size: 110px;
-        line-height: 110px;
-        text-align: center;
-        color: #fff;
-        position: absolute;
-        left: 50%;
-        margin-left: -55px;
-        top: 50%;
-        margin-top: -55px;
-      }
+      top: 50%;
+      margin-top: -44px;
     }
     .open-btn{
       width: 180px;
       height: 60px;
       line-height: 60px;
       text-align: center;
-      background-color: #ff3f53;
+      background-image: linear-gradient(135deg, #2ED5DF, #4E73EB);
       position: absolute;
       top: 34px;
       right: 30px;
+      font-size: 28px;
+      border-radius: 8px;
     }
   }
 </style>

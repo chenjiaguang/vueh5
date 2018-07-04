@@ -46,7 +46,7 @@
       <div class="color-block"></div>
       <div class="join-header">已经报名的小伙伴({{activity.join.length}})</div>
       <div class="join-partner clearfix">
-        <div class="join-avatar fl" v-for="item in activity.join" :key="item.uid" :style="{backgroundImage: 'url(' + item.avatar + ')'}"></div>
+        <div class="join-avatar fl" v-for="(item, idx) in activity.join" :key="idx" :style="{backgroundImage: 'url(' + item.avatar + ')'}"></div>
       </div>
     </div>
     <div @click="goOrder" class="fixed-button" :style="{backgroundColor: activity.statusText === '购票' ? '#ff3f53' : '#bbbbbb'}">{{activity.statusText}}</div>

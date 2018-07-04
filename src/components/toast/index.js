@@ -5,7 +5,7 @@ let Main = Vue.extend(main)
 let timer = null
 let last = null
 
-let Toast = (text, duration) => {
+let Toast = (text, duration, callback) => {
   clearTimeout(timer)
   if (last) {
     let _last = window.document.getElementById(last)
@@ -22,6 +22,7 @@ let Toast = (text, duration) => {
   _main.$mount(div)
   timer = setTimeout(() => {
     Toast.hide(id)
+    callback && callback()
   }, duration || 2000)
 }
 
