@@ -643,7 +643,7 @@
             this.$toast(res.msg)
             this.submitting = false
           } else if (res && !Boolean(res.error)) { // 校验验证码通过，继续下单流程
-            this.$ajax('/jv/qz/v21/apply', {data: rData}).then(res => { // 请求后端下单接口,接受返回参数,如果有error,则提示，无error，则判断是否应调起支付
+            this.$ajax('/jv/anonymous/qz/v21/apply', {data: rData}).then(res => { // 请求后端下单接口,接受返回参数,如果有error,则提示，无error，则判断是否应调起支付
               this.submitting = false
               console.log('orderSubmit', res)
               if (res && Boolean(res.error) && res.msg) {
