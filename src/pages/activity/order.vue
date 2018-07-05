@@ -634,56 +634,44 @@
           name: name,
           sex: sex,
           idCard: idCard,
-          phone: phone
+          phone: phone,
+          phoneCode: code
         }
         this.submitting = true
-        this.$ajax('/jv/sms/verify', {data: {phone: phone, code: code, purpose: 'normal'}}).then(res => {
-          console.log('验证码', res)
-          if (res && Boolean(res.error) && res.msg) { // 校验验证码出错
+        this.$ajax('/jv/anonymous/qz/v21/apply', {data: rData}).then(res => { // 请求后端下单接口,接受返回参数,如果有error,则提示，无error，则判断是否应调起支付
+          this.submitting = false
+          console.log('orderSubmit', res)
+          if (res && Boolean(res.error) && res.msg) {
             this.$toast(res.msg)
-            this.submitting = false
-          } else if (res && !Boolean(res.error)) { // 校验验证码通过，继续下单流程
-            this.$ajax('/jv/anonymous/qz/v21/apply', {data: rData}).then(res => { // 请求后端下单接口,接受返回参数,如果有error,则提示，无error，则判断是否应调起支付
-              this.submitting = false
-              console.log('orderSubmit', res)
-              if (res && Boolean(res.error) && res.msg) {
-                this.$toast(res.msg)
-              } else if (res && !Boolean(res.error)) {
-                if (res.data && res.data.needToPlay) { // 需要支付
-                  if (typeof WeixinJSBridge == "undefined") { // 不允许调用微信公众号支付,其他浏览器
-                    let _rData = {
-                      checkcode: res.data.checkcode,
-                      payType: '1',
-                      tradeType: 'MWEB'
-                    }
-                    this.$ajax('/jv/qz/v21/activity/pay', {data: _rData}).then(res => {
-                      console.log('微信外h5 res', res)
-                      if (res && Boolean(res.error) && res.msg) {
-                        this.$toast(res.msg)
-                      } else if (res && !Boolean(res.error)) {
-                        let _href = res.data.mweb_url
-                        window.location.replace(_href)
-                      }
-                    }).catch(err => {
-                      console.log('微信外h5 err', err)
-                    })
-                  } else { // 允许调用微信公众号支付,微信浏览器
-                    let _href = API_DOMAIN + '/jv/qz/v21/activity/weixin/JSAPI/pay/' + res.data.checkcode
+          } else if (res && !Boolean(res.error)) {
+            if (res.data && res.data.needToPlay) { // 需要支付
+              if (typeof WeixinJSBridge == "undefined") { // 不允许调用微信公众号支付,其他浏览器
+                let _rData = {
+                  checkcode: res.data.checkcode,
+                  payType: '1',
+                  tradeType: 'MWEB'
+                }
+                this.$ajax('/jv/qz/v21/activity/pay', {data: _rData}).then(res => {
+                  console.log('微信外h5 res', res)
+                  if (res && Boolean(res.error) && res.msg) {
+                    this.$toast(res.msg)
+                  } else if (res && !Boolean(res.error)) {
+                    let _href = res.data.mweb_url
                     window.location.replace(_href)
                   }
-                } else if (res.data && !res.data.needToPlay) { // 不需要支付
-                  this.$toast('报名成功', 2000, () => this.goSuccess(res))
-                }
+                }).catch(err => {
+                  console.log('微信外h5 err', err)
+                })
+              } else { // 允许调用微信公众号支付,微信浏览器
+                let _href = API_DOMAIN + '/jv/qz/v21/activity/weixin/JSAPI/pay/' + res.data.checkcode
+                window.location.replace(_href)
               }
-            }).catch(err => {
-              this.submitting = false
-            })
-          } else {
-            this.submitting = false
+            } else if (res.data && !res.data.needToPlay) { // 不需要支付
+              this.$toast('报名成功', 2000, () => this.goSuccess(res))
+            }
           }
         }).catch(err => {
           this.submitting = false
-          console.log('校验验证码出错')
         })
       },
       goSuccess (res) {
