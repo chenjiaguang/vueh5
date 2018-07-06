@@ -11,7 +11,7 @@
         <div class="activity-title">{{activity.title}}</div>
         <div class="activity-content-item clearfix">
           <div class="left fl">地点：</div>
-          <div class="right fl">{{activity.address}}</div>
+          <div class="right fl activity-address">{{activity.address}}</div>
         </div>
         <div class="activity-content-item clearfix">
           <div class="left fl">时间：</div>
@@ -251,6 +251,9 @@ import Vue from 'vue';
     font-size: 32px;
     line-height: 46px;
     padding-bottom: 5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
   .activity-content-item{
     font-size: 28px;
@@ -263,6 +266,12 @@ import Vue from 'vue';
     .right{
       width: 85%;
     }
+  }
+  .activity-address{
+    display: -webkit-box;    
+    -webkit-box-orient: vertical;    
+    -webkit-line-clamp: 2;    
+    overflow: hidden;
   }
   .ticket-attention{
     padding: 40px 4% 176px;

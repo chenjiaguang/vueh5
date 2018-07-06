@@ -25,13 +25,13 @@
       <div class="ticket-addition clearfix" v-if="selectedTicket">
         <div class="addition-left fl">选择数量</div>
         <div class="addition-right fr clearfix">
-          剩余{{selectedTicket.amount}}张
+          <span v-if="selectedTicket.max && selectedTicket.max.toString() !== '0'">剩余{{selectedTicket.amount}}张</span>
           <div class="ticket-changer fr">
             <i class="minus-icon iconfont icon-jian" @click="minus" :style="{color: selectedTicket.putAmount <= 1 ? '#999' : '#333'}">
               <span class="minus-icon-line"></span>
             </i>
             {{selectedTicket.putAmount}}
-            <i class="add-icon iconfont icon-jia" @click="add" :style="{color: selectedTicket.putAmount >= Number(selectedTicket.amount) ? '#999' : '#333'}">
+            <i class="add-icon iconfont icon-jia" @click="add" :style="{color: selectedTicket.putAmount >= Number(selectedTicket.amount) && (!selectedTicket.max || selectedTicket.max.toString() !== '0') ? '#999' : '#333'}">
               <span class="add-icon-line"></span>
             </i>
           </div>
@@ -523,7 +523,7 @@
       },
       add () {
         let selected = this.form.ticket.filter(item => item.selected)[0]
-        if (selected.putAmount >= selected.amount) {
+        if (selected.putAmount >= selected.amount && selected.max && selected.max.toString() !== '0') {
           return false
         }
         selected.putAmount += 1

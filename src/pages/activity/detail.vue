@@ -44,7 +44,7 @@
     </div>
     <div class="join-wrapper" v-if="activity.join && activity.join.length > 0">
       <div class="color-block"></div>
-      <div class="join-header">已经报名的小伙伴({{activity.join.length}})</div>
+      <div class="join-header">已经报名的小伙伴({{activity.joinTotal}})</div>
       <div class="join-partner clearfix">
         <div class="join-avatar fl" v-for="(item, idx) in activity.join" :key="idx" :style="{backgroundImage: 'url(' + item.avatar + ')'}"></div>
       </div>
@@ -102,7 +102,7 @@
   }
   .info-item{
     position: relative;
-    height: 76px;
+    min-height: 76px;
     line-height: 76px;
     font-size: 28px;
   }
@@ -123,6 +123,9 @@
     background-color: #E5E5E5;
   }
   .sponsor-name{
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
     font-weight: 600;
   }
   .cost{
@@ -157,6 +160,7 @@
   }
   .content-context{
     padding-bottom: 21px;
+    white-space: pre-wrap;
   }
   .content-context img{
     display: block;
@@ -252,6 +256,7 @@ export default {
   name: 'ActivityDetail',
   data () {
     return {
+      setted: false,
       activity: {
         id: '',
         banner: '',
@@ -271,6 +276,7 @@ export default {
         cost: '',
         deadline: '',
         tags: [],
+        joinTotal: 0,
         join: [],
         statusText: '',
         ticket: []
@@ -313,6 +319,7 @@ export default {
             height: item.height
           }
         })
+        this.activity.joinTotal = res.data.joined_total
         this.activity.join = res.data.joined_users
         this.activity.statusText = res.data.status_text
         let tagsArr = []
@@ -335,21 +342,20 @@ export default {
       this.$router.push({name: 'mapPage', query: { lng: option.lng, lat: option.lat, title: option.title || '' }})
     },
     goOrder () {
-//      if (this.activity.statusText !== '购票') {
-//        return false
-//      }
+      if (this.activity.statusText !== '购票') {
+        return false
+      }
       this.$router.push({name: 'ActivityOrder', query: {id: this.$route.query.id}})
     },
     changeShowContext () {
-      if (!this.showMore) {
-        let headerHeight = this.$refs['contentHeader'].offsetHeight
-        let contentHeight = this.$refs['contentContext'].offsetHeight
-        let btnHeight = this.$refs['contentBtn'].offsetHeight
-        this.$refs['contentContainer'].style.height = headerHeight + contentHeight + btnHeight + 'px'
-        this.showMore = true
+      let currentHeight = this.$refs['contentContainer'].offsetHeight
+      console.log(currentHeight, this.halfScreenHeight, this.contentWrapperHeight)
+      if (currentHeight > this.halfScreenHeight) {
+        this.$refs['contentContainer'].style.height = this.halfScreenHeight + 'px'
+        this.showMore = false
       } else {
         this.$refs['contentContainer'].style.height = this.contentWrapperHeight + 'px'
-        this.showMore = false
+        this.showMore = true
       }
     }
   },
@@ -357,15 +363,17 @@ export default {
     this.fetchActivity()
   },
   updated () {
-    if (!this.$refs['contentContainer']) {
+    if (this.setted) {
       return false
     }
-    let wrapperHeight = this.$refs['contentContainer'].offsetHeight
-    if (!this.contentWrapperHeight) {
-      this.contentWrapperHeight = wrapperHeight
-    }
-    if (wrapperHeight > this.halfScreenHeight && !this.showMore) { // 大于半屏且处于隐藏状态
-      this.$refs['contentContainer'].style.height = this.halfScreenHeight + 'px'
+    let btnHeight = (84 / 750) * window.innerWidth
+    if (this.$refs['contentContainer']) {
+      let wrapperHeight = this.$refs['contentContainer'].offsetHeight
+      if (wrapperHeight > this.halfScreenHeight && !this.showMore) { // 大于半屏且处于隐藏状态
+        this.contentWrapperHeight = wrapperHeight + btnHeight
+        this.$refs['contentContainer'].style.height = this.halfScreenHeight + 'px'
+      }
+      this.setted = true
     }
   }
 }
