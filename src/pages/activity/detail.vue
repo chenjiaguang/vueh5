@@ -73,7 +73,7 @@
     background-repeat: no-repeat;
   }
   .info-container, .content-container{
-    padding: 30px 4% 0;
+    padding: 0 4%;
   }
   .location-text, .sponsor-text{
     overflow: hidden;
@@ -96,7 +96,7 @@
     transition: height 300ms;
   }
   .info-title{
-    padding: 26px 0 38px;
+    padding: 23px 0 38px;
     font-size: 32px;
     line-height: 46px;
   }
