@@ -31,7 +31,7 @@
       <div class="tag-container clearfix">
         <div class="fl tag-item" v-for="(item, idx) in activity.tags" :key="idx">{{item}}<div class="tag-border"></div></div>
       </div>
-      <div ref="contentContainer" class="content-container" v-if="activity.content && activity.content.length > 0">
+      <div ref="contentContainer" @load="layout" class="content-container" v-if="activity.content && activity.content.length > 0">
         <div ref="contentHeader" class="header">活动介绍</div>
         <div ref="contentContext" class="content-context">
           <template v-for="(item, idx) in activity.content">
@@ -349,7 +349,6 @@ export default {
     },
     changeShowContext () {
       let currentHeight = this.$refs['contentContainer'].offsetHeight
-      console.log(currentHeight, this.halfScreenHeight, this.contentWrapperHeight)
       if (currentHeight > this.halfScreenHeight) {
         this.$refs['contentContainer'].style.height = this.halfScreenHeight + 'px'
         this.showMore = false
@@ -357,24 +356,29 @@ export default {
         this.$refs['contentContainer'].style.height = this.contentWrapperHeight + 'px'
         this.showMore = true
       }
+    },
+    layout () {
+      if (this.setted) {
+        return false
+      }
+      setTimeout(() => {
+        let btnHeight = (84 / 750) * window.innerWidth
+        if (this.$refs['contentContainer']) {
+          let wrapperHeight = this.$refs['contentContainer'].offsetHeight
+          if (wrapperHeight > this.halfScreenHeight && !this.showMore) { // 大于半屏且处于隐藏状态
+            this.contentWrapperHeight = wrapperHeight + btnHeight
+            this.$refs['contentContainer'].style.height = this.halfScreenHeight + 'px'
+          }
+          this.setted = true
+        }
+      }, 50)
     }
   },
   created () {
     this.fetchActivity()
   },
   updated () {
-    if (this.setted) {
-      return false
-    }
-    let btnHeight = (84 / 750) * window.innerWidth
-    if (this.$refs['contentContainer']) {
-      let wrapperHeight = this.$refs['contentContainer'].offsetHeight
-      if (wrapperHeight > this.halfScreenHeight && !this.showMore) { // 大于半屏且处于隐藏状态
-        this.contentWrapperHeight = wrapperHeight + btnHeight
-        this.$refs['contentContainer'].style.height = this.halfScreenHeight + 'px'
-      }
-      this.setted = true
-    }
+    this.layout()
   }
 }
 </script>
