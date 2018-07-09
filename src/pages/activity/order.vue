@@ -652,6 +652,7 @@
         }
         this.submitting = true
         this.$ajax('/jv/anonymous/qz/v21/apply', {data: rData}).then(res => { // 请求后端下单接口,接受返回参数,如果有error,则提示，无error，则判断是否应调起支付
+          alert('apply成功')
           this.submitting = false
           console.log('orderSubmit', res)
           if (res && Boolean(res.error) && res.msg) {
@@ -686,6 +687,7 @@
             }
           }
         }).catch(err => {
+          alert('apply失败')
           this.submitting = false
         })
       },
