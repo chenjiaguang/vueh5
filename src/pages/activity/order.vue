@@ -655,6 +655,7 @@
           alert('apply成功')
           this.submitting = false
           console.log('orderSubmit', res)
+          alert('res.error', Boolean(res.error))
           if (res && Boolean(res.error) && res.msg) {
             this.$toast(res.msg)
           } else if (res && !Boolean(res.error)) {

@@ -5,9 +5,9 @@
     <div @click="complete" class="complete-btn">已完成支付</div>
     <div @click="rePay" class="repay-btn">未完成，重新支付</div>
     <div class="contact">客服电话：<a class="tel-btn" href="tel:4006806307">400-680-6307</a></div>
-    <!-- <div v-for="(value, key) in query" :key="key">
+    <div v-for="(value, key) in query" :key="key">
       {{ key }}: {{ value }}
-    </div> -->
+    </div>
   </div>
 </template>
 
