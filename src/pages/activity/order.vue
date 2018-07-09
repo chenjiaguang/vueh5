@@ -1,77 +1,79 @@
 <template>
-  <div class="activity-detail">
-    <div class="activity-container" v-if="activity.id">
-      <div class="info-container" :class="{'no-tags': activity.tags.length === 0}">
-        <div class="info-title">{{activity.title}}</div>
-        <div class="info-item clearfix">
-          <div class="fl left">地点：</div>
-          <div class="fl right" style="overflow: hidden;text-overflow: ellipsis;white-space: nowrap;">{{activity.address}}</div>
-        </div>
-        <div class="info-item clearfix">
-          <div class="fl left">时间：</div>
-          <div class="fl right">{{activity.date}}</div>
-        </div>
-      </div>
-      <div class="tag-container clearfix" v-if="activity.tags && activity.tags.length > 0">
-        <div class="fl tag-item" v-for="(item, idx) in activity.tags" :key="idx">{{item}}<div class="tag-border"></div></div>
-      </div>
-      <div class="color-block"></div>
-    </div>
-    <div class="form-wrapper" v-if="activity.id">
-      <div class="header">选择票种</div>
-      <div class="ticket-wrapper clearfix">
-        <div class="ticket-item fl" @click="selectTicket(item)" :class="{'disabled-ticket' : !item.amount || item.amount.toString() === '0', 'selected-ticket': item.selected}" v-if="form.ticket && form.ticket[0]" v-for="item in form.ticket" :key="item.id">{{item.name}}</div>
-      </div>
-      <div class="ticket-addition clearfix" v-if="selectedTicket">
-        <div class="addition-left fl">选择数量</div>
-        <div class="addition-right fr clearfix">
-          <span v-if="selectedTicket.max && selectedTicket.max.toString() !== '0'">剩余{{selectedTicket.amount}}张</span>
-          <div class="ticket-changer fr">
-            <i class="minus-icon iconfont icon-jian" @click="minus" :style="{color: selectedTicket.putAmount <= 1 ? '#999' : '#333'}">
-              <span class="minus-icon-line"></span>
-            </i>
-            {{selectedTicket.putAmount}}
-            <i class="add-icon iconfont icon-jia" @click="add" :style="{color: selectedTicket.putAmount >= Number(selectedTicket.amount) && (!selectedTicket.max || selectedTicket.max.toString() !== '0') ? '#999' : '#333'}">
-              <span class="add-icon-line"></span>
-            </i>
+  <div class="activity-detail" :style="{width: winWidth + 'px', height: winHeight + 'px', position: 'relative'}">
+    <div class="scroller">
+      <div class="activity-container" v-if="activity.id">
+        <div class="info-container" :class="{'no-tags': activity.tags.length === 0}">
+          <div class="info-title">{{activity.title}}</div>
+          <div class="info-item clearfix">
+            <div class="fl left">地点：</div>
+            <div class="fl right" style="overflow: hidden;text-overflow: ellipsis;white-space: nowrap;">{{activity.address}}</div>
+          </div>
+          <div class="info-item clearfix">
+            <div class="fl left">时间：</div>
+            <div class="fl right">{{activity.date}}</div>
           </div>
         </div>
+        <div class="tag-container clearfix" v-if="activity.tags && activity.tags.length > 0">
+          <div class="fl tag-item" v-for="(item, idx) in activity.tags" :key="idx">{{item}}<div class="tag-border"></div></div>
+        </div>
+        <div class="color-block"></div>
       </div>
-      <div class="header info-header">报名人信息</div>
-      <div class="user-info">
-        <div class="user-info-item clearfix" v-if="form.userInfo.needName">
-          <div class="user-left fl"><i class="require-icon iconfont icon-xinghao"></i>姓名</div>
-          <input class="user-full-input fl" v-model="form.userInfo.name" />
+      <div class="form-wrapper" v-if="activity.id">
+        <div class="header">选择票种</div>
+        <div class="ticket-wrapper clearfix">
+          <div class="ticket-item fl" @click="selectTicket(item)" :class="{'disabled-ticket' : !item.amount || item.amount.toString() === '0', 'selected-ticket': item.selected}" v-if="form.ticket && form.ticket[0]" v-for="item in form.ticket" :key="item.id">{{item.name}}</div>
         </div>
-        <div class="user-info-item clearfix">
-          <div class="user-left fl"><i class="require-icon iconfont icon-xinghao"></i>手机</div>
-          <input class="phone-input fl" type="number" v-model="form.userInfo.phone" />
-          <div class="get-code-btn fl" :class="{'get-code-btn-disabled': disabledSend}" @click="!disabledSend && sendCode()">{{btnText}}</div>
+        <div class="ticket-addition clearfix" v-if="selectedTicket">
+          <div class="addition-left fl">选择数量</div>
+          <div class="addition-right fr clearfix">
+            <span v-if="selectedTicket.max && selectedTicket.max.toString() !== '0'">剩余{{selectedTicket.amount}}张</span>
+            <div class="ticket-changer fr">
+              <i class="minus-icon iconfont icon-jian" @click="minus" :style="{color: selectedTicket.putAmount <= 1 ? '#999' : '#333'}">
+                <span class="minus-icon-line"></span>
+              </i>
+              {{selectedTicket.putAmount}}
+              <i class="add-icon iconfont icon-jia" @click="add" :style="{color: selectedTicket.putAmount >= Number(selectedTicket.amount) && (!selectedTicket.max || selectedTicket.max.toString() !== '0') ? '#999' : '#333'}">
+                <span class="add-icon-line"></span>
+              </i>
+            </div>
+          </div>
         </div>
-        <div class="user-info-item clearfix">
-          <div class="user-left fl"><i class="require-icon iconfont icon-xinghao"></i>验证码</div>
-          <input class="user-full-input fl" type="number" v-model="form.userInfo.code" />
+        <div class="header info-header">报名人信息</div>
+        <div class="user-info">
+          <div class="user-info-item clearfix" v-if="form.userInfo.needName">
+            <div class="user-left fl"><i class="require-icon iconfont icon-xinghao"></i>姓名</div>
+            <input class="user-full-input fl" v-model="form.userInfo.name" />
+          </div>
+          <div class="user-info-item clearfix">
+            <div class="user-left fl"><i class="require-icon iconfont icon-xinghao"></i>手机</div>
+            <input class="phone-input fl" type="number" v-model="form.userInfo.phone" />
+            <div class="get-code-btn fl" :class="{'get-code-btn-disabled': disabledSend}" @click="!disabledSend && sendCode()">{{btnText}}</div>
+          </div>
+          <div class="user-info-item clearfix">
+            <div class="user-left fl"><i class="require-icon iconfont icon-xinghao"></i>验证码</div>
+            <input class="user-full-input fl" type="number" v-model="form.userInfo.code" />
+          </div>
+          <div class="user-info-item clearfix" v-if="form.userInfo.needIdCard">
+            <div class="user-left fl"><i class="require-icon iconfont icon-xinghao"></i>身份证号</div>
+            <input class="user-full-input fl" type="number" v-model="form.userInfo.idCard" />
+          </div>
+          <div class="user-info-item clearfix" v-if="form.userInfo.needSex">
+            <div class="user-left fl"><i class="require-icon iconfont icon-xinghao"></i>性别</div>
+            <div @click="form.userInfo.sex = 1" class="sexual-option fl clearfix"><i class="iconfont fl" :class="{'icon-quanzi': form.userInfo.sex.toString() === '1', 'icon-quan': form.userInfo.sex.toString() !== '1'}"></i>男</div>
+            <div @click="form.userInfo.sex = 2" class="sexual-option fl clearfix"><i class="iconfont fl" :class="{'icon-quanzi': form.userInfo.sex.toString() === '2', 'icon-quan': form.userInfo.sex.toString() !== '2'}"></i>女</div>
+          </div>
         </div>
-        <div class="user-info-item clearfix" v-if="form.userInfo.needIdCard">
-          <div class="user-left fl"><i class="require-icon iconfont icon-xinghao"></i>身份证号</div>
-          <input class="user-full-input fl" type="number" v-model="form.userInfo.idCard" />
+        <div class="pay-way-box" v-if="shouldPay && shouldPay.toString() !== '0'">
+          <div class="header pay-header">选择支付方式</div>
+          <div class="pay-way">
+            <div class="pay-way-item clearfix" @click="changePayWay(1)" v-if="form.payWay.toString() === '1'"><i class="iconfont icon-weixinzhifu fl" style="color: #09bb07;"></i>微信支付<i class="iconfont fr" :class="{'icon-gou': form.payWay.toString() === '1', 'icon-quan': form.payWay.toString() === '2'}"></i></div>
+            <div class="pay-way-item clearfix" @click="changePayWay(2)" v-if="form.payWay.toString() === '2'"><i class="iconfont icon-zhifubaozhifu fl" style="color: #00a0e8;"></i>支付宝支付<i class="iconfont fr" :class="{'icon-gou': form.payWay.toString() === '2', 'icon-quan': form.payWay.toString() === '1'}"></i></div>
+          </div>
         </div>
-        <div class="user-info-item clearfix" v-if="form.userInfo.needSex">
-          <div class="user-left fl"><i class="require-icon iconfont icon-xinghao"></i>性别</div>
-          <div @click="form.userInfo.sex = 1" class="sexual-option fl clearfix"><i class="iconfont fl" :class="{'icon-quanzi': form.userInfo.sex.toString() === '1', 'icon-quan': form.userInfo.sex.toString() !== '1'}"></i>男</div>
-          <div @click="form.userInfo.sex = 2" class="sexual-option fl clearfix"><i class="iconfont fl" :class="{'icon-quanzi': form.userInfo.sex.toString() === '2', 'icon-quan': form.userInfo.sex.toString() !== '2'}"></i>女</div>
+        <div class="agreement-box clearfix" @click.stop="changeAgreement">
+          <i class="iconfont fl" style="width: 4.95%" :class="{'icon-gou': form.agreement, 'icon-quan': !form.agreement}"></i>
+          <div class="fl" style="width: 95.05%">我同意<span @click.stop="goAgreement" style="color: #1EB0FD">《范团活动参与协议》</span>并已确认活动真实性，同意支付 报名费用。</div>
         </div>
-      </div>
-      <div class="pay-way-box" v-if="shouldPay && shouldPay.toString() !== '0'">
-        <div class="header pay-header">选择支付方式</div>
-        <div class="pay-way">
-          <div class="pay-way-item clearfix" @click="changePayWay(1)" v-if="form.payWay.toString() === '1'"><i class="iconfont icon-weixinzhifu fl" style="color: #09bb07;"></i>微信支付<i class="iconfont fr" :class="{'icon-gou': form.payWay.toString() === '1', 'icon-quan': form.payWay.toString() === '2'}"></i></div>
-          <div class="pay-way-item clearfix" @click="changePayWay(2)" v-if="form.payWay.toString() === '2'"><i class="iconfont icon-zhifubaozhifu fl" style="color: #00a0e8;"></i>支付宝支付<i class="iconfont fr" :class="{'icon-gou': form.payWay.toString() === '2', 'icon-quan': form.payWay.toString() === '1'}"></i></div>
-        </div>
-      </div>
-      <div class="agreement-box clearfix" @click.stop="changeAgreement">
-        <i class="iconfont fl" style="width: 4.95%" :class="{'icon-gou': form.agreement, 'icon-quan': !form.agreement}"></i>
-        <div class="fl" style="width: 95.05%">我同意<span @click.stop="goAgreement" style="color: #1EB0FD">《范团活动参与协议》</span>并已确认活动真实性，同意支付 报名费用。</div>
       </div>
     </div>
     <div class="fixed-button">
@@ -85,7 +87,16 @@
 <style scoped>
   .activity-detail{
     width:100%;
-    padding-bottom: 160px;
+    padding-bottom: 100px;
+    overflow: hidden;
+  }
+  .scroller{
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-bottom: 60px;
+    -webkit-overflow-scrolling: touch;
   }
   .info-container{
     padding: 0 4% 0;
@@ -399,7 +410,7 @@
     font-weight: 600;
     line-height: 100px;
     padding-left: 30px;
-    position: fixed;
+    position: absolute;
     left: 0;
     bottom: 0;
   }
@@ -439,6 +450,8 @@
     name: 'ActivityDetail',
     data () {
       return {
+        winWidth: window.innerWidth,
+        winHeight: window.innerHeight,
         activity: {
           id: '',
           title: '',
@@ -657,14 +670,14 @@
                     this.$toast(res.msg)
                   } else if (res && !Boolean(res.error)) {
                     let _href = res.data.mweb_url
-                    window.location.replace(_href)
+                    window.location.href = _href
                   }
                 }).catch(err => {
                   console.log('微信外h5 err', err)
                 })
               } else { // 允许调用微信公众号支付,微信浏览器
                 let _href = API_DOMAIN + '/jv/qz/v21/activity/weixin/JSAPI/pay/' + res.data.checkcode
-                window.location.replace(_href)
+                window.location.href = _href
               }
             } else if (res.data && !res.data.needToPlay) { // 不需要支付
               this.$toast('报名成功', 2000, () => this.goSuccess(res))
@@ -676,6 +689,10 @@
       },
       goSuccess (res) {
         this.$router.replace({name: 'ActivityTicket', query: {checkcode: res.data.checkcode}})
+      },
+      resize () {
+        this.winWidth = window.innerWidth
+        this.winHeight = window.innerHeight
       }
     },
     computed: {
@@ -692,6 +709,12 @@
     },
     created () {
       this.fetchActivity()
+    },
+    mounted () {
+      window.addEventListener('resize', this.resize)
+    },
+    beforeDestroy () {
+      window.removeEventListener('resize', this.resize)
     }
   }
 </script>

@@ -32,14 +32,14 @@
               this.$toast(res.msg)
             } else if (res && !Boolean(res.error)) {
               let _href = res.data.mweb_url
-              window.location.replace(_href)
+              window.location.href = _href
             }
           }).catch(err => {
             console.log('微信外h5 err', err)
           })
         } else { // 允许调用微信公众号支付,微信浏览器
           let _href = API_DOMAIN + '/jv/qz/v21/activity/weixin/JSAPI/pay/' + this.$route.query.checkcode
-          window.location.replace(_href)
+          window.location.href = _href
         }
       },
       complete () { // 完成订单，跳转票据二维码页面
@@ -50,7 +50,7 @@
       let {from, payResult, checkcode} = this.$route.query // from: JSAPI(微信公众号支付)、MWEB(微信h5支付)、APP（微信app支付）
       if (from === 'JSAPI') { // 微信公众号支付
         if (payResult === 'FAIL' || payResult === 'CANCEL') { // 未完成支付的逻辑,支付失败时提示，用户取消则不做任何提示
-          payResult === 'FAIL' && this.$toast('未完成支付')
+          payResult === 'FAIL' && this.$toast('支付失败')
         } else if (payResult === 'SUCCESS') { // 完成支付立即跳转成功页面
           this.$toast('报名成功', 2000, this.complete) 
         }
