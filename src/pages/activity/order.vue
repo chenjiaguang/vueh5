@@ -478,7 +478,7 @@
           this.activity.title = res.data.title
           this.activity.address = res.data.address_text
           this.activity.date = res.data.time_text
-          this.activity.deadline = res.data.deadline
+          this.activity.deadline = res.data.deadline_text
           this.form.ticket = res.data.activity_fees.map((item, idx) => {
             return {
               id: item.id,

@@ -307,7 +307,7 @@ export default {
         this.activity.address.coordinate.lat = res.data.latitude
         this.activity.date = res.data.time_text
         this.activity.cost = res.data.money
-        this.activity.deadline = res.data.deadline
+        this.activity.deadline = res.data.deadline_text
         this.activity.content = res.data.content.filter(item => item.type.toString() !== '0').map(item => {
           return {
             type: item.type,
@@ -371,7 +371,7 @@ export default {
           }
           this.setted = true
         }
-      }, 50)
+      }, 100)
     }
   },
   created () {

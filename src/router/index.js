@@ -83,7 +83,16 @@ const router = new Router({
 router.beforeEach((to, from, next) => {
   /* 路由发生变化修改页面title */
   if (to.meta.title) {
+    let i = document.createElement('iframe');
+    i.src = 'https://www.baidu.com/favicon.ico';
+    i.style.display = 'none';
+    i.onload = () => {
+        setTimeout(() => {
+            i.remove()
+        }, 9)
+    }
     document.title = to.meta.title
+    document.body.appendChild(i)
   }
   next()
 })
