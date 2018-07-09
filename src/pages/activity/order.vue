@@ -659,6 +659,7 @@
           } else if (res && !Boolean(res.error)) {
             if (res.data && res.data.needToPlay) { // 需要支付
               if (typeof WeixinJSBridge == "undefined") { // 不允许调用微信公众号支付,其他浏览器
+                alert('typeof WeixinJSBridge', typeof WeixinJSBridge)
                 let _rData = {
                   checkcode: res.data.checkcode,
                   payType: '1',
