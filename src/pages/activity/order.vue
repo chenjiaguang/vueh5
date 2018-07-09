@@ -676,8 +676,8 @@
                   console.log('微信外h5 err', err)
                 })
               } else { // 允许调用微信公众号支付,微信浏览器
+                alert('_href:' + API_DOMAIN)
                 let _href = API_DOMAIN + '/jv/qz/v21/activity/weixin/JSAPI/pay/' + res.data.checkcode
-                alert('_href:' + _href)
                 window.location.href = _href
               }
             } else if (res.data && !res.data.needToPlay) { // 不需要支付
