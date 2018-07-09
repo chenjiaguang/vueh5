@@ -5,7 +5,7 @@
         <div class="info-title">{{activity.title}}</div>
         <div class="info-item clearfix">
           <div class="fl left">地点：</div>
-          <div class="fl right">{{activity.address}}</div>
+          <div class="fl right" style="overflow: hidden;text-overflow: ellipsis;white-space: nowrap;">{{activity.address}}</div>
         </div>
         <div class="info-item clearfix">
           <div class="fl left">时间：</div>
