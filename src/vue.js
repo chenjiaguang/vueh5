@@ -3,7 +3,12 @@ import Vuex from 'vuex'
 import ajax from './lib/ajax'
 import browserUA from './lib/browserUA'
 import toast from './components/toast'
+import VConsole from 'vconsole/dist/vconsole.min.js' // import vconsole
 
+/* eslint-disable no-new */
+if (process.env.NODE_ENV !== 'production') { // 非正式环境包，就实例化vconsole
+    new VConsole() // 初始化
+}
 Vue.prototype.$apiDomain = process.env.API_DOMAIN
 Vue.prototype.$locationDomain = process.env.LOCATION_DOMAIN
 Vue.prototype.$ajax = ajax
