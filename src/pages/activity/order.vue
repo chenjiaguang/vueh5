@@ -652,16 +652,14 @@
         }
         this.submitting = true
         this.$ajax('/jv/anonymous/qz/v21/apply', {data: rData}).then(res => { // 请求后端下单接口,接受返回参数,如果有error,则提示，无error，则判断是否应调起支付
-          alert('apply成功')
           this.submitting = false
           console.log('orderSubmit', res)
-          alert('res.error', Boolean(res.error))
+          console.log('WeixinJSBridge', typeof WeixinJSBridge, res.error, Boolean(res.error))
           if (res && Boolean(res.error) && res.msg) {
             this.$toast(res.msg)
           } else if (res && !Boolean(res.error)) {
             if (res.data && res.data.needToPlay) { // 需要支付
               if (typeof WeixinJSBridge == "undefined") { // 不允许调用微信公众号支付,其他浏览器
-                alert('typeof WeixinJSBridge', typeof WeixinJSBridge)
                 let _rData = {
                   checkcode: res.data.checkcode,
                   payType: '1',
@@ -679,8 +677,7 @@
                   console.log('微信外h5 err', err)
                 })
               } else { // 允许调用微信公众号支付,微信浏览器
-                alert('_href:' + API_DOMAIN)
-                let _href = API_DOMAIN + '/jv/qz/v21/activity/weixin/JSAPI/pay/' + res.data.checkcode
+                let _href = this.$apiDomain + '/jv/qz/v21/activity/weixin/JSAPI/pay/' + res.data.checkcode
                 window.location.href = _href
               }
             } else if (res.data && !res.data.needToPlay) { // 不需要支付
@@ -688,7 +685,6 @@
             }
           }
         }).catch(err => {
-          alert('apply失败')
           this.submitting = false
         })
       },

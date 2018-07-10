@@ -38,7 +38,7 @@
             console.log('微信外h5 err', err)
           })
         } else { // 允许调用微信公众号支付,微信浏览器
-          let _href = API_DOMAIN + '/jv/qz/v21/activity/weixin/JSAPI/pay/' + this.$route.query.checkcode
+          let _href = this.$apiDomain + '/jv/qz/v21/activity/weixin/JSAPI/pay/' + this.$route.query.checkcode
           window.location.href = _href
         }
       },
