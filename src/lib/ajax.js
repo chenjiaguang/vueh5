@@ -10,7 +10,6 @@ axios.interceptors.request.use(function (config) {
     config.data = JSON.parse(JSON.stringify(config.data))
     config.data.token = config.data.token || window.localStorage.token || ''
   }
-  config.headers.token = 'lcaKiq5GIC_FHqubOBcI6FUKaL8N171U'
   return config
 }, function (error) {
   // 对请求错误做些什么
