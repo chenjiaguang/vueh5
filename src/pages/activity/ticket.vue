@@ -123,7 +123,7 @@ import Vue from 'vue';
       let rData = {
         checkcode: checkcode
       }
-       this.$ajax('/jv/qz/v21/activityapplyinfo', {data: rData}).then(res => {
+       this.$ajax('/jv/anonymous/qz/v21/activityapplyinfo', {data: rData}).then(res => {
         if (res && Boolean(res.error) && res.msg) {
           this.$toast(res.msg)
         } else if (res && !Boolean(res.error)) {

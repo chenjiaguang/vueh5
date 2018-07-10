@@ -91,6 +91,7 @@
     width:100%;
     padding-bottom: 100px;
     overflow: hidden;
+    background-color: #fff;
   }
   .scroller-wrapper{
     width: 100%;

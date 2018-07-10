@@ -57,6 +57,7 @@
   .activity-detail{
     width:100%;
     padding-bottom: 130px;
+    background-color: #fff;
   }
   .header{
     font-size: 32px;

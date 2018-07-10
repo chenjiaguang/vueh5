@@ -14,6 +14,7 @@ export default {
   body{
     margin: 0;
     color: #333;
+    /* background-color: #fff; */
   }
   *,::before,::after{
     margin:0;
