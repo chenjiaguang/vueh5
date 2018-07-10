@@ -673,7 +673,7 @@
                   payType: '1',
                   tradeType: 'MWEB'
                 }
-                this.$ajax('/jv/qz/v21/activity/pay', {data: _rData}).then(res => {
+                this.$ajax('/jv/anonymous/qz/v21/activity/pay', {data: _rData}).then(res => {
                   console.log('微信外h5 res', res)
                   if (res && Boolean(res.error) && res.msg) {
                     this.$toast(res.msg)
