@@ -2,7 +2,7 @@
   <div class="webpay-wrapper" v-if="query.from === 'MWEB' || (query.from === 'JSAPI' && payResult !== 'SUCCESS')">
     <i class="webpay-icon iconfont icon-pay_icon"></i>
     <div class="webpay-header">请确认是否完成支付</div>
-    <div @click="this.complete(true)" class="complete-btn">已完成支付</div>
+    <div @click="complete(true)" class="complete-btn">已完成支付</div>
     <div @click="rePay" class="repay-btn">未完成，重新支付</div>
     <div class="contact">客服电话：<a class="tel-btn" href="tel:4006806307">400-680-6307</a></div>
     <!-- <div v-for="(value, key) in query" :key="key">
