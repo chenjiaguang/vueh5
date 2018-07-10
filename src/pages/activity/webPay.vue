@@ -2,12 +2,12 @@
   <div class="webpay-wrapper" v-if="query.from === 'MWEB' || (query.from === 'JSAPI' && payResult !== 'SUCCESS')">
     <i class="webpay-icon iconfont icon-pay_icon"></i>
     <div class="webpay-header">请确认是否完成支付</div>
-    <div @click="complete" class="complete-btn">已完成支付</div>
+    <div @click="this.complete(true)" class="complete-btn">已完成支付</div>
     <div @click="rePay" class="repay-btn">未完成，重新支付</div>
     <div class="contact">客服电话：<a class="tel-btn" href="tel:4006806307">400-680-6307</a></div>
-    <div v-for="(value, key) in query" :key="key">
+    <!-- <div v-for="(value, key) in query" :key="key">
       {{ key }}: {{ value }}
-    </div>
+    </div> -->
   </div>
 </template>
 
@@ -42,8 +42,28 @@
           window.location.href = _href
         }
       },
-      complete () { // 完成订单，跳转票据二维码页面
-        this.$router.replace({name: 'ActivityTicket', query: {checkcode: this.$route.query.checkcode}})
+      complete (shouldConfirm) { // 完成订单，跳转票据二维码页面， shouldConfirm表示是否应该先验证
+        if (shouldConfirm) { // 需要验证先验证，通过了再跳转
+          let rData = {
+            checkcode: this.$route.query.checkcode,
+            payNo: this.$route.query.payNo
+          }
+          this.$ajax('/jv/qz/v21/activity/payResult', {data: rData}).then(res => {
+            if (res && Boolean(res.error) && res.msg) {
+              this.$toast(res.msg)
+            } else if (res && !Boolean(res.error)) {
+              if (res.data && res.data.success) {
+                this.$router.replace({name: 'ActivityTicket', query: {checkcode: this.$route.query.checkcode}})
+              } else if (res.data && !res.data.success) {
+                alert('支付失败，如遇到支付问题请拨打客服电话咨询：4006806307')
+              }
+            }
+          }).catch(err => {
+            console.log('验证订单出错', err)
+          })
+        } else { // 不需要验证直接跳转
+          this.$router.replace({name: 'ActivityTicket', query: {checkcode: this.$route.query.checkcode}})
+        }
       }
     },
     created () {
@@ -52,7 +72,7 @@
         if (payResult === 'FAIL' || payResult === 'CANCEL') { // 未完成支付的逻辑,支付失败时提示，用户取消则不做任何提示
           payResult === 'FAIL' && this.$toast('支付失败')
         } else if (payResult === 'SUCCESS') { // 完成支付立即跳转成功页面
-          this.$toast('报名成功', 2000, this.complete) 
+          this.$toast('报名成功', 2000, his.complete) 
         }
       } else if (from === 'MWEB') { // 微信h5支付，不做任何操作，让用户自己选择
         
