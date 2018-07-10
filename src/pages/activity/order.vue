@@ -410,7 +410,7 @@
     font-weight: 600;
     line-height: 100px;
     padding-left: 30px;
-    position: absolute;
+    position: relative;
     left: 0;
     bottom: 0;
   }
