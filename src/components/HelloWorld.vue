@@ -1,6 +1,6 @@
 <template>
   <div class="hello">
-    <h1 @click="testAlert">{{ msg }}</h1>
+    <h1>{{ msg }}</h1>
     <h2>Essential Links</h2>
     <ul>
       <li>
@@ -95,9 +95,6 @@ export default {
     goActivity () {
       console.log('goActivity')
       this.$router.push({name: 'ActivityDetail', query: {id: 20}})
-    },
-    testAlert () {
-      this.$modal.showAlert(12314234234)
     }
   }
 }

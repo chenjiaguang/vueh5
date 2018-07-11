@@ -55,7 +55,7 @@
               if (res.data && res.data.success) {
                 this.$router.replace({name: 'ActivityTicket', query: {checkcode: this.$route.query.checkcode}})
               } else if (res.data && !res.data.success) {
-                alert('支付失败，如遇到支付问题请拨打客服电话咨询：4006806307')
+                is.$modal.showAlert(<div>支付失败，如遇到支付问题请拨打客服电话咨询：<a style="color:#1EB0FD" href="tel:4006806307">4006806307</a></div>)
               }
             }
           }).catch(err => {

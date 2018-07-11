@@ -4,22 +4,28 @@ import main from './Modal.vue'
 let Main = Vue.extend(main)
 
 let Modal = {
-    showAlert: (text) => {
+    showAlert: (text, onClose) => {
         let div = window.document.createElement('div')
         let _main = new Main({
             data: function () {
                 return {
-                    text: text
+                    text: text,
+                    onClose: onClose || function () {}
                 }
             }
         })
-        _main.id = '_custom_modal_'
+        let id = 'custom-modal-' + new Date().getTime()
+        _main.id = id
         window.document.body.appendChild(div)
         _main.$mount(div)
     },
-    hideAlert: () => {
-        let modal = window.document.getElementById('_custom_modal_')
+    hideAlert: (id, onClose) => {
+        let modal = window.document.getElementById(id)
         window.document.body.removeChild(modal)
+        console.log('onClose', onClose)
+        if (onClose) {
+            onClose()
+        }
     }
 }
 

@@ -31,7 +31,8 @@
       <div class="tag-container clearfix">
         <div class="fl tag-item" v-for="(item, idx) in activity.tags" :key="idx">{{item}}<div class="tag-border"></div></div>
       </div>
-      <div ref="contentContainer" @load="layout" class="content-container" v-if="activity.content && activity.content.length > 0">
+      <show-hide-content :content="activity.content" v-if="activity.content && activity.content.length > 0" />
+      <!-- <div ref="contentContainer" class="content-container" v-if="activity.content && activity.content.length > 0">
         <div ref="contentHeader" class="header">活动介绍</div>
         <div ref="contentContext" class="content-context">
           <template v-for="(item, idx) in activity.content">
@@ -40,7 +41,7 @@
           </template>
         </div>
         <div v-if="contentWrapperHeight && contentWrapperHeight > halfScreenHeight" ref="contentBtn" class="show-hide-btn" @click="changeShowContext"><span class="show-hide-text">{{showMore ? '收起' : '查看更多图文详情'}}<i class="pull-sign iconfont icon-pull_down" :style="{transform: showMore ? 'scale(0.25) rotate(180deg)' : 'scale(0.25) rotate(0)'}"></i></span></div>
-      </div>
+      </div> -->
     </div>
     <div class="join-wrapper" v-if="activity.join && activity.join.length > 0">
       <div class="color-block"></div>
@@ -73,7 +74,7 @@
     background-size: cover;
     background-repeat: no-repeat;
   }
-  .info-container, .content-container{
+  .info-container{
     padding: 0 4%;
   }
   .location-text, .sponsor-text{
@@ -88,13 +89,6 @@
   .location-sign{
     font-size: 24px;
     color: #1EB0FD;
-  }
-  .content-container{
-    font-size:28px;
-    line-height: 46px;
-    position: relative;
-    overflow: hidden;
-    transition: height 300ms;
   }
   .info-title{
     padding: 23px 0 38px;
@@ -159,60 +153,6 @@
     transform-origin: 0 0;
     z-index: 0;
   }
-  .content-context{
-    padding-bottom: 21px;
-    white-space: pre-wrap;
-  }
-  .content-context img{
-    display: block;
-    margin: 21px 0;
-    width: 100%;
-  }
-  .show-hide-btn{
-    width: 92%;
-    height: 84px;
-    background-color: #fff;
-    margin-left: 4%;
-    line-height:84px;
-    font-size: 24px;
-    text-align: center;
-    position: absolute;
-    left: 0;
-    bottom: 0;
-  }
-  .show-hide-btn:after{
-    content: "";
-    display: block;
-    width: 200%;
-    height: 2px;
-    position: absolute;
-    top: 0;
-    left: 0;
-    transform: scale(0.5);
-    transform-origin: 0 0;
-    background-color: #e5e5e5;
-  }
-  .show-hide-text{
-    display: inline-block;
-    position: relative;
-    padding-right:35px;
-  }
-  .pull-sign{
-    position: absolute;
-    right: 0;
-    top: 50%;
-    margin-top: -38px;
-    margin-right: -24px;
-    display: block;
-    width: 72px;
-    height: 72px;
-    line-height: 72px;
-    font-size:72px;
-    color: #333;
-    transform-origin: 50% 50%;
-    transition: all 300ms;
-
-  }
   .join-partner{
     padding: 30px 23px 25px;
   }
@@ -253,6 +193,7 @@
 
 <script>
 import '@/iconfont/iconfont.css'
+import ShowHideContent from './components/ShowHideContent'
 export default {
   name: 'ActivityDetail',
   data () {
@@ -261,6 +202,7 @@ export default {
       activity: {
         id: '',
         banner: '',
+        content: [],
         title: '',
         sponsor: { // 主办方
           name: '',
@@ -287,6 +229,7 @@ export default {
       halfScreenHeight: parseInt(window.innerHeight * 0.5),
     }
   },
+  components: { ShowHideContent },
   methods: {
     fetchActivity () {
       let rData = {
