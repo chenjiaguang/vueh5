@@ -15,7 +15,6 @@ let Router = new Vue({
   components: { App },
   template: '<App/>'
 })
-
 Vue.use({
   Router
 })

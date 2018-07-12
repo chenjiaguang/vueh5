@@ -1,7 +1,7 @@
 <template>
   <div class="hello">
-    <h1>{{ msg }}</h1>
-    <h2>Essential Links</h2>
+    <h1 @click="preview">{{ msg }}</h1>
+    <h2 @click="hidePreview">Essential Links</h2>
     <ul>
       <li>
         <a
@@ -84,6 +84,7 @@
 </template>
 
 <script>
+import ImagePreview from './imagePreview'
 export default {
   name: 'HelloWorld',
   data () {
@@ -95,6 +96,19 @@ export default {
     goActivity () {
       console.log('goActivity')
       this.$router.push({name: 'ActivityDetail', query: {id: 20}})
+    },
+    preview () {
+      ImagePreview.show([
+        'http://pic.pptbz.com/201506/2015070581208537.JPG',
+        'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1531403270905&di=d86baceda90dad89a813018d3a46b936&imgtype=0&src=http%3A%2F%2Fp2.qhimg.com%2Ft011fc13354f12d1a46.jpg',
+        'http://img.zcool.cn/community/01ca8c573c04b832f8757cb97b2444.jpg@1280w_1l_2o_100sh.jpg',
+        'http://img.zcool.cn/community/0181845834f4eda8012060c8c95113.JPG@1280w_1l_2o_100sh.png'
+        ],
+        55
+      )
+    },
+    hidePreview () {
+      ImagePreview.hide(55)
     }
   }
 }

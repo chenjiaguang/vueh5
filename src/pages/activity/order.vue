@@ -671,10 +671,9 @@
                 let _rData = {
                   checkcode: res.data.checkcode,
                   payType: '1',
-                  tradeType: 'MWEB',
-                  token: res.data.token
+                  tradeType: 'MWEB'
                 }
-                this.$ajax('/jv/qz/v21/activity/pay', {data: _rData}).then(res => {
+                this.$ajax('/jv/anonymous/qz/v21/activity/pay', {data: _rData}).then(res => {
                   console.log('微信外h5 res', res)
                   if (res && Boolean(res.error) && res.msg) {
                     this.$toast(res.msg)
@@ -686,7 +685,7 @@
                   console.log('微信外h5 err', err)
                 })
               } else { // 允许调用微信公众号支付,微信浏览器
-                let _href = this.$apiDomain + '/jv/qz/v21/activity/weixin/JSAPI/pay/' + res.data.checkcode + '/' + res.data.token
+                let _href = this.$apiDomain + '/jv/qz/v21/activity/weixin/JSAPI/pay/' + res.data.checkcode
                 window.location.href = _href
               }
             } else if (res.data && !res.data.needToPlay) { // 不需要支付
