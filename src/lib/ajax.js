@@ -13,7 +13,6 @@ axios.interceptors.request.use(function (config) {
   if (config.data.token) { // 如果传入了token，将token放入headers中
     config.headers.token = config.data.token
   }
-  console.log('config', config)
   return config
 }, function (error) {
   // 对请求错误做些什么

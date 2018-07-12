@@ -49,13 +49,14 @@
             payNo: this.$route.query.payNo
           }
           this.$ajax('/jv/qz/v21/activity/payResult', {data: rData}).then(res => {
-            if (res && Boolean(res.error) && res.msg) {
+            console.log('chenggong', res, Boolean(res.error), !Boolean(res.error), res.msg, typeof res.msg)
+            if (res && Boolean(res.error)) {
               this.$toast(res.msg)
-            } else if (res && !Boolean(res.error)) {
+            } else if (!Boolean(res.error)) {
               if (res.data && res.data.success) {
                 this.$router.replace({name: 'ActivityTicket', query: {checkcode: this.$route.query.checkcode}})
               } else if (res.data && !res.data.success) {
-                is.$modal.showAlert('<div>支付失败，如遇到支付问题请拨打客服电话咨询：<a style="color:#1EB0FD" href="tel:4006806307">4006806307</a></div>')
+                this.$modal.showAlert('<div>支付失败，如遇到支付问题请拨打客服电话咨询：<a style="color:#1EB0FD" href="tel:4006806307">4006806307</a></div>')
               }
             }
           }).catch(err => {
