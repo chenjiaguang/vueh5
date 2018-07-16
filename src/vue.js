@@ -4,7 +4,7 @@ import ajax from './lib/ajax'
 import browserUA from './lib/browserUA'
 import toast from './components/toast'
 import modal from './components/modal'
-import ImagePreview from './components/ImagePreview'
+import ImagePreview from './components/imagePreview'
 import VConsole from 'vconsole/dist/vconsole.min.js' // import vconsole
 
 /* eslint-disable no-new */
