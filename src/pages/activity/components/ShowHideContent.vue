@@ -1,12 +1,16 @@
 <template>
-    <div class="content-container" ref="contentWrapper" :style="{height: showMore ? (contentWrapperHeight + 'px') : (halfScreenHeight + 'px')}">
-        <div ref="contentContainer">
+    <div class="content-container" ref="contentWrapper" :style="{height: showMore ? (contentWrapperHeight + 'px') : (contentWrapperHeight ? halfScreenHeight + 'px' : 'auto')}">
+        <div ref="contentContainer" @resize="() => {console.log('resize')}">
           <div ref="contentHeader" class="header">活动介绍</div>
           <div ref="contentContext" class="content-context">
               <template v-for="(item, idx) in content">
-                <p :key="idx" v-if="item.type === '1'" @load="load">{{item.content}}</p>
-                <img :key="idx" v-else-if="item.type === '2'" :src="item.content.image" @load="load" />
+                <p :key="idx" v-if="item.type === '1'" class="content-text" @load="load">{{item.content}}</p>
+                <div :key="idx" v-else-if="item.type === '2' && item.content" class="image-box">
+                  <img :src="item.content.image" class="image" @load="load" @click="() => preview(idx)" />
+                  <div v-if="item.content.description" class="description" @load="load">{{item.content.description}}</div>
+                </div>
               </template>
+              <img src="" @error="load" style="width:0;height:0;display:none;" />
           </div>
         </div>
         <div v-if="contentWrapperHeight && contentWrapperHeight > halfScreenHeight" ref="contentBtn" class="show-hide-btn" @click="changeShowContext"><span class="show-hide-text">{{showMore ? '收起' : '查看更多图文详情'}}<i class="pull-sign iconfont icon-pull_down" :style="{transform: showMore ? 'scale(0.25) rotate(180deg)' : 'scale(0.25) rotate(0)'}"></i></span></div>
@@ -30,13 +34,25 @@
     padding-top: 66px;
   }
   .content-context{
-    padding-bottom: 21px;
+    margin-bottom: 21px;
+  }
+  .content-text{
     white-space: pre-wrap;
   }
-  .content-context img{
-    display: block;
-    margin: 21px 0;
+  .image-box{
     width: 100%;
+    margin: 21px 0;
+  }
+  .image{
+    display: block;
+    width: 100%;
+  }
+  .description{
+    font-size: 24px;
+    line-height: 34px;
+    color: #999;
+    padding: 13px 0 35px;
+    text-align: center;
   }
   .show-hide-btn{
     width: 92%;
@@ -117,12 +133,29 @@ export default {
       this.$nextTick(() => {
         let btnHeight = (84 / 750) * window.innerWidth
         let wrapperHeight = this.$refs['contentContainer'].offsetHeight
-        if (wrapperHeight > this.halfScreenHeight && !this.$refs['contentBtn']) { // 大于半屏且未显示切换按钮
+        console.log('wrapperHeight', wrapperHeight, this.halfScreenHeight)
+        if (wrapperHeight > this.halfScreenHeight) { // 大于半屏
           this.contentWrapperHeight = wrapperHeight + btnHeight
-        } else {
-          this.contentWrapperHeight = wrapperHeight
         }
       })
+    },
+    preview (index) {
+      let idx = this.contentImages.idxArr.indexOf(index)
+      this.$previewImage.show({images: this.contentImages.imageArr, idx: idx})
+    }
+  },
+  computed: {
+    contentImages () {
+      let imageArr = []
+      let idxArr = []
+      this.content.forEach((item, idx) => {
+        if (item.type.toString() === '2') {
+          imageArr.push(item.content.image)
+          idxArr.push(idx)
+        }
+      })
+      let obj = {imageArr, idxArr}
+      return obj
     }
   }
 }
