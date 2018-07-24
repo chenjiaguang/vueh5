@@ -694,6 +694,10 @@
                 let _href = this.$apiDomain + '/jv/qz/v21/activity/weixin/JSAPI/pay/' + res.data.checkcode
                 window.location.href = _href
               }
+            } else if (res.data && !res.data.needToPlay) {
+              if (res.msg) { // 如果无msg则直接跳转
+                this.goSuccess(res)
+              }
             }
           }
         }).catch(err => {
