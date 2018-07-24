@@ -662,8 +662,14 @@
         this.$ajax('/jv/anonymous/qz/v21/apply', {data: rData}).then(res => { // 请求后端下单接口,接受返回参数,如果有error,则提示，无error，则判断是否应调起支付
           this.submitting = false
           if (res && res.msg) {
-            if (res.data && !Boolean(res.error) && res.data.needToPlay) {
+            if (Boolean(res.error)) { // 出错时仅提示
               this.$toast(res.msg)
+            } else {
+              if (res.data && res.data.needToPlay) { // 无错且需支付时仅提示
+                this.$toast(res.msg)
+              } else if (res.data && !res.data.needToPlay) { // 无措且不需支付时提示后跳转
+                this.$toast(res.msg, 2000, () => this.goSuccess(res))
+              }
             }
           }
           if (res && !Boolean(res.error)) {
@@ -688,8 +694,6 @@
                 let _href = this.$apiDomain + '/jv/qz/v21/activity/weixin/JSAPI/pay/' + res.data.checkcode
                 window.location.href = _href
               }
-            } else if (res.data && !res.data.needToPlay) { // 不需要支付
-              this.$toast('报名成功', 2000, () => this.goSuccess(res))
             }
           }
         }).catch(err => {

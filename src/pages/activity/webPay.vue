@@ -52,14 +52,14 @@
               this.$toast(res.msg)
             } else if (!Boolean(res.error)) {
               if (res.data && res.data.success) {
-                if (res.msg) {
+                if (res.msg) { // 成功且有提示信息，提示后跳转
                   this.$toast(res.msg, 2000, () => {
                     this.$router.replace({name: 'ActivityTicket', query: {checkcode: this.$route.query.checkcode}})
                   })
-                } else {
+                } else { // 成功且无提示信息，直接跳转
                   this.$router.replace({name: 'ActivityTicket', query: {checkcode: this.$route.query.checkcode}})
                 }
-              } else if (res.data && !res.data.success) {
+              } else if (res.data && !res.data.success) { // 不成功侧弹窗提示
                 this.$modal.showAlert('<div>支付失败，如遇到支付问题请拨打客服电话咨询：<a style="color:#1EB0FD" href="tel:4006806307">4006806307</a></div>')
               }
             }
