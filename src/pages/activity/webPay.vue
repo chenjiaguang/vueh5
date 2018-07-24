@@ -27,7 +27,6 @@
             tradeType: 'MWEB'
           }
           this.$ajax('/jv/anonymous/qz/v21/activity/pay', {data: _rData}).then(res => {
-            console.log('微信外h5 res', res)
             if (res && Boolean(res.error) && res.msg) {
               this.$toast(res.msg)
             } else if (res && !Boolean(res.error)) {
@@ -35,7 +34,7 @@
               window.location.href = _href
             }
           }).catch(err => {
-            console.log('微信外h5 err', err)
+            console.log('微信外h5 err')
           })
         } else { // 允许调用微信公众号支付,微信浏览器
           let _href = this.$apiDomain + '/jv/qz/v21/activity/weixin/JSAPI/pay/' + this.$route.query.checkcode
@@ -49,12 +48,17 @@
             payNo: this.$route.query.payNo
           }
           this.$ajax('/jv/qz/v21/activity/payResult', {data: rData}).then(res => {
-            console.log('chenggong', res, Boolean(res.error), !Boolean(res.error), res.msg, typeof res.msg)
-            if (res && Boolean(res.error)) {
+            if (res && Boolean(res.error) && res.msg) {
               this.$toast(res.msg)
             } else if (!Boolean(res.error)) {
               if (res.data && res.data.success) {
-                this.$router.replace({name: 'ActivityTicket', query: {checkcode: this.$route.query.checkcode}})
+                if (res.msg) {
+                  this.$toast(res.msg, 2000, () => {
+                    this.$router.replace({name: 'ActivityTicket', query: {checkcode: this.$route.query.checkcode}})
+                  })
+                } else {
+                  this.$router.replace({name: 'ActivityTicket', query: {checkcode: this.$route.query.checkcode}})
+                }
               } else if (res.data && !res.data.success) {
                 this.$modal.showAlert('<div>支付失败，如遇到支付问题请拨打客服电话咨询：<a style="color:#1EB0FD" href="tel:4006806307">4006806307</a></div>')
               }
@@ -73,7 +77,7 @@
         if (payResult === 'FAIL' || payResult === 'CANCEL') { // 未完成支付的逻辑,支付失败时提示，用户取消则不做任何提示
           payResult === 'FAIL' && this.$toast('支付失败')
         } else if (payResult === 'SUCCESS') { // 完成支付立即跳转成功页面
-          this.$toast('报名成功', 2000, his.complete) 
+          this.complete(true)
         }
       } else if (from === 'MWEB') { // 微信h5支付，不做任何操作，让用户自己选择
         

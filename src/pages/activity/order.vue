@@ -661,11 +661,12 @@
         this.submitting = true
         this.$ajax('/jv/anonymous/qz/v21/apply', {data: rData}).then(res => { // 请求后端下单接口,接受返回参数,如果有error,则提示，无error，则判断是否应调起支付
           this.submitting = false
-          console.log('orderSubmit', res)
-          console.log('WeixinJSBridge', typeof WeixinJSBridge, res.error, Boolean(res.error))
-          if (res && Boolean(res.error) && res.msg) {
-            this.$toast(res.msg)
-          } else if (res && !Boolean(res.error)) {
+          if (res && res.msg) {
+            if (res.data && !Boolean(res.error) && res.data.needToPlay) {
+              this.$toast(res.msg)
+            }
+          }
+          if (res && !Boolean(res.error)) {
             if (res.data && res.data.needToPlay) { // 需要支付
               if (typeof WeixinJSBridge == "undefined") { // 不允许调用微信公众号支付,其他浏览器
                 let _rData = {
@@ -674,7 +675,6 @@
                   tradeType: 'MWEB'
                 }
                 this.$ajax('/jv/anonymous/qz/v21/activity/pay', {data: _rData}).then(res => {
-                  console.log('微信外h5 res', res)
                   if (res && Boolean(res.error) && res.msg) {
                     this.$toast(res.msg)
                   } else if (res && !Boolean(res.error)) {
@@ -682,7 +682,7 @@
                     window.location.href = _href
                   }
                 }).catch(err => {
-                  console.log('微信外h5 err', err)
+                  console.log('微信外h5 err')
                 })
               } else { // 允许调用微信公众号支付,微信浏览器
                 let _href = this.$apiDomain + '/jv/qz/v21/activity/weixin/JSAPI/pay/' + res.data.checkcode
