@@ -6,6 +6,10 @@ import toast from './components/toast'
 import modal from './components/modal'
 import ImagePreview from './components/imagePreview'
 import VConsole from 'vconsole/dist/vconsole.min.js' // import vconsole
+import {
+    /* eslint-disable no-unused-vars */
+    Style
+  } from 'cube-ui'
 
 /* eslint-disable no-new */
 if (process.env.NODE_ENV !== 'production') { // 非正式环境包，就实例化vconsole
