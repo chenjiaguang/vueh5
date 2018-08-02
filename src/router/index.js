@@ -12,12 +12,12 @@ import Agreement from '@/pages/agreement'
 import TestImageContainer from '@/pages/testImageContainer'
 
 Vue.use(Router)
-let prefix = '/h5'
+let prefix = ''
 
 const router = new Router({
   routes: [
     {
-      path: '*',
+      path: '*', // 所有404页面，（未能正确匹配路由时显示的页面）
       name: 'NotFoundPage',
       meta: {
         title: '范团'
