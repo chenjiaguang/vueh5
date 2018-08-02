@@ -5,5 +5,5 @@ fi
 echo "测试环境请使用 make test"
 ${SUDO} git pull
 ${SUDO} npm run build $1
-${SUDO} rm -rf ./dist
-${SUDO} mv ./temp ./dist
+${SUDO} rm -rf ./h5
+${SUDO} mv ./temp ./h5

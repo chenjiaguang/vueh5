@@ -12,7 +12,7 @@ import Agreement from '@/pages/agreement'
 import TestImageContainer from '@/pages/testImageContainer'
 
 Vue.use(Router)
-let prefix = ''
+let prefix = '/h5'
 
 const router = new Router({
   routes: [
