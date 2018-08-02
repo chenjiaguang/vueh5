@@ -12,6 +12,7 @@ import Agreement from '@/pages/agreement'
 import TestImageContainer from '@/pages/testImageContainer'
 
 Vue.use(Router)
+let prefix = '/h5'
 
 const router = new Router({
   routes: [
@@ -24,12 +25,12 @@ const router = new Router({
       component: NotFoundPage
     },
     {
-      path: '/',
+      path: prefix + '/',
       name: 'Home',
       component: Home
     },
     {
-      path: '/activity/detail',
+      path: prefix + '/activity/detail',
       name: 'ActivityDetail',
       component: ActivityDetail,
       meta: {
@@ -37,7 +38,7 @@ const router = new Router({
       }
     },
     {
-      path: '/activity/order',
+      path: prefix + '/activity/order',
       name: 'ActivityOrder',
       component: ActivityOrder,
       meta: {
@@ -45,7 +46,7 @@ const router = new Router({
       }
     },
     {
-      path: '/webPay', // 微信外h5支付回调页面
+      path: prefix + '/webPay', // 微信外h5支付回调页面
       name: 'WebPay',
       component: WebPay,
       meta: {
@@ -53,7 +54,7 @@ const router = new Router({
       }
     },
     {
-      path: '/activity/success',
+      path: prefix + '/activity/success',
       name: 'ActivitySuccess',
       component: ActivitySuccess,
       meta: {
@@ -61,7 +62,7 @@ const router = new Router({
       }
     },
     {
-      path: '/activity/ticket',
+      path: prefix + '/activity/ticket',
       name: 'ActivityTicket',
       component: ActivityTicket,
       meta: {
@@ -69,7 +70,7 @@ const router = new Router({
       }
     },
     {
-      path: '/map',
+      path: prefix + '/map',
       name: 'mapPage',
       component: MapPage,
       meta: {
@@ -77,7 +78,7 @@ const router = new Router({
       }
     },
     {
-      path: '/agreement',
+      path: prefix + '/agreement',
       name: 'agreement',
       component: Agreement,
       meta: {
@@ -85,7 +86,7 @@ const router = new Router({
       }
     },
     {
-      path: '/test/image',
+      path: prefix + '/test/image',
       name: 'testImageContainer',
       component: TestImageContainer,
       meta: {
