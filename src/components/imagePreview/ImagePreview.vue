@@ -1,6 +1,6 @@
 <template>
     <transition appear appear-class="before-appear">
-        <div class="container" :id="id" ref="mySwiper" :style="{width: swiperOption.width + 'px', height: swiperOption.height + 'px'}" @click="close">
+        <div class="container" :id="id" ref="mySwiper" :style="{width: swiperOption.width + 'px', height: swiperOption.height + 'px', zIndex: timestap}" @click="close">
             <swiper class="swiper-wrapper" :options="swiperOption">
                 <!-- slides --> 
                 <swiper-slide class="swiper-item" v-for="(item, idx) in images" :key="idx">
@@ -36,7 +36,8 @@ export default {
                     el: '.swiper-pagination',
                     type: 'fraction'
                 }
-            }
+            },
+            timestap: 999
         }
     },
     components: {
@@ -45,6 +46,7 @@ export default {
     },
     methods: {
         close () {
+            console.log('close')
             this.$previewImage.hide(this.id)
         }
     }

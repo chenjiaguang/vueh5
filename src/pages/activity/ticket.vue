@@ -38,7 +38,7 @@
       <div class="attention-item">3.暂不支持退票，有需要请联系主办方</div>
     </div>
     <div class="fixed-button">
-      <img src="/cwebassets/image/van_logo.png" class="van-logo" />
+      <img :src="$assetsPublicPath + '/cwebassets/image/van_logo.png'" class="van-logo" />
       有范又有趣的海南生活圈
       <div class="open-btn" @click="openFantTuanC">立即打开</div>
     </div>

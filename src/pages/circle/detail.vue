@@ -1,6 +1,6 @@
 <template>
   <div :style="{height: winHeight + 'px'}">
-    <cube-scroll class="toutiao" ref="pageScroller" :scrollEvents="[]" :options="{bounce: false}">
+    <cube-scroll class="toutiao" ref="pageScroller" :scrollEvents="['scroll']" :options="{bounce: false}" @scroll="outerScroll">
       <header ref="topHeader" class="top-header">
         <div class="top-header-bg" :style="{backgroundImage: 'url(' + circle.cover.compress + ')'}"></div>
         <div class="top-header-content">
@@ -15,31 +15,8 @@
           </div>
         </div>
       </header>
-      <div class="dynamic-item">
-        <div class="user-overview">
-          <div class="user-avatar" :style="{backgroundImage: 'url(' + testItem.avatar + ')'}"></div>
-          <div class="user-name clearfix">
-            <span class="user-name-text fl">{{testItem.name}}</span>
-            <img v-if="testItem.is_manager" :src="$assetsPublicPath + '/cwebassets/image/manager.png'" class="user-tag fl" />
-            <img v-if="testItem.is_owner" :src="$assetsPublicPath + '/cwebassets/image/circle_owner.png'" class="user-tag fl" />
-            <img v-if="testItem.is_settop" :src="$assetsPublicPath + '/cwebassets/image/settop.png'" class="user-tag fl" />
-          </div>
-          <div class="publish-time">{{testItem.time_text}}</div>
-        </div>
-        <div class="dynamic-content">
-          {{testItem.content_text}}
-          <div class="show-hide-content">全文</div>
-        </div>
-        <div class="dynamic-pinture">
-          <image-container :images="testItem.pictrues" :showDelete="false" />
-        </div>
-        <div class="publish-address">{{testItem.address}}</div>
-        <div class="at-activity"><i class="iconfont icon-location"></i>{{testItem.activity}}</div>
-        <div class="with-article">
-          <div class="with-article-cover" :style="{backgroundImage: 'url(' + testItem.with_article.cover + ')'}"></div>
-          <div class="with-article-title">{{testItem.with_article.title}}</div>
-        </div>
-      </div>
+      <dynamic-item :itemData="testItem" @changeLike="changeLike" />
+      <activity-item :itemData="activityItem" />
       <div class="scroll-wrapper" :style="{height: winHeight + 'px'}" v-if="tabs && tabs.length > 0">
         <div class="nav-scroll-list-wrap" ref="navWrapper" :style="{height: tabBarHeight + 'px'}">
           <cube-tab-bar v-model="selectedLabel" class="tab-box" @change="changeTabBar" :style="{height: tabBarHeight + 'px'}">
@@ -80,12 +57,19 @@
         </div>
       </div>
     </cube-scroll>
+    <transition name="backtop-fade">
+      <i v-if="showBackTop" class="iconfont icon-back_top backtop-icon"></i>
+    </transition>
+    <i class="iconfont icon-camera publish-icon"></i>
+    <download-box />
   </div>
 </template>
 
 <script type="text/ecmascript-6">
 import Vue from 'vue'
-import ImageContainer from '../../components/ImageContainer'
+import DynamicItem from './components/DynamicItem'
+import ActivityItem from './components/ActivityItem'
+import DownloadBox from '../../components/DownloadBox'
 import {
     /* eslint-disable no-unused-vars */
     Style,
@@ -122,11 +106,27 @@ let cnt = 1
 export default {
   data() {
     return {
+      activityItem: {
+        id: 74,
+        cover: 'http://img.qikula.com/file/image/pic/1a485694362n61804661c27.jpg',
+        title: '夏日沙滩排球大作战，我的战队等你来约，兄弟就差你了！',
+        address: '海口市秀英区滨海大道假日海滩夏日烧烤园A12区水电费就算了收到了房间收到了饭是',
+        time: '01-03 18:30 至 05-06 18:30',
+        fee: '65起',
+        status: '进行中'
+      },
+      showBackTop: false,
       testItem: {
+        is_like: false,
+        like_number: 4,
+        comment_number: 6,
+        address: '海口世贸北路一号椰风海岸二期',
+        activity: '啤酒与烧烤，夏日里的绝佳搭配。约吗？快来加入我们吧阿斯顿了开发建设的收到了副科级',
         name: '测试名字',
         time_text: '2018-08-05',
-        content_text: '动态的内容动态的内容动态的内容动态的内容动态的内容动态的内容动态的内容动态的内容动态的内容动态的内容',
+        content_text: '动态的内容动态的内容动态的内容动态的内容动态的内容动水电费水电费上课地方失联飞机阿失联飞机阿失联飞机阿市领导发就阿市领导开发就阿市领导发  老师看大家发拉屎阿酸辣粉 爱上 发生的福利态的内容动态的内容动态的内容动态的内容动态的内容',
         avatar: 'http://img.qikula.com/file/image/pic/1a485694362n61804661c27.jpg',
+        is_long_dynamic: true,
         is_manager: true,
         is_owner: true,
         is_settop: true,
@@ -158,7 +158,8 @@ export default {
           }
         ],
         with_article: {
-
+          title: '测试文章标题测试文章标题测试文章标题测试文章标题测试文章标题测试文章标题测试文章标题测试文章标题测试文章标题测试文章标题测试文章标题',
+          cover: 'http://img.zcool.cn/community/01247f5991c8d40000002129fce48c.jpg'
         }
       },
       circle: {
@@ -181,12 +182,10 @@ export default {
         pullUpLoad: {
           threshold: (window.innerWidth / 750) * 100
         }
-      },
-      navTxts: txts,
-      secondStop: 26
+      }
     }
   },
-  components: {ImageContainer},
+  components: {DynamicItem, ActivityItem, DownloadBox},
   methods: {
     changeTabBar (tabTitle) { // 点击tab切换
       let wrapperWidth = this.$refs['navWrapper'] ? this.$refs['navWrapper'].offsetWidth : window.innerWidth
@@ -343,6 +342,22 @@ export default {
         this.tabs[idx].data = this.tabs[idx].data.concat({title: 'sdfsdfsdf'})
         this.$refs['contentScroll'][idx].forceUpdate()
       }, 1000)
+    },
+    changeLike () {
+      if (this.testItem.is_like) {
+        this.testItem.is_like = false
+        this.testItem.like_number -= 1
+      } else {
+        this.testItem.is_like = true
+        this.testItem.like_number += 1
+      }
+    },
+    outerScroll ({x, y}) {
+      if (-y > this.winHeight) { // 超过半屏显示返回顶部
+        this.showBackTop = true
+      } else {
+        this.showBackTop = false
+      }
     }
   },
   created () {
@@ -409,7 +424,7 @@ fl{
   overflow : hidden;
   text-overflow: ellipsis;
   display: -webkit-box;
-  /* -webkit-line-clamp: 3; */
+  -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
 }
 .top-header-overview{
@@ -431,60 +446,6 @@ fl{
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;
-}
-.dynamic-item{
-  width: 100%;
-  padding: 0 4%;
-}
-.user-overview{
-  padding: 30px 0 23px;
-  position: relative;
-  min-height: 76px;
-  box-sizing: content-box;
-}
-.user-avatar{
-  width: 76px;
-  height: 76px;
-  position: absolute;
-  left: 0;
-  top: 30px;
-  background-repeat: no-repeat;
-  background-size: cover;
-  background-position: center;
-  border-radius: 50%;
-}
-.user-name{
-  padding-left: 100px;
-}
-.user-name-text{
-  padding-top: 2px;
-  font-size: 28px;
-  line-height: 38px;
-  color: #333;
-  font-weight: bold;
-}
-.publish-time{
-  font-size: 24px;
-  line-height: 34px;
-  color: #999;
-  padding-left: 100px;
-}
-.user-tag{
-  display: block;
-  height: 28px;
-  margin-left:10px;
-  position: relative;
-  top: 7px;
-}
-.dynamic-content{
-  font-size: 32px;
-  line-height: 46px;
-  color: #333;
-}
-.show-hide-content{
-  font-size:32px;
-  line-height: 58px;
-  color:#1EB0FD;
 }
 .nav-scroll-list-wrap{
   position: relative;
@@ -620,5 +581,48 @@ fl{
   100%{
     transform: rotate(360deg)
   }
+}
+.gray-block{
+  position: relative;
+  left: -5%;
+  width: 110%;
+  height: 10px;
+  background: #F5F5F5;
+}
+.backtop-icon{
+  display: block;
+  width: 88px;
+  height: 88px;
+  background-color: #717171;
+  color: #fff;
+  font-size:46px;
+  line-height: 88px;
+  text-align: center;
+  border-radius: 8px;
+  position: fixed;
+  right: 54px;
+  bottom: 282px;
+  z-index: 2;
+}
+.backtop-fade-enter-active, .backtop-fade-leave-active {
+  transition: all .5s;
+}
+.backtop-fade-enter, .backtop-fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+  opacity: 0;
+}
+.publish-icon{
+  display: block;
+  width: 88px;
+  height: 88px;
+  background-color: #1EB0FD;
+  color: #fff;
+  font-size:46px;
+  line-height: 88px;
+  text-align: center;
+  border-radius: 8px;
+  position: fixed;
+  right: 54px;
+  bottom: 184px;
+  z-index: 2;
 }
 </style>

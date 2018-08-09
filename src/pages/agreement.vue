@@ -27,9 +27,9 @@
         winHeight: window.innerHeight,
         src: '',
         srcObject: {
-          user: '/cwebassets/userAgreement.html',
-          author: '/cwebassets/authorAgreement.html',
-          activity: '/cwebassets/activityAgreement.html'
+          user: this.$assetsPublicPath + '/cwebassets/userAgreement.html',
+          author: this.$assetsPublicPath + '/cwebassets/authorAgreement.html',
+          activity: this.$assetsPublicPath + '/cwebassets/activityAgreement.html'
         }
       }
     },

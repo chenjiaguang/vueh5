@@ -18,7 +18,8 @@ let ImagePreview = {
                 return {
                     images: images,
                     id: 'custom-preview-image-' + (id || new Date().getTime()),
-                    swiperOption: _options
+                    swiperOption: _options,
+                    timestap: new Date().getTime()
                 }
             }
         })

@@ -1,12 +1,24 @@
 <template>
   <div id="app">
-    <router-view/>
+    <transition :name="transitionName">
+      <router-view/>
+    </transition>
   </div>
 </template>
 
 <script>
 export default {
-  name: 'App'
+  name: 'App',
+  data () {
+    return {
+      transitionName: 'none'
+    }
+  },
+  watch: {
+    '$route' (nextRoute, preRoute) {
+      console.log(this.$route)
+    }
+  }
 }
 </script>
 

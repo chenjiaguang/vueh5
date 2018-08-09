@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import NotFoundPage from '@/pages/notFoundPage'
 import Home from '@/pages/home'
+import CircleDetail from '@/pages/circle/detail'
 import ActivityDetail from '@/pages/activity/detail'
 import ActivityOrder from '@/pages/activity/order'
 import WebPay from '@/pages/activity/webPay'
@@ -9,6 +10,7 @@ import ActivitySuccess from '@/pages/activity/success'
 import ActivityTicket from '@/pages/activity/ticket'
 import MapPage from '@/pages/mapPage'
 import Agreement from '@/pages/agreement'
+import UserCenter from '@/pages/user/center'
 import TestImageContainer from '@/pages/testImageContainer'
 
 Vue.use(Router)
@@ -87,10 +89,26 @@ const router = new Router({
     },
     {
       path: prefix + '/test/image',
-      name: 'testImageContainer',
+      name: 'TestImageContainer',
       component: TestImageContainer,
       meta: {
         title: '图片测试'
+      }
+    },
+    {
+      path: prefix + '/circle/detail',
+      name: 'CircleDetail',
+      component: CircleDetail,
+      meta: {
+        title: '活动列表'
+      }
+    },
+    {
+      path: prefix + '/user/center',
+      name: 'UserCenter',
+      component: UserCenter,
+      meta: {
+        title: '范团名片'
       }
     }
   ],

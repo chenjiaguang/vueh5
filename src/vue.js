@@ -5,6 +5,7 @@ import browserUA from './lib/browserUA'
 import toast from './components/toast'
 import modal from './components/modal'
 import ImagePreview from './components/imagePreview'
+
 import VConsole from 'vconsole/dist/vconsole.min.js' // import vconsole
 import {
     /* eslint-disable no-unused-vars */
@@ -15,6 +16,7 @@ import {
 if (process.env.NODE_ENV !== 'production') { // 非正式环境包，就实例化vconsole
     new VConsole() // 初始化
 }
+Vue.prototype.$assetsPublicPath = '/h5'
 Vue.prototype.$apiDomain = process.env.API_DOMAIN
 Vue.prototype.$locationDomain = process.env.LOCATION_DOMAIN
 Vue.prototype.$ajax = ajax

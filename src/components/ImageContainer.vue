@@ -1,8 +1,8 @@
 <template>
   <div style="width: 100%;overflow: hidden;">
     <template v-for="(item, idx) in images">
-      <transition :key="idx" appear appear-class="before-appear">
-        <div :style="{marginTop: idx < 3 ? 0 : '1.055%'}" class="item-container fl" :class="{disabled: !item.url, one: images.length === 1, 'two-and-more': images.length > 1, left: idx % 3 === 0, horizontal: Number(item.width) >= Number(item.height), vertical: Number(item.width) < Number(item.height)}">
+      <transition :key="idx" :appear="appearAnimation" appear-class="before-appear">
+        <div @click="previewImage(idx)" :style="{marginTop: idx < 3 ? 0 : '1.055%'}" class="item-container fl" :class="{disabled: !item.url, one: images.length === 1, 'two-and-more': images.length > 1, left: idx % 3 === 0, horizontal: Number(item.width) >= Number(item.height), vertical: Number(item.width) < Number(item.height)}">
           <img :src="item.url" class="image-item" :class="{horizontal: images.length === 1 && (Number(item.width) / Number(item.height) >= 1.44) || images.length > 1 && Number(item.width) >= Number(item.height), vertical: images.length === 1 && (Number(item.width) / Number(item.height) < 1.44) || images.length > 1 && Number(item.width) < Number(item.height)}" />
           <div class="long-tag" v-if="Number(item.height) / Number(item.width) > 4">长图</div>
           <div class="delete-btn iconfont icon-guanbi" v-if="showDelete" @click="deleteImage(item, idx)"></div>
@@ -14,13 +14,18 @@
 
 <script>
 export default {
-  props: ['images', 'showDelete', 'deleteFunc'],
+  props: ['images', 'showDelete', 'deleteFunc', 'appearAnimation'],
   data () {
     return {}
   },
   methods: {
     deleteImage (item, idx) {
       this.$emit('deleteFunc', item, idx)
+    },
+    previewImage (idx) {
+      console.log(123)
+      let _images = this.images.map(item => item.url)
+      this.$previewImage.show({images: _images, idx})
     }
   }
 }
@@ -33,7 +38,6 @@ export default {
 }
 .item-container{
   margin-left: 1.055%;
-  background-color: #999;
   position: relative;
   overflow: hidden;
   transition: all 0.5s;

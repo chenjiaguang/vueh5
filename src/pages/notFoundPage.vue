@@ -1,6 +1,6 @@
 <template>
   <div class="page">
-    <img class="image" src="/cwebassets/image/not_found.png" />
+    <img class="image" :src="$assetsPublicPath + '/cwebassets/image/not_found.png'" />
     <div class="not-found-tip">该页面不存在哦～</div>
   </div>
 </template>
