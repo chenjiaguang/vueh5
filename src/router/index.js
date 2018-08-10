@@ -12,6 +12,7 @@ import MapPage from '@/pages/mapPage'
 import Agreement from '@/pages/agreement'
 import UserCenter from '@/pages/user/center'
 import TestImageContainer from '@/pages/testImageContainer'
+import EditDynamic from '@/pages/dynamic/edit'
 
 Vue.use(Router)
 let prefix = '/h5'
@@ -109,6 +110,14 @@ const router = new Router({
       component: UserCenter,
       meta: {
         title: '范团名片'
+      }
+    },
+    {
+      path: prefix + '/dynamic/edit',
+      name: 'EditDynamic',
+      component: EditDynamic,
+      meta: {
+        title: '发动态'
       }
     }
   ],

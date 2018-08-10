@@ -4,6 +4,7 @@ axios.defaults.method = 'post'
 axios.interceptors.request.use(function (config) {
   if (!config.data) config.data = {}
   // 在发送请求之前做些什么
+  console.log(config)
   if (config.data instanceof FormData) {
     config.data.append('token', config.data.token || window.localStorage.token || '')
   } else {

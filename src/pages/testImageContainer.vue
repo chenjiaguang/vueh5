@@ -1,12 +1,6 @@
 <template>
   <div class="test-box">
-    <image-container :images="images" :showDelete="true" @deleteFunc="deleteFunction" />
-    <div>
-      <div v-for="(item, idx) in imgLinks" :key="idx">
-        <cube-button :light="true" @click="add(idx)">添加{{idx + 1}}</cube-button>
-        <cube-button @click="deleteImage(item, idx)">删除{{idx + 1}}</cube-button>
-      </div>
-    </div>
+    <div @click="jump">跳转</div>
   </div>
 </template>
 
@@ -73,6 +67,24 @@ export default {
   },
   components: {ImageContainer},
   methods: {
+    jump () {
+      let topic = [
+        {
+          id: 2,
+          title: '测试话题'
+        }
+      ]
+      let activity = {
+        id: 2,
+        title: '屯昌木色湖一日游'
+      }
+      let circle = {
+        id: 2,
+        title: '舌尖上的海口'
+      }
+      let range = 1
+      this.$router.push({name: 'EditDynamic', params: {topic: topic, activity: activity, circle: circle, range: range}})
+    },
     add (idx) {
       let img = this.imgLinks[idx]
       this.images.push(img)

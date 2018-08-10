@@ -2,7 +2,12 @@
   <div style="width: 100%;overflow: hidden;">
     <template v-for="(item, idx) in images">
       <transition :key="idx" :appear="appearAnimation" appear-class="before-appear">
-        <div @click="previewImage(idx)" :style="{marginTop: idx < 3 ? 0 : '1.055%'}" class="item-container fl" :class="{disabled: !item.url, one: images.length === 1, 'two-and-more': images.length > 1, left: idx % 3 === 0, horizontal: Number(item.width) >= Number(item.height), vertical: Number(item.width) < Number(item.height)}">
+        <div v-if="item.url === 'add-btn'" :style="{marginTop: idx < 3 ? 0 : '1.055%'}" :class="{left: idx % 3 === 0}" class="item-container add-btn two-and-more fl">
+          <form @submit.prevent="test" ref="upload" id="upload-image" enctype="multipart/form-data" method="post" action="http://fanttest.com/jv/image/upload">
+            <input @change="addImage" multiple class="input-image" type="file" accept="image/gif, image/jpeg, image/jpe, image/png" />
+          </form>
+        </div>
+        <div v-else @click="previewImage(idx)" :style="{marginTop: idx < 3 ? 0 : '1.055%'}" class="item-container fl" :class="{disabled: !item.url, one: images.length === 1, 'two-and-more': images.length > 1, left: idx % 3 === 0, horizontal: Number(item.width) >= Number(item.height), vertical: Number(item.width) < Number(item.height)}">
           <img :src="item.url" class="image-item" :class="{horizontal: images.length === 1 && (Number(item.width) / Number(item.height) >= 1.44) || images.length > 1 && Number(item.width) >= Number(item.height), vertical: images.length === 1 && (Number(item.width) / Number(item.height) < 1.44) || images.length > 1 && Number(item.width) < Number(item.height)}" />
           <div class="long-tag" v-if="Number(item.height) / Number(item.width) > 4">长图</div>
           <div class="delete-btn iconfont icon-guanbi" v-if="showDelete" @click="deleteImage(item, idx)"></div>
@@ -14,11 +19,34 @@
 
 <script>
 export default {
-  props: ['images', 'showDelete', 'deleteFunc', 'appearAnimation'],
+  props: ['images', 'showDelete', 'deleteFunc', 'appearAnimation', 'addFunc'],
   data () {
     return {}
   },
   methods: {
+    test () {
+      console.log('test')
+    },
+    addImage () {
+      console.log('onchange')
+      this.$refs['upload'][0].submit()
+      return false
+      let rData = {
+        token: 'lcaKiq5GIC_FHqubOBcI6FUKaL8N171U',
+        data: data.target.files
+      }
+      this.$ajax('/jv/image/upload', {data: rData}).then(res => {
+        console.log(111, res)
+      }).catch(err => {
+        console.log(222, err)
+      })
+      // let reader = new FileReader()
+      // reader.readAsDataURL(data.target.files[0])
+      // reader.onload = function () {
+      //   console.log('this', this)
+      // }
+      this.$emit('addFunc')
+    },
     deleteImage (item, idx) {
       this.$emit('deleteFunc', item, idx)
     },
@@ -61,6 +89,42 @@ export default {
     width: 32.63%;
     padding-top: 32.63%;
   }
+}
+.add-btn{
+  background: #F4F4F4;
+  &:before{
+    content: "";
+    display: block;
+    width: 33.33%;
+    height: 3.03%;
+    position: absolute;
+    left: 33.33%;
+    top: 48.485%;
+    background: #D8D8D8;
+    z-index: 1;
+  }
+  &:after{
+    content: "";
+    display: block;
+    width: 33.33%;
+    height: 3.03%;
+    position: absolute;
+    left: 33.33%;
+    top: 48.485%;
+    background: #D8D8D8;
+    transform: rotate(90deg);
+    z-index: 1;
+  }
+}
+.input-image{
+  display: block;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0;
+  z-index: 2;
 }
 .left{
   margin-left: 0
