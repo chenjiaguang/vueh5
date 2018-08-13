@@ -1,14 +1,12 @@
 <template>
   <div style="width: 100%;overflow: hidden;">
     <template v-for="(item, idx) in images">
-      <transition :key="idx" :appear="appearAnimation" appear-class="before-appear">
-        <div v-if="item.url === 'add-btn'" :style="{marginTop: idx < 3 ? 0 : '1.055%'}" :class="{left: idx % 3 === 0}" class="item-container add-btn two-and-more fl">
-          <form @submit.prevent="test" ref="upload" id="upload-image" enctype="multipart/form-data" method="post" action="http://fanttest.com/jv/image/upload">
-            <input @change="addImage" multiple class="input-image" type="file" accept="image/gif, image/jpeg, image/jpe, image/png" />
-          </form>
+      <transition :key="item.sign || item.id || idx" :appear="appearAnimation" appear-class="before-appear">
+        <div key="add-btn" v-if="item.url === 'add-btn'" :style="{marginTop: idx < 3 ? 0 : '1.055%'}" :class="{left: idx % 3 === 0}" class="item-container add-btn two-and-more fl">
+          <input ref="upload" @change="addImage" multiple class="input-image" type="file" accept="image/gif, image/jpeg, image/jpe, image/png" />
         </div>
-        <div v-else @click="previewImage(idx)" :style="{marginTop: idx < 3 ? 0 : '1.055%'}" class="item-container fl" :class="{disabled: !item.url, one: images.length === 1, 'two-and-more': images.length > 1, left: idx % 3 === 0, horizontal: Number(item.width) >= Number(item.height), vertical: Number(item.width) < Number(item.height)}">
-          <img :src="item.url" class="image-item" :class="{horizontal: images.length === 1 && (Number(item.width) / Number(item.height) >= 1.44) || images.length > 1 && Number(item.width) >= Number(item.height), vertical: images.length === 1 && (Number(item.width) / Number(item.height) < 1.44) || images.length > 1 && Number(item.width) < Number(item.height)}" />
+        <div :key="item.sign || item.id || idx" v-else @click="previewImage(idx)" :style="{marginTop: idx < 3 ? 0 : '1.055%'}" class="item-container fl" :class="{disabled: !(item.localUrl || item.url), one: images.length === 1, 'two-and-more': images.length > 1, left: idx % 3 === 0, horizontal: Number(item.width) >= Number(item.height), vertical: Number(item.width) < Number(item.height)}">
+          <img :src="item.localUrl || item.url" class="image-item" :class="{horizontal: images.length === 1 && (Number(item.width) / Number(item.height) >= 1.44) || images.length > 1 && Number(item.width) >= Number(item.height), vertical: images.length === 1 && (Number(item.width) / Number(item.height) < 1.44) || images.length > 1 && Number(item.width) < Number(item.height)}" />
           <div class="long-tag" v-if="Number(item.height) / Number(item.width) > 4">长图</div>
           <div class="delete-btn iconfont icon-guanbi" v-if="showDelete" @click="deleteImage(item, idx)"></div>
         </div>
@@ -23,36 +21,24 @@ export default {
   data () {
     return {}
   },
+  watch: {
+    images () {
+      console.log('watch', this.images)
+    }
+  },
   methods: {
     test () {
       console.log('test')
     },
     addImage () {
-      console.log('onchange')
-      this.$refs['upload'][0].submit()
-      return false
-      let rData = {
-        token: 'lcaKiq5GIC_FHqubOBcI6FUKaL8N171U',
-        data: data.target.files
-      }
-      this.$ajax('/jv/image/upload', {data: rData}).then(res => {
-        console.log(111, res)
-      }).catch(err => {
-        console.log(222, err)
-      })
-      // let reader = new FileReader()
-      // reader.readAsDataURL(data.target.files[0])
-      // reader.onload = function () {
-      //   console.log('this', this)
-      // }
-      this.$emit('addFunc')
+      let files = this.$refs['upload'][0].files
+      this.$emit('addFunc', files)
     },
     deleteImage (item, idx) {
       this.$emit('deleteFunc', item, idx)
     },
     previewImage (idx) {
-      console.log(123)
-      let _images = this.images.map(item => item.url)
+      let _images = this.images.map(item => (item.url || item.localUrl))
       this.$previewImage.show({images: _images, idx})
     }
   }
@@ -68,12 +54,13 @@ export default {
   margin-left: 1.055%;
   position: relative;
   overflow: hidden;
-  transition: all 0.5s;
+  transition: all 1s;
+  opacity: 1;
   &.before-appear{
     width: 0 !important;
     padding-top: 0 !important;
   }
-  &.v-leave-to{
+  &.v-leave-to, &.v-leave-active{
     width: 0 !important;
     padding-top: 0 !important;
   }
@@ -129,13 +116,13 @@ export default {
 .left{
   margin-left: 0
 }
-.item-container.disabled{
-  transform: scale(0, 0);
-  margin-top: 0 !important;
-  width: 0;
-  padding-top: 0;
-  opacity: 0;
-}
+// .item-container.disabled{
+//   transform: scale(0, 0);
+//   margin-top: 0 !important;
+//   width: 0;
+//   // padding-top: 0;
+//   // opacity: 0;
+// }
 .fl{
     float: left;
 }

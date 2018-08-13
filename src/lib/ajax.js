@@ -4,15 +4,17 @@ axios.defaults.method = 'post'
 axios.interceptors.request.use(function (config) {
   if (!config.data) config.data = {}
   // 在发送请求之前做些什么
-  console.log(config)
   if (config.data instanceof FormData) {
     config.data.append('token', config.data.token || window.localStorage.token || '')
   } else {
     config.data = JSON.parse(JSON.stringify(config.data))
     config.data.token = config.data.token || window.localStorage.token || ''
   }
-  if (config.data.token) { // 如果传入了token，将token放入headers中
-    config.headers.token = config.data.token
+  if (config.token || config.data.token) { // 如果传入了token，将token放入headers中
+    config.headers.token = config.token || config.data.token
+  }
+  if (config.contentType) {
+    config.headers['Content-Type'] = config.contentType
   }
   return config
 }, function (error) {

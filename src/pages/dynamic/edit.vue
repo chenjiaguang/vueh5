@@ -93,8 +93,62 @@ export default {
   },
   components: {imageContainer, EditOption},
   methods: {
-    addImage () {
-      console.log('addImage')
+    addImage (files) {
+      
+      let _this = this
+      let currentLength = this.images.filter(item => item.url !== 'add-btn').length
+      let addLength = 9 - currentLength // 最多9图
+      if (addLength <= 0) { // 超过9图处理
+        return false
+      }
+      for (let i = 0; i < files.length; i++) {
+        if (i < addLength) {
+          let sign = new Date().getTime() + i
+          let item = {
+            sign: new Date().getTime() + i,
+            url: '',
+            width: '',
+            height: '',
+            localUrl: '',
+            status: ''
+          }
+          this.images.splice(-1, 0 ,item) // 在添加按钮前插入图片
+          let fileReader = new FileReader()
+          fileReader.readAsDataURL(files[i])
+          fileReader.onload = function () {
+            let img = document.createElement('img')
+            img.src = this.result
+            img.onload = function (imageData) {
+              if (_this.images.length > 9) { // 大于9张图时终止，为防止其他错误
+                return false
+              }
+              let data = imageData.path[0]
+              _this.images = _this.images.map((item, idx) => {
+                if (item.sign === sign) {
+                  return {
+                    sign: sign,
+                    url: '',
+                    width: data.width,
+                    height: data.height,
+                    localUrl: data.src,
+                    status: 'local'
+                  }
+                } else {
+                  return item
+                }
+              })
+            }
+          }
+        }
+      }
+      return false
+      let formData = new FormData()
+      formData.append('file', files[0])
+      this.$ajax('/jv/image/upload', {token: 'lcaKiq5GIC_FHqubOBcI6FUKaL8N171U', contentType: 'multipart/form-data', data: formData}).then(res => {
+        console.log(111, res)
+      }).catch(err => {
+        console.log(222, err)
+      })
     },
     changeRange () {
       console.log('changeRange')
