@@ -1,8 +1,9 @@
 <template>
   <div id="app">
-    <transition :name="transitionName">
-      <router-view/>
-    </transition>
+    <keep-alive>
+      <router-view v-if="$route.meta.keepAlive"></router-view>
+    </keep-alive>
+    <router-view v-if="!$route.meta.keepAlive"></router-view>
   </div>
 </template>
 
@@ -12,11 +13,6 @@ export default {
   data () {
     return {
       transitionName: 'none'
-    }
-  },
-  watch: {
-    '$route' (nextRoute, preRoute) {
-      console.log(this.$route)
     }
   }
 }

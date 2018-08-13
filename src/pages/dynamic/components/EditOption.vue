@@ -1,15 +1,17 @@
 <template>
-  <div class="option-box" @click="onTap">
-    <div class="option-header clearfix" :style="{paddingRight: option.rightIcon ? '11%' : 0}">
-      <i :class="leftIconClass" v-if="option.leftIcon"></i>
-      <div class="title fl" :style="{width: (option.rightText || option.rightIcon) ? '60%' : '100%'}">{{option.title}}</div>
-      <div class="right-text fr" v-if="option.rightText">{{option.rightText}}</div>
-      <i :class="rightIconClass" v-if="option.rightIcon"></i>
+  <keep-alive>
+    <div class="option-box" @click="onTap">
+      <div class="option-header clearfix" :style="{paddingRight: option.rightIcon ? '11%' : 0}">
+        <i :class="leftIconClass" v-if="option.leftIcon"></i>
+        <div class="title fl" :style="{width: (option.rightText || option.rightIcon) ? '60%' : '100%'}">{{option.title}}</div>
+        <div class="right-text fr" v-if="option.rightText">{{option.rightText}}</div>
+        <i :class="rightIconClass" v-if="option.rightIcon"></i>
+      </div>
+      <div class="extra-box">
+        <slot name="extra"></slot>
+      </div>
     </div>
-    <div class="extra-box">
-      <slot name="extra"></slot>
-    </div>
-  </div>
+  </keep-alive>
 </template>
 
 <style lang="scss" scoped>
@@ -92,11 +94,9 @@ export default {
       return _class
     },
     rightIconClass () {
-      console.log('this.option.rightIcon', this.option.rightIcon)
       let _class = ''
       if (this.option.rightIcon) {
         if (this.option.rightIcon === 'next') {
-          console.log(3222)
           _class = 'iconfont right-icon next icon-' + this.option.rightIcon
         } else {
           _class = 'iconfont right-icon icon-' + this.option.rightIcon
@@ -109,7 +109,6 @@ export default {
   },
   methods: {
     onTap () {
-      console.log('onTap')
       this.$emit('tapFunc')
     }
   }

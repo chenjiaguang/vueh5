@@ -35,7 +35,9 @@ axios.interceptors.response.use(function (res) {
   }
 }, function (error) {
   // 对响应错误做点什么
-  window.alert(error.message)
+  if (error.message) {
+    window.alert(error.message)
+  }
   return Promise.reject(error)
 })
 
