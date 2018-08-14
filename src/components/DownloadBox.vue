@@ -1,51 +1,52 @@
 <template>
-  <div class="fixed-button-wrapper">
-    <div class="fixed-button" :style="{zIndex: 1}">
-      <img :src="$assetsPublicPath + '/cwebassets/image/van_logo.png'" class="van-logo" />
-        有范又有趣的海南生活圈
-      <div class="open-btn" @click="openFantTuanC">立即打开</div>
+  <div class="box">
+    <div class="row space-between center">
+      <div class="left row">
+        <img class="logo" :src="$assetsPublicPath + '/cwebassets/image/van_logo.png'" />
+        <div class="text-box title">有范又有趣的海南生活圈</div>
+      </div>
+      <div class="go" @click="openFantTuanC">
+        立即打开
+      </div>
     </div>
-    <weixin :show="showWeixinTip" @changeShow="showHideTip" />
   </div>
 </template>
 
+<style src='../common.css' />
 <style lang="scss" type="text/scss" scoped>
-.fixed-button-wrapper{
-
-}
-.fixed-button{
-  position: fixed;
-  left: 0;
-  bottom: 0;
-  width: 100%;
+.box {
   height: 128px;
-  box-sizing: border-box;
-  padding-left: 138px;
-  line-height: 128px;
+  padding-top: 20px;
+  padding-bottom: 20px;
+  padding-left: 30px;
+  padding-right: 30px;
+  background-color: #FAFAFA;
+
+  border-bottom-width: 1px;
+  border-bottom-color: #E5E5E5;
+  border-bottom-style: solid;
+}
+.logo {
+  height: 88px;
+  width: 88px;
+}
+.go {
+  height: 46px;
+  width: 139px;
+  background-color: #1fb0fd;
+  color: #ffffff;
+  font-size: 24px;
+  line-height: 46px;
+  text-align: center;
+  border-radius: 6px;
+}
+.text-box {
+  margin-left: 20px;
+}
+.title {
+  color: #666666;
   font-size: 32px;
-  color: #fff;
-  background-color: rgba(38,38,38,0.75);
-  .van-logo{
-    display: block;
-    width: 88px;
-    height: 88px;
-    position:absolute;
-    left: 30px;
-    top: 50%;
-    margin-top: -44px;
-  }
-  .open-btn{
-    width: 180px;
-    height: 60px;
-    line-height: 60px;
-    text-align: center;
-    background-image: linear-gradient(-18deg, #FF9C00, #FF283C);
-    position: absolute;
-    top: 34px;
-    right: 30px;
-    font-size: 28px;
-    border-radius: 8px;
-  }
+  line-height: 88px;
 }
 </style>
 

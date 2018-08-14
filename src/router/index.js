@@ -14,7 +14,9 @@ import UserCenter from '@/pages/user/center'
 import TestImageContainer from '@/pages/testImageContainer'
 import EditDynamic from '@/pages/dynamic/edit'
 import EditDynamicRange from '@/pages/dynamic/chooseRange'
-
+import DynamicDetail from '@/pages/dynamic/detail'
+import DynamicArticleDetail from '@/pages/dynamic/articleDetail'
+import DynamicSendComment from '@/pages/dynamic/sendComment'
 Vue.use(Router)
 let prefix = '/h5'
 
@@ -128,6 +130,30 @@ const router = new Router({
       component: EditDynamicRange,
       meta: {
         title: '选择可见范围'
+      }
+    },
+    {
+      path: prefix + '/dynamic/detail',
+      name: 'DynamicDetail',
+      component: DynamicDetail,
+      meta: {
+        title: '动态详情'
+      }
+    },
+    {
+      path: prefix + '/dynamic/articleDetail',
+      name: 'DynamicArticleDetail',
+      component: DynamicArticleDetail,
+      meta: {
+        title: '长文详情'
+      }
+    },
+    {
+      path: prefix + '/dynamic/sendComment',
+      name: 'DynamicSendComment',
+      component: DynamicSendComment,
+      meta: {
+        title: '评论'
       }
     }
   ],
