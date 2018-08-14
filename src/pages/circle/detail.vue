@@ -1,6 +1,7 @@
 <template>
   <div :style="{height: winHeight + 'px'}">
     <cube-scroll class="toutiao" ref="pageScroller" :scrollEvents="['scroll']" :options="{bounce: false}" @scroll="outerScroll">
+      <download-box />
       <header ref="topHeader" class="top-header">
         <div class="top-header-bg" :style="{backgroundImage: 'url(' + circle.cover.compress + ')'}"></div>
         <div class="top-header-content">
@@ -63,7 +64,6 @@
       <i v-if="showBackTop" class="iconfont icon-back_top backtop-icon"></i>
     </transition>
     <i class="iconfont icon-camera publish-icon"></i>
-    <download-box />
   </div>
 </template>
 
@@ -432,6 +432,7 @@ fl{
 .top-header{
   width: 100%;
   position: relative;
+  overflow: hidden;
 }
 .top-header-bg{
   position: absolute;
