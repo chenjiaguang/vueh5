@@ -13,6 +13,9 @@ import Agreement from '@/pages/agreement'
 import UserCenter from '@/pages/user/center'
 import TestImageContainer from '@/pages/testImageContainer'
 import EditDynamic from '@/pages/dynamic/edit'
+import DynamicDetail from '@/pages/dynamic/detail'
+import DynamicArticleDetail from '@/pages/dynamic/articleDetail'
+import DynamicSendComment from '@/pages/dynamic/sendComment'
 
 Vue.use(Router)
 let prefix = '/h5'
@@ -118,6 +121,30 @@ const router = new Router({
       component: EditDynamic,
       meta: {
         title: '发动态'
+      }
+    },
+    {
+      path: prefix + '/dynamic/detail',
+      name: 'DynamicDetail',
+      component: DynamicDetail,
+      meta: {
+        title: '动态详情'
+      }
+    },
+    {
+      path: prefix + '/dynamic/articleDetail',
+      name: 'DynamicArticleDetail',
+      component: DynamicArticleDetail,
+      meta: {
+        title: '长文详情'
+      }
+    },
+    {
+      path: prefix + '/dynamic/sendComment',
+      name: 'DynamicSendComment',
+      component: DynamicSendComment,
+      meta: {
+        title: '评论'
       }
     }
   ],
