@@ -1,10 +1,10 @@
 <template>
   <div class="edit-page">
     <div class="text-box">
-      <textarea class="text-content" placeholder="此刻，我想说..."></textarea>
+      <textarea class="text-content" placeholder="此刻，我想说..." v-model="dynamicText"></textarea>
     </div>
     <div class="pic-box">
-      <image-container :images="images" @addFunc="addImage" />
+      <image-container :images="images" :showDelete="true" @deleteFunc="deleteImage" :appearAnimation="true" :isUpload="true" @addFunc="addImage" @preview="previewCallback" />
     </div>
     <div class="options-box" v-if="topic || activity || circle || range">
       <edit-option :option="{leftIcon: 'topic_edit', title: '话题'}" v-if="topic">
@@ -16,8 +16,9 @@
       </edit-option>
       <edit-option :option="{leftIcon: 'activity_edit', title: activity.title}" v-if="activity"></edit-option>
       <edit-option :option="{leftIcon: 'circle', title: '发布于圈子', rightText: circle.title}" v-if="circle"></edit-option>
-      <edit-option :option="{leftIcon: 'range_' + range, title: rangeMap[range.toString()], rightIcon: 'next'}" @tapFunc="changeRange" v-if="range"></edit-option>
+      <edit-option :option="{leftIcon: 'range_' + range, title: rangeMap[range.toString()], rightIcon: 'next'}" @tapFunc="changeRange" v-if="range || range.toString() === '0'"></edit-option>
     </div>
+    <div class="submit-btn" @click="submitDynamic">发布</div>
   </div>
 </template>
 
@@ -61,25 +62,34 @@
   color: #FF611A;
   margin-right: 8px;
 }
+.submit-btn{
+  margin-top: 80px;
+  height: 90px;
+  font-size: 34px;
+  line-height: 90px;
+  color: #fff;
+  background: #1EB0FD;
+  border-radius: 8px;
+  text-align: center;
+}
 </style>
 
 <script>
 import imageContainer from '@/components/ImageContainer'
 import EditOption from './components/EditOption'
+import axios from 'axios'
+
+// 接受参数(params) topic: [{id: 2, title: '测试话题'}]    activity: {id: 2, title: '屯昌木色湖一日游'}    circle: {id: 2, title: '舌尖上的海口'}    range: 0||1|2  
 export default {
   data () {
-    let topic = this.$route.params.topic || null
-    let activity = this.$route.params.activity || null
-    let circle = this.$route.params.circle || null
-    let range = this.$route.params.range || null
+    let topic = this.$route.params.topic ? this.$route.params.topic.concat([]) : null
+    let activity = this.$route.params.activity ? Object.assign({}, this.$route.params.activity) : null
+    let circle = this.$route.params.circle ? Object.assign({}, this.$route.params.circle) : null
+    let range = this.$route.params.range !== undefined ? this.$route.params.range.toString() : null
     return {
-      images: [
-        {
-          url: 'add-btn',
-          width: 220,
-          height: 220
-        }
-      ],
+      dynamicText: '',
+      images: [],
+      cancelRequest: {},
       topic,
       activity,
       circle,
@@ -88,15 +98,19 @@ export default {
         0: '公开',
         1: '仅好友可见',
         2: '仅自己可见'
-      }
+      },
+      submitting: false,
+      isPreview: false
     }
   },
   components: {imageContainer, EditOption},
   methods: {
+    previewCallback () {
+      this.isPreview = true
+    },
     addImage (files) {
-      
       let _this = this
-      let currentLength = this.images.filter(item => item.url !== 'add-btn').length
+      let currentLength = this.images.length
       let addLength = 9 - currentLength // 最多9图
       if (addLength <= 0) { // 超过9图处理
         return false
@@ -105,14 +119,67 @@ export default {
         if (i < addLength) {
           let sign = new Date().getTime() + i
           let item = {
+            id: '',
             sign: new Date().getTime() + i,
             url: '',
             width: '',
             height: '',
             localUrl: '',
-            status: ''
+            status: 'submitting'
           }
-          this.images.splice(-1, 0 ,item) // 在添加按钮前插入图片
+          this.images.push(item) // 在添加按钮前插入图片
+          var CancelToken = axios.CancelToken
+          let formData = new FormData()
+          formData.append('file', files[i])
+          this.$ajax('/jv/image/upload', {
+            token: 'lcaKiq5GIC_FHqubOBcI6FUKaL8N171U',
+            contentType: 'multipart/form-data',
+            data: formData,
+            cancelToken: new CancelToken(function executor(cancel) {
+              // An executor function receives a cancel function as a parameter
+              _this.cancelRequest[sign.toString()] = cancel
+            })
+          }).then(res => { // 上传返回数据处理
+            let status = ''
+            let id = ''
+            let url = ''
+            if (res && res.msg) {
+              _this.$toast(res.msg)
+            }
+            if (!Boolean(res.error) && res.data) {
+              status = 'success'
+              id = res.data.id[0]
+              url = res.data.url[0]
+            } else {
+              status = 'error'
+            }
+            _this.images = _this.images.map((item, idx) => {
+              if (item.sign === sign) {
+                return Object.assign({}, item, {
+                  status: status,
+                  id: id,
+                  url: url
+                })
+              } else {
+                return item
+              }
+            })
+            this.cancelRequest[sign.toString()] = null
+          }).catch(err => {
+            if (err && err.msg) {
+              _this.$toast(res.msg)
+            }
+            _this.images = _this.images.map((item, idx) => {
+              if (item.sign === sign) {
+                return Object.assign({}, item, {
+                  status: 'error'
+                })
+              } else {
+                return item
+              }
+            })
+            this.cancelRequest[sign.toString()] = null
+          })
           let fileReader = new FileReader()
           fileReader.readAsDataURL(files[i])
           fileReader.onload = function () {
@@ -125,14 +192,11 @@ export default {
               let data = imageData.path[0]
               _this.images = _this.images.map((item, idx) => {
                 if (item.sign === sign) {
-                  return {
-                    sign: sign,
-                    url: '',
+                  return Object.assign({}, item, {
                     width: data.width,
                     height: data.height,
-                    localUrl: data.src,
-                    status: 'local'
-                  }
+                    localUrl: data.src
+                  })
                 } else {
                   return item
                 }
@@ -141,21 +205,140 @@ export default {
           }
         }
       }
-      return false
-      let formData = new FormData()
-      formData.append('file', files[0])
-      this.$ajax('/jv/image/upload', {token: 'lcaKiq5GIC_FHqubOBcI6FUKaL8N171U', contentType: 'multipart/form-data', data: formData}).then(res => {
-        console.log(111, res)
-      }).catch(err => {
-        console.log(222, err)
-      })
+    },
+    deleteImage (item, idx) {
+      let cancel = this.cancelRequest[item.sign.toString()]
+      if (cancel) {
+        cancel()
+        this.cancelRequest[item.sign.toString()] = null
+      }
+      this.images.splice(idx, 1)
     },
     changeRange () {
-      console.log('changeRange')
+      this.$router.push({name: 'EditDynamicRange', query: {selected: this.range}})
+    },
+    submitDynamic () {
+      let flat = false // 标记是否可提交,false可提交
+      let content = ''
+      let image_ids = ''
+      let topic_ids = ''
+      let uploadImages = this.images.filter(item => item.status === 'success')
+      if (!this.dynamicText && uploadImages.length === 0) {
+        this.$toast('请输入至少10个字哦~')
+        flat = true
+      } else if (this.dynamicText && this.dynamicText.length > 2000){
+        this.$toast('输入太多了，不能多于2000个字哦~')
+        flat = true
+      } else {
+        content = this.dynamicText
+      }
+      let imageIds = this.images.map((item, idx) => {
+        if (item.status === 'submitting') {
+          flat = true
+        }
+        if (item.id) {
+          return item.id
+        }
+      })
+      let topicIds = this.topic.map((item, idx) => {
+        if (item.id) {
+          return item.id
+        }
+      })
+      if (imageIds && imageIds.length > 0) {
+        image_ids = imageIds.join(',')
+      }
+      if (topicIds && topicIds.length > 0) {
+        topic_ids = topicIds.join(',')
+      }
+      if (this.submitting) {
+        this.$toast('正在提交...')
+        return false
+      }
+      if (flat) {
+        return false
+      }
+      let rData = {
+        token: 'lcaKiq5GIC_FHqubOBcI6FUKaL8N171U',
+        content: content,
+        image_ids: image_ids,
+        range: this.range || '',
+        actid: this.activity ? (this.activity.id || '') : '',
+        circle_id: this.circle ? (this.circle.id || '') : '',
+        topicId: topic_ids
+      }
+      this.submitting = true
+      this.$ajax('/jv/qz/publish/dynamic', {data: rData}).then(res => {
+        if (res && res.msg) {
+          if (!Boolean(res.error)) { // 发布成功
+            this.$toast(res.msg, 2000, () => {
+              this.$router.go(-1)
+            })
+          } else {
+            this.$toast(res.msg)
+          }
+        }
+        if (res && !res.msg && !Boolean(res.error)) { // 发布成功 _todo 发布成功后处理
+          this.$router.go(-1)
+        }
+        this.submitting = false
+      }).catch(err => {
+        this.submitting = false
+      })
+    },
+    resetData () {
+      let topic = this.$route.params.topic || null
+      let activity = this.$route.params.activity || null
+      let circle = this.$route.params.circle || null
+      let range = this.$route.params.range !== undefined ? this.$route.params.range.toString() : null
+      this.dynamicText = ''
+      this.topic = topic
+      this.activity = activity
+      this.circle = circle
+      this.range = range
+      this.images = []
+      this.cancelRequest = {}
+      this.rangeMap = {
+        0: '公开',
+        1: '仅好友可见',
+        2: '仅自己可见'
+      }
+      this.submitting = false
+      this.isPreview = false
     }
   },
-  mounted () {
-    console.log('this.topic', this.topic, this.activity)
+  beforeRouteEnter (to, from, next) {
+    if (from.name !== 'EditDynamicRange') {
+      to.params.resetData = true
+      let title = ''
+      if (to.params.circle && to.params.circle.title) {
+        title = to.params.circle.title
+      } else {
+        title = '发动态'
+      }
+      let i = document.createElement('iframe');
+      i.src = 'https://www.baidu.com/favicon.ico';
+      i.style.display = 'none';
+      i.onload = () => {
+          setTimeout(() => {
+              i.remove()
+          }, 9)
+      }
+      document.title = title
+      document.body.appendChild(i)
+    } else {
+      to.params.resetData = false
+    }
+    next(vm => {
+      if (from.name === 'EditDynamicRange') {
+        vm.range = from.query.selected
+      }
+    })
+  },
+  activated () {
+    if (this.$route.params.resetData) {
+      this.resetData()
+    }
   }
 }
 </script>

@@ -82,7 +82,7 @@ export default {
         id: 2,
         title: '舌尖上的海口'
       }
-      let range = 1
+      let range = 0
       this.$router.push({name: 'EditDynamic', params: {topic: topic, activity: activity, circle: circle, range: range}})
     },
     add (idx) {
