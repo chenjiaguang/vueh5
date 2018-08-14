@@ -39,7 +39,7 @@
     height: 60px;
     line-height: 60px;
     text-align: center;
-    background-image: linear-gradient(135deg, #2ED5DF, #4E73EB);
+    background-image: linear-gradient(-18deg, #FF9C00, #FF283C);
     position: absolute;
     top: 34px;
     right: 30px;

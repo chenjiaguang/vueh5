@@ -52,6 +52,7 @@
     margin: -2px 10px 0 0;
     padding: 0;
     border: none;
+    display: inline-block !important;
   }
 </style>
 

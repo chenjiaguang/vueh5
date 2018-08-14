@@ -40,10 +40,8 @@ export default {
     },
     previewImage (idx) {
       let _images = this.images.map(item => (item.url || item.localUrl))
-      this.$previewImage.show({images: _images, idx}, this.previewCallBack)
-    },
-    previewCallBack () {
-      this.emit('preview')
+      let instance = this.$previewImage.show({images: _images, idx})
+      this.$emit('preview', instance)
     }
   }
 }

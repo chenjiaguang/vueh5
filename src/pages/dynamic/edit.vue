@@ -100,13 +100,13 @@ export default {
         2: '仅自己可见'
       },
       submitting: false,
-      isPreview: false
+      previewInstance: null
     }
   },
   components: {imageContainer, EditOption},
   methods: {
-    previewCallback () {
-      this.isPreview = true
+    previewCallback (instance) {
+      this.previewInstance = instance
     },
     addImage (files) {
       let _this = this
@@ -334,6 +334,15 @@ export default {
         vm.range = from.query.selected
       }
     })
+  },
+  beforeRouteLeave (to, from, next) {
+    if (this.previewInstance) { // 存在浏览图片窗口时
+      this.$previewImage.hide(this.previewInstance)
+      this.previewInstance = null
+      next(false)
+    } else {
+      next()
+    }
   },
   activated () {
     if (this.$route.params.resetData) {

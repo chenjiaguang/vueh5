@@ -15,12 +15,10 @@
           </div>
         </div>
       </header>
-      <dynamic-item :itemData="testItem" @changeLike="changeLike" />
-      <activity-item :itemData="activityItem" />
-      <div class="scroll-wrapper" :style="{height: winHeight + 'px'}" v-if="tabs && tabs.length > 0">
-        <div class="nav-scroll-list-wrap" ref="navWrapper" :style="{height: tabBarHeight + 'px'}">
+      <div class="scroll-wrapper" :style="{height: winHeight + 'px'}">
+        <div class="nav-scroll-list-wrap" ref="navWrapper" :style="{height: tabBarHeight + 'px'}" v-if="tabs && tabs.length > 1">
           <cube-tab-bar v-model="selectedLabel" class="tab-box" @change="changeTabBar" :style="{height: tabBarHeight + 'px'}">
-            <cube-tab v-for="(item) in tabs" :label="item.title" :key="item.title">
+            <cube-tab v-for="(item) in tabs" ref="tabItem" :label="item.title" :key="item.title">
             </cube-tab>
           </cube-tab-bar>
           <div class="tab-slider">
@@ -29,7 +27,7 @@
           <div class="tab-border"></div>
         </div>
         <div class="tabs-wrapper" ref="slideWrapper" :style="{height: (winHeight - tabBarHeight) + 'px'}">
-          <cube-slide ref="slideInstance" :data="tabs" :initialIndex="selectedIdx" :autoPlay="false" :allow-vertical="false" :loop="false" :speed="500" :options="{listenScroll: true, probeType: 3}" @change="changeSlide" @scroll="slideScroll">
+          <cube-slide ref="slideInstance" :data="tabs" :initialIndex="selectedIdx" :autoPlay="false" :allow-vertical="false" :loop="false" :speed="500" :options="{listenScroll: true, probeType: 3, click: false}" @change="changeSlide" @scroll="slideScroll">
             <cube-slide-item v-for="(item, index) in tabs" :key="item.title" :style="{height: (winHeight - tabBarHeight) + 'px'}">
               <cube-scroll
                 ref="contentScroll"
@@ -37,9 +35,13 @@
                 :options="options"
                 @pulling-down="onPullingDown(index)"
                 @pulling-up="onPullingUp(index)">
-                <div v-for="(item, index) in tabs[index].data" :key="index" class="imgs-item">
-                  <div>{{item.title}}</div>
-                </div>
+                <transition name="loading-scale">
+                  <div class="first-loading-box" v-if="!tabs[index].paging.pn">
+                    <loading-view />
+                  </div>
+                </transition>
+                <dynamic-item v-if="index === 0" v-for="(item, idx) in tabs[index].data" :key="idx" :itemData="item" @changeLike="changeLike" />
+                <activity-item v-else-if="index === 1" v-for="(item, idx) in tabs[index].data" :key="idx" :itemData="item" />
                 <template slot="pulldown" slot-scope="props">
                   <div class="cube-pulldown-wrapper" :style="props.pullDownStyle">
                     <img v-show="!props.isPullingDown" class="pull-down-icon" :style="{transform: 'translateY(' + props.bubbleY + 'px)'}" :src="$assetsPublicPath + '/cwebassets/image/refresh_icon.png'" />
@@ -70,6 +72,7 @@ import Vue from 'vue'
 import DynamicItem from './components/DynamicItem'
 import ActivityItem from './components/ActivityItem'
 import DownloadBox from '../../components/DownloadBox'
+import LoadingView from '@/components/LoadingView'
 import {
     /* eslint-disable no-unused-vars */
     Style,
@@ -105,6 +108,8 @@ const txts = ['关注', '推荐', '新时代', '热点', '体育', '娱乐', '�
 let cnt = 1
 export default {
   data() {
+    let selectedIdx = parseInt(this.$route.query.jump_tab || 0)
+    let selectedLabel = (this.$route.query.jump_tab && this.$route.query.jump_tab.toString() === '1') ? '活动' : '动态'
     return {
       activityItem: {
         id: 74,
@@ -170,10 +175,10 @@ export default {
       winHeight: window.innerHeight,
       tabs: tabs,
       tabBarHeight: parseInt((window.innerWidth / 750) * 88),
-      selectedLabel: '动态',
+      selectedLabel: selectedLabel,
       content: imgs.slice(),
-      selectedIdx: 0,
-      tabSlideX: 0,
+      selectedIdx: selectedIdx,
+      tabSlideX: -window.innerWidth + 'px',
       options: {
         pullDownRefresh: {
           threshold: (window.innerWidth / 750) * 89,
@@ -181,11 +186,21 @@ export default {
         },
         pullUpLoad: {
           threshold: (window.innerWidth / 750) * 100
-        }
+        },
+        click: false
       }
     }
   },
-  components: {DynamicItem, ActivityItem, DownloadBox},
+  components: {DynamicItem, ActivityItem, DownloadBox, LoadingView},
+  watch: {
+    'circle.id': function () {
+      if (this.$route.query.jump_tab && this.$route.query.jump_tab.toString() === '1') { // 有指定首先显示的tab则刷新该tab数据,否则默认刷新动态tab
+        this.fetchActivity(1)
+      } else {
+        this.fetchDynamic(1)
+      }
+    }
+  },
   methods: {
     changeTabBar (tabTitle) { // 点击tab切换
       let wrapperWidth = this.$refs['navWrapper'] ? this.$refs['navWrapper'].offsetWidth : window.innerWidth
@@ -201,10 +216,45 @@ export default {
       this.selectedIdx = idx
     },
     slideScroll ({x, y}) { // 华东slide
-      let tabWidth = this.$refs['navWrapper'].offsetWidth / this.tabs.length
-      let sliderWidth = this.$refs['slideWrapper'].offsetWidth
-      let tabPos = -(x / (sliderWidth / tabWidth)) + tabWidth / 2
-      this.tabSlideX = tabPos + 'px'
+      if (!this.$refs['tabItem'] || this.tabs.length <= 1) {
+        return false
+      }
+      let slideTotalWidth = this.$refs['slideInstance'].$el.getBoundingClientRect().width * this.tabs.length
+      let pre = this.selectedIdx === 0 ? null : this.$refs['tabItem'][this.selectedIdx - 1]
+      let next = this.selectedIdx === (this.tabs.length - 1) ? null : this.$refs['tabItem'][this.selectedIdx + 1]
+      let current = this.$refs['tabItem'][this.selectedIdx]
+      let position = {pre: pre ? pre.$el.getBoundingClientRect() : null, next: next ? next.$el.getBoundingClientRect() : null, current: current.$el.getBoundingClientRect()}
+      let relativeX = this.selectedIdx === 0 ? 0 : -this.$refs['slideInstance'].$el.getBoundingClientRect().width * this.selectedIdx // 基准x位置
+      let relativeSlideX = position.current.x + position.current.width / 2
+      let preSlideX = position.pre ? (position.pre.x + position.pre.width / 2) : null
+      let nextSlideX = position.next ? (position.next.x + position.next.width / 2) : null
+      let touchX = x - relativeX
+      let slideX = 0
+      if (this.selectedIdx === 0) {
+        slideX = nextSlideX - relativeSlideX
+      } else if (this.selectedIdx === this.tabs.length - 1) {
+        slideX = relativeSlideX - preSlideX
+      } else if (touchX > 0) {
+        slideX = relativeSlideX - preSlideX
+      } else if (touchX <= 0) {
+        slideX = nextSlideX - relativeSlideX
+      }
+      let moveX = (touchX / this.$refs['slideInstance'].$el.getBoundingClientRect().width) * slideX
+      this.tabSlideX = relativeSlideX - moveX + 'px'
+    },
+    initSlideBlock () {
+      if (this.timer) {
+        clearInterval(this.timer)
+      }
+      this.timer = setInterval(() => {
+        const initialTab = parseInt(this.$route.query.jump_tab || 0)
+        if (this.$refs['tabItem']) {
+          let pos = this.$refs['tabItem'][initialTab].$el.getBoundingClientRect()
+          let slideX = pos.x + pos.width / 2
+          this.tabSlideX = slideX + 'px'
+          clearInterval(this.timer)
+        }
+      },30)
     },
     fetchCircle () {
       let rData = {
@@ -221,22 +271,26 @@ export default {
             this.tabs = [
               {
                 title: '动态',
-                data: []
+                data: [],
+                paging: {},
+                fetching: false
               },
               {
                 title: '活动',
-                data: []
+                data: [],
+                paging: {},
+                fetching: false
               }
             ]
-            this.tabSlideX = (window.innerWidth / this.tabs.length / 2) + 'px'
           } else { // 无活动tab
             this.tabs = [
               {
                 title: '动态',
-                data: []
+                data: [],
+                paging: {},
+                fetching: false
               }
             ]
-            this.tabSlideX = (window.innerWidth / this.tabs.length / 2) + 'px'
           }
         }
       }).catch(err => {
@@ -244,51 +298,45 @@ export default {
       })
     },
     fetchDynamic (pn) {
+      if (this.tabs[0].fetching) { // 正在拉取动态数据
+        return false
+      }
       let rData = {
         pn: pn,
         limit: 20,
-        cid: this.$route.query.circle_id,
-        snapshot: '0',
+        cid: this.circle.id,
+        snapshot: this.tabs[0].paging.snapshot || '',
         token: 'lcaKiq5GIC_FHqubOBcI6FUKaL8N171U'
       }
+      this.tabs[0].fetching = true
       this.$ajax('/jv/qz/v21/circledynamics', {data: rData}).then(res => { // 获取动态列表
         if (res && res.msg) {
           this.$toast(res.msg)
         }
         if (res && !Boolean(res.error) && res.data) { // 成功获取数据
-          this.circle = res.data
-          if (res.data.user_can_create_activity) { // 有活动tab
-            this.tabs = [
-              {
-                title: '动态',
-                data: []
-              },
-              {
-                title: '活动',
-                data: []
-              }
-            ]
-            this.tabSlideX = (window.innerWidth / this.tabs.length / 2) + 'px'
-          } else { // 无活动tab
-            this.tabs = [
-              {
-                title: '动态',
-                data: []
-              }
-            ]
-            this.tabSlideX = (window.innerWidth / this.tabs.length / 2) + 'px'
+          this.tabs[0].fetching = false
+          this.tabs[0].paging = res.data.paging
+          if (pn.toString() === '1') { // 刷新
+            this.tabs[0].data = res.data.list
+          } else {
+            this.tabs[0].data = this.tabs[0].data.concat(res.data.list)
           }
         }
       }).catch(err => {
-
+        this.tabs[0].fetching = false
+        if (err && err.msg) {
+          this.$toast(err.msg)
+        } else {
+          this.$toast('获取动态失败')
+        }
       })
     },
     fetchActivity (pn) {
       let rData = {
         pn: pn,
         limit: 20,
-        cid: this.$route.query.circle_id,
-        snapshot: '0',
+        cid: this.circle.id,
+        snapshot: this.tabs[1].paging.snapshot || '',
         token: 'lcaKiq5GIC_FHqubOBcI6FUKaL8N171U'
       }
       this.$ajax('/jv/qz/v21/circleactivities', {data: rData}).then(res => { // 获取活动列表
@@ -329,19 +377,17 @@ export default {
       } else if (idx === 1) { // 活动列表
         this.fetchActivity(1)
       }
-      setTimeout(() => {
-        // let tabs = this.tabs
-        this.tabs[idx].data.unshift({title: 'sdfsdfsdf'})
-        // this.tabs = tabs
-        this.$refs['contentScroll'][idx].scrollTo(0, 0, 500)
-        // this.$refs['contentScroll'][idx].forceUpdate()
-      }, 1000)
     },
     onPullingUp (idx) {
-      setTimeout(() => {
-        this.tabs[idx].data = this.tabs[idx].data.concat({title: 'sdfsdfsdf'})
-        this.$refs['contentScroll'][idx].forceUpdate()
-      }, 1000)
+      if (!(this.tabs[idx].paging && this.tabs[idx].paging.pn && !this.tabs[idx].paging.is_end)) { // 未生成paging，或者paging.pn不存在，或者已是最后一页     终止操作
+        return false
+      }
+      let pn = parseInt(this.tabs[idx].paging.pn) + 1
+      if (idx === 0) { // 动态列表
+        this.fetchDynamic(pn)
+      } else if (idx === 1) { // 活动列表
+        this.fetchActivity(pn)
+      }
     },
     changeLike () {
       if (this.testItem.is_like) {
@@ -362,6 +408,7 @@ export default {
   },
   created () {
     this.fetchCircle()
+    this.initSlideBlock()
   }
 }
 </script>
@@ -446,6 +493,10 @@ fl{
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;
+}
+.scroll-wrapper{
+  position: relative;
+  background: #fff;
 }
 .nav-scroll-list-wrap{
   position: relative;
@@ -614,7 +665,8 @@ fl{
   display: block;
   width: 88px;
   height: 88px;
-  background-color: #1EB0FD;
+  background-color: #FF5126;
+  background-image: linear-gradient(155deg, #FAB03C, #FF273B);
   color: #fff;
   font-size:46px;
   line-height: 88px;
@@ -624,5 +676,16 @@ fl{
   right: 54px;
   bottom: 184px;
   z-index: 2;
+}
+.first-loading-box{
+  height: 152px;
+  margin-top: 0;
+}
+.loading-scale-leave-to{
+  transform: scale(0.5, 0.5);
+  height: 0;
+}
+.loading-scale-leave-active{
+  transition: all 500ms;
 }
 </style>

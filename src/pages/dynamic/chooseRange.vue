@@ -85,9 +85,14 @@ export default {
   },
   methods: {
     onTap (item) {
-      console.log('onTap')
-      this.selected = item.code
-      this.$route.query.selected = item.code
+      if (this.selected.toString() !== item.code.toString()) {
+        this.selected = item.code
+        this.$route.query.selected = item.code
+        this.$router.go(-1)
+      } else {
+        this.selected = item.code
+        this.$route.query.selected = item.code
+      }
     }
   }
 }

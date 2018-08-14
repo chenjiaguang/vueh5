@@ -24,13 +24,13 @@
       <div class="with-article-title">{{itemData.newsArticle.name}}</div>
     </div>
     <div class="comment-and-like clearfix">
-      <div @click="changeLike" class="comment-and-like-item fl" :style="{paddingLeft: 0, color: itemData.is_like ? '#FE5273' : '#333'}">
+      <div @click="changeLike" class="comment-and-like-item fl" :style="{paddingLeft: 0, color: itemData.has_like ? '#FE5273' : '#333'}">
         <div class="comment-and-like-icon-box">
           <transition-group name="fade" mode="in-out">
-            <i v-if="itemData.is_like" key="like" class="iconfont icon-like comment-and-like-icon"></i>
+            <i v-if="itemData.has_like" key="like" class="iconfont icon-like comment-and-like-icon"></i>
             <i v-else key="dislike" class="iconfont icon-dislike comment-and-like-icon"></i>
           </transition-group>
-          <span>{{itemData.like_number || '赞'}}</span>
+          <span>{{itemData.like_num || '赞'}}</span>
         </div>
       </div>
       <div class="comment-and-like-item fl" style="padding-right: 0;">

@@ -52,6 +52,7 @@
     margin: -2px 10px 0 0;
     padding: 0;
     border: none;
+    display: inline-block !important;
   }
 </style>
 
@@ -91,7 +92,6 @@ export default {
         this.contentHeight = wrapperHeight
         let _lineHeight = parseFloat(window.getComputedStyle(this.$refs['contentContainer'], false).lineHeight)
         this.contentMaxHeight = Math.ceil(_lineHeight * 5)
-        console.log('this.contentMaxHeight', this.contentMaxHeight)
         if (this.contentHeight > this.contentMaxHeight) {
           this.showMore = false
           this.$refs['contentContainer'].style.maxHeight = this.contentMaxHeight + 'px'

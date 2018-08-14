@@ -25,7 +25,6 @@ let ImagePreview = {
         })
         window.document.body.appendChild(div)
         _main.$mount(div)
-        callback && callback()
         return _main
     },
     hide: (element) => {

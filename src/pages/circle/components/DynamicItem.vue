@@ -3,37 +3,37 @@
     <div class="user-overview">
       <div class="user-avatar" :style="{backgroundImage: 'url(' + itemData.avatar + ')'}"></div>
       <div class="user-name clearfix">
-        <span class="user-name-text fl">{{itemData.name}}</span>
-        <img v-if="itemData.is_manager" :src="$assetsPublicPath + '/cwebassets/image/manager.png'" class="user-tag fl" />
-        <img v-if="itemData.is_owner" :src="$assetsPublicPath + '/cwebassets/image/circle_owner.png'" class="user-tag fl" />
-        <img v-if="itemData.is_settop" :src="$assetsPublicPath + '/cwebassets/image/settop.png'" class="user-tag fl" />
+        <span class="user-name-text fl">{{itemData.username}}</span>
+        <img v-if="itemData.is_circle_manager" :src="$assetsPublicPath + '/cwebassets/image/manager.png'" class="user-tag fl" />
+        <img v-if="itemData.is_circle_owner" :src="$assetsPublicPath + '/cwebassets/image/circle_owner.png'" class="user-tag fl" />
+        <img v-if="itemData.is_top" :src="$assetsPublicPath + '/cwebassets/image/settop.png'" class="user-tag fl" />
       </div>
-      <div class="publish-time">{{itemData.time_text}}</div>
+      <div class="publish-time">{{itemData.time}}</div>
     </div>
-    <show-hide-content :content="itemData.content_text" :isLongDynamic="itemData.is_long_dynamic" />
-    <div class="dynamic-pinture">
-      <image-container :images="itemData.pictrues" :appearAnimation="false" :showDelete="false" />
+    <show-hide-content :content="(itemData.type && itemData.type.toString() === '18') ? itemData.title : (itemData.content || '')" :isLongDynamic="(itemData.type && itemData.type.toString() === '18') ? true : false" />
+    <div class="dynamic-pinture" v-if="itemData.covers && itemData.covers.length > 0">
+      <image-container :images="itemData.covers" :appearAnimation="false" :showDelete="false" />
     </div>
-    <div v-if="itemData.address" class="publish-address">{{itemData.address}}</div>
-    <div v-if="itemData.activity" class="at-activity"><i class="iconfont icon-activity activity-sign"></i>{{itemData.activity}}</div>
-    <div v-if="itemData.with_article && itemData.with_article.title" class="with-article">
-      <div class="with-article-cover" :style="{backgroundImage: 'url(' + itemData.with_article.cover + ')'}"></div>
-      <div class="with-article-title">{{itemData.with_article.title}}</div>
+    <div v-if="itemData.location" class="publish-address">{{itemData.location}}</div>
+    <div v-if="itemData.activity" class="at-activity"><i class="iconfont icon-activity activity-sign"></i>{{itemData.activity.title}}</div>
+    <div v-if="itemData.newsArticle && itemData.newsArticle.name" class="with-article">
+      <div class="with-article-cover" :style="{backgroundImage: 'url(' + ((itemData.newsArticle.covers && itemData.newsArticle.covers[0]) ? itemData.newsArticle.covers[0].compress : '') + ')'}"></div>
+      <div class="with-article-title">{{itemData.newsArticle.name}}</div>
     </div>
     <div class="comment-and-like clearfix">
-      <div @click="changeLike" class="comment-and-like-item fl" :style="{paddingLeft: 0, color: itemData.is_like ? '#FE5273' : '#333'}">
+      <div @click="changeLike" class="comment-and-like-item fl" :style="{paddingLeft: 0, color: itemData.has_like ? '#FE5273' : '#333'}">
         <div class="comment-and-like-icon-box">
           <transition-group name="fade" mode="in-out">
-            <i v-if="itemData.is_like" key="like" class="iconfont icon-like comment-and-like-icon"></i>
+            <i v-if="itemData.has_like" key="like" class="iconfont icon-like comment-and-like-icon"></i>
             <i v-else key="dislike" class="iconfont icon-dislike comment-and-like-icon"></i>
           </transition-group>
-          <span>{{itemData.like_number || '赞'}}</span>
+          <span>{{itemData.like_num || '赞'}}</span>
         </div>
       </div>
       <div class="comment-and-like-item fl" style="padding-right: 0;">
         <div class="comment-and-like-icon-box">
           <i class="iconfont icon-comment_icon comment-and-like-icon"></i>
-          <span>{{itemData.comment_number || '评论'}}</span>
+          <span>{{itemData.comment_num || '评论'}}</span>
         </div>
       </div>
     </div>
@@ -60,6 +60,7 @@
   width: 100%;
   padding: 0 4% 4px;
   overflow: visible;
+  text-align: left;
 }
 .user-overview{
   padding: 30px 0 23px;
