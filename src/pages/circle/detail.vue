@@ -28,7 +28,7 @@
           <div class="tab-border"></div>
         </div>
         <div class="tabs-wrapper" ref="slideWrapper" :style="{height: (winHeight - ((tabs && tabs.length) > 1 ? tabBarHeight : 0)) + 'px'}">
-          <cube-slide ref="slideInstance" :data="tabs" :initialIndex="selectedIdx" :autoPlay="false" :allow-vertical="false" :loop="false" :speed="500" :options="{listenScroll: true, probeType: 3, click: false}" @change="changeSlide" @scroll="slideScroll">
+          <cube-slide ref="slideInstance" :data="tabs" :initial-index="selectedIdx" :auto-play="false" :allow-vertical="false" :loop="false" :speed="500" :options="{listenScroll: true, probeType: 3, click: false}" @change="changeSlide" @scroll="slideScroll">
             <cube-slide-item v-for="(item, index) in tabs" :key="item.title" :style="{height: (winHeight - ((tabs && tabs.length) > 1 ? tabBarHeight : 0)) + 'px'}">
               <cube-scroll
                 ref="contentScroll"
@@ -44,7 +44,7 @@
                 </transition>
                 <div v-if="tabs[index].paging && tabs[index].paging.is_end && tabs[index].data && tabs[index].data.length === 0" class="empty-box">该圈子暂无{{index === 0 ? '动态' : '活动'}}</div>
                 <dynamic-item v-if="index === 0" v-for="(item, idx) in tabs[index].data" :key="idx" :itemData="item" @changeLike="changeLike" />
-                <activity-item v-else-if="index === 1" v-for="(item, idx) in tabs[index].data" :key="idx" :itemData="item" />
+                <activity-item v-if="index === 1" v-for="(item, idx) in tabs[index].data" :key="idx" :itemData="item" />
                 <template slot="pulldown" slot-scope="props">
                   <div class="cube-pulldown-wrapper" :style="props.pullDownStyle">
                     <img v-show="!props.isPullingDown" class="pull-down-icon" :style="{transform: 'translateY(' + props.bubbleY + 'px)'}" :src="$assetsPublicPath + '/cwebassets/image/refresh_icon.png'" />
@@ -119,6 +119,7 @@ export default {
   data() {
     let selectedIdx = parseInt(this.$route.query.jump_tab || 0)
     let selectedLabel = (this.$route.query.jump_tab && this.$route.query.jump_tab.toString() === '1') ? '活动' : '动态'
+    console.log('selectedIdx', selectedIdx, typeof selectedIdx)
     return {
       activityItem: {
         id: 74,
@@ -217,19 +218,26 @@ export default {
         if (item.title === tabTitle) {
           this.selectedLabel = tabTitle
           this.selectedIdx = index
-          if (!this.tabs[index].paging.pn) {
-            if (index === 0) {
-              this.fetchDynamic(1)
-            } else if (index === 1) {
-              this.fetchActivity(1)
-            }
-          }
+          // if (!this.tabs[index].paging.pn) {
+          //   if (index === 0) {
+          //     this.fetchDynamic(1)
+          //   } else if (index === 1) {
+          //     this.fetchActivity(1)
+          //   }
+          // }
         }
       })
     },
     changeSlide (idx) { // 滑动slide触发tab切换
       this.selectedLabel = this.tabs[idx].title
       this.selectedIdx = idx
+      if (!this.tabs[idx].paging.pn) {
+        if (idx === 0) {
+          this.fetchDynamic(1)
+        } else if (idx === 1) {
+          this.fetchActivity(1)
+        }
+      }
     },
     slideScroll ({x, y}) { // 华东slide
       if (!this.$refs['tabItem'] || this.tabs.length <= 1) {
