@@ -1,13 +1,13 @@
 <template>
   <div class="activity-item" @click="goActivity">
-    <div class="activity-pic" :style="{backgroundImage: 'url(' + itemData.cover + ')'}"></div>
+    <div class="activity-pic" :style="{backgroundImage: 'url(' + itemData.covers[0].compress + ')'}"></div>
     <div class="activity-overview">
       <div class="title">{{itemData.title}}</div>
       <div class="address">{{itemData.address || '线上活动'}}</div>
-      <div class="time">{{itemData.time}}</div>
-      <div class="fee">&yen;{{(itemData.fee && itemData.fee !== '0') ? itemData.fee : '免费'}}</div>
+      <div class="time">{{itemData.time_text}}</div>
+      <div class="fee">{{itemData.money || '免费'}}</div>
     </div>
-    <div class="activity-status" :style="{color: itemData.status === '已结束' ? '#999' : '#1EB0FD', borderColor: itemData.status === '已结束' ? '#999' : '#1EB0FD'}">{{itemData.status}}</div>
+    <div class="activity-status" :style="{color: itemData.status_text === '已结束' ? '#999' : '#1EB0FD', borderColor: itemData.status_text === '已结束' ? '#999' : '#1EB0FD'}">{{itemData.status_text}}</div>
   </div>
 </template>
 
@@ -32,6 +32,7 @@
   min-height: 198px;
   box-sizing: border-box;
   position: relative;
+  text-align: left;
 }
 .activity-item:after{
   content: "";
@@ -64,6 +65,7 @@
   color: #333;
   font-weight: bold;
   padding-top: 26px;
+  white-space: normal;
 }
 .address{
   font-size: 24px;

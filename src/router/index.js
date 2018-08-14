@@ -17,6 +17,7 @@ import EditDynamicRange from '@/pages/dynamic/chooseRange'
 import DynamicDetail from '@/pages/dynamic/detail'
 import DynamicArticleDetail from '@/pages/dynamic/articleDetail'
 import DynamicSendComment from '@/pages/dynamic/sendComment'
+import TopicDetal from '@/pages/topic/detail'
 Vue.use(Router)
 let prefix = '/h5'
 
@@ -154,6 +155,14 @@ const router = new Router({
       component: DynamicSendComment,
       meta: {
         title: '评论'
+      }
+    },
+    {
+      path: prefix + '/topic/detail',
+      name: 'TopicDetal',
+      component: TopicDetal,
+      meta: {
+        title: '范团话题'
       }
     }
   ],

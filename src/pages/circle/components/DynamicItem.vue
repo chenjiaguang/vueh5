@@ -27,13 +27,13 @@
             <i v-if="itemData.has_like" key="like" class="iconfont icon-like comment-and-like-icon"></i>
             <i v-else key="dislike" class="iconfont icon-dislike comment-and-like-icon"></i>
           </transition-group>
-          <span>{{itemData.like_num || '赞'}}</span>
+          <span>{{likeNumber || '赞'}}</span>
         </div>
       </div>
       <div class="comment-and-like-item fl" style="padding-right: 0;">
         <div class="comment-and-like-icon-box">
           <i class="iconfont icon-comment_icon comment-and-like-icon"></i>
-          <span>{{itemData.comment_num || '评论'}}</span>
+          <span>{{commentNumber || '评论'}}</span>
         </div>
       </div>
     </div>
@@ -224,9 +224,22 @@ export default {
     return {}
   },
   components: {ImageContainer, ShowHideContent},
+  computed: {
+    likeNumber () {
+      let num = parseInt(this.itemData.like_num)
+      return num > 999 ? '999+' : num
+    },
+    commentNumber () {
+      let num = parseInt(this.itemData.comment_num)
+      return num > 999 ? '999+' : num
+    }
+  },
   methods: {
     changeLike () {
-      this.$emit('changeLike')
+      if (this.itemData.submitting) {
+        return false
+      }
+      this.$emit('changeLike', this.itemData)
     }
   }
 }

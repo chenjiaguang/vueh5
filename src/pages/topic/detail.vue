@@ -43,7 +43,7 @@
                   </div>
                 </transition>
                 <div v-if="tabs[index].paging && tabs[index].paging.is_end && tabs[index].data && tabs[index].data.length === 0" class="empty-box">该圈子暂无{{index === 0 ? '动态' : '活动'}}</div>
-                <dynamic-item v-if="index === 0" v-for="(item, idx) in tabs[index].data" :key="idx" :itemData="item" @changeLike="changeLike" />
+                <topic-item v-if="index === 0" v-for="(item, idx) in tabs[index].data" :key="idx" :itemData="item" @changeLike="changeLike" />
                 <activity-item v-else-if="index === 1" v-for="(item, idx) in tabs[index].data" :key="idx" :itemData="item" />
                 <template slot="pulldown" slot-scope="props">
                   <div class="cube-pulldown-wrapper" :style="props.pullDownStyle">
@@ -78,8 +78,7 @@
 
 <script type="text/ecmascript-6">
 import Vue from 'vue'
-import DynamicItem from './components/DynamicItem'
-import ActivityItem from './components/ActivityItem'
+import TopicItem from './components/TopicItem'
 import DownloadBox from '../../components/DownloadBox'
 import LoadingView from '@/components/LoadingView'
 import {
@@ -98,7 +97,20 @@ Vue.use(TabBar)
 Vue.use(TabPanels)
 Vue.use(Slide)
 Vue.use(Sticky)
-const tabs = []
+const tabs = [
+  {
+    title: '最新',
+    data: [],
+    paging: {},
+    fetching: false
+  },
+  {
+    title: '最热',
+    data: [],
+    paging: {},
+    fetching: false
+  }
+]
 const imgs = [
   {
     url: 'http://om0jxp12h.bkt.clouddn.com/toutiao_12.JPG'
@@ -118,8 +130,9 @@ let cnt = 1
 export default {
   data() {
     let selectedIdx = parseInt(this.$route.query.jump_tab || 0)
-    let selectedLabel = (this.$route.query.jump_tab && this.$route.query.jump_tab.toString() === '1') ? '活动' : '动态'
+    let selectedLabel = (this.$route.query.jump_tab && this.$route.query.jump_tab.toString() === '1') ? '最热' : '最新'
     return {
+      topicInfo: {},
       activityItem: {
         id: 74,
         cover: 'http://img.qikula.com/file/image/pic/1a485694362n61804661c27.jpg',
@@ -200,7 +213,7 @@ export default {
       }
     }
   },
-  components: {DynamicItem, ActivityItem, DownloadBox, LoadingView},
+  components: {TopicItem, DownloadBox, LoadingView},
   watch: {
     'circle.id': function () {
       if (this.$route.query.jump_tab && this.$route.query.jump_tab.toString() === '1') { // 有指定首先显示的tab则刷新该tab数据,否则默认刷新动态tab
@@ -272,76 +285,37 @@ export default {
         }
       },30)
     },
-    fetchCircle () {
-      let rData = {
-        cid: this.$route.query.circle_id,
-        token: 'lcaKiq5GIC_FHqubOBcI6FUKaL8N171U'
-      }
-      this.$ajax('/jv/qz/v21/circleinfo', {data: rData}).then(res => {
-        if (res && res.msg) {
-          this.$toast(res.msg)
-        }
-        if (res && !Boolean(res.error) && res.data) { // 成功获取数据
-          this.circle = res.data
-          if (res.data.circle_has_activity) { // 有活动tab
-            this.tabs = [
-              {
-                title: '动态',
-                data: [],
-                paging: {},
-                fetching: false
-              },
-              {
-                title: '活动',
-                data: [],
-                paging: {},
-                fetching: false
-              }
-            ]
-          } else { // 无活动tab
-            this.tabs = [
-              {
-                title: '动态',
-                data: [],
-                paging: {},
-                fetching: false
-              }
-            ]
-          }
-        }
-      }).catch(err => {
-
-      })
-    },
-    fetchDynamic (pn) {
-      if (this.tabs[0].fetching) { // 正在拉取动态数据
+    fetchTopic (idx, pn) {
+      if (this.tabs[idx].fetching) { // 正在拉取动态数据
         return false
       }
-      let rData = {
+      let rData = { // type区分最新和最热，0最新，1最热
         pn: pn,
         limit: 20,
-        cid: this.circle.id,
-        snapshot: this.tabs[0].paging.snapshot || '',
-        token: 'lcaKiq5GIC_FHqubOBcI6FUKaL8N171U'
+        topicId: this.$route.query.topic_id,
+        snapshot: this.tabs[idx].paging.snapshot || '',
+        token: 'lcaKiq5GIC_FHqubOBcI6FUKaL8N171U',
+        type: idx
       }
-      this.tabs[0].fetching = true
+      this.tabs[idx].fetching = true
       this.$ajax('/jv/qz/v21/circledynamics', {data: rData}).then(res => { // 获取动态列表
         if (res && res.msg) {
           this.$toast(res.msg)
         }
         if (res && !Boolean(res.error) && res.data) { // 成功获取数据
-          this.tabs[0].fetching = false
-          this.tabs[0].paging = res.data.paging
+          this.tabs[idx].fetching = false
+          this.tabs[idx].paging = res.data.paging
           if (pn.toString() === '1') { // 刷新
-            this.tabs[0].data = res.data.list
+            this.topicInfo = {id, title, state, content, begin_color, end_color} = res.data
+            this.tabs[idx].data = res.data.list
           } else {
-            this.tabs[0].data = this.tabs[0].data.concat(res.data.list)
+            this.tabs[idx].data = this.tabs[idx].data.concat(res.data.list)
           }
         } else {
-          this.tabs[0].fetching = false
+          this.tabs[idx].fetching = false
         }
       }).catch(err => {
-        this.tabs[0].fetching = false
+        this.tabs[idx].fetching = false
         if (err && err.msg) {
           this.$toast(err.msg)
         } else {
@@ -368,7 +342,7 @@ export default {
           if (pn.toString() === '1') { // 刷新
             this.tabs[1].data = res.data.list
           } else {
-            this.tabs[1].data = this.tabs[1].data.concat(res.data.list)
+            this.tabs[1].data = this.tabs[0].data.concat(res.data.list)
           }
         } else {
           this.tabs[1].fetching = false
@@ -459,7 +433,7 @@ export default {
     // }
   },
   created () {
-    this.fetchCircle()
+    this.fetchTopic(0,1)
     this.initSlideBlock()
   }
 }
