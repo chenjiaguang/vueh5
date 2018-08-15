@@ -6,13 +6,13 @@
     <div class="comment-box">
       <i class="iconfont icon-comment_icon"></i>
       <div class="badge-container">
-        <div class="badge">0</div>
+        <div class="badge">{{dynamic.comment_num}}</div>
       </div>
 
     </div>
 
     <div class="like-box" @click="clickLike(dynamic.id)">
-      <i class="iconfont icon-dislike"></i>
+      <i :class="['iconfont',dynamic.has_like?'icon-like':'icon-dislike']"></i>
     </div>
   </div>
 </template>
@@ -20,22 +20,49 @@
 export default {
   props: ['dynamic'],
   data () {
-    return {
-    };
+    return {};
   },
-  components: {  },
+  computed: {
+    likeData: function () {
+      return {
+        type: '0',
+        id: this.dynamic.id,
+        like: !this.dynamic.has_like
+      };
+    }
+  },
+  components: {},
   methods: {
     clickLike (id) {
-
+      this.$ajax('/jv/qz/like', { data: this.likeData })
+        .then(res => {
+          this.dynamic.has_like = !this.dynamic.has_like;
+          if (this.dynamic.has_like) {
+            // 增加
+            this.dynamic.like_list.splice(0, 0, res.data);
+            this.dynamic.like_num++;
+          } else {
+            // 减少
+            let i = this.dynamic.like_list.findIndex((value, index, arr) => {
+              return value.uid === res.data.uid;
+            });
+            this.dynamic.like_list.splice(i, 1);
+            this.dynamic.like_num--;
+          }
+        })
+        .catch();
     },
     clickComment (id) {
-
+      this.$router.push({
+        name: 'DynamicSendComment',
+        query: { dy_id: this.dynamic.id }
+      });
     }
   }
 };
 </script>
 <style scoped>
-.fix-box{
+.fix-box {
   position: fixed;
   height: 100px;
   padding-top: 20px;
@@ -48,54 +75,60 @@ export default {
   background-color: #ffffff;
 
   border-top-width: 0.5px;
-  border-color: #CBCBCB;
+  border-color: #cbcbcb;
   border-top-style: solid;
 
+  z-index: 1;
   display: flex;
   flex-direction: row;
   align-items: center;
 }
-.comment-input{
-  background-color: #F1F1F1;
-  border-radius:16px;
-  width:496px;
-  height:60px;
+.comment-input {
+  background-color: #f1f1f1;
+  border-radius: 16px;
+  width: 496px;
+  height: 60px;
+  font-size: 30px;
   padding-left: 20px;
   padding-right: 20px;
   padding-top: 15px;
   padding-bottom: 15px;
-  color:#C5C5C5;
+  color: #c5c5c5;
 }
-.comment-box{
+.comment-box {
   height: 55px;
   width: 55px;
   padding: 10px;
   margin-left: 47px;
   position: relative;
 }
-.icon-comment_icon{
+.icon-comment_icon {
   font-size: 35px;
 }
-.like-box{
+.like-box {
   height: 55px;
   width: 55px;
   padding: 10px;
   margin-left: 37px;
 }
-.icon-dislike{
+.icon-like {
+  font-size: 35px;
+  color: #fe5273;
+}
+.icon-dislike {
   font-size: 35px;
 }
-.badge-container{
+.badge-container {
   position: absolute;
   top: -10px;
   width: 70px;
   text-align: center;
 }
-.badge{
-  background-color: #FE5273;
+.badge {
+  background-color: #fe5273;
   border-radius: 12px;
-  font-size: 20px;
-  padding: 5px;
+  font-size: 24px;
+  padding: 2px;
   color: #fff;
   display: inline-block;
   min-width: 30px;

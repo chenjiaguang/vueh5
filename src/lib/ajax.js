@@ -1,9 +1,11 @@
 import axios from 'axios'
+import toast from '../components/toast'
 
 axios.defaults.method = 'post'
 axios.interceptors.request.use(function (config) {
   if (!config.data) config.data = {}
   // 在发送请求之前做些什么
+  window.localStorage.token = 'c46bb5b5d0f54013bcdf75a6ebf967b1'
   if (config.data instanceof FormData) {
     config.data.append('token', config.data.token || window.localStorage.token || '')
   } else {
@@ -27,6 +29,13 @@ axios.interceptors.response.use(function (res) {
   if (res.data.error && res.data.error.toString() === '403') {
     window.localStorage.token = ''
   }
+  if (res.data.msg && res.data.error !== 0 && res.data.error !== '0') {
+    if (res.config.dontToast !== true) {
+      toast(res.data.msg, 2000, () => {});
+    }
+    return Promise.reject(res)
+  }
+
   // 如果用于下载文件时，返回整个对象，否则直接返回对象的数据部分
   if (res.config.responseType === 'blob') {
     return res

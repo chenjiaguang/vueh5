@@ -1,13 +1,15 @@
 <template>
   <div class="container">
     <div class="fix-box">
-      <div class="left">
+      <div class="left" @click="back">
           <i class="iconfont icon-goback" />
       </div>
       <div class="mid">评论</div>
-      <div :class="['right',content?'active':null]">发布</div>
+      <div :class="['right',content?'active':null]" @click="sendComment">发布</div>
     </div>
-    <textarea class="input" placeholder="来说点什么吧~" v-model="content"/>
+    <div class="fix-box-bg" @click="focus">
+    </div>
+    <textarea :style="{height: winHeight/2 + 'px'}" ref="input" class="input" :placeholder="replyName?'回复 '+replyName+':':'来说点什么吧~'" v-model="content" :maxlength="1000"/>
   </div>
 </template>
 
@@ -15,43 +17,88 @@
 export default {
   data () {
     return {
-      content: ''
+      content: '',
+      dy_id: this.$route.query.dy_id,
+      commentId: this.$route.query.commentId,
+      pid: this.$route.query.pid,
+      isReply: this.$route.query.isReply,
+      replyName: this.$route.query.replyName,
+      winHeight: window.innerHeight
     };
   },
-  components: {},
-  mounted () {
+  computed: {
+    sendCommentData: function () {
+      return {
+        content: this.content,
+        dy_id: this.dy_id,
+        commentId: this.commentId,
+        pid: this.pid
+      };
+    }
   },
+  components: {},
+  mounted () {},
   methods: {
+    back () {
+      this.$router.back();
+    },
+    focus () {
+      this.$refs.input.focus();
+    },
+    sendComment () {
+      if (this.content) {
+        let url = '';
+        if (this.isReply) {
+          url = '/jv/qz/publish/reply';
+        } else {
+          url = '/jv/qz/publish/comment';
+        }
+        this.$ajax(url, { data: this.sendCommentData })
+          .then(res => {
+            this.$toast(res.msg ? res.msg : '发送成功', 2000, () => {
+              this.$router.back();
+            });
+          })
+          .catch(e => {
+            console.log(e);
+          });
+      }
+    }
   }
 };
 </script>
 
 <style src='../../common.css' />
 <style scoped>
-.container{
+.container {
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
 }
-.input{
+.input {
   flex: 1;
-  margin-top: 90px;
+  margin-top: 100px;
   width: 100%;
-  height: 100%;
 
   box-sizing: border-box;
   border: none;
   resize: none;
-  border:0;
-  border-image-width:0;
+  border: 0;
+  border-image-width: 0;
 
   color: #333333;
   font-size: 34px;
 }
-
-.fix-box{
+.fix-box-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+.fix-box {
   position: fixed;
   height: 88px;
   left: 0;
@@ -60,29 +107,30 @@ export default {
   background-color: #fafafa;
 
   border-bottom-width: 0.5px;
-  border-color: #E5E5E5;
+  border-color: #e5e5e5;
   border-bottom-style: solid;
 
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
+  z-index: 99999;
 }
-.icon-goback{
+.icon-goback {
   font-size: 41px;
   padding-left: 21px;
 }
-.mid{
-  color:#333333;
-  font-size:34px;
+.mid {
+  color: #333333;
+  font-size: 34px;
 }
-.right{
-  color:#C5C5C5;
-  font-size:32px;
+.right {
+  color: #c5c5c5;
+  font-size: 32px;
   padding-right: 30px;
   font-weight: bold;
 }
-.right.active{
-  color:#1EB0FD;
+.right.active {
+  color: #1eb0fd;
 }
 </style>

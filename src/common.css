@@ -1,26 +1,55 @@
+
+/************BASE CSS************/
 .row {
-    display: flex;
-    flex-direction: row;
-  }
-  .row-reverse {
-    flex-direction: row-reverse;
-  }
-  .column {
-    display: flex;
-    flex-direction: column;
-  }
-  .space-between {
-    justify-content: space-between;
-  }
-  .center{
-    align-items: center;
-  }
-  .flex-start{
-    align-items: flex-start;
-  }
-  .flex-end {
-    align-items: flex-end;
-  }
-  .stretch{
-    align-items:stretch;
-  }
+  display: flex;
+  flex-direction: row;
+}
+.row-reverse {
+  flex-direction: row-reverse;
+}
+.column {
+  display: flex;
+  flex-direction: column;
+}
+.space-between {
+  justify-content: space-between;
+}
+.center{
+  align-items: center;
+}
+.flex-start{
+  align-items: flex-start;
+}
+.flex-end {
+  align-items: flex-end;
+}
+.stretch{
+  align-items:stretch;
+}
+.flex-wrap-wrap{
+  flex-wrap:wrap;
+}
+
+
+
+
+
+/************主题 CSS************/
+.action-sheet-item {
+  padding: 0 !important;
+  height: 100px !important;
+  line-height: 100px !important;
+  font-size: 34px !important;
+  color: #333333 !important;
+}
+.cube-action-sheet-space{
+  height: 10px !important;
+  background-color:#E1E1E1 !important;
+}
+.cube-action-sheet-cancel span {
+  padding: 0 !important;
+  height: 100px !important;
+  line-height: 100px !important;
+  font-size: 34px !important;
+  color: #333333 !important;
+}
