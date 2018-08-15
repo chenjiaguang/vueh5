@@ -143,10 +143,7 @@ const router = new Router({
     {
       path: prefix + '/dynamic/articleDetail',
       name: 'DynamicArticleDetail',
-      component: DynamicArticleDetail,
-      meta: {
-        title: '长文详情'
-      }
+      component: DynamicArticleDetail
     },
     {
       path: prefix + '/dynamic/sendComment',
