@@ -49,7 +49,7 @@
                 ref="contentScroll"
                 :data="tabs[index].data"
                 :options="{bounce: false, click: false}">
-                <dynamic-item v-for="(item, idx) in tabs[index].data" :key="idx" :itemData="item" @changeLike="changeLike" />
+                <dynamic-item v-for="(item, idx) in tabs[index].data" :key="idx" :itemData="item" @changeLike="changeLike" @showPreview="showPreview" @hidePreview="hidePreview" />
               </cube-scroll>
             </cube-slide-item>
           </cube-slide>
@@ -223,11 +223,30 @@ export default {
           threshold: (window.innerWidth / 750) * 128
         }
       },
-      timer: null
+      timer: null,
+      previewInstance: null
     }
   },
   components: {DownloadBox, DynamicItem},
+  watch: {
+    '$route.query.previewImage': function (val, oldVal) {
+      if (!val && oldVal) {
+        if (this.previewInstance) {
+          this.$previewImage.hide(this.previewInstance)
+          this.previewInstance = null
+        }
+      }
+    }
+  },
   methods: {
+    showPreview (instance) {
+      this.previewInstance = instance
+      this.$router.push({name: this.$route.name, query: {previewImage: true}, params: {previewImage: true}})
+    },
+    hidePreview () {
+      this.previewInstance = null
+      this.$router.go(-1)
+    },
     changeTabBar (tabTitle) { // 点击tab切换
       const tabSlidePos = this.$refs['tabSlide'].getBoundingClientRect()
       this.tabs.forEach((item, index) => {

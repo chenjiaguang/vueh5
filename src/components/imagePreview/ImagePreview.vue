@@ -46,8 +46,8 @@ export default {
     },
     methods: {
         close () {
-            console.log('close')
             this.$previewImage.hide(this.id)
+            this.onHide()
         }
     }
 }

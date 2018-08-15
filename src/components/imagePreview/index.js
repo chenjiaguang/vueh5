@@ -4,7 +4,7 @@ import main from './ImagePreview.vue'
 let Main = Vue.extend(main)
 
 let ImagePreview = {
-    show: (obj, callback) => {
+    show: (obj, onShow, onHide) => {
         let {images, id, idx, options} = obj
         let _initialOptions = {
             width: window.innerWidth,
@@ -21,11 +21,14 @@ let ImagePreview = {
                     swiperOption: _options,
                     timestap: new Date().getTime()
                 }
+            },
+            methods: {
+                onHide: onHide || function () {}
             }
         })
         window.document.body.appendChild(div)
         _main.$mount(div)
-        callback && callback()
+        onShow && onShow(_main)
         return _main
     },
     hide: (element) => {

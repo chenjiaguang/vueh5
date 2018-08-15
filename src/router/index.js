@@ -17,6 +17,7 @@ import EditDynamicRange from '@/pages/dynamic/chooseRange'
 import DynamicDetail from '@/pages/dynamic/detail'
 import DynamicArticleDetail from '@/pages/dynamic/articleDetail'
 import DynamicSendComment from '@/pages/dynamic/sendComment'
+import TopicDetal from '@/pages/topic/detail'
 Vue.use(Router)
 let prefix = '/h5'
 
@@ -152,6 +153,14 @@ const router = new Router({
       meta: {
         title: '评论'
       }
+    },
+    {
+      path: prefix + '/topic/detail',
+      name: 'TopicDetail',
+      component: TopicDetal,
+      meta: {
+        title: '范团话题'
+      }
     }
   ],
   hashbang: false,
@@ -161,6 +170,7 @@ const router = new Router({
 
 router.beforeEach((to, from, next) => {
   /* 路由发生变化修改页面title */
+  console.log('beforeEach')
   if (to.meta.title) {
     let i = document.createElement('iframe');
     i.src = 'https://www.baidu.com/favicon.ico';

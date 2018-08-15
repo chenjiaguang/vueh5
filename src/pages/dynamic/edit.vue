@@ -4,7 +4,7 @@
       <textarea class="text-content" placeholder="此刻，我想说..." v-model="dynamicText"></textarea>
     </div>
     <div class="pic-box">
-      <image-container :images="images" :showDelete="true" @deleteFunc="deleteImage" :appearAnimation="true" :isUpload="true" @addFunc="addImage" @preview="previewCallback" />
+      <image-container :images="images" :showDelete="true" @deleteFunc="deleteImage" :appearAnimation="true" :isUpload="true" @addFunc="addImage" @showPreview="showPreview" @hidePreview="hidePreview" />
     </div>
     <div class="options-box" v-if="topic || activity || circle || range">
       <edit-option :option="{leftIcon: 'topic_edit', title: '话题'}" v-if="topic">
@@ -100,13 +100,28 @@ export default {
         2: '仅自己可见'
       },
       submitting: false,
-      isPreview: false
+      previewInstance: null
     }
   },
   components: {imageContainer, EditOption},
+  watch: {
+    '$route.query.previewImage': function (val, oldVal) {
+      if (!val && oldVal) {
+        if (this.previewInstance) {
+          this.$previewImage.hide(this.previewInstance)
+          this.previewInstance = null
+        }
+      }
+    }
+  },
   methods: {
-    previewCallback () {
-      this.isPreview = true
+    showPreview (instance) {
+      this.previewInstance = instance
+      this.$router.push({name: 'EditDynamic', query: {previewImage: true}, params: {previewImage: true}})
+    },
+    hidePreview () {
+      this.previewInstance = null
+      this.$router.go(-1)
     },
     addImage (files) {
       let _this = this
