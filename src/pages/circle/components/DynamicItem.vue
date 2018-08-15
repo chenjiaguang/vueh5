@@ -12,7 +12,7 @@
     </div>
     <show-hide-content :content="(itemData.type && itemData.type.toString() === '18') ? itemData.title : (itemData.content || '')" :isLongDynamic="(itemData.type && itemData.type.toString() === '18') ? true : false" />
     <div class="dynamic-pinture" v-if="itemData.covers && itemData.covers.length > 0">
-      <image-container :images="itemData.covers" :appearAnimation="false" :showDelete="false" />
+      <image-container :images="itemData.covers" :appearAnimation="false" :showDelete="false" @showPreview="showPreview" @hidePreview="hidePreview" />
     </div>
     <div v-if="itemData.location" class="publish-address">{{itemData.location}}</div>
     <div v-if="itemData.activity" class="at-activity"><i class="iconfont icon-activity activity-sign"></i>{{itemData.activity.title}}</div>
@@ -61,6 +61,7 @@
   padding: 0 4% 4px;
   overflow: visible;
   text-align: left;
+  background-color: #fff;
 }
 .user-overview{
   padding: 30px 0 23px;
@@ -240,6 +241,12 @@ export default {
         return false
       }
       this.$emit('changeLike', this.itemData)
+    },
+    showPreview (instance) {
+      this.$emit('showPreview', instance)
+    },
+    hidePreview () {
+      this.$emit('hidePreview')
     }
   }
 }

@@ -33,6 +33,7 @@
   box-sizing: border-box;
   position: relative;
   text-align: left;
+  background-color: #fff;
 }
 .activity-item:after{
   content: "";

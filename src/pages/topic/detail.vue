@@ -3,16 +3,11 @@
     <cube-scroll class="toutiao" ref="pageScroller" :scrollEvents="['scroll']" :options="{bounce: false}" @scroll="outerScroll">
       <download-box />
       <header ref="topHeader" class="top-header">
-        <div class="top-header-bg" :style="{backgroundImage: 'url(' + circle.cover.compress + ')'}"></div>
-        <div class="top-header-content">
-          <div class="top-header-avatar" :style="{backgroundImage: 'url(' + circle.cover.compress + ')'}"></div>
-          <div class="top-header-text">
-            <div class="top-header-name">{{circle.name}}</div>
-            <div class="top-header-intro">{{circle.intro}}</div>
-            <div class="top-header-overview">
-              <span>{{circle.followed_num || 0}}人关注</span>
-              <span>{{circle.dynamic_num || 0}}条动态</span>
-            </div>
+        <div class="top-header-bg" :style="{backgroundImage: 'linear-gradient(60deg,#' + topicInfo.beginColor + ',#' + topicInfo.endColor + ')'}"></div>
+        <div class="top-header-content-wrapper">
+          <div class="top-header-content">
+            <div class="top-header-title" v-if="topicInfo.title"><i class="iconfont icon-topic top-header-icon"></i><span class="top-header-title-text">{{topicInfo.title}}</span></div>
+            <div class="top-header-intro">{{topicInfo.content}}</div>
           </div>
         </div>
       </header>
@@ -43,8 +38,7 @@
                   </div>
                 </transition>
                 <div v-if="tabs[index].paging && tabs[index].paging.is_end && tabs[index].data && tabs[index].data.length === 0" class="empty-box">该圈子暂无{{index === 0 ? '动态' : '活动'}}</div>
-                <topic-item v-if="index === 0" v-for="(item, idx) in tabs[index].data" :key="idx" :itemData="item" @changeLike="changeLike" />
-                <activity-item v-else-if="index === 1" v-for="(item, idx) in tabs[index].data" :key="idx" :itemData="item" />
+                <topic-item v-for="(item, idx) in tabs[index].data" :key="idx" :itemData="item" @changeLike="(data) => changeLike(data, index)" @showPreview="showPreview" @hidePreview="hidePreview" />
                 <template slot="pulldown" slot-scope="props">
                   <div class="cube-pulldown-wrapper" :style="props.pullDownStyle">
                     <img v-show="!props.isPullingDown" class="pull-down-icon" :style="{transform: 'translateY(' + props.bubbleY + 'px)'}" :src="$assetsPublicPath + '/cwebassets/image/refresh_icon.png'" />
@@ -111,94 +105,20 @@ const tabs = [
     fetching: false
   }
 ]
-const imgs = [
-  {
-    url: 'http://om0jxp12h.bkt.clouddn.com/toutiao_12.JPG'
-  },
-  {
-    url: 'http://om0jxp12h.bkt.clouddn.com/toutiao_21.JPG'
-  },
-  {
-    url: 'http://om0jxp12h.bkt.clouddn.com/toutiao_31.JPG'
-  },
-  {
-    url: 'http://om0jxp12h.bkt.clouddn.com/toutiao_21.JPG'
-  }
-]
-const txts = ['关注', '推荐', '新时代', '热点', '体育', '娱乐', '科技', '头条号', '问答', '国际', 'cube-ui666']
-let cnt = 1
 export default {
   data() {
     let selectedIdx = parseInt(this.$route.query.jump_tab || 0)
     let selectedLabel = (this.$route.query.jump_tab && this.$route.query.jump_tab.toString() === '1') ? '最热' : '最新'
     return {
-      topicInfo: {},
-      activityItem: {
-        id: 74,
-        cover: 'http://img.qikula.com/file/image/pic/1a485694362n61804661c27.jpg',
-        title: '夏日沙滩排球大作战，我的战队等你来约，兄弟就差你了！',
-        address: '海口市秀英区滨海大道假日海滩夏日烧烤园A12区水电费就算了收到了房间收到了饭是',
-        time: '01-03 18:30 至 05-06 18:30',
-        fee: '65起',
-        status: '进行中'
+      topicInfo: {
+        beginColor: 'B0B0B0',
+        endColor: 'F9F9F9'
       },
       showBackTop: false,
-      testItem: {
-        is_like: false,
-        like_number: 4,
-        comment_number: 6,
-        address: '海口世贸北路一号椰风海岸二期',
-        activity: '啤酒与烧烤，夏日里的绝佳搭配。约吗？快来加入我们吧阿斯顿了开发建设的收到了副科级',
-        name: '测试名字',
-        time_text: '2018-08-05',
-        content_text: '动态的内容动态的内容动态的内容动态的内容动态的内容动水电费水电费上课地方失联飞机阿失联飞机阿失联飞机阿市领导发就阿市领导开发就阿市领导发  老师看大家发拉屎阿酸辣粉 爱上 发生的福利态的内容动态的内容动态的内容动态的内容动态的内容',
-        avatar: 'http://img.qikula.com/file/image/pic/1a485694362n61804661c27.jpg',
-        is_long_dynamic: true,
-        is_manager: true,
-        is_owner: true,
-        is_settop: true,
-        pictrues: [
-          {
-            url: 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1533548953876&di=179b3cf1aa8604adcdf1654a5c0650b9&imgtype=0&src=http%3A%2F%2Fimgsrc.baidu.com%2Fimgad%2Fpic%2Fitem%2F7acb0a46f21fbe09334115c061600c338644adc3.jpg',
-            width: 1200,
-            height: 720
-          },
-          {
-            url: 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1533549055739&di=7e26cb3f8760b42ca4d043f91c6a2140&imgtype=0&src=http%3A%2F%2Fimgsrc.baidu.com%2Fimgad%2Fpic%2Fitem%2F4a36acaf2edda3ccd53548ea0be93901203f9223.jpg',
-            width: 1200,
-            height: 675
-          },
-          {
-            url: 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1533549104992&di=e8a8aa74591a4982dc6324ba4e429b12&imgtype=0&src=http%3A%2F%2Fimgsrc.baidu.com%2Fimgad%2Fpic%2Fitem%2Fac4bd11373f0820207282ceb41fbfbedaa641baf.jpg',
-            width: 1200,
-            height: 750
-          },
-          {
-            url: 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1533549171335&di=aa3f0a281a41cfb2f189abbcd47e45ca&imgtype=0&src=http%3A%2F%2Fa3.topitme.com%2Fa%2Fff%2Fc8%2F1183976520bfec8ffao.jpg',
-            width: 1500,
-            height: 2120
-          },
-          {
-            url: 'http://img.zcool.cn/community/01247f5991c8d40000002129fce48c.jpg',
-            width: 1000,
-            height: 6047
-          }
-        ],
-        with_article: {
-          title: '测试文章标题测试文章标题测试文章标题测试文章标题测试文章标题测试文章标题测试文章标题测试文章标题测试文章标题测试文章标题测试文章标题',
-          cover: 'http://img.zcool.cn/community/01247f5991c8d40000002129fce48c.jpg'
-        }
-      },
-      circle: {
-        cover: {
-          compress: ''
-        }
-      },
       winHeight: window.innerHeight,
       tabs: tabs,
-      tabBarHeight: parseInt((window.innerWidth / 750) * 88),
+      tabBarHeight: parseInt((window.innerWidth / 750) * 96),
       selectedLabel: selectedLabel,
-      content: imgs.slice(),
       selectedIdx: selectedIdx,
       tabSlideX: -window.innerWidth + 'px',
       options: {
@@ -210,20 +130,30 @@ export default {
           threshold: (window.innerWidth / 750) * 100
         },
         click: false
-      }
+      },
+      previewInstance: null
     }
   },
   components: {TopicItem, DownloadBox, LoadingView},
   watch: {
-    'circle.id': function () {
-      if (this.$route.query.jump_tab && this.$route.query.jump_tab.toString() === '1') { // 有指定首先显示的tab则刷新该tab数据,否则默认刷新动态tab
-        this.fetchActivity(1)
-      } else {
-        this.fetchDynamic(1)
+    '$route.query.previewImage': function (val, oldVal) {
+      if (!val && oldVal) {
+        if (this.previewInstance) {
+          this.$previewImage.hide(this.previewInstance)
+          this.previewInstance = null
+        }
       }
     }
   },
   methods: {
+    showPreview (instance) {
+      this.previewInstance = instance
+      this.$router.push({name: this.$route.name, query: {previewImage: true}, params: {previewImage: true}})
+    },
+    hidePreview () {
+      this.previewInstance = null
+      this.$router.go(-1)
+    },
     changeTabBar (tabTitle) { // 点击tab切换
       let wrapperWidth = this.$refs['navWrapper'] ? this.$refs['navWrapper'].offsetWidth : window.innerWidth
       this.tabs.forEach((item, index) => {
@@ -231,11 +161,7 @@ export default {
           this.selectedLabel = tabTitle
           this.selectedIdx = index
           if (!this.tabs[index].paging.pn) {
-            if (index === 0) {
-              this.fetchDynamic(1)
-            } else if (index === 1) {
-              this.fetchActivity(1)
-            }
+            this.fetchTopic(index, 1)
           }
         }
       })
@@ -298,7 +224,7 @@ export default {
         type: idx
       }
       this.tabs[idx].fetching = true
-      this.$ajax('/jv/qz/v21/circledynamics', {data: rData}).then(res => { // 获取动态列表
+      this.$ajax('/jv/qz/topic/find', {data: rData}).then(res => { // 获取动态列表
         if (res && res.msg) {
           this.$toast(res.msg)
         }
@@ -306,7 +232,9 @@ export default {
           this.tabs[idx].fetching = false
           this.tabs[idx].paging = res.data.paging
           if (pn.toString() === '1') { // 刷新
-            this.topicInfo = {id, title, state, content, begin_color, end_color} = res.data
+            console.log(907)
+            let {id, title, state, content, beginColor, endColor} = res.data
+            this.topicInfo = {id, title, state, content, beginColor, endColor}
             this.tabs[idx].data = res.data.list
           } else {
             this.tabs[idx].data = this.tabs[idx].data.concat(res.data.list)
@@ -319,62 +247,21 @@ export default {
         if (err && err.msg) {
           this.$toast(err.msg)
         } else {
-          this.$toast('获取动态失败')
-        }
-      })
-    },
-    fetchActivity (pn) {
-      let rData = {
-        pn: pn,
-        limit: 20,
-        cid: this.circle.id,
-        snapshot: this.tabs[1].paging.snapshot || '',
-        token: 'lcaKiq5GIC_FHqubOBcI6FUKaL8N171U'
-      }
-      this.tabs[1].fetching = true
-      this.$ajax('/jv/qz/v21/circleactivities', {data: rData}).then(res => { // 获取活动列表
-        if (res && res.msg) {
-          this.$toast(res.msg)
-        }
-        if (res && !Boolean(res.error) && res.data) { // 成功获取数据
-          this.tabs[1].fetching = false
-          this.tabs[1].paging = res.data.paging
-          if (pn.toString() === '1') { // 刷新
-            this.tabs[1].data = res.data.list
-          } else {
-            this.tabs[1].data = this.tabs[0].data.concat(res.data.list)
-          }
-        } else {
-          this.tabs[1].fetching = false
-        }
-      }).catch(err => {
-        this.tabs[1].fetching = false
-        if (err && err.msg) {
-          this.$toast(err.msg)
-        } else {
-          this.$toast('获取活动失败')
+          this.$toast('获取话题失败')
         }
       })
     },
     onPullingDown (idx) {
-      if (idx === 0) { // 动态列表
-        this.fetchDynamic(1)
-      } else if (idx === 1) { // 活动列表
-        this.fetchActivity(1)
-      }
+      this.fetchTopic(idx, 1)
     },
     onPullingUp (idx) {
       if (!(this.tabs[idx].paging && this.tabs[idx].paging.pn && !this.tabs[idx].paging.is_end)) { // 未生成paging，或者paging.pn不存在，或者已是最后一页     终止操作
         return false
       }
       let pn = parseInt(this.tabs[idx].paging.pn) + 1
-      if (idx === 0) { // 动态列表
-        this.fetchDynamic(pn)
-      } else if (idx === 1) { // 活动列表
-        this.fetchActivity(pn)
-      }
+      this.fetchTopic(idx, pn)
     },
-    changeLike (item) {
+    changeLike (item, idx) {
       console.log('changeLike', item)
       let rData = {
         token: 'lcaKiq5GIC_FHqubOBcI6FUKaL8N171U',
@@ -382,36 +269,44 @@ export default {
         like: !item.has_like,
         type: 0
       }
-      this.tabs[0].data.forEach(i => {
-        if (i.id === item.id) {
-          i.submitting = true
-        }
-      })
+      for (let i = 0; i < this.tabs.length; i++) {
+        this.tabs[i].data.forEach(listItem => {
+          if (listItem.id === item.id) {
+            listItem.submitting = true
+          }
+        })
+      }
       this.$ajax('/jv/qz/like', {data: rData}).then(res => {
         if (res && res.msg) {
           this.$toast(res.msg)
         }
         if (res && !Boolean(res.error)) {
-          this.tabs[0].data.forEach(i => {
-            if (i.id === item.id) {
-              i.has_like = !item.has_like
-              i.like_num = parseInt(item.like_num) + (item.has_like ? 1 : -1)
-              i.submitting = false
-            }
-          })
+          for(let i = 0; i < this.tabs.length; i++) {
+            this.tabs[i].data.forEach(listItem => {
+              if (listItem.id === item.id) {
+                listItem.has_like = !listItem.has_like
+                listItem.like_num = parseInt(listItem.like_num) + (listItem.has_like ? 1 : -1)
+                listItem.submitting = false
+              }
+            })
+          }
         } else {
-          this.tabs[0].data.forEach(i => {
-            if (i.id === item.id) {
-              i.submitting = false
+          for(let i = 0; i < this.tabs.length; i++) {
+            this.tabs[i].data.forEach(listItem => {
+              if (listItem.id === item.id) {
+                listItem.submitting = false
+              }
+            })
+          }
+        }
+      }).catch(err => {
+        for(let i = 0; i < this.tabs.length; i++) {
+          this.tabs[i].data.forEach(listItem => {
+            if (listItem.id === item.id) {
+              listItem.submitting = false
             }
           })
         }
-      }).catch(err => {
-        this.tabs[0].data.forEach(i => {
-          if (i.id === item.id) {
-            i.submitting = false
-          }
-        })
       })
     },
     outerScroll ({x, y}) {
@@ -469,68 +364,58 @@ fl{
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;
-  filter: blur(33px);
   z-index: 0;
 }
-.top-header-content{
+.top-header-content-wrapper{
   position: relative;
   z-index: 1;
   width: 100%;
-  height: 288px;
-  background-color: rgba(32,31,31,0.3)
+  height: 264px;
 }
-.top-header-text{
-  padding-left: 220px;
-  padding-top: 30px;
-  padding-right: 30px;
+.top-header-content{
+  position: absolute;
+  width: 100%;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  padding: 0 4%;
+  box-sizing: border-box;
 }
-.top-header-name{
-  font-size: 36px;
-  font-weight: bold;
+.top-header-title{
+  font-size: 46px;
+  line-height: 56px;
   color: #fff;
-  line-height: 42px;
+  white-space: normal;
+}
+.top-header-title-text{
+  vertical-align: middle;
 }
 .top-header-intro{
   font-size: 24px;
   color: #fff;
-  line-height: 36px;
-  padding-top: 22px;
+  line-height: 32px;
+  padding-top: 18px;
   overflow : hidden;
-  text-overflow: ellipsis;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
+  white-space: normal;
 }
-.top-header-overview{
-  font-size: 24px;
-  color: #fff;
-  line-height: 34px;
-  padding-top: 20px;
-}
-.top-header-overview > span{
-    padding-right: 30px;
-  }
-.top-header-avatar{
-  position: absolute;
-  left: 40px;
-  top: 30px;
-  width: 150px;
-  height: 150px;
-  border-radius: 10px;
-  background-repeat: no-repeat;
-  background-size: cover;
-  background-position: center;
+.top-header-icon{
+  font-size: 46px;
+  vertical-align: middle;
+  margin-right: 10px;
+  position: relative;
+  top: -2px;
 }
 .scroll-wrapper{
   position: relative;
-  background: #fff;
+  background: #F5F5F5;
 }
 .nav-scroll-list-wrap{
   position: relative;
   background-color: #fff;
 }
 .tab-box{
-  height: 88px;
+  height: 96px;
+  padding: 0 4%;
 }
 .tab-slider{
   width: 100%;
@@ -545,7 +430,7 @@ fl{
   position: absolute;
   left: -20px;
   bottom: 0;
-  background: #1EB0FD;
+  background: #FF611A;
   border-radius: 4px;
 }
 .tab-border{
@@ -558,12 +443,24 @@ fl{
   transform-origin: 0 100%;
   background: #e5e5e5;
 }
+.cube-tab-bar{
+  justify-content: flex-start;
+}
 .cube-tab{
+  flex: 0;
+  margin-left: 45px;
   font-size: 36px;
   color: #666;
+  white-space: nowrap;
+}
+.cube-tab:first-child{
+  margin-left: 0;
 }
 .cube-tab_active{
   color: #333;
+  font-weight: bold;
+}
+div.cube-tab_active div{
   font-weight: bold;
 }
 .bottom-footer{
@@ -603,6 +500,7 @@ fl{
   color: #666;
   height: 100px;
   position: relative;
+  background-color: #fff;
 }
 .pullup-content{
   position: absolute;

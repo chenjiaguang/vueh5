@@ -43,7 +43,7 @@
                   </div>
                 </transition>
                 <div v-if="tabs[index].paging && tabs[index].paging.is_end && tabs[index].data && tabs[index].data.length === 0" class="empty-box">该圈子暂无{{index === 0 ? '动态' : '活动'}}</div>
-                <dynamic-item v-if="index === 0" v-for="(item, idx) in tabs[index].data" :key="idx" :itemData="item" @changeLike="changeLike" />
+                <dynamic-item v-if="index === 0" v-for="(item, idx) in tabs[index].data" :key="idx" :itemData="item" @changeLike="changeLike" @showPreview="showPreview" @hidePreview="hidePreview" />
                 <activity-item v-if="index === 1" v-for="(item, idx) in tabs[index].data" :key="idx" :itemData="item" />
                 <template slot="pulldown" slot-scope="props">
                   <div class="cube-pulldown-wrapper" :style="props.pullDownStyle">
@@ -99,84 +99,14 @@ Vue.use(TabPanels)
 Vue.use(Slide)
 Vue.use(Sticky)
 const tabs = []
-const imgs = [
-  {
-    url: 'http://om0jxp12h.bkt.clouddn.com/toutiao_12.JPG'
-  },
-  {
-    url: 'http://om0jxp12h.bkt.clouddn.com/toutiao_21.JPG'
-  },
-  {
-    url: 'http://om0jxp12h.bkt.clouddn.com/toutiao_31.JPG'
-  },
-  {
-    url: 'http://om0jxp12h.bkt.clouddn.com/toutiao_21.JPG'
-  }
-]
-const txts = ['关注', '推荐', '新时代', '热点', '体育', '娱乐', '科技', '头条号', '问答', '国际', 'cube-ui666']
-let cnt = 1
 export default {
   data() {
-    let selectedIdx = parseInt(this.$route.query.jump_tab || 0)
+    // let selectedIdx = parseInt(this.$route.query.jump_tab || 0)
+    let selectedIdx = 0
     let selectedLabel = (this.$route.query.jump_tab && this.$route.query.jump_tab.toString() === '1') ? '活动' : '动态'
     console.log('selectedIdx', selectedIdx, typeof selectedIdx)
     return {
-      activityItem: {
-        id: 74,
-        cover: 'http://img.qikula.com/file/image/pic/1a485694362n61804661c27.jpg',
-        title: '夏日沙滩排球大作战，我的战队等你来约，兄弟就差你了！',
-        address: '海口市秀英区滨海大道假日海滩夏日烧烤园A12区水电费就算了收到了房间收到了饭是',
-        time: '01-03 18:30 至 05-06 18:30',
-        fee: '65起',
-        status: '进行中'
-      },
       showBackTop: false,
-      testItem: {
-        is_like: false,
-        like_number: 4,
-        comment_number: 6,
-        address: '海口世贸北路一号椰风海岸二期',
-        activity: '啤酒与烧烤，夏日里的绝佳搭配。约吗？快来加入我们吧阿斯顿了开发建设的收到了副科级',
-        name: '测试名字',
-        time_text: '2018-08-05',
-        content_text: '动态的内容动态的内容动态的内容动态的内容动态的内容动水电费水电费上课地方失联飞机阿失联飞机阿失联飞机阿市领导发就阿市领导开发就阿市领导发  老师看大家发拉屎阿酸辣粉 爱上 发生的福利态的内容动态的内容动态的内容动态的内容动态的内容',
-        avatar: 'http://img.qikula.com/file/image/pic/1a485694362n61804661c27.jpg',
-        is_long_dynamic: true,
-        is_manager: true,
-        is_owner: true,
-        is_settop: true,
-        pictrues: [
-          {
-            url: 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1533548953876&di=179b3cf1aa8604adcdf1654a5c0650b9&imgtype=0&src=http%3A%2F%2Fimgsrc.baidu.com%2Fimgad%2Fpic%2Fitem%2F7acb0a46f21fbe09334115c061600c338644adc3.jpg',
-            width: 1200,
-            height: 720
-          },
-          {
-            url: 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1533549055739&di=7e26cb3f8760b42ca4d043f91c6a2140&imgtype=0&src=http%3A%2F%2Fimgsrc.baidu.com%2Fimgad%2Fpic%2Fitem%2F4a36acaf2edda3ccd53548ea0be93901203f9223.jpg',
-            width: 1200,
-            height: 675
-          },
-          {
-            url: 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1533549104992&di=e8a8aa74591a4982dc6324ba4e429b12&imgtype=0&src=http%3A%2F%2Fimgsrc.baidu.com%2Fimgad%2Fpic%2Fitem%2Fac4bd11373f0820207282ceb41fbfbedaa641baf.jpg',
-            width: 1200,
-            height: 750
-          },
-          {
-            url: 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1533549171335&di=aa3f0a281a41cfb2f189abbcd47e45ca&imgtype=0&src=http%3A%2F%2Fa3.topitme.com%2Fa%2Fff%2Fc8%2F1183976520bfec8ffao.jpg',
-            width: 1500,
-            height: 2120
-          },
-          {
-            url: 'http://img.zcool.cn/community/01247f5991c8d40000002129fce48c.jpg',
-            width: 1000,
-            height: 6047
-          }
-        ],
-        with_article: {
-          title: '测试文章标题测试文章标题测试文章标题测试文章标题测试文章标题测试文章标题测试文章标题测试文章标题测试文章标题测试文章标题测试文章标题',
-          cover: 'http://img.zcool.cn/community/01247f5991c8d40000002129fce48c.jpg'
-        }
-      },
       circle: {
         cover: {
           compress: ''
@@ -186,7 +116,6 @@ export default {
       tabs: tabs,
       tabBarHeight: parseInt((window.innerWidth / 750) * 88),
       selectedLabel: selectedLabel,
-      content: imgs.slice(),
       selectedIdx: selectedIdx,
       tabSlideX: -window.innerWidth + 'px',
       options: {
@@ -198,7 +127,8 @@ export default {
           threshold: (window.innerWidth / 750) * 100
         },
         click: false
-      }
+      },
+      previewInstance: null
     }
   },
   components: {DynamicItem, ActivityItem, DownloadBox, LoadingView},
@@ -209,22 +139,31 @@ export default {
       } else {
         this.fetchDynamic(1)
       }
+    },
+    '$route.query.previewImage': function (val, oldVal) {
+      if (!val && oldVal) {
+        if (this.previewInstance) {
+          this.$previewImage.hide(this.previewInstance)
+          this.previewInstance = null
+        }
+      }
     }
   },
   methods: {
+    showPreview (instance) {
+      this.previewInstance = instance
+      this.$router.push({name: 'CircleDetail', query: {previewImage: true}, params: {previewImage: true}})
+    },
+    hidePreview () {
+      this.previewInstance = null
+      this.$router.go(-1)
+    },
     changeTabBar (tabTitle) { // 点击tab切换
       let wrapperWidth = this.$refs['navWrapper'] ? this.$refs['navWrapper'].offsetWidth : window.innerWidth
       this.tabs.forEach((item, index) => {
         if (item.title === tabTitle) {
           this.selectedLabel = tabTitle
           this.selectedIdx = index
-          // if (!this.tabs[index].paging.pn) {
-          //   if (index === 0) {
-          //     this.fetchDynamic(1)
-          //   } else if (index === 1) {
-          //     this.fetchActivity(1)
-          //   }
-          // }
         }
       })
     },
@@ -276,6 +215,7 @@ export default {
           let pos = this.$refs['tabItem'][initialTab].$el.getBoundingClientRect()
           let slideX = pos.x + pos.width / 2
           this.tabSlideX = slideX + 'px'
+          this.selectedIdx = initialTab
           clearInterval(this.timer)
         }
       },30)
@@ -557,7 +497,7 @@ fl{
 }
 .scroll-wrapper{
   position: relative;
-  background: #fff;
+  background: #F5F5F5;
 }
 .nav-scroll-list-wrap{
   position: relative;
@@ -637,6 +577,7 @@ fl{
   color: #666;
   height: 100px;
   position: relative;
+  background-color: #fff;
 }
 .pullup-content{
   position: absolute;

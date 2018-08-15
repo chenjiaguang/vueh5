@@ -8,14 +8,14 @@
         <img v-if="itemData.is_owner" :src="$assetsPublicPath + '/cwebassets/image/circle_owner.png'" class="user-tag fl" />
         <img v-if="itemData.is_settop" :src="$assetsPublicPath + '/cwebassets/image/settop.png'" class="user-tag fl" /> -->
       </div>
-      <div class="publish-time-and-circle">{{itemData.time}}<span class="from-circle">发布于<span @click="goCircle" class="from-circle-text">{{itemData.circle_name}}</span></span></div>
+      <div class="publish-time-and-circle">{{itemData.time}}<span class="from-circle" v-if="itemData.circle_name">发布于<span @click="goCircle" class="from-circle-text">{{itemData.circle_name}}</span></span></div>
     </div>
     <show-hide-content :content="(itemData.type && itemData.type.toString() === '18') ? itemData.title : (itemData.content || '')" :isLongDynamic="(itemData.type && itemData.type.toString() === '18') ? true : false" />
     <div v-if="itemData.topicInfo && itemData.topicInfo.length > 0" class="topic-box clearfix">
-      <div v-for="(item, idx) in itemData.topicInfo" :key="idx" class="topic-item fl" :class="{'margin-left-0': idx === 0}"><i class="iconfont icon-topic relative-topic-icon"></i>{{item.title}}</div>
+      <div v-for="(item, idx) in itemData.topicInfo" :key="idx" class="topic-item fl"><i class="iconfont icon-topic relative-topic-icon"></i>{{item.title}}</div>
     </div>
     <div class="dynamic-picture" v-if="itemData.covers && itemData.covers.length > 0">
-      <image-container :images="itemData.covers" :appearAnimation="false" :showDelete="false" />
+      <image-container :images="itemData.covers" :appearAnimation="false" :showDelete="false" @showPreview="showPreview" @hidePreview="hidePreview" />
     </div>
     <div v-if="itemData.location" class="publish-address">{{itemData.location}}</div>
     <div v-if="itemData.activity" class="at-activity"><i class="iconfont icon-activity activity-sign"></i>{{itemData.activity.title}}</div>
@@ -115,10 +115,7 @@
   background-color: #F0F0F0;
   padding: 0 20px;
   border-radius :5px;
-  margin: 0 0 10px 14px;
-}
-.topic-item.margin-left-0{
-  margin-left: 0;
+  margin: 0 14px 10px 0;
 }
 .relative-topic-icon{
   font-size: 24px;
@@ -270,6 +267,12 @@ export default {
     },
     goCircle () {
       console.log('goCircle')
+    },
+    showPreview (instance) {
+      this.$emit('showPreview', instance)
+    },
+    hidePreview () {
+      this.$emit('hidePreview')
     }
   }
 }
