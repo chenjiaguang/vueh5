@@ -1,4 +1,5 @@
 import axios from 'axios'
+import toast from '../components/toast'
 
 axios.defaults.method = 'post'
 axios.interceptors.request.use(function (config) {
@@ -29,8 +30,10 @@ axios.interceptors.response.use(function (res) {
     window.localStorage.token = ''
   }
   if (res.data.msg && res.data.error !== 0 && res.data.error !== '0') {
-    window.alert(res.data.msg)
-    return Promise.reject(res.data.msg)
+    if (res.config.dontToast !== true) {
+      toast(res.data.msg, 2000, () => {});
+    }
+    return Promise.reject(res)
   }
 
   // 如果用于下载文件时，返回整个对象，否则直接返回对象的数据部分

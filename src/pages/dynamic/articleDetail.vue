@@ -59,13 +59,13 @@
 
         <div v-if="dynamic&&!isArticle" id="content-container" class="column">
           <div class="dynamic-content">{{dynamic.content}}</div>
-          <DetailImageContainer class="detail-image-container"  :images="dynamic.covers"/>
           <TopicTagBox :topicInfo="dynamic.topicInfo" />
+          <DetailImageContainer class="detail-image-container"  :images="dynamic.covers"/>
           <a class="content-article-box row center" v-if="dynamic.aid" :href="dynamic.newsArticle.article_url">
             <div class="content-article-img" :style="`background-image:url(${dynamic.newsArticle.covers[0].compress})`"/>
             <div class="content-article-content">{{dynamic.newsArticle.name}}</div>
           </a>
-          <a class="content-activity-box row center" v-if="dynamic.actid" :href="dynamic.activity.id">
+          <a class="content-activity-box row center" v-if="dynamic.actid" href="javascript:void(0)" @click="clickActivity(dynamic.actid)">
             <div class="content-activity-img" :style="`background-image:url(${dynamic.activity.covers[0].compress})`"/>
             <div class="content-activity-right">
               <div class="content-activity-title">{{dynamic.activity.title}}</div>
@@ -123,6 +123,7 @@
     </cube-scroll>
     <ScrollToTop @click="scrollToTop" :visible="scrollToTopVisible"/>
     <DynamicFixedBox v-if="dynamic" :dynamic="dynamic"/>
+    <NotFoundPage v-if="isLoad&&!dynamic"/>
   </div>
 </template>
 
@@ -133,6 +134,7 @@ import DynamicFixedBox from '../../components/DynamicFixedBox';
 import ScrollToTop from '../../components/ScrollToTop';
 import TopicTagBox from '../../components/TopicTagBox';
 import DetailImageContainer from '../../components/DetailImageContainer';
+import NotFoundPage from '../notFoundPage';
 import { Scroll, ActionSheet } from 'cube-ui';
 Vue.use(Scroll);
 Vue.use(ActionSheet);
@@ -140,6 +142,7 @@ export default {
   data () {
     return {
       dynamic: null,
+      isLoad: false,
       imageList: [],
       options: {
         pullDownRefresh: false,
@@ -156,7 +159,8 @@ export default {
     DynamicFixedBox,
     ScrollToTop,
     TopicTagBox,
-    DetailImageContainer
+    DetailImageContainer,
+    NotFoundPage
   },
   mounted () {
     if (this.isArticle) {
@@ -195,7 +199,7 @@ export default {
       } else {
         url = '/jv/anonymous/qz/dynamic';
       }
-      this.$ajax(url, { data: this.dynamicData })
+      this.$ajax(url, { data: this.dynamicData, dontToast: true })
         .then(res => {
           this.dynamic = res.data;
           let i = 0;
@@ -209,8 +213,11 @@ export default {
                 return content.imageUrl;
               });
           }
+          this.isLoad = true;
         })
-        .catch();
+        .catch(e => {
+          this.isLoad = true;
+        });
     },
     fetchMoreReplies (comment) {
       this.replyData.commentId = comment.id;
@@ -259,6 +266,9 @@ export default {
           this.$toast(res.msg ? res.msg : '关注成功', 2000, () => {});
         })
         .catch();
+    },
+    clickActivity (id) {
+      this.$router.push({ name: 'ActivityDetail', query: { id: id } });
     },
     showReplyActionSheet (commentId, replyName = '', pid = '') {
       this.$createActionSheet({

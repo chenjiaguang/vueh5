@@ -1,6 +1,6 @@
 <template>
   <div v-if="topicInfo && topicInfo.length > 0" class="topic-box clearfix">
-    <div v-for="(item, idx) in topicInfo" :key="idx" @click="click" class="topic-item fl"><i class="iconfont icon-topic relative-topic-icon"></i>{{item.title}}</div>
+    <div v-for="(item, idx) in topicInfo" :key="idx" @click="()=>click(item.id)" class="topic-item fl"><i class="iconfont icon-topic relative-topic-icon"></i>{{item.title}}</div>
   </div>
 </template>
 <script>
@@ -12,12 +12,11 @@ export default {
   computed: {},
   components: {},
   methods: {
-    click () {
-      alert('待完成');
-      // this.$router.push({
-      //   name: 'DynamicSendComment',
-      //   query: { dy_id: this.dynamic.id }
-      // });
+    click (id) {
+      this.$router.push({
+        name: 'TopicDetail',
+        query: { topic_id: id }
+      });
     }
   }
 };
