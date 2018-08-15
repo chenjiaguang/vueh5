@@ -1,16 +1,18 @@
 <template>
   <div :style="{height: winHeight + 'px'}">
-    <cube-scroll class="toutiao" ref="pageScroller" :scrollEvents="['scroll']" :options="{bounce: false}" @scroll="outerScroll">
-      <download-box />
-      <header ref="topHeader" class="top-header">
-        <div class="top-header-bg" :style="{backgroundImage: 'linear-gradient(60deg,#' + topicInfo.beginColor + ',#' + topicInfo.endColor + ')'}"></div>
-        <div class="top-header-content-wrapper">
-          <div class="top-header-content">
-            <div class="top-header-title" v-if="topicInfo.title"><i class="iconfont icon-topic top-header-icon"></i><span class="top-header-title-text">{{topicInfo.title}}</span></div>
-            <div class="top-header-intro">{{topicInfo.content}}</div>
+    <cube-scroll class="toutiao" ref="pageScroller" :scrollEvents="['scroll']" :options="{bounce: false}">
+      <div class="banner" ref="topBanner">
+        <download-box />
+        <header ref="topHeader" class="top-header">
+          <div class="top-header-bg" :style="{backgroundImage: 'linear-gradient(60deg,#' + topicInfo.beginColor + ',#' + topicInfo.endColor + ')'}"></div>
+          <div class="top-header-content-wrapper">
+            <div class="top-header-content">
+              <div class="top-header-title" v-if="topicInfo.title"><i class="iconfont icon-topic top-header-icon"></i><span class="top-header-title-text">{{topicInfo.title}}</span></div>
+              <div class="top-header-intro">{{topicInfo.content}}</div>
+            </div>
           </div>
-        </div>
-      </header>
+        </header>
+      </div>
       <div ref="innerWrapper" class="scroll-wrapper" :style="{height: winHeight + 'px'}">
         <div class="nav-scroll-list-wrap" ref="navWrapper" :style="{height: tabBarHeight + 'px'}" v-if="tabs && tabs.length > 1">
           <cube-tab-bar v-model="selectedLabel" class="tab-box" @change="changeTabBar" :style="{height: tabBarHeight + 'px'}">
@@ -30,6 +32,7 @@
                 :data="tabs[index].data"
                 :scrollEvents="['scroll']"
                 :options="options"
+                @scroll="innerScroll"
                 @pulling-down="onPullingDown(index)"
                 @pulling-up="onPullingUp(index)">
                 <transition name="loading-scale">
@@ -51,7 +54,7 @@
                     <div class="pullup-content"><img class="pull-up-icon" :src="$assetsPublicPath + '/cwebassets/image/loading_icon.png'" />正在加载...</div>
                   </div>
                   <!-- 加载完无数据 -->
-                  <div v-else-if="tabs[index].paging && tabs[index].paging.is_end && tabs[index].data && tabs[index].data.length === 0" style="height: 0;"></div>
+                  <div v-else-if="tabs[index].paging && tabs[index].paging.is_end && tabs[index].data && tabs[index].data.length === 0" class="pullup-wrapper" style="height: 0;"></div>
                   <!-- 其他情况 -->
                   <div v-else class="pullup-wrapper">
                     <div class="pullup-content">再刷也没有了</div>
@@ -66,7 +69,10 @@
     <transition name="backtop-fade">
       <i v-if="showBackTop" class="iconfont icon-back_top backtop-icon"></i>
     </transition>
-    <i class="iconfont icon-camera publish-icon"></i>
+    <!-- <i class="iconfont icon-camera publish-icon"></i> -->
+    <div class="discuss-box">
+      <i class="iconfont icon-discuss discuss-icon"></i><span>参与讨论</span>
+    </div>
   </div>
 </template>
 
@@ -129,7 +135,8 @@ export default {
         pullUpLoad: {
           threshold: (window.innerWidth / 750) * 100
         },
-        click: false
+        click: true,
+        stopPropagation: true
       },
       previewInstance: null
     }
@@ -309,23 +316,27 @@ export default {
         }
       })
     },
-    outerScroll ({x, y}) {
-      if (-y > this.winHeight) { // 超过半屏显示返回顶部
+    // outerScroll ({x, y}) {
+    //   if (-y > this.winHeight) { // 超过半屏显示返回顶部
+    //     this.showBackTop = true
+    //   } else {
+    //     this.showBackTop = false
+    //   }
+    // },
+    innerScroll ({x, y}) {
+      let bannerPos = this.$refs['topBanner'].getBoundingClientRect()
+      // let outerWrapperPos = this.$refs['pageScroller'].scrollTo(0, -innerWrapperPos.top, 500)
+      if (-y > window.innerHeight) { // 超过一屏显示返回顶部
         this.showBackTop = true
       } else {
         this.showBackTop = false
       }
-    },
-    // innerScroll ({x, y}) {
-    //   let outerWrapperPos = this.$refs['pageScroller'].$el.getBoundingClientRect()
-    //   let innerWrapperPos = this.$refs['innerWrapper'].getBoundingClientRect()
-    //   if (-y > innerWrapperPos.top) {
-    //     return false
-    //   }
-    //   if (y < 0 && innerWrapperPos.y > 0) {
-    //     this.$refs['pageScroller'].scrollTo(x, y)
-    //   }
-    // }
+      if (-y > window.innerHeight / 200) { // 超过半屏隐藏顶部banner
+        this.$refs['pageScroller'].scrollTo(0, -bannerPos.height, 500)
+      } else {
+        this.$refs['pageScroller'].scrollTo(0, 0, 500)
+      }
+    }
   },
   created () {
     this.fetchTopic(0,1)
@@ -501,12 +512,15 @@ div.cube-tab_active div{
   height: 100px;
   position: relative;
   background-color: #fff;
+  box-sizing: content-box;
+  padding-bottom: 98px;
 }
 .pullup-content{
   position: absolute;
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
+  margin-top: -49px;
   padding-left: 42px;
 }
 @keyframes refreshing {
@@ -577,7 +591,7 @@ div.cube-tab_active div{
   border-radius: 8px;
   position: fixed;
   right: 54px;
-  bottom: 178px;
+  bottom: 278px;
   z-index: 2;
 }
 .backtop-fade-enter-active, .backtop-fade-leave-active {
@@ -599,7 +613,7 @@ div.cube-tab_active div{
   border-radius: 8px;
   position: fixed;
   right: 54px;
-  bottom: 80px;
+  bottom: 178px;
   z-index: 2;
 }
 .first-loading-box{
@@ -619,5 +633,35 @@ div.cube-tab_active div{
   line-height: 48px;
   padding: 50px 0;
   text-align: center;
+}
+.discuss-box{
+  width: 100%;
+  height: 98px;
+  line-height: 98px;
+  font-size: 30px;
+  color: #666;
+  text-align: center;
+  background: #FAFAFA;
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  z-index: 3;
+}
+.discuss-box:before{
+  content: "";
+  display: block;
+  width: 300%;
+  height: 3px;
+  position: absolute;
+  left: 0;
+  top: 0;
+  background: #CBCBCB;
+  transform: scale(0.3333, 0.3333);
+  transform-origin: 0 0;
+}
+.discuss-icon{
+  font-size: 36px;
+  color: #FF611A;
+  margin-right: 20px;
 }
 </style>

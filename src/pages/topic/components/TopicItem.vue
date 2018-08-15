@@ -24,7 +24,7 @@
       <div class="with-article-title">{{itemData.newsArticle.name}}</div>
     </div>
     <div class="comment-and-like clearfix">
-      <cube-button @click="changeLike" class="comment-and-like-item fl" :style="{paddingLeft: 0, color: itemData.has_like ? '#FE5273' : '#333'}">
+      <div @click="changeLike" class="comment-and-like-item fl" :style="{paddingLeft: 0, color: itemData.has_like ? '#FE5273' : '#333'}">
         <div class="comment-and-like-icon-box">
           <transition-group name="fade" mode="in-out">
             <i v-if="itemData.has_like" key="like" class="iconfont icon-like comment-and-like-icon"></i>
@@ -32,7 +32,7 @@
           </transition-group>
           <span>{{likeNumber || '赞'}}</span>
         </div>
-      </cube-button>
+      </div>
       <div class="comment-and-like-item fl" style="padding-right: 0;">
         <div class="comment-and-like-icon-box">
           <i class="iconfont icon-comment_icon comment-and-like-icon"></i>
@@ -174,6 +174,7 @@
   left: 134px;
   top: 50%;
   transform: translateY(-50%);
+  white-space: normal;
 }
 .comment-and-like{
   width: 100%;
