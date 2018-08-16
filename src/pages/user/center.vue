@@ -10,7 +10,7 @@
           <div class="top-header-overview">
             <div class="user-name"><span style="vertical-align: middle">{{user.username}}</span><img v-if="user.is_news" class="author-sign" :src="$assetsPublicPath + '/cwebassets/image/author_icon.png'" /></div>
             <div class="user-intro">{{user.intro}}</div>
-            <div class="follow-and-fans clearfix">
+            <div v-if="user.id" class="follow-and-fans clearfix">
               <div class="follow-box fl"><span class="follow-and-fans-text">关注</span><span class="follow-and-fans-number">{{followNumber}}</span></div>
               <div class="fans-box fl"><span class="follow-and-fans-text">粉丝</span><span class="follow-and-fans-number">{{fansNumber}}</span></div>
             </div>

@@ -1,6 +1,6 @@
 <template>
     <div class="content-container" ref="contentWrapper">
-        <div ref="contentContainer" class="content-text clearfix"><img v-if="isLongDynamic" :src="$assetsPublicPath + '/cwebassets/image/long_dynamic.png'" class="long-dynamic-icon" /><span style="vertical-align: middle">{{content}}</span></div>
+        <div ref="contentContainer" class="content-text clearfix"><img v-if="isLongDynamic" :src="$assetsPublicPath + '/cwebassets/image/long_dynamic.png'" class="long-dynamic-icon" />{{content}}</div>
         <div v-if="contentHeight && contentHeight > contentMaxHeight" ref="contentBtn" class="show-hide-btn clearfix"><span @click="changeShowContext" class="show-hide-btn-text fr">{{showMore ? '收起' : '展开'}}</span></div>
     </div>
 </template>
@@ -12,7 +12,7 @@
   }
   .content-text{
     font-size:32px;
-    line-height: 46px;
+    line-height: 48px;
     margin-bottom: 17px;
     overflow: hidden;
     transition: all 300ms;
@@ -41,7 +41,7 @@
   }
   .show-hide-btn-text{
     display: block;
-    line-height: 46px;
+    line-height: 48px;
     font-size: 32px;
     color: #1EB0FD;
     padding-left: 50px;
@@ -51,7 +51,7 @@
   .long-dynamic-icon{
     vertical-align: middle;
     height: 30px;
-    margin: -2px 10px 0 0;
+    margin: -4px 10px 0 0;
     padding: 0;
     border: none;
     display: inline-block !important;
