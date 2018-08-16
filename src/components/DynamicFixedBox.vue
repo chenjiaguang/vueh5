@@ -13,10 +13,18 @@
     </div>
 
     <div class="like-box" @click="clickLike(dynamic.id)">
-      <transition name="fade" mode="out-in">
-        <i v-if="dynamic.has_like" class='iconfont icon-like' key="1"></i>
-        <i v-else class='iconfont icon-dislike' key="2"></i>
+      <transition
+        enter-active-class="animated wobble"
+        leave-active-class="hide"
+      >
+        <div v-if="dynamic.has_like" style="height:100%;width:100%;">
+          <i class='iconfont icon-like'></i>
+        </div>
       </transition>
+
+      <div v-if="!dynamic.has_like" style="height:100%;width:100%;">
+        <i class='iconfont icon-dislike'></i>
+      </div>
     </div>
   </div>
 </template>
@@ -38,10 +46,10 @@ export default {
   components: {},
   methods: {
     clickLike (id) {
-      this.dynamic.has_like = !this.dynamic.has_like;
+      let nowHasLike = this.dynamic.has_like = !this.dynamic.has_like;
       this.$ajax('/jv/qz/like', { data: this.likeData })
         .then(res => {
-          if (this.dynamic.has_like) {
+          if (nowHasLike) {
             // 增加
             this.dynamic.like_list.splice(0, 0, res.data);
             this.dynamic.like_num++;
@@ -69,13 +77,6 @@ export default {
 };
 </script>
 <style scoped>
-.fade-enter-active,
-.fade-leave-active {
-  transition: all 0.3s;
-}
-.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
-  opacity: 0;
-}
 
 .fix-box {
   position: fixed;
