@@ -173,6 +173,7 @@
   left: 134px;
   top: 50%;
   transform: translateY(-50%);
+  white-space: normal;
 }
 .comment-and-like{
   width: 100%;
