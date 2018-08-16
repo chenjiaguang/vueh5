@@ -46,23 +46,23 @@ export default {
   components: {},
   methods: {
     clickLike (id) {
-      this.dynamic.has_like = !this.dynamic.has_like;
-      // this.$ajax('/jv/qz/like', { data: this.likeData })
-      //   .then(res => {
-      //     if (this.dynamic.has_like) {
-      //       // 增加
-      //       this.dynamic.like_list.splice(0, 0, res.data);
-      //       this.dynamic.like_num++;
-      //     } else {
-      //       // 减少
-      //       let i = this.dynamic.like_list.findIndex((value, index, arr) => {
-      //         return value.uid === res.data.uid;
-      //       });
-      //       this.dynamic.like_list.splice(i, 1);
-      //       this.dynamic.like_num--;
-      //     }
-      //   })
-      //   .catch();
+      let nowHasLike = this.dynamic.has_like = !this.dynamic.has_like;
+      this.$ajax('/jv/qz/like', { data: this.likeData })
+        .then(res => {
+          if (nowHasLike) {
+            // 增加
+            this.dynamic.like_list.splice(0, 0, res.data);
+            this.dynamic.like_num++;
+          } else {
+            // 减少
+            let i = this.dynamic.like_list.findIndex((value, index, arr) => {
+              return value.uid === res.data.uid;
+            });
+            this.dynamic.like_list.splice(i, 1);
+            this.dynamic.like_num--;
+          }
+        })
+        .catch();
     },
     clickComment (id) {
       this.$router.push({
