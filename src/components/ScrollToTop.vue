@@ -1,17 +1,15 @@
 //滑动到顶部点击框
 <template>
-  <div :class="['fix-box',visible?null:'hide']" @click="handleClick">
-    <i class="iconfont icon-back_top"></i>
-  </div>
+  <transition name="backtop-fade">
+    <i v-if="visible" class="fix-box iconfont icon-back_top" :style="position ? {bottom: position.bottom + 'px', right: position.right + 'px'} : null" @click="handleClick"></i>
+  </transition>
 </template>
 <script>
 export default {
-  props: ['visible', 'click', 'scroll'],
+  props: ['visible', 'position', 'scroll'],
   data () {
     return {};
   },
-  computed: {},
-  components: {},
   methods: {
     handleClick (event) {
       this.scroll.scrollTo(0, 0, 500);
@@ -21,27 +19,24 @@ export default {
 </script>
 <style scoped>
 .fix-box {
+  display: block;
   position: fixed;
   height: 88px;
+  line-height: 88px;
   width: 88px;
   right: 50px;
   bottom: 153px;
-  padding: 22px;
-  background-color: #000000;
-
-  z-index: 1;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  opacity: 0.5;
-  border-radius: 6px;
-  transition: all 0.3s;
-}
-.hide {
-  opacity: 0;
-}
-.icon-back_top {
   font-size: 44px;
-  color: #ffffff;
+  color: #fff;
+  text-align: center;
+  background-color: rgba(0,0,0,0.5);
+  z-index: 1;
+  border-radius: 6px;
+}
+.backtop-fade-enter-active, .backtop-fade-leave-active {
+  transition: all .5s;
+}
+.backtop-fade-enter, .backtop-fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+  opacity: 0;
 }
 </style>

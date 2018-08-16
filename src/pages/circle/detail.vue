@@ -72,10 +72,8 @@
         </div>
       </div>
     </cube-scroll>
-    <transition name="backtop-fade">
-      <i v-if="showBackTop" class="iconfont icon-back_top backtop-icon"></i>
-    </transition>
-    <i class="iconfont icon-camera publish-icon"></i>
+    <scroll-to-top v-if="$refs['contentScroll']" :visible="showBackTop" :position="{bottom: (winWidth / 750) * 178, right: (winWidth / 750) * 54}" :scroll="$refs['contentScroll'][selectedIdx]"/>
+    <i class="iconfont icon-camera publish-icon" @click="goPublish"></i>
   </div>
 </template>
 
@@ -85,6 +83,7 @@ import DynamicItem from './components/DynamicItem'
 import ActivityItem from './components/ActivityItem'
 import DownloadBox from '../../components/DownloadBox'
 import LoadingView from '@/components/LoadingView'
+import ScrollToTop from '@/components/ScrollToTop'
 import {
     /* eslint-disable no-unused-vars */
     Style,
@@ -129,6 +128,7 @@ export default {
         }
       },
       winHeight: window.innerHeight,
+      winWidth: window.innerWidth,
       tabs: tabs,
       tabBarHeight: parseInt((window.innerWidth / 750) * 88),
       selectedLabel: selectedLabel,
@@ -148,7 +148,7 @@ export default {
       showTabbar: false
     }
   },
-  components: {DynamicItem, ActivityItem, DownloadBox, LoadingView},
+  components: {DynamicItem, ActivityItem, DownloadBox, LoadingView, ScrollToTop},
   watch: {
     'circle.id': function () {
       console.log('this.tabs', this.tabs, this.selectedIdx, this.selectedLabel)
@@ -411,6 +411,9 @@ export default {
       } else {
         this.$refs['pageScroller'].scrollTo(0, 0, 500)
       }
+    },
+    goPublish () {
+      this.$router.push({name: 'EditDynamic', params: {circle: {id: this.circle.id, title: this.circle.name}}})
     }
   },
   created () {
@@ -663,12 +666,6 @@ fl{
   right: 54px;
   bottom: 178px;
   z-index: 2;
-}
-.backtop-fade-enter-active, .backtop-fade-leave-active {
-  transition: all .5s;
-}
-.backtop-fade-enter, .backtop-fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
-  opacity: 0;
 }
 .publish-icon{
   display: block;
