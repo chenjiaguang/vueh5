@@ -59,15 +59,19 @@ export default {
     clickComment (id) {
       this.$router.push({
         name: 'DynamicSendComment',
-        query: { dy_id: this.dynamic.id }
+        query: { dy_id: this.dynamic.id },
+        params: {
+          dynamic: this.dynamic
+        }
       });
     }
   }
 };
 </script>
 <style scoped>
-.fade-enter-active, .fade-leave-active {
-  transition: all .3s;
+.fade-enter-active,
+.fade-leave-active {
+  transition: all 0.3s;
 }
 .fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
   opacity: 0;
@@ -139,7 +143,7 @@ export default {
   background-color: #fe5273;
   border-radius: 12px;
   font-size: 24px;
-  padding: 2px;
+  padding: 4px;
   color: #fff;
   display: inline-block;
   min-width: 30px;

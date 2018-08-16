@@ -5,7 +5,7 @@
           <i class="iconfont icon-goback" />
       </div>
       <div class="mid">评论</div>
-      <div :class="['right',content?'active':null]" @click="sendComment">发布</div>
+      <div :class="['right',content&&!isSended?'active':null]" @click="sendComment">发布</div>
     </div>
     <div class="fix-box-bg" @click="focus">
     </div>
@@ -18,6 +18,7 @@ export default {
   data () {
     return {
       content: '',
+      isSended: false,
       dy_id: this.$route.query.dy_id,
       commentId: this.$route.query.commentId,
       pid: this.$route.query.pid,
@@ -37,7 +38,6 @@ export default {
     }
   },
   components: {},
-  mounted () {},
   methods: {
     back () {
       this.$router.back();
@@ -46,20 +46,31 @@ export default {
       this.$refs.input.focus();
     },
     sendComment () {
-      if (this.content) {
+      if (this.content && !this.isSended) {
         let url = '';
         if (this.isReply) {
           url = '/jv/qz/publish/reply';
         } else {
           url = '/jv/qz/publish/comment';
         }
+        this.isSended = true;
         this.$ajax(url, { data: this.sendCommentData })
           .then(res => {
-            this.$toast(res.msg ? res.msg : '发送成功', 2000, () => {
+            this.$toast(res.msg ? res.msg : '发送成功', 1500, () => {
               this.$router.back();
+              let params = this.$route.params;
+              setTimeout(() => {
+                if (this.isReply) {
+                  params.comment.replys.list.splice(0, 0, res.data.reply);
+                } else {
+                  params.dynamic.comment_list.splice(0, 0, res.data.comment);
+                  params.dynamic.comment_num++;
+                }
+              }, 500);
             });
           })
           .catch(e => {
+            this.isSended = false;
             console.log(e);
           });
       }

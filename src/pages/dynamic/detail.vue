@@ -98,28 +98,35 @@
 
           <div v-if="dynamic&&dynamic.comment_num>0" id="comment-container" class="column" >
             <div class="comment-text" >{{dynamic.comment_num}}条评论</div>
-            <div v-for="(comment,index) in dynamic.comment_list" :key="'comments'+index">
-              <div class="comment-box row space-between">
-                <div class="column">
-                  <img class="user-avatar" :src="comment.avatar" @click="clickUser(comment.uid)" />
-                </div>
-                <div class="comment-right-box column">
-                  <div class="row">
-                    <div class="comment-username" @click="clickUser(comment.uid)">{{comment.username}}</div>
+            <transition-group name="fade" tag="div">
+              <div v-for="(comment) in dynamic.comment_list" :key="'comments'+comment.id">
+                <div class="comment-box row space-between">
+                  <div class="column">
+                    <img class="user-avatar" :src="comment.avatar" @click="clickUser(comment.uid)" />
                   </div>
-                  <div class="comment-content" @click="()=>showReplyActionSheet(comment.id,comment.username)">{{comment.content}}</div>
-                  <div class="comment-time">{{comment.time}}</div>
-                  <div v-if="comment.replys.list.length>0" class="comment-replies-box">
-                    <div class="reply-box" v-for="(reply,index) in comment.replys.list" :key="index" @click="()=>showReplyActionSheet(comment.id,reply.username,reply.id)">
-                      <span class="reply-from" v-if="reply.pusername" @click="clickUser(reply.uid)">{{reply.username}}</span><span class="reply-from" v-if="!reply.pusername" @click="clickUser(reply.uid)">{{reply.username}}:</span><span class="reply-reply" v-if="reply.pusername">回复</span><span class="reply-to" v-if="reply.pusername" @click="clickUser(reply.puid)">{{reply.pusername}}:</span><span class="reply-content">{{reply.content}}</span>
+                  <div class="comment-right-box column" >
+                    <div class="row">
+                      <div class="comment-username" @click="clickUser(comment.uid)">{{comment.username}}</div>
                     </div>
-                    <div class="reply-box" v-if="!comment.replys.paging.is_end">
-                      <span class="reply-more" v-if="!comment.replys.paging.is_end" @click="()=>fetchMoreReplies(comment)">查看更多回复></span>
-                    </div>
+                    <div class="comment-content" @click="()=>showReplyActionSheet(comment,comment.username)">{{comment.content}}</div>
+                    <div class="comment-time">{{comment.time}}</div>
+
+                    <transition name="fade">
+                      <div v-if="comment.replys.list.length>0" class="comment-replies-box">
+                        <transition-group name="fade" tag="div">
+                          <div class="reply-box" v-for="(reply) in comment.replys.list" :key="'replys'+reply.id" @click.stop="()=>showReplyActionSheet(comment,reply.username,reply.id)">
+                            <span class="reply-from" v-if="reply.pusername" @click.stop="clickUser(reply.uid)">{{reply.username}}</span><span class="reply-from" v-if="!reply.pusername" @click.stop="clickUser(reply.uid)">{{reply.username}}:</span><span class="reply-reply" v-if="reply.pusername">回复</span><span class="reply-to" v-if="reply.pusername" @click.stop="clickUser(reply.puid)">{{reply.pusername}}:</span><span class="reply-content">{{reply.content}}</span>
+                          </div>
+                        </transition-group>
+                        <div class="reply-box" v-if="!comment.replys.paging.is_end">
+                          <span class="reply-more" v-if="!comment.replys.paging.is_end" @click.stop="()=>fetchMoreReplies(comment)">查看更多回复></span>
+                        </div>
+                      </div>
+                    </transition>
                   </div>
                 </div>
               </div>
-            </div>
+            </transition-group>
           </div>
         </div>
       </cube-scroll>
@@ -167,12 +174,14 @@ export default {
     NotFoundPage
   },
   mounted () {
+    this.fetch();
+  },
+  activated () {
     if (this.isArticle) {
       document.title = '长文详情';
     } else {
       document.title = '动态详情';
     }
-    this.fetch();
   },
   computed: {
     followData: function () {
@@ -274,7 +283,7 @@ export default {
     clickActivity (id) {
       this.$router.push({ name: 'ActivityDetail', query: { id: id } });
     },
-    showReplyActionSheet (commentId, replyName = '', pid = '') {
+    showReplyActionSheet (comment, replyName = '', pid = '') {
       this.$createActionSheet({
         data: [
           {
@@ -287,10 +296,13 @@ export default {
             this.$router.push({
               name: 'DynamicSendComment',
               query: {
-                commentId: commentId,
+                commentId: comment.id,
                 pid: pid,
                 isReply: true,
                 replyName: replyName
+              },
+              params: {
+                comment: comment
               }
             });
           }
@@ -611,6 +623,7 @@ export default {
 .reply-box {
   background-color: transparent;
   margin-bottom: 8px;
+  transition: all 0.15s;
 }
 .reply-box:active {
   background-color: #cccccc;
@@ -641,8 +654,15 @@ export default {
   line-height: 38px;
 }
 /*************************************************************/
-.cube-pullup-wrapper{
+.cube-pullup-wrapper {
   height: 50px;
   align-items: start;
+}
+
+.fade-enter-active, .fade-leave-active {
+  transition: all 1s;
+}
+.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+  opacity: 0;
 }
 </style>
