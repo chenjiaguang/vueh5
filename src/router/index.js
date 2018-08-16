@@ -15,7 +15,6 @@ import TestImageContainer from '@/pages/testImageContainer'
 import EditDynamic from '@/pages/dynamic/edit'
 import EditDynamicRange from '@/pages/dynamic/chooseRange'
 import DynamicDetail from '@/pages/dynamic/detail'
-import DynamicArticleDetail from '@/pages/dynamic/articleDetail'
 import DynamicSendComment from '@/pages/dynamic/sendComment'
 import TopicDetal from '@/pages/topic/detail'
 Vue.use(Router)
@@ -138,13 +137,7 @@ const router = new Router({
       name: 'DynamicDetail',
       component: DynamicDetail,
       meta: {
-        title: '动态详情'
       }
-    },
-    {
-      path: prefix + '/dynamic/articleDetail',
-      name: 'DynamicArticleDetail',
-      component: DynamicArticleDetail
     },
     {
       path: prefix + '/dynamic/sendComment',

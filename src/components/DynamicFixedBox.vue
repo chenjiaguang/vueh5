@@ -1,3 +1,4 @@
+//动态固底交互
 <template>
   <div class="fix-box">
     <div class="comment-input" @click="clickComment(dynamic.id)">
