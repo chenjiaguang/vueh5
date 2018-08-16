@@ -113,7 +113,8 @@ const router = new Router({
       name: 'UserCenter',
       component: UserCenter,
       meta: {
-        title: '范团名片'
+        title: '范团名片',
+        keepAlive: true
       }
     },
     {
@@ -154,7 +155,8 @@ const router = new Router({
       name: 'TopicDetail',
       component: TopicDetal,
       meta: {
-        title: '范团话题'
+        title: '范团话题',
+        keepAlive: true
       }
     }
   ],

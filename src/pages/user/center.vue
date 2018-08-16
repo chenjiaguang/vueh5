@@ -1,6 +1,32 @@
 <template>
   <div :style="{height: winHeight + 'px'}">
-    <cube-scroll class="outer-scroller" ref="pageScroller" :options="options" @scroll="outerScroll" @pulling-up="onPullingUp(index)">
+    <cube-scroll :data="tabs" ref="pageScroller" :scrollEvents="['scroll']" :options="options" @scroll="outerScroll" @pulling-up="onPullingUp">
+      <div ref="topBanner">
+        <download-box />
+        <header ref="topHeader" class="top-header">
+          <div class="top-header-bg" :style="{backgroundImage: 'url(' + user.cover + ')'}">
+            <div class="top-header-avatar" :style="{backgroundImage: 'url(' + user.avatar_url + ')', opacity: user.avatar_url ? 1 : 0}"></div>
+          </div>
+          <div class="top-header-overview">
+            <div class="user-name"><span style="vertical-align: middle">{{user.username}}</span><img v-if="user.is_news" class="author-sign" :src="$assetsPublicPath + '/cwebassets/image/author_icon.png'" /></div>
+            <div class="user-intro">{{user.intro}}</div>
+            <div class="follow-and-fans clearfix">
+              <div class="follow-box fl"><span class="follow-and-fans-text">关注</span><span class="follow-and-fans-number">{{followNumber}}</span></div>
+              <div class="fans-box fl"><span class="follow-and-fans-text">粉丝</span><span class="follow-and-fans-number">{{fansNumber}}</span></div>
+            </div>
+            <transition v-if="!user.is_owner" appear appear-class="follow-appear">
+              <div class="follow-btn-wrapper">
+                <div @click="changeFollow" class="follow-btn" :style="{color: followStatusText === '未关注' ? '#fff' : '#666', backgroundColor: followStatusText === '未关注' ? '#1EB0FD' : '#fff', borderColor: followStatusText === '未关注' ? '#1EB0FD' : '#B7B7B7'}"><i class="iconfont follow-btn-icon" :class="{'icon-add_focus': followStatusText === '未关注', 'icon-focused': followStatusText === '已关注', 'icon-transform': followStatusText === '互相关注'}"></i>{{followStatusText}}</div>
+              </div>
+            </transition>
+          </div>
+        </header>
+      </div>
+      <div v-if="tabs[0].paging && tabs[0].paging.is_end && tabs[0].data && tabs[0].data.length === 0" class="empty-box">
+        <img :src="$assetsPublicPath + '/cwebassets/image/empty_dynamic.png'" class="empty-image" />
+        暂无动态
+      </div>
+      <dynamic-item v-for="(item, idx) in tabs[0].data" :key="idx" :itemData="item" @changeLike="changeLike" @addComment="addComment" @showPreview="showPreview" @hidePreview="hidePreview" />
       <template slot="pulldown" slot-scope="props">
         <div class="cube-pulldown-wrapper" :style="props.pullDownStyle">
           <img v-show="!props.isPullingDown" class="pull-down-icon" :style="{transform: 'translateY(' + props.bubbleY + 'px)'}" :src="$assetsPublicPath + '/cwebassets/image/refresh_icon.png'" />
@@ -8,59 +34,19 @@
         </div>
       </template>
       <template slot="pullup" slot-scope="props">
-        <div class="cube-pullup-wrapper pullup-wrapper" :style="props.pullUpStyle">
+        <!-- 可以下拉继续加载 -->
+        <div class="cube-pullup-wrapper pullup-wrapper" :style="props.pullUpStyle" v-if="tabs[0].paging && tabs[0].paging.pn && !tabs[0].paging.is_end">
           <div class="pullup-content"><img class="pull-up-icon" :src="$assetsPublicPath + '/cwebassets/image/loading_icon.png'" />正在加载...</div>
         </div>
+        <!-- 加载完无数据 -->
+        <div v-else-if="tabs[0].paging && tabs[0].paging.is_end && tabs[0].data && tabs[0].data.length === 0" class="pullup-wrapper" style="height: 0;"></div>
+        <!-- 其他情况 -->
+        <div v-else class="pullup-wrapper">
+          <div class="pullup-content">再刷也没有了</div>
+        </div>
       </template>
-      <header ref="topHeader" class="top-header">
-        <div class="top-header-bg" :style="{backgroundImage: 'url(' + user.cover + ')'}">
-          <div class="top-header-avatar" :style="{backgroundImage: 'url(' + user.avatar_url + ')', opacity: user.avatar_url ? 1 : 0}"></div>
-        </div>
-        <div class="top-header-overview">
-          <div class="user-name"><span style="vertical-align: middle">{{user.username}}</span><img v-if="user.is_news" class="author-sign" :src="$assetsPublicPath + '/cwebassets/image/author_icon.png'" /></div>
-          <div class="user-intro">{{user.intro}}</div>
-          <div class="follow-and-fans clearfix">
-            <div class="follow-box fl"><span class="follow-and-fans-text">关注</span><span class="follow-and-fans-number">{{followNumber}}</span></div>
-            <div class="fans-box fl"><span class="follow-and-fans-text">粉丝</span><span class="follow-and-fans-number">{{fansNumber}}</span></div>
-          </div>
-          <transition v-if="!user.is_owner" appear appear-class="follow-appear">
-            <div class="follow-btn-wrapper">
-              <div class="follow-btn" :style="{color: followStatusText === '未关注' ? '#fff' : '#666', backgroundColor: followStatusText === '未关注' ? '#1EB0FD' : '#fff', borderColor: followStatusText === '未关注' ? '#1EB0FD' : '#B7B7B7'}"><i class="iconfont follow-btn-icon" :class="{'icon-jia': followStatusText === '未关注', 'icon-focused': followStatusText === '已关注', 'icon-transform': followStatusText === '互相关注'}"></i>{{followStatusText}}</div>
-            </div>
-          </transition>
-        </div>
-      </header>
-      <!-- <dynamic-item :itemData="testItem" @changeLike="changeLike" /> -->
-      <div class="scroll-wrapper" v-if="tabs && tabs.length > 0">
-        <div class="nav-scroll-list-wrap" ref="navWrapper" v-if="tabs && tabs.length > 1">
-          <cube-tab-bar v-model="selectedLabel" class="tab-box" @change="changeTabBar">
-            <cube-tab v-for="(item) in tabs" ref="tabItem" :label="item.title" :key="item.title">
-            </cube-tab>
-          </cube-tab-bar>
-          <div class="tab-slider">
-            <div class="tab-slider-body" ref="tabSlide" :style="{transform: 'translateX(' + tabSlideX + ')'}"></div>
-          </div>
-          <div class="tab-border"></div>
-        </div>
-        <div class="tabs-wrapper" ref="slideWrapper">
-          <cube-slide ref="slideInstance" :data="tabs" :initialIndex="selectedIdx" :autoPlay="false" :allow-vertical="false" :loop="false" :speed="500" :options="{listenScroll: true, probeType: 3, click: false}" @change="changeSlide" @scroll="slideScroll">
-            <cube-slide-item v-for="(item, index) in tabs" :key="index">
-              <cube-scroll
-                ref="contentScroll"
-                :data="tabs[index].data"
-                :options="{bounce: false, click: false}">
-                <dynamic-item v-for="(item, idx) in tabs[index].data" :key="idx" :itemData="item" @changeLike="changeLike" @showPreview="showPreview" @hidePreview="hidePreview" />
-              </cube-scroll>
-            </cube-slide-item>
-          </cube-slide>
-        </div>
-      </div>
     </cube-scroll>
-    <transition name="backtop-fade">
-      <i v-if="showBackTop" class="iconfont icon-back_top backtop-icon"></i>
-    </transition>
-    <i class="iconfont icon-camera publish-icon"></i>
-    <download-box />
+    <scroll-to-top v-if="$refs['pageScroller']" :visible="showBackTop" :scroll="$refs['pageScroller']"/>
   </div>
 </template>
 
@@ -68,6 +54,7 @@
 import Vue from 'vue'
 import DownloadBox from '../../components/DownloadBox'
 import DynamicItem from './components/DynamicItem'
+import ScrollToTop from '@/components/ScrollToTop'
 import {
     /* eslint-disable no-unused-vars */
     Style,
@@ -87,37 +74,11 @@ Vue.use(Sticky)
 const tabs = [
   {
     title: '动态',
-    data: [
-      {
-        title: '111111111'
-      }
-    ]
-  },
-  {
-    title: '文章',
-    data: [
-      {
-        title: '2222222222'
-      }
-    ]
+    data: [],
+    paging: {},
+    fetching: false
   }
 ]
-const imgs = [
-  {
-    url: 'http://om0jxp12h.bkt.clouddn.com/toutiao_12.JPG'
-  },
-  {
-    url: 'http://om0jxp12h.bkt.clouddn.com/toutiao_21.JPG'
-  },
-  {
-    url: 'http://om0jxp12h.bkt.clouddn.com/toutiao_31.JPG'
-  },
-  {
-    url: 'http://om0jxp12h.bkt.clouddn.com/toutiao_21.JPG'
-  }
-]
-const txts = ['关注', '推荐', '新时代', '热点', '体育', '娱乐', '科技', '头条号', '问答', '国际', 'cube-ui666']
-let cnt = 1
 export default {
   data() {
     return {
@@ -125,109 +86,26 @@ export default {
       user: {
         is_owner: true
       },
-      dynamic: [],
-      dynamicPaging: {},
-      article: [],
-      articlePaging: {},
-      activityItem: {
-        id: 74,
-        cover: 'http://img.qikula.com/file/image/pic/1a485694362n61804661c27.jpg',
-        title: '夏日沙滩排球大作战，我的战队等你来约，兄弟就差你了！',
-        address: '海口市秀英区滨海大道假日海滩夏日烧烤园A12区水电费就算了收到了房间收到了饭是',
-        time: '01-03 18:30 至 05-06 18:30',
-        fee: '65起',
-        status: '进行中'
-      },
       showBackTop: false,
-      testItem: {
-        theme: [
-          {
-            id: 1,
-            title: '舌尖上的海口'
-          },
-          {
-            id: 2,
-            title: '海南生活'
-          },
-          {
-            id: 3,
-            title: '治理熊孩子'
-          }
-        ],
-        circle_name: '舌尖上的海鸥',
-        is_like: false,
-        like_number: 4,
-        comment_number: 6,
-        address: '海口世贸北路一号椰风海岸二期',
-        activity: '啤酒与烧烤，夏日里的绝佳搭配。约吗？快来加入我们吧阿斯顿了开发建设的收到了副科级',
-        name: '测试名字',
-        time_text: '2018-08-05',
-        content_text: '动态的内容动态的内容动态的内容动态的内容动态的内容动水电费水电费上课地方失联飞机阿失联飞机阿失联飞机阿市领导发就阿市领导开发就阿市领导发  老师看大家发拉屎阿酸辣粉 爱上 发生的福利态的内容动态的内容动态的内容动态的内容动态的内容',
-        avatar: 'http://img.qikula.com/file/image/pic/1a485694362n61804661c27.jpg',
-        is_long_dynamic: true,
-        is_manager: true,
-        is_owner: true,
-        is_settop: true,
-        pictrues: [
-          {
-            url: 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1533548953876&di=179b3cf1aa8604adcdf1654a5c0650b9&imgtype=0&src=http%3A%2F%2Fimgsrc.baidu.com%2Fimgad%2Fpic%2Fitem%2F7acb0a46f21fbe09334115c061600c338644adc3.jpg',
-            width: 1200,
-            height: 720
-          },
-          {
-            url: 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1533549055739&di=7e26cb3f8760b42ca4d043f91c6a2140&imgtype=0&src=http%3A%2F%2Fimgsrc.baidu.com%2Fimgad%2Fpic%2Fitem%2F4a36acaf2edda3ccd53548ea0be93901203f9223.jpg',
-            width: 1200,
-            height: 675
-          },
-          {
-            url: 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1533549104992&di=e8a8aa74591a4982dc6324ba4e429b12&imgtype=0&src=http%3A%2F%2Fimgsrc.baidu.com%2Fimgad%2Fpic%2Fitem%2Fac4bd11373f0820207282ceb41fbfbedaa641baf.jpg',
-            width: 1200,
-            height: 750
-          },
-          {
-            url: 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1533549171335&di=aa3f0a281a41cfb2f189abbcd47e45ca&imgtype=0&src=http%3A%2F%2Fa3.topitme.com%2Fa%2Fff%2Fc8%2F1183976520bfec8ffao.jpg',
-            width: 1500,
-            height: 2120
-          },
-          {
-            url: 'http://img.zcool.cn/community/01247f5991c8d40000002129fce48c.jpg',
-            width: 1000,
-            height: 6047
-          }
-        ],
-        with_article: {
-          title: '测试文章标题测试文章标题测试文章标题测试文章标题测试文章标题测试文章标题测试文章标题测试文章标题测试文章标题测试文章标题测试文章标题',
-          cover: 'http://img.zcool.cn/community/01247f5991c8d40000002129fce48c.jpg'
-        }
-      },
-      userHeader: {
-        cover: 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1533549055739&di=7e26cb3f8760b42ca4d043f91c6a2140&imgtype=0&src=http%3A%2F%2Fimgsrc.baidu.com%2Fimgad%2Fpic%2Fitem%2F4a36acaf2edda3ccd53548ea0be93901203f9223.jpg',
-        avatar: 'http://img.zcool.cn/community/01247f5991c8d40000002129fce48c.jpg',
-        is_author: true,
-        user_name: '追逐繁星的孩子',
-        user_intro: '海南有趣、有料、有温度的生活圈，分分钟带你吃遍全海南吃遍全海南',
-        follow_number: 9999,
-        fans_number: 12456,
-        is_fans: false,
-        is_follow: true
-      },
       winHeight: window.innerHeight,
+      winWidth: window.innerWidth,
       tabs: tabs,
       selectedLabel: '动态',
-      content: imgs.slice(),
       selectedIdx: 0,
       tabSlideX: -window.innerWidth + 'px',
       options: {
         pullDownRefresh: false,
         pullUpLoad: {
-          threshold: (window.innerWidth / 750) * 128
-        }
+          threshold: (window.innerWidth / 750) * 100
+        },
+        stopPropagation: true
       },
       timer: null,
-      previewInstance: null
+      previewInstance: null,
+      following: false
     }
   },
-  components: {DownloadBox, DynamicItem},
+  components: {DownloadBox, DynamicItem, ScrollToTop},
   watch: {
     '$route.query.previewImage': function (val, oldVal) {
       if (!val && oldVal) {
@@ -288,153 +166,44 @@ export default {
       this.tabSlideX = relativeSlideX - moveX + 'px'
     },
     fetchList (tabIdx, pn) {
+      if (this.tabs[tabIdx].fetching) { // 正在拉取动态数据
+        return false
+      }
       let _type = tabIdx === 0 ? 1 : 2
       let rData = { // type  1,动态  2,文章
         id: this.$route.query.user_id,
         token: 'lcaKiq5GIC_FHqubOBcI6FUKaL8N171U',
         type: _type,
         pn: pn,
+        snapshot: this.tabs[tabIdx].paging.snapshot || '',
         limit: 10,
         lastYear: ''
       }
+      this.tabs[tabIdx].fetching = true
       this.$ajax('/jv/user/social', {data: rData}).then(res => {
         if (res && res.msg) {
           this.$toast(res.msg)
         }
         if (res && !Boolean(res.error) && res.data) { // 成功获取数据
-          this.user = res.data.user
           this.lastYear = res.data.lastYear
-          if (_type === 1) { // 请求的数据是动态
-            if (pn === 1) { // 加载第一页时
-              this.tabs[0] = {
-                title: '动态',
-                data: res.data.list,
-                paging: res.data.paging
-              }
-              if (!res.data.user.has_articles) { // 没有文章tab时
-                this.tabs.splice(1, 1)
-              } else { // 有文章tab时
-                this.tabs[1] = this.tabs[1] || {
-                  title: '文章',
-                  data: [],
-                  paging: {}
-                }
-              }
-            } else {
-              this.tabs[0].data = this.tabs[0].data.concat(res.data.list)
-              this.tabs[0].data.paging = res.data.paging
-              if (!res.data.user.has_articles) { // 没有文章tab时
-                this.tabs.splice(1, 1)
-              } else { // 有文章tab时
-                this.tabs[1] = this.tabs[1] || {
-                  title: '文章',
-                  data: [],
-                  paging: {}
-                }
-              }
-            }
-          } else if (_type === 2) { // 请求的数据是文章
-            if (pn === 1) { // 加载第一页时
-              if (res.data.user.has_articles) { // 有文章tab时
-                this.tabs[1] = {
-                  title: '文章',
-                  data: [],
-                  paging: {}
-                }
-              } else { // 没有文章tab时
-                this.tabs.splice(1, 1)
-              }
-            } else {
-              if (res.data.user.has_articles) { // 有文章tab时
-                this.tabs[1].data = this.tabs[1].data.concat(res.data.list)
-                this.tabs[1].data.paging = res.data.paging
-              } else { // 没有文章tab时
-                this.tabs.splice(1, 1)
-              }
-            }
+          res.data.user && (this.user = res.data.user)
+          let _tabs = [].concat(this.tabs)
+          _tabs[tabIdx].paging = res.data.paging
+          _tabs[tabIdx].fetching = false
+          if (pn === 1) { // 第一页
+            _tabs[tabIdx].data = res.data.list
+          } else { // 非第一页
+            _tabs[tabIdx].data = this.tabs[tabIdx].data.concat(res.data.list)
           }
+          this.tabs = _tabs
         }
       }).catch(err => {
-
-      })
-    },
-    fetchDynamic (pn) {
-      let rData = {
-        pn: pn,
-        limit: 20,
-        cid: this.$route.query.circle_id,
-        snapshot: '0',
-        token: 'lcaKiq5GIC_FHqubOBcI6FUKaL8N171U'
-      }
-      this.$ajax('/jv/qz/v21/circledynamics', {data: rData}).then(res => { // 获取动态列表
-        if (res && res.msg) {
-          this.$toast(res.msg)
+        this.tabs[tabIdx].fetching = false
+        if (err && err.msg) {
+          this.$toast(err.msg)
+        } else {
+          this.$toast('获取用户数据失败')
         }
-        if (res && !Boolean(res.error) && res.data) { // 成功获取数据
-          this.circle = res.data
-          if (res.data.user_can_create_activity) { // 有活动tab
-            this.tabs = [
-              {
-                title: '动态',
-                data: []
-              },
-              {
-                title: '活动',
-                data: []
-              }
-            ]
-            this.tabSlideX = (window.innerWidth / this.tabs.length / 2) + 'px'
-          } else { // 无活动tab
-            this.tabs = [
-              {
-                title: '动态',
-                data: []
-              }
-            ]
-            this.tabSlideX = (window.innerWidth / this.tabs.length / 2) + 'px'
-          }
-        }
-      }).catch(err => {
-
-      })
-    },
-    fetchActivity (pn) {
-      let rData = {
-        pn: pn,
-        limit: 20,
-        cid: this.$route.query.circle_id,
-        snapshot: '0'
-      }
-      this.$ajax('/jv/qz/v21/circleactivities', {data: rData}).then(res => { // 获取活动列表
-        if (res && res.msg) {
-          this.$toast(res.msg)
-        }
-        if (res && !Boolean(res.error) && res.data) { // 成功获取数据
-          this.circle = res.data
-          if (res.data.user_can_create_activity) { // 有活动tab
-            this.tabs = [
-              {
-                title: '动态',
-                data: []
-              },
-              {
-                title: '活动',
-                data: []
-              }
-            ]
-            this.tabSlideX = (window.innerWidth / this.tabs.length / 2) + 'px'
-          } else { // 无活动tab
-            this.tabs = [
-              {
-                title: '动态',
-                data: []
-              }
-            ]
-            this.tabSlideX = (window.innerWidth / this.tabs.length / 2) + 'px'
-          }
-        }
-      }).catch(err => {
-
       })
     },
     initSlideBlock () {
@@ -450,44 +219,84 @@ export default {
         }
       },30)
     },
-    onPullingDown (idx) {
-      if (idx === 0) { // 动态列表
-        this.fetchDynamic(1)
-      } else if (idx === 1) { // 活动列表
-        this.fetchActivity(1)
+    onPullingUp () {
+      console.log('onPullingUp', this.tabs[0].paging)
+      if (!(this.tabs[0].paging && this.tabs[0].paging.pn && !this.tabs[0].paging.is_end)) { // 未生成paging，或者paging.pn不存在，或者已是最后一页     终止操作
+        return false
       }
-      setTimeout(() => {
-        // let tabs = this.tabs
-        this.tabs[idx].data.unshift({title: 'sdfsdfsdf'})
-        // this.tabs = tabs
-        this.$refs['contentScroll'][idx].scrollTo(0, 0, 500)
-        // this.$refs['contentScroll'][idx].forceUpdate()
-      }, 1000)
+      let pn = parseInt(this.tabs[0].paging.pn) + 1
+      this.fetchList(0, pn)
     },
-    onPullingUp (idx) {
-      setTimeout(() => {
-        this.tabs[idx].data = this.tabs[idx].data.concat({title: 'sdfsdfsdf'})
-        this.$refs['contentScroll'][idx].forceUpdate()
-      }, 1000)
-    },
-    changeLike () {
-      if (this.testItem.is_like) {
-        this.testItem.is_like = false
-        this.testItem.like_number -= 1
-      } else {
-        this.testItem.is_like = true
-        this.testItem.like_number += 1
+    changeLike (item) {
+      let rData = {
+        token: 'lcaKiq5GIC_FHqubOBcI6FUKaL8N171U',
+        id: item.id,
+        like: !item.has_like,
+        type: 0
       }
+      this.tabs[0].data.forEach(i => {
+        if (i.id === item.id) {
+          i.submitting = true
+        }
+      })
+      this.$ajax('/jv/qz/like', {data: rData}).then(res => {
+        if (res && res.msg) {
+          this.$toast(res.msg)
+        }
+        if (res && !Boolean(res.error)) {
+          this.tabs[0].data.forEach(i => {
+            if (i.id === item.id) {
+              i.has_like = !i.has_like
+              i.like_num = parseInt(i.like_num) + (i.has_like ? 1 : -1)
+              i.submitting = false
+            }
+          })
+        } else {
+          this.tabs[0].data.forEach(i => {
+            if (i.id === item.id) {
+              i.submitting = false
+            }
+          })
+        }
+      }).catch(err => {
+        this.tabs[0].data.forEach(i => {
+          if (i.id === item.id) {
+            i.submitting = false
+          }
+        })
+      })
+    },
+    addComment (item) {
+      this.$router.push({name: 'DynamicSendComment', query:{dy_id: item.id}, params: {dynamic: item}})
     },
     outerScroll ({x, y}) {
-      if (-y > this.winHeight) { // 超过半屏显示返回顶部
+      if (-y > this.winHeight) { // 超过一屏显示返回顶部
         this.showBackTop = true
       } else {
         this.showBackTop = false
       }
     },
-    test () {
-      console.log('test')
+    changeFollow () {
+      if (this.following) { // 关注/取关接口不允许多次调用
+        return false
+      }
+      let rData = {
+        token: 'lcaKiq5GIC_FHqubOBcI6FUKaL8N171U',
+        follow: this.user.is_following ? 0 : 1,
+        following_id: this.user.id
+      }
+      this.following = true
+      this.$ajax('/jv/user/follow', {data: rData}).then(res => {
+        this.following = false
+        if (res && res.msg) {
+          this.$toast(res.msg)
+        }
+        if (res && !Boolean(res.error)) { // 请求成功
+          this.user.is_following = !this.user.is_following
+        }
+      }).catch(err => {
+        this.following = false
+      })
     }
   },
   computed: {
@@ -513,9 +322,9 @@ export default {
       let text = null
       if (!this.user.is_following) { // 未关注该用户
         text = '未关注'
-      } else if (!this.user.is_being_followed) { // 已关注该用户，但该用户未关注我
+      } else if (this.user.is_following && !this.user.is_being_followed) { // 已关注该用户，但该用户未关注我
         text = '已关注'
-      } else if (this.user.isFriend) { // 已关注该用户，且该用户关注我
+      } else if (this.user.is_following && this.user.is_being_followed) { // 已关注该用户，且该用户关注我
         text = '互相关注'
       }
       return text
@@ -646,11 +455,12 @@ export default {
   box-sizing: border-box;
   font-size: 60px;
   text-align: center;
+  transition: all 500ms;
 }
 .follow-btn-icon{
-  font-size: 66px;
+  font-size: 54px;
   color: inherit;
-  margin-right: 9px;
+  margin-right: 24px;
 }
 .nav-scroll-list-wrap{
   position: relative;
@@ -738,12 +548,11 @@ export default {
 .pullup-wrapper{
   font-size: 24px;
   color: #666;
-  height: 228px;
+  height: 100px;
   position: relative;
 }
 .pullup-content{
   position: absolute;
-  margin-top: -64px;
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
@@ -841,5 +650,18 @@ export default {
   right: 54px;
   bottom: 184px;
   z-index: 2;
+}
+.empty-box{
+  padding: 140px 0;
+  font-size: 28px;
+  color: #999;
+  line-height: 68px;
+  text-align: center;
+}
+.empty-image{
+  display: block;
+  width: 240px;
+  height: 240px;
+  margin: 0 auto;
 }
 </style>

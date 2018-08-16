@@ -16,6 +16,8 @@
     margin-bottom: 17px;
     overflow: hidden;
     transition: all 300ms;
+    white-space: normal;
+    word-wrap: break-word;
   }
   .clearfix:after{
     content: "";
@@ -92,7 +94,6 @@ export default {
         this.contentHeight = wrapperHeight
         let _lineHeight = parseFloat(window.getComputedStyle(this.$refs['contentContainer'], false).lineHeight)
         this.contentMaxHeight = Math.ceil(_lineHeight * 5)
-        console.log('this.contentMaxHeight', this.contentMaxHeight)
         if (this.contentHeight > this.contentMaxHeight) {
           this.showMore = false
           this.$refs['contentContainer'].style.maxHeight = this.contentMaxHeight + 'px'

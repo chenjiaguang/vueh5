@@ -16,6 +16,8 @@
     margin-bottom: 17px;
     overflow: hidden;
     transition: all 300ms;
+    white-space: normal;
+    word-wrap: break-word;
   }
   .clearfix:after{
     content: "";

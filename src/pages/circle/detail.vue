@@ -118,8 +118,6 @@ export default {
   data() {
     let selectedIdx = parseInt(this.$route.query.jump_tab || 0)
     let selectedLabel = (this.$route.query.jump_tab && this.$route.query.jump_tab.toString() === '1') ? '活动' : '动态'
-    // let selectedIdx = 0
-    // let selectedLabel = '动态'
     return {
       showBackTop: false,
       circle: {
@@ -237,7 +235,6 @@ export default {
           let pos = this.$refs['tabItem'][initialTab].$el.getBoundingClientRect()
           let slideX = pos.x + pos.width / 2
           this.tabSlideX = slideX + 'px'
-          // this.selectedIdx = initialTab
           clearInterval(this.timer)
         }
       },30)
@@ -359,7 +356,6 @@ export default {
       }
     },
     changeLike (item) {
-      console.log('changeLike', item)
       let rData = {
         token: 'lcaKiq5GIC_FHqubOBcI6FUKaL8N171U',
         id: item.id,
@@ -651,21 +647,6 @@ fl{
   width: 110%;
   height: 10px;
   background: #F5F5F5;
-}
-.backtop-icon{
-  display: block;
-  width: 88px;
-  height: 88px;
-  background-color: #717171;
-  color: #fff;
-  font-size:46px;
-  line-height: 88px;
-  text-align: center;
-  border-radius: 8px;
-  position: fixed;
-  right: 54px;
-  bottom: 178px;
-  z-index: 2;
 }
 .publish-icon{
   display: block;
