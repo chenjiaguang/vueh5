@@ -1,23 +1,25 @@
 <template>
   <div :style="{height: winHeight + 'px'}">
-    <cube-scroll class="toutiao" ref="pageScroller" :scrollEvents="['scroll']" :options="{bounce: false}" @scroll="outerScroll">
-      <download-box />
-      <header ref="topHeader" class="top-header">
-        <div class="top-header-bg" :style="{backgroundImage: 'url(' + circle.cover.compress + ')'}"></div>
-        <div class="top-header-content">
-          <div class="top-header-avatar" :style="{backgroundImage: 'url(' + circle.cover.compress + ')'}"></div>
-          <div class="top-header-text">
-            <div class="top-header-name">{{circle.name}}</div>
-            <div class="top-header-intro">{{circle.intro}}</div>
-            <div class="top-header-overview">
-              <span>{{circle.followed_num || 0}}人关注</span>
-              <span>{{circle.dynamic_num || 0}}条动态</span>
+    <cube-scroll class="toutiao" ref="pageScroller" :scrollEvents="['scroll']" :options="{bounce: false}">
+      <div ref="topBanner">
+        <download-box />
+        <header class="top-header">
+          <div class="top-header-bg" :style="{backgroundImage: 'url(' + circle.cover.compress + ')'}"></div>
+          <div class="top-header-content">
+            <div class="top-header-avatar" :style="{backgroundImage: 'url(' + circle.cover.compress + ')'}"></div>
+            <div class="top-header-text">
+              <div class="top-header-name">{{circle.name}}</div>
+              <div class="top-header-intro">{{circle.intro}}</div>
+              <div class="top-header-overview">
+                <span>{{circle.followed_num || 0}}人关注</span>
+                <span>{{circle.dynamic_num || 0}}条动态</span>
+              </div>
             </div>
           </div>
-        </div>
-      </header>
+        </header>
+      </div>
       <div ref="innerWrapper" class="scroll-wrapper" :style="{height: winHeight + 'px'}">
-        <div class="nav-scroll-list-wrap" ref="navWrapper" :style="{height: tabBarHeight + 'px'}" v-if="tabs && tabs.length > 1">
+        <div class="nav-scroll-list-wrap" ref="navWrapper" :style="{height: tabBarHeight + 'px'}" v-if="tabs && tabs.length > 1 && showTabbar">
           <cube-tab-bar v-model="selectedLabel" class="tab-box" @change="changeTabBar" :style="{height: tabBarHeight + 'px'}">
             <cube-tab v-for="(item) in tabs" ref="tabItem" :label="item.title" :key="item.title">
             </cube-tab>
@@ -28,13 +30,14 @@
           <div class="tab-border"></div>
         </div>
         <div class="tabs-wrapper" ref="slideWrapper" :style="{height: (winHeight - ((tabs && tabs.length) > 1 ? tabBarHeight : 0)) + 'px'}">
-          <cube-slide ref="slideInstance" :data="tabs" :initial-index="selectedIdx" :auto-play="false" :allow-vertical="false" :loop="false" :speed="500" :options="{listenScroll: true, probeType: 3, click: false}" @change="changeSlide" @scroll="slideScroll">
+          <cube-slide ref="slideInstance" :data="tabs" :initialIndex="selectedIdx" :autoPlay="false" :allow-vertical="false" :refreshResetCurrent="true" :loop="false" :speed="500" :options="{listenScroll: true, probeType: 3, stopPropagation: true}" @change="changeSlide" @scroll="slideScroll">
             <cube-slide-item v-for="(item, index) in tabs" :key="item.title" :style="{height: (winHeight - ((tabs && tabs.length) > 1 ? tabBarHeight : 0)) + 'px'}">
               <cube-scroll
                 ref="contentScroll"
                 :data="tabs[index].data"
                 :scrollEvents="['scroll']"
                 :options="options"
+                @scroll="innerScroll"
                 @pulling-down="onPullingDown(index)"
                 @pulling-up="onPullingUp(index)">
                 <transition name="loading-scale">
@@ -98,13 +101,26 @@ Vue.use(TabBar)
 Vue.use(TabPanels)
 Vue.use(Slide)
 Vue.use(Sticky)
-const tabs = []
+const tabs = [
+  {
+    title: '动态',
+    data: [],
+    paging: {},
+    fetching: false
+  },
+  {
+    title: '活动',
+    data: [],
+    paging: {},
+    fetching: false
+  }
+]
 export default {
   data() {
-    // let selectedIdx = parseInt(this.$route.query.jump_tab || 0)
-    let selectedIdx = 0
+    let selectedIdx = parseInt(this.$route.query.jump_tab || 0)
     let selectedLabel = (this.$route.query.jump_tab && this.$route.query.jump_tab.toString() === '1') ? '活动' : '动态'
-    console.log('selectedIdx', selectedIdx, typeof selectedIdx)
+    // let selectedIdx = 0
+    // let selectedLabel = '动态'
     return {
       showBackTop: false,
       circle: {
@@ -128,14 +144,20 @@ export default {
         },
         click: false
       },
-      previewInstance: null
+      previewInstance: null,
+      showTabbar: false
     }
   },
   components: {DynamicItem, ActivityItem, DownloadBox, LoadingView},
   watch: {
     'circle.id': function () {
+      console.log('this.tabs', this.tabs, this.selectedIdx, this.selectedLabel)
       if (this.$route.query.jump_tab && this.$route.query.jump_tab.toString() === '1') { // 有指定首先显示的tab则刷新该tab数据,否则默认刷新动态tab
-        this.fetchActivity(1)
+        if (this.tabs[1]) {
+          this.fetchActivity(1)
+        } else {
+          this.fetchDynamic(1)
+        }
       } else {
         this.fetchDynamic(1)
       }
@@ -215,7 +237,7 @@ export default {
           let pos = this.$refs['tabItem'][initialTab].$el.getBoundingClientRect()
           let slideX = pos.x + pos.width / 2
           this.tabSlideX = slideX + 'px'
-          this.selectedIdx = initialTab
+          // this.selectedIdx = initialTab
           clearInterval(this.timer)
         }
       },30)
@@ -231,34 +253,19 @@ export default {
         }
         if (res && !Boolean(res.error) && res.data) { // 成功获取数据
           this.circle = res.data
-          if (res.data.circle_has_activity) { // 有活动tab
-            this.tabs = [
-              {
-                title: '动态',
-                data: [],
-                paging: {},
-                fetching: false
-              },
-              {
-                title: '活动',
-                data: [],
-                paging: {},
-                fetching: false
-              }
-            ]
-          } else { // 无活动tab
-            this.tabs = [
-              {
-                title: '动态',
-                data: [],
-                paging: {},
-                fetching: false
-              }
-            ]
+          if (!res.data.circle_has_activity) { // 有活动tab
+            this.tabs.splice(1, 1)
+            this.showTabbar = true
+          } else {
+            this.showTabbar = true
           }
         }
       }).catch(err => {
-
+        if (err.msg) {
+          this.$toast(err.msg)
+        } else {
+          this.$toast('获取圈子失败')
+        }
       })
     },
     fetchDynamic (pn) {
@@ -298,6 +305,9 @@ export default {
       })
     },
     fetchActivity (pn) {
+      if (!this.tabs[1]) {
+        return false
+      }
       let rData = {
         pn: pn,
         limit: 20,
@@ -388,23 +398,20 @@ export default {
         })
       })
     },
-    outerScroll ({x, y}) {
-      if (-y > this.winHeight) { // 超过半屏显示返回顶部
+    innerScroll ({x, y}) {
+      let bannerPos = this.$refs['topBanner'].getBoundingClientRect()
+      // let outerWrapperPos = this.$refs['pageScroller'].scrollTo(0, -innerWrapperPos.top, 500)
+      if (-y > window.innerHeight) { // 超过一屏显示返回顶部
         this.showBackTop = true
       } else {
         this.showBackTop = false
       }
-    },
-    // innerScroll ({x, y}) {
-    //   let outerWrapperPos = this.$refs['pageScroller'].$el.getBoundingClientRect()
-    //   let innerWrapperPos = this.$refs['innerWrapper'].getBoundingClientRect()
-    //   if (-y > innerWrapperPos.top) {
-    //     return false
-    //   }
-    //   if (y < 0 && innerWrapperPos.y > 0) {
-    //     this.$refs['pageScroller'].scrollTo(x, y)
-    //   }
-    // }
+      if (-y > window.innerHeight / 200) { // 超过半屏隐藏顶部banner
+        this.$refs['pageScroller'].scrollTo(0, -bannerPos.height, 500)
+      } else {
+        this.$refs['pageScroller'].scrollTo(0, 0, 500)
+      }
+    }
   },
   created () {
     this.fetchCircle()
