@@ -1,9 +1,8 @@
 <template>
   <div :style="{height: winHeight + 'px'}">
 
-    <div :style="{height: winHeight-(100/750*winWidth) + 'px'}">
+    <div v-if="dynamic" :style="{height: winHeight-(100/750*winWidth) + 'px'}">
       <cube-scroll
-        v-if="dynamic"
         ref="contentScroll"
         :data="dynamic.comment_list"
         :options="options"
@@ -625,7 +624,7 @@ export default {
 .reply-box {
   background-color: transparent;
   margin-bottom: 8px;
-  transition: all 0.15s;
+  transition: all 0.1s;
 }
 .reply-box:active {
   background-color: #cccccc;

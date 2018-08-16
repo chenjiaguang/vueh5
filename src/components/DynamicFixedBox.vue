@@ -39,7 +39,7 @@ export default {
       return {
         type: '0',
         id: this.dynamic.id,
-        like: !this.dynamic.has_like
+        like: this.dynamic.has_like
       };
     }
   },
