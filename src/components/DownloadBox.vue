@@ -1,3 +1,4 @@
+//
 <template>
   <div class="box">
     <div class="row space-between center">

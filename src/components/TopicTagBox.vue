@@ -1,3 +1,4 @@
+//话题容器
 <template>
   <div v-if="topicInfo && topicInfo.length > 0" class="topic-box clearfix">
     <div v-for="(item, idx) in topicInfo" :key="idx" @click="()=>click(item.id)" class="topic-item fl"><i class="iconfont icon-topic relative-topic-icon"></i>{{item.title}}</div>

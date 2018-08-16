@@ -1,3 +1,4 @@
+//滑动到顶部点击框
 <template>
   <div :class="['fix-box',visible?null:'hide']" @click="handleClick">
     <i class="iconfont icon-back_top"></i>
@@ -5,7 +6,7 @@
 </template>
 <script>
 export default {
-  props: ['visible', 'click'],
+  props: ['visible', 'click', 'scroll'],
   data () {
     return {};
   },
@@ -13,7 +14,7 @@ export default {
   components: {},
   methods: {
     handleClick (event) {
-      this.$emit('click', event);
+      this.scroll.scrollTo(0, 0, 500);
     }
   }
 };
@@ -34,7 +35,7 @@ export default {
   align-items: center;
   opacity: 0.5;
   border-radius: 6px;
-  transition: all 0.25s;
+  transition: all 0.3s;
 }
 .hide {
   opacity: 0;

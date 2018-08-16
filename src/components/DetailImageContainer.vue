@@ -1,3 +1,4 @@
+// 动态详情页的图片展示
 <template>
   <div class="row flex-wrap-wrap space-between">
     <div v-for="(item, idx) in images" :key="idx" @click="previewImage(idx)" :class="[imageClassName]">
