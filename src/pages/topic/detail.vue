@@ -25,7 +25,7 @@
           <div class="tab-border"></div>
         </div>
         <div class="tabs-wrapper" ref="slideWrapper" :style="{height: (winHeight - ((tabs && tabs.length) > 1 ? tabBarHeight : 0)) + 'px'}">
-          <cube-slide ref="slideInstance" :data="tabs" :initialIndex="selectedIdx" :autoPlay="false" :allow-vertical="false" :loop="false" :speed="500" :options="{listenScroll: true, probeType: 3, click: false}" @change="changeSlide" @scroll="slideScroll">
+          <cube-slide ref="slideInstance" :data="tabs" :initialIndex="selectedIdx" :autoPlay="false" :allow-vertical="false" :loop="false" :speed="500" :options="{listenScroll: true, probeType: 3, stopPropagation: true}" @change="changeSlide" @scroll="slideScroll">
             <cube-slide-item v-for="(item, index) in tabs" :key="item.title" :style="{height: (winHeight - ((tabs && tabs.length) > 1 ? tabBarHeight : 0)) + 'px'}">
               <cube-scroll
                 ref="contentScroll"
@@ -66,6 +66,7 @@
         </div>
       </div>
     </cube-scroll>
+
     <transition name="backtop-fade">
       <i v-if="showBackTop" class="iconfont icon-back_top backtop-icon"></i>
     </transition>
@@ -135,8 +136,7 @@ export default {
         pullUpLoad: {
           threshold: (window.innerWidth / 750) * 100
         },
-        click: true,
-        stopPropagation: true
+        click: false
       },
       previewInstance: null
     }
@@ -176,6 +176,9 @@ export default {
     changeSlide (idx) { // 滑动slide触发tab切换
       this.selectedLabel = this.tabs[idx].title
       this.selectedIdx = idx
+      if (!this.tabs[idx].paging.pn) {
+        this.fetchTopic(idx, 1)
+      }
     },
     slideScroll ({x, y}) { // 华东slide
       if (!this.$refs['tabItem'] || this.tabs.length <= 1) {
@@ -239,7 +242,6 @@ export default {
           this.tabs[idx].fetching = false
           this.tabs[idx].paging = res.data.paging
           if (pn.toString() === '1') { // 刷新
-            console.log(907)
             let {id, title, state, content, beginColor, endColor} = res.data
             this.topicInfo = {id, title, state, content, beginColor, endColor}
             this.tabs[idx].data = res.data.list
@@ -269,7 +271,6 @@ export default {
       this.fetchTopic(idx, pn)
     },
     changeLike (item, idx) {
-      console.log('changeLike', item)
       let rData = {
         token: 'lcaKiq5GIC_FHqubOBcI6FUKaL8N171U',
         id: item.id,
@@ -339,7 +340,7 @@ export default {
     }
   },
   created () {
-    this.fetchTopic(0,1)
+    this.fetchTopic(this.selectedIdx, 1)
     this.initSlideBlock()
   }
 }

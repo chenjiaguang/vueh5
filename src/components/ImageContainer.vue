@@ -2,7 +2,7 @@
   <div style="width: 100%;overflow: hidden;">
     <template v-for="(item, idx) in images">
       <transition :key="item.sign || item.id || idx" :appear="appearAnimation" appear-class="before-appear">
-        <div v-lazy-container="{ selector: 'img', adapter: {error (listender, Init) {console.log('listender', listender)}}}" :key="item.sign || item.id || idx" @click="previewImage(idx)" :style="{marginTop: idx < 3 ? 0 : '1.055%'}" class="item-container fl" :class="{disabled: !(item.localUrl || item.url), one: images.length === 1 && !isUpload, 'two-and-more': images.length > 1 || isUpload, left: idx % 3 === 0, horizontal: Number(item.width) >= Number(item.height), vertical: Number(item.width) < Number(item.height)}">
+        <div v-lazy-container="{selector: 'img'}" :key="item.sign || item.id || idx" @click="previewImage(idx)" :style="{marginTop: idx < 3 ? 0 : '1.055%'}" class="item-container fl" :class="{disabled: !(item.localUrl || item.url), one: images.length === 1 && !isUpload, 'two-and-more': images.length > 1 || isUpload, left: idx % 3 === 0, horizontal: Number(item.width) >= Number(item.height), vertical: Number(item.width) < Number(item.height)}">
           <img :data-src="item.localUrl || item.url" class="image-item" :class="{horizontal: images.length === 1 && (Number(item.width) / Number(item.height) >= 1.44) || images.length > 1 && Number(item.width) >= Number(item.height), vertical: images.length === 1 && (Number(item.width) / Number(item.height) < 1.44) || images.length > 1 && Number(item.width) < Number(item.height)}" />
           <div class="long-tag" v-if="Number(item.height) / Number(item.width) > 4">长图</div>
           <div class="delete-btn iconfont icon-guanbi" v-if="showDelete" @click.stop="deleteImage(item, idx)"></div>
@@ -59,6 +59,7 @@ export default {
   opacity: 1;
   transform: scale(1, 1);
   transform-origin: 0 0;
+  background-color: #EEEEEE;
   &.before-appear{
     width: 0 !important;
     transform: scale(0, 0);
@@ -152,6 +153,10 @@ export default {
 .image-item.vertical{
   width: 100%;
   height: auto;
+}
+img[lazy=error]{
+  max-width: 50%;
+  max-height: 50%;
 }
 .long-tag{
   width: 128px;

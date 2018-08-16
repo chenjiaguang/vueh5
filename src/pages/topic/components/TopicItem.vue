@@ -194,6 +194,7 @@
   left: 0;
   top: 0;
   background: #E5E5E5;
+  z-index: 1;
 }
 .comment-and-like-item{
   width: 50%;
