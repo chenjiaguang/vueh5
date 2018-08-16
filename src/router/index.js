@@ -137,6 +137,7 @@ const router = new Router({
       name: 'DynamicDetail',
       component: DynamicDetail,
       meta: {
+        keepAlive: true
       }
     },
     {
