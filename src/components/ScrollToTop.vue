@@ -34,7 +34,7 @@ export default {
   align-items: center;
   opacity: 0.5;
   border-radius: 6px;
-  transition: all 0.25s;
+  transition: all 0.3s;
 }
 .hide {
   opacity: 0;

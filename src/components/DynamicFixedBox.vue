@@ -12,7 +12,10 @@
     </div>
 
     <div class="like-box" @click="clickLike(dynamic.id)">
-      <i :class="['iconfont',dynamic.has_like?'icon-like':'icon-dislike']"></i>
+      <transition name="fade" mode="out-in">
+        <i v-if="dynamic.has_like" class='iconfont icon-like' key="1"></i>
+        <i v-else class='iconfont icon-dislike' key="2"></i>
+      </transition>
     </div>
   </div>
 </template>
@@ -34,9 +37,9 @@ export default {
   components: {},
   methods: {
     clickLike (id) {
+      this.dynamic.has_like = !this.dynamic.has_like;
       this.$ajax('/jv/qz/like', { data: this.likeData })
         .then(res => {
-          this.dynamic.has_like = !this.dynamic.has_like;
           if (this.dynamic.has_like) {
             // 增加
             this.dynamic.like_list.splice(0, 0, res.data);
@@ -62,6 +65,13 @@ export default {
 };
 </script>
 <style scoped>
+.fade-enter-active, .fade-leave-active {
+  transition: all .3s;
+}
+.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+  opacity: 0;
+}
+
 .fix-box {
   position: fixed;
   height: 100px;
