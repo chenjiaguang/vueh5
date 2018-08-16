@@ -13,10 +13,18 @@
     </div>
 
     <div class="like-box" @click="clickLike(dynamic.id)">
-      <transition name="fade-quick" mode="out-in">
-        <i v-if="dynamic.has_like" class='iconfont icon-like' key="1"></i>
-        <i v-else class='iconfont icon-dislike' key="2"></i>
+      <transition
+        enter-active-class="animated wobble"
+        leave-active-class="hide"
+      >
+        <div v-if="dynamic.has_like" style="height:100%;width:100%;">
+          <i class='iconfont icon-like'></i>
+        </div>
       </transition>
+
+      <div v-if="!dynamic.has_like" style="height:100%;width:100%;">
+        <i class='iconfont icon-dislike'></i>
+      </div>
     </div>
   </div>
 </template>
@@ -39,22 +47,22 @@ export default {
   methods: {
     clickLike (id) {
       this.dynamic.has_like = !this.dynamic.has_like;
-      this.$ajax('/jv/qz/like', { data: this.likeData })
-        .then(res => {
-          if (this.dynamic.has_like) {
-            // 增加
-            this.dynamic.like_list.splice(0, 0, res.data);
-            this.dynamic.like_num++;
-          } else {
-            // 减少
-            let i = this.dynamic.like_list.findIndex((value, index, arr) => {
-              return value.uid === res.data.uid;
-            });
-            this.dynamic.like_list.splice(i, 1);
-            this.dynamic.like_num--;
-          }
-        })
-        .catch();
+      // this.$ajax('/jv/qz/like', { data: this.likeData })
+      //   .then(res => {
+      //     if (this.dynamic.has_like) {
+      //       // 增加
+      //       this.dynamic.like_list.splice(0, 0, res.data);
+      //       this.dynamic.like_num++;
+      //     } else {
+      //       // 减少
+      //       let i = this.dynamic.like_list.findIndex((value, index, arr) => {
+      //         return value.uid === res.data.uid;
+      //       });
+      //       this.dynamic.like_list.splice(i, 1);
+      //       this.dynamic.like_num--;
+      //     }
+      //   })
+      //   .catch();
     },
     clickComment (id) {
       this.$router.push({
