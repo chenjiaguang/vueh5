@@ -39,7 +39,9 @@
               </div>
               <!-- 右 -->
               <div>
-                <div class="follow-button" v-if="!dynamic.is_following"  @click="clickFollow(dynamic.uid)">+ 关注</div>
+                <transition name="fade-quick">
+                  <div class="follow-button" v-if="!dynamic.is_following"  @click="clickFollow(dynamic.uid)">+ 关注</div>
+                </transition>
               </div>
             </div>
           </div>
@@ -98,7 +100,7 @@
 
           <div v-if="dynamic&&dynamic.comment_num>0" id="comment-container" class="column" >
             <div class="comment-text" >{{dynamic.comment_num}}条评论</div>
-            <transition-group name="fade" tag="div">
+            <transition-group name="fade-slow" tag="div">
               <div v-for="(comment) in dynamic.comment_list" :key="'comments'+comment.id">
                 <div class="comment-box row space-between">
                   <div class="column">
@@ -111,9 +113,9 @@
                     <div class="comment-content" @click="()=>showReplyActionSheet(comment,comment.username)">{{comment.content}}</div>
                     <div class="comment-time">{{comment.time}}</div>
 
-                    <transition name="fade">
+                    <transition name="fade-slow">
                       <div v-if="comment.replys.list.length>0" class="comment-replies-box">
-                        <transition-group name="fade" tag="div">
+                        <transition-group name="fade-slow" tag="div">
                           <div class="reply-box" v-for="(reply) in comment.replys.list" :key="'replys'+reply.id" @click.stop="()=>showReplyActionSheet(comment,reply.username,reply.id)">
                             <span class="reply-from" v-if="reply.pusername" @click.stop="clickUser(reply.uid)">{{reply.username}}</span><span class="reply-from" v-if="!reply.pusername" @click.stop="clickUser(reply.uid)">{{reply.username}}:</span><span class="reply-reply" v-if="reply.pusername">回复</span><span class="reply-to" v-if="reply.pusername" @click.stop="clickUser(reply.puid)">{{reply.pusername}}:</span><span class="reply-content">{{reply.content}}</span>
                           </div>
@@ -657,12 +659,5 @@ export default {
 .cube-pullup-wrapper {
   height: 50px;
   align-items: start;
-}
-
-.fade-enter-active, .fade-leave-active {
-  transition: all 1s;
-}
-.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
-  opacity: 0;
 }
 </style>

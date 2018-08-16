@@ -13,7 +13,7 @@
     </div>
 
     <div class="like-box" @click="clickLike(dynamic.id)">
-      <transition name="fade" mode="out-in">
+      <transition name="fade-quick" mode="out-in">
         <i v-if="dynamic.has_like" class='iconfont icon-like' key="1"></i>
         <i v-else class='iconfont icon-dislike' key="2"></i>
       </transition>
@@ -69,13 +69,6 @@ export default {
 };
 </script>
 <style scoped>
-.fade-enter-active,
-.fade-leave-active {
-  transition: all 0.3s;
-}
-.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
-  opacity: 0;
-}
 
 .fix-box {
   position: fixed;
