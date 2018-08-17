@@ -29,6 +29,7 @@
   </div>
 </template>
 <script>
+import utils from '../lib/utils';
 export default {
   props: ['dynamic'],
   data () {
@@ -46,7 +47,7 @@ export default {
   components: {},
   methods: {
     clickLike (id) {
-      let nowHasLike = this.dynamic.has_like = !this.dynamic.has_like;
+      let nowHasLike = (this.dynamic.has_like = !this.dynamic.has_like);
       this.$ajax('/jv/qz/like', { data: this.likeData })
         .then(res => {
           if (nowHasLike) {
@@ -65,19 +66,20 @@ export default {
         .catch();
     },
     clickComment (id) {
-      this.$router.push({
-        name: 'DynamicSendComment',
-        query: { dy_id: this.dynamic.id },
-        params: {
-          dynamic: this.dynamic
-        }
-      });
+      if (utils.checkLogin()) {
+        this.$router.push({
+          name: 'DynamicSendComment',
+          query: { dy_id: this.dynamic.id },
+          params: {
+            dynamic: this.dynamic
+          }
+        });
+      }
     }
   }
 };
 </script>
 <style scoped>
-
 .fix-box {
   position: fixed;
   height: 100px;

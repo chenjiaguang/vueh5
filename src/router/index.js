@@ -17,6 +17,8 @@ import EditDynamicRange from '@/pages/dynamic/chooseRange'
 import DynamicDetail from '@/pages/dynamic/detail'
 import DynamicSendComment from '@/pages/dynamic/sendComment'
 import TopicDetal from '@/pages/topic/detail'
+import SMSCode from '@/pages/smsCode'
+import WeixinLoginJump from '@/pages/weixinLoginJump'
 Vue.use(Router)
 let prefix = '/h5'
 
@@ -140,6 +142,16 @@ const router = new Router({
       meta: {
         keepAlive: true
       }
+    },
+    {
+      path: prefix + '/smsCode',
+      name: 'SMSCode',
+      component: SMSCode
+    },
+    {
+      path: prefix + '/weixinLoginJump',
+      name: 'WeixinLoginJump',
+      component: WeixinLoginJump
     },
     {
       path: prefix + '/dynamic/sendComment',

@@ -175,6 +175,7 @@ export default {
     NotFoundPage
   },
   mounted () {
+    window.localStorage.token = ''
     this.fetch();
   },
   activated () {
