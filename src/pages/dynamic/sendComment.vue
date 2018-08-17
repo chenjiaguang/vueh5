@@ -63,7 +63,7 @@ export default {
                 if (this.isReply) {
                   params.comment.replys.list.splice(0, 0, res.data.reply);
                 } else {
-                  params.dynamic.comment_list.splice(0, 0, res.data.comment);
+                  params.dynamic.comment_list && params.dynamic.comment_list.splice(0, 0, res.data.comment);
                   params.dynamic.comment_num++;
                 }
               }, 500);

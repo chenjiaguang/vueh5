@@ -40,7 +40,7 @@
                     <loading-view />
                   </div>
                 </transition>
-                <div v-if="tabs[index].paging && tabs[index].paging.is_end && tabs[index].data && tabs[index].data.length === 0" class="empty-box">该圈子暂无{{index === 0 ? '动态' : '活动'}}</div>
+                <div v-if="tabs[index].paging && tabs[index].paging.is_end && tabs[index].data && tabs[index].data.length === 0" class="empty-box">该话题暂无{{index === 0 ? '最新动态' : '最热动态'}}</div>
                 <topic-item v-for="(item, idx) in tabs[index].data" :key="idx" :itemData="item" @changeLike="(data) => changeLike(data, index)" @showPreview="showPreview" @hidePreview="hidePreview" />
                 <template slot="pulldown" slot-scope="props">
                   <div class="cube-pulldown-wrapper" :style="props.pullDownStyle">
@@ -66,12 +66,8 @@
         </div>
       </div>
     </cube-scroll>
-
-    <transition name="backtop-fade">
-      <i v-if="showBackTop" class="iconfont icon-back_top backtop-icon"></i>
-    </transition>
-    <!-- <i class="iconfont icon-camera publish-icon"></i> -->
-    <div class="discuss-box">
+    <scroll-to-top v-if="$refs['contentScroll']" :visible="showBackTop" :position="{bottom: (winWidth / 750) * 278, right: (winWidth / 750) * 54}" :scroll="$refs['contentScroll'][selectedIdx]"/>
+    <div class="discuss-box" @click="goPublish">
       <i class="iconfont icon-discuss discuss-icon"></i><span>参与讨论</span>
     </div>
   </div>
@@ -82,6 +78,7 @@ import Vue from 'vue'
 import TopicItem from './components/TopicItem'
 import DownloadBox from '../../components/DownloadBox'
 import LoadingView from '@/components/LoadingView'
+import ScrollToTop from '@/components/ScrollToTop'
 import {
     /* eslint-disable no-unused-vars */
     Style,
@@ -123,6 +120,7 @@ export default {
       },
       showBackTop: false,
       winHeight: window.innerHeight,
+      winWidth: window.innerWidth,
       tabs: tabs,
       tabBarHeight: parseInt((window.innerWidth / 750) * 96),
       selectedLabel: selectedLabel,
@@ -141,7 +139,7 @@ export default {
       previewInstance: null
     }
   },
-  components: {TopicItem, DownloadBox, LoadingView},
+  components: {TopicItem, DownloadBox, LoadingView, ScrollToTop},
   watch: {
     '$route.query.previewImage': function (val, oldVal) {
       if (!val && oldVal) {
@@ -317,13 +315,6 @@ export default {
         }
       })
     },
-    // outerScroll ({x, y}) {
-    //   if (-y > this.winHeight) { // 超过半屏显示返回顶部
-    //     this.showBackTop = true
-    //   } else {
-    //     this.showBackTop = false
-    //   }
-    // },
     innerScroll ({x, y}) {
       let bannerPos = this.$refs['topBanner'].getBoundingClientRect()
       // let outerWrapperPos = this.$refs['pageScroller'].scrollTo(0, -innerWrapperPos.top, 500)
@@ -337,6 +328,9 @@ export default {
       } else {
         this.$refs['pageScroller'].scrollTo(0, 0, 500)
       }
+    },
+    goPublish () {
+      this.$router.push({name: 'EditDynamic', params: {topic: [{id: this.topicInfo.id, title: this.topicInfo.title}]}})
     }
   },
   created () {
@@ -579,27 +573,6 @@ div.cube-tab_active div{
   width: 110%;
   height: 10px;
   background: #F5F5F5;
-}
-.backtop-icon{
-  display: block;
-  width: 88px;
-  height: 88px;
-  background-color: #717171;
-  color: #fff;
-  font-size:46px;
-  line-height: 88px;
-  text-align: center;
-  border-radius: 8px;
-  position: fixed;
-  right: 54px;
-  bottom: 278px;
-  z-index: 2;
-}
-.backtop-fade-enter-active, .backtop-fade-leave-active {
-  transition: all .5s;
-}
-.backtop-fade-enter, .backtop-fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
-  opacity: 0;
 }
 .publish-icon{
   display: block;

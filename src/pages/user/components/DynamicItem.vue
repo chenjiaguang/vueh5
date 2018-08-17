@@ -8,7 +8,7 @@
         <img v-if="itemData.is_owner" :src="$assetsPublicPath + '/cwebassets/image/circle_owner.png'" class="user-tag fl" />
         <img v-if="itemData.is_settop" :src="$assetsPublicPath + '/cwebassets/image/settop.png'" class="user-tag fl" /> -->
       </div>
-      <div class="publish-time-and-circle">{{itemData.time}}<span class="from-circle" v-if="itemData.circle_name">发布于<span @click="goCircle" class="from-circle-text">{{itemData.circle_name}}</span></span></div>
+      <div class="publish-time-and-circle">{{itemData.time}}<span class="from-circle" v-if="itemData.circle_name">发布于<span class="from-circle-text">{{itemData.circle_name}}</span></span></div>
     </div>
     <show-hide-content :content="(itemData.type && itemData.type.toString() === '18') ? itemData.title : (itemData.content || '')" :isLongDynamic="(itemData.type && itemData.type.toString() === '18') ? true : false" />
     <div v-if="itemData.topicInfo && itemData.topicInfo.length > 0" class="topic-box clearfix">
@@ -33,7 +33,7 @@
           <span>{{likeNumber || '赞'}}</span>
         </div>
       </div>
-      <div class="comment-and-like-item fl" style="padding-right: 0;">
+      <div @click="addComment" class="comment-and-like-item fl" style="padding-right: 0;">
         <div class="comment-and-like-icon-box">
           <i class="iconfont icon-comment_icon comment-and-like-icon"></i>
           <span>{{commentNumber || '评论'}}</span>
@@ -265,10 +265,10 @@ export default {
   },
   methods: {
     changeLike () {
-      this.$emit('changeLike')
+      this.$emit('changeLike', this.itemData)
     },
-    goCircle () {
-      console.log('goCircle')
+    addComment () {
+      this.$emit('addComment', this.itemData)
     },
     showPreview (instance) {
       this.$emit('showPreview', instance)
