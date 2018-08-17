@@ -1,6 +1,6 @@
 <template>
   <keep-alive>
-    <div class="option-box" @click="onTap">
+    <div class="option-box" @click.stop="onTap">
       <div class="option-header clearfix" :style="{paddingRight: option.rightIcon ? '11%' : 0}">
         <i :class="leftIconClass" v-if="option.leftIcon"></i>
         <div class="title fl" :style="{width: (option.rightText || option.rightIcon) ? '60%' : '100%'}">{{option.title}}</div>

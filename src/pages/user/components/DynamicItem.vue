@@ -1,21 +1,21 @@
 <template>
-  <div class="dynamic-item">
+  <div class="dynamic-item" @click.stop="goDynamic">
     <div class="user-overview">
-      <div class="user-avatar" :style="{backgroundImage: 'url(' + itemData.avatar + ')'}"></div>
+      <div class="user-avatar" @click.stop="goUser" :style="{backgroundImage: 'url(' + itemData.avatar + ')'}"></div>
       <div class="user-name clearfix">
-        <span class="user-name-text fl">{{itemData.username}}</span>
+        <span @click.stop="goUser" class="user-name-text fl">{{itemData.username}}</span>
         <!-- <img v-if="itemData.is_manager" :src="$assetsPublicPath + '/cwebassets/image/manager.png'" class="user-tag fl" />
         <img v-if="itemData.is_owner" :src="$assetsPublicPath + '/cwebassets/image/circle_owner.png'" class="user-tag fl" />
         <img v-if="itemData.is_settop" :src="$assetsPublicPath + '/cwebassets/image/settop.png'" class="user-tag fl" /> -->
       </div>
-      <div class="publish-time-and-circle">{{itemData.time}}<span class="from-circle" v-if="itemData.circle_name">发布于<span class="from-circle-text">{{itemData.circle_name}}</span></span></div>
+      <div class="publish-time-and-circle">{{itemData.time}}<span class="from-circle" v-if="itemData.circle_name">发布于<span @click.stop="goCircle" class="from-circle-text">{{itemData.circle_name}}</span></span></div>
     </div>
     <show-hide-content :content="(itemData.type && itemData.type.toString() === '18') ? itemData.title : (itemData.content || '')" :isLongDynamic="(itemData.type && itemData.type.toString() === '18') ? true : false" />
     <div v-if="itemData.topicInfo && itemData.topicInfo.length > 0" class="topic-box clearfix">
-      <div v-for="(item, idx) in itemData.topicInfo" :key="idx" class="topic-item fl"><i class="iconfont icon-topic relative-topic-icon"></i>{{item.title}}</div>
+      <div v-for="(item, idx) in itemData.topicInfo" :key="idx" @click.stop="goTopic(idx)" class="topic-item fl"><i class="iconfont icon-topic relative-topic-icon"></i>{{item.title}}</div>
     </div>
     <div class="dynamic-picture" v-if="itemData.covers && itemData.covers.length > 0">
-      <image-container :images="itemData.covers" :appearAnimation="false" :showDelete="false" @showPreview="showPreview" @hidePreview="hidePreview" />
+      <image-container :images="itemData.covers" :router="router" :appearAnimation="false" :showDelete="false" @showPreview="showPreview" @hidePreview="hidePreview" />
     </div>
     <div v-if="itemData.location" class="publish-address">{{itemData.location}}</div>
     <div v-if="itemData.activity" class="at-activity"><i class="iconfont icon-activity activity-sign"></i>{{itemData.activity.title}}</div>
@@ -26,7 +26,7 @@
       </div>
     </div>
     <div class="comment-and-like clearfix">
-      <div @click="changeLike" class="comment-and-like-item fl" :style="{paddingLeft: 0, color: itemData.has_like ? '#FE5273' : '#333'}">
+      <div @click.stop="changeLike" class="comment-and-like-item fl" :style="{paddingLeft: 0, color: itemData.has_like ? '#FE5273' : '#333'}">
         <div class="comment-and-like-icon-box">
           <transition-group name="fade" mode="in-out">
             <i v-if="itemData.has_like" key="like" class="iconfont icon-like comment-and-like-icon"></i>
@@ -35,7 +35,7 @@
           <span>{{likeNumber || '赞'}}</span>
         </div>
       </div>
-      <div @click="addComment" class="comment-and-like-item fl" style="padding-right: 0;">
+      <div @click.stop="addComment" class="comment-and-like-item fl" style="padding-right: 0;">
         <div class="comment-and-like-icon-box">
           <i class="iconfont icon-comment_icon comment-and-like-icon"></i>
           <span>{{commentNumber || '评论'}}</span>
@@ -256,6 +256,9 @@ export default {
     itemData: {
       type: Object,
       required: true
+    },
+    router: {
+      required: false
     }
   },
   data() {
@@ -277,7 +280,19 @@ export default {
       this.$emit('changeLike', this.itemData)
     },
     addComment () {
-      this.$emit('addComment', this.itemData)
+      this.router.push({name: 'DynamicSendComment', query:{dy_id: this.itemData.id}, params: {dynamic: this.itemData}})
+    },
+    goDynamic () {
+      this.router.push({ name: 'DynamicDetail', query: { id: this.itemData.id, isArticle: this.itemData.type.toString() === '18' ? true : false } })
+    },
+    goUser () {
+      this.router.push({ name: 'UserCenter', query: { user_id: this.itemData.uid } })
+    },
+    goCircle () {
+      this.router.push({ name: 'CircleDetail', query: { circle_id: this.itemData.circle_id } })
+    },
+    goTopic (idx) {
+      this.router.push({ name: 'TopicDetail', query: { topic_id: this.itemData.topicInfo[idx].id } })
     },
     showPreview (instance) {
       this.$emit('showPreview', instance)

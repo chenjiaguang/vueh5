@@ -26,7 +26,7 @@
         <img :src="$assetsPublicPath + '/cwebassets/image/empty_dynamic.png'" class="empty-image" />
         暂无动态
       </div>
-      <dynamic-item v-for="(item, idx) in tabs[0].data" :key="idx" :itemData="item" @changeLike="changeLike" @addComment="addComment" @showPreview="showPreview" @hidePreview="hidePreview" />
+      <dynamic-item v-for="(item, idx) in tabs[0].data" :key="idx" :itemData="item" :router="$router" @changeLike="changeLike" @showPreview="showPreview" @hidePreview="hidePreview" />
       <template slot="pulldown" slot-scope="props">
         <div class="cube-pulldown-wrapper" :style="props.pullDownStyle">
           <img v-show="!props.isPullingDown" class="pull-down-icon" :style="{transform: 'translateY(' + props.bubbleY + 'px)'}" :src="$assetsPublicPath + '/cwebassets/image/refresh_icon.png'" />
@@ -263,9 +263,6 @@ export default {
           }
         })
       })
-    },
-    addComment (item) {
-      this.$router.push({name: 'DynamicSendComment', query:{dy_id: item.id}, params: {dynamic: item}})
     },
     outerScroll ({x, y}) {
       if (-y > this.$winHeight) { // 超过一屏显示返回顶部

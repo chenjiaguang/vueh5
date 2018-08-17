@@ -1,5 +1,5 @@
 <template>
-  <div class="activity-item" @click="goActivity">
+  <div class="activity-item" @click.stop="goActivity">
     <div class="activity-pic" :style="{backgroundImage: 'url(' + itemData.covers[0].compress + ')'}"></div>
     <div class="activity-overview">
       <div class="title">{{itemData.title}}</div>

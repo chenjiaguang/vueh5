@@ -25,7 +25,7 @@
           <div class="tab-border" :style="{transform: 'scale(1,' + $tranScale + ')'}"></div>
         </div>
         <div class="tabs-wrapper" ref="slideWrapper" :style="{height: ($winHeight - ((tabs && tabs.length) > 1 ? tabBarHeight : 0)) + 'px'}">
-          <cube-slide ref="slideInstance" :data="tabs" :initialIndex="selectedIdx" :autoPlay="false" :showDots="false" :allow-vertical="false" :loop="false" :speed="500" :options="{listenScroll: true, probeType: 3}" @change="changeSlide" @scroll="slideScroll">
+          <cube-slide ref="slideInstance" :data="tabs" :initialIndex="selectedIdx" :autoPlay="false" :showDots="false" :allow-vertical="false" :loop="false" :speed="500" :options="{listenScroll: true, probeType: 3, click: false}" @change="changeSlide" @scroll="slideScroll">
             <cube-slide-item v-for="(item, index) in tabs" :key="item.title" :style="{height: ($winHeight - ((tabs && tabs.length) > 1 ? tabBarHeight : 0)) + 'px'}">
               <cube-scroll
                 ref="contentScroll"
@@ -41,7 +41,7 @@
                   </div>
                 </transition>
                 <div v-if="tabs[index].paging && tabs[index].paging.is_end && tabs[index].data && tabs[index].data.length === 0" class="empty-box">该话题暂无{{index === 0 ? '最新动态' : '最热动态'}}</div>
-                <topic-item v-for="(item, idx) in tabs[index].data" :key="idx" :itemData="item" @changeLike="(data) => changeLike(data, index)" @showPreview="showPreview" @hidePreview="hidePreview" />
+                <topic-item v-for="(item, idx) in tabs[index].data" :key="idx" :itemData="item" :router="$router" @changeLike="(data) => changeLike(data, index)" @showPreview="showPreview" @hidePreview="hidePreview" />
                 <template slot="pulldown" slot-scope="props">
                   <div class="cube-pulldown-wrapper" :style="props.pullDownStyle">
                     <img v-show="!props.isPullingDown" class="pull-down-icon" :style="{transform: 'translateY(' + props.bubbleY + 'px)'}" :src="$assetsPublicPath + '/cwebassets/image/refresh_icon.png'" />
@@ -132,8 +132,8 @@ export default {
         pullUpLoad: {
           threshold: (window.innerWidth / 750) * 100
         },
-        probeType: 1,
-        click: false
+        probeType: 3,
+        stopPropagation: true
       },
       previewInstance: null
     }
