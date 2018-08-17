@@ -163,7 +163,8 @@ export default {
       winWidth: window.innerWidth,
       pn: 1,
       scrollToTopVisible: false,
-      isArticle: this.$route.query.isArticle
+      isArticle:
+        this.$route.query.isArticle && this.$route.query.isArticle !== 'false'
     };
   },
   components: {
@@ -175,10 +176,18 @@ export default {
     NotFoundPage
   },
   mounted () {
-    window.localStorage.token = ''
     this.fetch();
   },
   activated () {
+    if (!this._refreshId) {
+      this._refreshId = this.$route.query.id
+    }
+    if (this._refreshId !== this.$route.query.id) {
+      this._refreshId = this.$route.query.id
+      this.dynamic = null;
+      this.isLoad = false;
+      this.fetch();
+    }
     if (this.isArticle) {
       document.title = '长文详情';
     } else {
