@@ -1,5 +1,5 @@
 <template>
-  <div :style="{height: winHeight + 'px'}">
+  <div :style="{height: $winHeight + 'px'}">
     <cube-scroll :data="tabs" ref="pageScroller" :scrollEvents="['scroll']" :options="options" @scroll="outerScroll" @pulling-up="onPullingUp">
       <div ref="topBanner">
         <download-box />
@@ -87,8 +87,6 @@ export default {
         is_owner: true
       },
       showBackTop: false,
-      winHeight: window.innerHeight,
-      winWidth: window.innerWidth,
       tabs: tabs,
       selectedLabel: '动态',
       selectedIdx: 0,
@@ -148,9 +146,9 @@ export default {
       let current = this.$refs['tabItem'][this.selectedIdx]
       let position = {pre: pre ? pre.$el.getBoundingClientRect() : null, next: next ? next.$el.getBoundingClientRect() : null, current: current.$el.getBoundingClientRect()}
       let relativeX = this.selectedIdx === 0 ? 0 : -this.$refs['slideInstance'].$el.getBoundingClientRect().width * this.selectedIdx // 基准x位置
-      let relativeSlideX = position.current.x + position.current.width / 2
-      let preSlideX = position.pre ? (position.pre.x + position.pre.width / 2) : null
-      let nextSlideX = position.next ? (position.next.x + position.next.width / 2) : null
+      let relativeSlideX = position.current.left + position.current.width / 2
+      let preSlideX = position.pre ? (position.pre.left + position.pre.width / 2) : null
+      let nextSlideX = position.next ? (position.next.left + position.next.width / 2) : null
       let touchX = x - relativeX
       let slideX = 0
       if (this.selectedIdx === 0) {
@@ -213,7 +211,7 @@ export default {
       this.timer = setInterval(() => {
         if (this.$refs['tabItem']) {
           let pos = this.$refs['tabItem'][0].$el.getBoundingClientRect()
-          let slideX = pos.x + pos.width / 2
+          let slideX = pos.left + pos.width / 2
           this.tabSlideX = slideX + 'px'
           clearInterval(this.timer)
         }
@@ -270,7 +268,7 @@ export default {
       this.$router.push({name: 'DynamicSendComment', query:{dy_id: item.id}, params: {dynamic: item}})
     },
     outerScroll ({x, y}) {
-      if (-y > this.winHeight) { // 超过一屏显示返回顶部
+      if (-y > this.$winHeight) { // 超过一屏显示返回顶部
         this.showBackTop = true
       } else {
         this.showBackTop = false
@@ -469,6 +467,7 @@ export default {
 .tab-box{
   height: 88px;
   padding: 0 4%;
+  overflow: hidden;
 }
 .tab-slider{
   width: 100%;
@@ -487,12 +486,12 @@ export default {
   border-radius: 4px;
 }
 .tab-border{
-  width: 300%;
-  height: 3px;
+  width: 100%;
+  height: 2px;
   position: absolute;
   left: 0;
   bottom: 0;
-  transform: scale(0.3333, 0.3333);
+  transform: scale(1, 0.5);
   transform-origin: 0 100%;
   background: #e5e5e5;
 }

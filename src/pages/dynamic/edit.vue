@@ -204,7 +204,7 @@ export default {
               if (_this.images.length > 9) { // 大于9张图时终止，为防止其他错误
                 return false
               }
-              let data = imageData.path[0]
+              let data = imageData.target ? imageData.target : (imageData.path && imageData.path[0]) ? imageData.path[0] : {}
               _this.images = _this.images.map((item, idx) => {
                 if (item.sign === sign) {
                   return Object.assign({}, item, {
@@ -255,16 +255,18 @@ export default {
           return item.id
         }
       })
-      let topicIds = this.topic.map((item, idx) => {
-        if (item.id) {
-          return item.id
+      if (this.topic) {
+        let topicIds = this.topic.map((item, idx) => {
+          if (item.id) {
+            return item.id
+          }
+        })
+        if (topicIds && topicIds.length > 0) {
+          topic_ids = topicIds.join(',')
         }
-      })
+      }
       if (imageIds && imageIds.length > 0) {
         image_ids = imageIds.join(',')
-      }
-      if (topicIds && topicIds.length > 0) {
-        topic_ids = topicIds.join(',')
       }
       if (this.submitting) {
         this.$toast('正在提交...')

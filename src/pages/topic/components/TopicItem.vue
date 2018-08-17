@@ -21,7 +21,9 @@
     <div v-if="itemData.activity" class="at-activity"><i class="iconfont icon-activity activity-sign"></i>{{itemData.activity.title}}</div>
     <div v-if="itemData.newsArticle && itemData.newsArticle.name" class="with-article">
       <div class="with-article-cover" :style="{backgroundImage: 'url(' + ((itemData.newsArticle.covers && itemData.newsArticle.covers[0]) ? itemData.newsArticle.covers[0].compress : '') + ')'}"></div>
-      <div class="with-article-title">{{itemData.newsArticle.name}}</div>
+      <div class="with-article-title">
+        <div class="with-article-title-text">{{itemData.newsArticle.name}}</div>
+      </div>
     </div>
     <div class="comment-and-like clearfix">
       <div @click="changeLike" class="comment-and-like-item fl" :style="{paddingLeft: 0, color: itemData.has_like ? '#FE5273' : '#333'}">
@@ -39,6 +41,7 @@
           <span>{{commentNumber || '评论'}}</span>
         </div>
       </div>
+      <div class="comment-and-like-border" :style="{transform: 'scale(1,' + $tranScale + ')'}"></div>
     </div>
     <div class="gray-block"></div>
   </div>
@@ -153,6 +156,7 @@
   background-color: #F5F5F5;
   position: relative;
   margin: 4px 0 20px;
+  overflow: hidden;
 }
 .with-article-cover{
   width: 100px;
@@ -160,8 +164,19 @@
   position: absolute;
   left: 14px;
   top: 14px;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
 }
 .with-article-title{
+  margin-left: 134px;
+  margin-right: 20px;
+  position: relative;
+  height: 100%;
+  box-sizing: centent-box;
+}
+.with-article-title-text{
+  width: 100%;
   font-size:28px;
   line-height: 36px;
   color: #333;
@@ -171,7 +186,7 @@
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   position: absolute;
-  left: 134px;
+  left: 0;
   top: 50%;
   transform: translateY(-50%);
   white-space: normal;
@@ -183,12 +198,10 @@
   text-align: center;
   position: relative;
 }
-.comment-and-like:before{
-  content: "";
-  display: block;
-  width: 300%;
-  height: 3px;
-  transform: scale(0.3333, 0.3333);
+.comment-and-like-border{
+  width: 100%;
+  height: 2px;
+  transform: scale(1, 0.5);
   transform-origin: 0 0;
   position: absolute;
   left: 0;
@@ -208,7 +221,7 @@
 }
 .comment-and-like-icon-box{
   height: 100%;
-  overflow: visible;
+  overflow: hidden;
   text-align: center;
   position: absolute;
   padding-left: 50px;
