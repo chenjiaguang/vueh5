@@ -247,7 +247,7 @@ export default {
       this.replyData.commentId = comment.id;
       comment.pn = comment.pn ? comment.pn + 1 : 2;
       this.replyData.pn = comment.pn;
-      this.$ajax('/jv/qz/replays', { data: this.replyData })
+      this.$ajax('/jv/anonymous/qz/replays', { data: this.replyData })
         .then(res => {
           res.data.list.forEach(element => {
             comment.replys.list.push(element);
@@ -616,6 +616,7 @@ export default {
   font-size: 30px;
   line-height: 42px;
   margin-bottom: 14px;
+  word-break: break-all;
 }
 .comment-time {
   color: #999999;
@@ -630,6 +631,7 @@ export default {
   padding-right: 24px;
   background-color: #f6f6f6;
   border-radius: 4px;
+  word-break: break-all;
 }
 .reply-box {
   background-color: transparent;
