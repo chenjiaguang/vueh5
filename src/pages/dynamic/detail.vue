@@ -186,12 +186,16 @@ export default {
   mounted () {
     this.fetch()
   },
+  watch: {
+    '$route': function (val, oldVal) {
+      utils.checkReloadWithKeepAliveNew(this, val, oldVal, 'DynamicDetail', ['id'], () => {
+        this.dynamic = null
+        this.isLoad = false
+        this.fetch()
+      })
+    }
+  },
   activated () {
-    utils.checkReloadWithKeepAlive(this, ['id'], () => {
-      this.dynamic = null
-      this.isLoad = false
-      this.fetch()
-    })
     if (this.isArticle) {
       document.title = '长文详情'
     } else {

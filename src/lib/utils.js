@@ -31,6 +31,57 @@ export default {
     }
     return false
   },
+  checkReloadWithKeepAliveNew (vm, $route, $oldRoute, routeName, checkQueryKeys, reloadCallback) {
+    let route = null
+    if ($route.name === routeName) {
+      route = $route
+    } else if ($oldRoute.name === routeName) {
+      route = $oldRoute
+    }
+    if (route) {
+      if (!vm._refresh) {
+        vm._refresh = {}
+      }
+      // 写入初始值
+      checkQueryKeys.forEach(checkQueryKey => {
+        if (!vm._refresh[checkQueryKey]) {
+          console.log('id', route.query[checkQueryKey])
+          vm._refresh[checkQueryKey] = route.query[checkQueryKey]
+        }
+      })
+
+      // 记录初始刷新时间
+      if (!vm._refreshTime) {
+        vm._refreshTime = Number(new Date())
+      }
+
+      // 判断是否需要reload
+      let reload = false
+      if ((window.localStorage.userChangeTime &&
+        vm._refreshTime < window.localStorage.userChangeTime)) {
+        // 发生了登入登出 需要reload
+        reload = true
+      }
+      if (!reload) {
+        // 参数发生变化 需要reload
+        checkQueryKeys.forEach(checkQueryKey => {
+          if (vm._refresh[checkQueryKey] !== route.query[checkQueryKey]) {
+            reload = true
+          }
+        })
+      }
+
+      if (reload) {
+        // 重新记录参数
+        checkQueryKeys.forEach(checkQueryKey => {
+          vm._refresh[checkQueryKey] = route.query[checkQueryKey]
+        })
+        // 重新记录时间
+        vm._refreshTime = Number(new Date())
+        reloadCallback()
+      }
+    }
+  },
   checkReloadWithKeepAlive (vm, checkQueryKeys, reloadCallback) {
     if (!vm._refresh) {
       vm._refresh = {}
