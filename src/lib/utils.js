@@ -1,6 +1,7 @@
 import browserUA from './browserUA';
 
 import router from '../router'
+import ajax from './ajax'
 
 export default {
   isPoneAvailable: function (phone) {
@@ -29,5 +30,32 @@ export default {
       })
     }
     return false;
+  },
+  /**
+   * 分享打开计数功能 自带next
+   */
+  beforeRouteEnterHandleShareOpen: function (to, from, next, type) {
+    if (this.beforeRouteEnterHandleShareOpenDontNext(to, from, next, type)) {
+      next({
+        name: to.name,
+        query: to.query,
+        params: to.params,
+        replace: true
+      });
+    } else {
+      next();
+    }
+  },
+  /**
+   * 分享打开计数功能 不带next 返回bool表示是否有路由更新
+   */
+  beforeRouteEnterHandleShareOpenDontNext: function (to, from, next, type) {
+    if (to.query.isShareOpen && to.query.isShareOpen !== 'false') {
+      ajax('/jv/share/anonymous/open', { data: { type: type } });
+      delete to.query.isShareOpen;
+      return true
+    } else {
+      return false
+    }
   }
 }

@@ -140,11 +140,12 @@
 
 <script>
 import Vue from 'vue';
-import DownloadBox from '../../components/DownloadBox';
-import DynamicFixedBox from '../../components/DynamicFixedBox';
-import ScrollToTop from '../../components/ScrollToTop';
-import TopicTagBox from '../../components/TopicTagBox';
-import DetailImageContainer from '../../components/DetailImageContainer';
+import DownloadBox from '@/components/DownloadBox';
+import DynamicFixedBox from '@/components/DynamicFixedBox';
+import ScrollToTop from '@/components/ScrollToTop';
+import TopicTagBox from '@/components/TopicTagBox';
+import DetailImageContainer from '@/components/DetailImageContainer';
+import utils from '@/lib/utils';
 import NotFoundPage from '../notFoundPage';
 import { Scroll, ActionSheet } from 'cube-ui';
 Vue.use(Scroll);
@@ -175,15 +176,22 @@ export default {
     DetailImageContainer,
     NotFoundPage
   },
+  beforeRouteEnter (to, from, next) {
+    if (to.query.isArticle && to.query.isArticle !== 'false') {
+      utils.beforeRouteEnterHandleShareOpen(to, from, next, 3);
+    } else {
+      utils.beforeRouteEnterHandleShareOpen(to, from, next, 4);
+    }
+  },
   mounted () {
     this.fetch();
   },
   activated () {
     if (!this._refreshId) {
-      this._refreshId = this.$route.query.id
+      this._refreshId = this.$route.query.id;
     }
     if (this._refreshId !== this.$route.query.id) {
-      this._refreshId = this.$route.query.id
+      this._refreshId = this.$route.query.id;
       this.dynamic = null;
       this.isLoad = false;
       this.fetch();
