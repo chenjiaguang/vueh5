@@ -24,17 +24,20 @@ module.exports = {
     // 是否禁止多个空格
     'no-multi-spaces': 'off',
     // 是否开启分号检查, off不检查, always强制使用分号, never强制不使用分号，还有其他选项 http://eslint.cn/docs/rules/semi
-    'semi': 'off',
+    'semi': 'warn',
     // indent 数组第一个指定是否启用这个规则
     // "off" 或 0 - 关闭规则
     // "warn" 或 1 - 开启规则，使用警告级别的错误：warn (不会导致程序退出)
     // "error" 或 2 - 开启规则，使用错误级别的错误：error (当被触发的时候，程序会退出)
     // 数组第二个指定空几个空格
-    'indent': ['off', 2],
+    'indent': ['warn', 2],
     // allow async-await
     'generator-star-spacing': 'off',
     // allow debugger during development
     'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off'
+
+    
+      
   },
   globals: {
     'AMap': 'AMap'

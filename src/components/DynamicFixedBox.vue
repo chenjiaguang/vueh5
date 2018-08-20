@@ -29,40 +29,41 @@
   </div>
 </template>
 <script>
-import utils from '../lib/utils';
+import utils from '../lib/utils'
 export default {
   props: ['dynamic'],
   data () {
-    return {};
+    return {}
   },
   computed: {
     likeData: function () {
       return {
         type: '0',
         id: this.dynamic.id,
-        like: this.dynamic.has_like
-      };
+        like: !this.dynamic.has_like
+      }
     }
   },
   components: {},
   methods: {
     clickLike (id) {
+      let nowHasLike = this.likeData.like
       this.$ajax('/jv/qz/like', { data: this.likeData })
         .then(res => {
-          let nowHasLike = (this.dynamic.has_like = !this.dynamic.has_like);
+          this.dynamic.has_like = nowHasLike
           if (nowHasLike) {
             // 增加
-            this.dynamic.like_list.splice(0, 0, res.data);
-            this.dynamic.like_num++;
+            this.dynamic.like_list.splice(0, 0, res.data)
+            this.dynamic.like_num++
           } else {
             // 减少
             let i = this.dynamic.like_list.findIndex((value, index, arr) => {
-              return value.uid === res.data.uid;
-            });
-            this.dynamic.like_list.splice(i, 1);
-            this.dynamic.like_num--;
+              return value.uid === res.data.uid
+            })
+            this.dynamic.like_list.splice(i, 1)
+            this.dynamic.like_num--
           }
-        });
+        })
     },
     clickComment (id) {
       if (utils.checkLogin()) {
@@ -72,11 +73,11 @@ export default {
           params: {
             dynamic: this.dynamic
           }
-        });
+        })
       }
     }
   }
-};
+}
 </script>
 <style scoped>
 .fix-box {

@@ -139,17 +139,17 @@
 </template>
 
 <script>
-import Vue from 'vue';
-import DownloadBox from '../../components/DownloadBox';
-import DynamicFixedBox from '../../components/DynamicFixedBox';
-import ScrollToTop from '../../components/ScrollToTop';
-import TopicTagBox from '../../components/TopicTagBox';
-import DetailImageContainer from '../../components/DetailImageContainer';
-import utils from '../../lib/utils';
-import NotFoundPage from '../notFoundPage';
-import { Scroll, ActionSheet } from 'cube-ui';
-Vue.use(Scroll);
-Vue.use(ActionSheet);
+import Vue from 'vue'
+import DownloadBox from '../../components/DownloadBox'
+import DynamicFixedBox from '../../components/DynamicFixedBox'
+import ScrollToTop from '../../components/ScrollToTop'
+import TopicTagBox from '../../components/TopicTagBox'
+import DetailImageContainer from '../../components/DetailImageContainer'
+import utils from '../../lib/utils'
+import NotFoundPage from '../notFoundPage'
+import { Scroll, ActionSheet } from 'cube-ui'
+Vue.use(Scroll)
+Vue.use(ActionSheet)
 export default {
   data () {
     return {
@@ -166,7 +166,7 @@ export default {
       scrollToTopVisible: false,
       isArticle:
         this.$route.query.isArticle && this.$route.query.isArticle !== 'false'
-    };
+    }
   },
   components: {
     DownloadBox,
@@ -178,24 +178,28 @@ export default {
   },
   beforeRouteEnter (to, from, next) {
     if (to.query.isArticle && to.query.isArticle !== 'false') {
-      utils.beforeRouteEnterHandleShareOpen(to, from, next, 4);
+      utils.beforeRouteEnterHandleShareOpen(to, from, next, 4)
     } else {
-      utils.beforeRouteEnterHandleShareOpen(to, from, next, 3);
+      utils.beforeRouteEnterHandleShareOpen(to, from, next, 3)
     }
   },
   mounted () {
-    this.fetch();
+    this.fetch()
+  },
+  watch: {
+    '$route': function (val, oldVal) {
+      utils.checkReloadWithKeepAliveNew(this, val, oldVal, 'DynamicDetail', ['id'], () => {
+        this.dynamic = null
+        this.isLoad = false
+        this.fetch()
+      })
+    }
   },
   activated () {
-    utils.checkReloadWithKeepAlive(this, ['id'], () => {
-      this.dynamic = null;
-      this.isLoad = false;
-      this.fetch();
-    });
     if (this.isArticle) {
-      document.title = '长文详情';
+      document.title = '长文详情'
     } else {
-      document.title = '动态详情';
+      document.title = '动态详情'
     }
   },
   computed: {
@@ -203,100 +207,100 @@ export default {
       return {
         follow: '1',
         following_id: this.dynamic.uid
-      };
+      }
     },
     dynamicData: function () {
       return {
         id: this.$route.query.id,
         showAll: false,
         origin: 'H5'
-      };
+      }
     },
     replyData: function () {
       return {
         commentId: '',
         limit: '10'
-      };
+      }
     }
   },
   methods: {
     fetch () {
-      let url = '';
+      let url = ''
       if (this.isArticle) {
-        url = '/jv/anonymous/qz/dynamicarticle';
+        url = '/jv/anonymous/qz/dynamicarticle'
       } else {
-        url = '/jv/anonymous/qz/dynamic';
+        url = '/jv/anonymous/qz/dynamic'
       }
       this.$ajax(url, { data: this.dynamicData, dontToast: true })
         .then(res => {
-          this.dynamic = res.data;
-          let i = 0;
+          this.dynamic = res.data
+          let i = 0
           if (this.isArticle) {
             this.imageList = this.dynamic.contents
               .filter(content => {
-                return content.type === '2';
+                return content.type === '2'
               })
               .map(content => {
-                content.imageIndex = i++;
-                return content.imageUrl;
-              });
+                content.imageIndex = i++
+                return content.imageUrl
+              })
           }
-          this.isLoad = true;
+          this.isLoad = true
         })
         .catch(e => {
-          this.isLoad = true;
-        });
+          this.isLoad = true
+        })
     },
     fetchMoreReplies (comment) {
-      this.replyData.commentId = comment.id;
-      comment.pn = comment.pn ? comment.pn + 1 : 2;
-      this.replyData.pn = comment.pn;
+      this.replyData.commentId = comment.id
+      comment.pn = comment.pn ? comment.pn + 1 : 2
+      this.replyData.pn = comment.pn
       this.$ajax('/jv/anonymous/qz/replays', { data: this.replyData })
         .then(res => {
           res.data.list.forEach(element => {
-            comment.replys.list.push(element);
-          });
-          comment.replys.paging.is_end = res.data.paging.is_end;
+            comment.replys.list.push(element)
+          })
+          comment.replys.paging.is_end = res.data.paging.is_end
           if (res.data.paging.is_end) {
-            this.options.pullUpLoad = false;
+            this.options.pullUpLoad = false
           }
         })
-        .catch();
+        .catch()
     },
     fetchMoreComments () {
-      this.pn++;
-      this.dynamicData.pn = this.pn;
-      let url = '';
+      this.pn++
+      this.dynamicData.pn = this.pn
+      let url = ''
       if (this.isArticle) {
-        url = '/jv/anonymous/qz/dynamicarticle';
+        url = '/jv/anonymous/qz/dynamicarticle'
       } else {
-        url = '/jv/anonymous/qz/dynamic';
+        url = '/jv/anonymous/qz/dynamic'
       }
       this.$ajax(url, { data: this.dynamicData })
         .then(res => {
           res.data.comment_list.forEach(element => {
-            this.dynamic.comment_list.push(element);
-          });
-          this.dynamic.paging.is_end = res.data.paging.is_end;
+            this.dynamic.comment_list.push(element)
+          })
+          this.dynamic.paging.is_end = res.data.paging.is_end
           if (res.data.paging.is_end) {
-            this.$refs.contentScroll.forceUpdate();
+            this.$refs.contentScroll.forceUpdate()
           }
         })
-        .catch();
+        .catch()
     },
     clickUser (uid) {
-      this.$router.push({ name: 'UserCenter', query: { user_id: uid } });
+      this.$router.push({ name: 'UserCenter', query: { user_id: uid } })
     },
     clickFollow (uid) {
       this.$ajax('/jv/user/follow', { data: this.followData })
         .then(res => {
-          this.dynamic.is_following = true;
-          this.$toast(res.msg ? res.msg : '关注成功', 2000, () => {});
+          this.dynamic.is_following = true
+          this.$toast(res.msg ? res.msg : '关注成功', 2000, () => {})
         })
-        .catch();
+        .catch()
     },
     clickActivity (id) {
-      this.$router.push({ name: 'ActivityDetail', query: { id: id } });
+      this.$router.push({ name: 'ActivityDetail', query: { id: id } })
     },
     showReplyActionSheet (comment, replyName = '', pid = '') {
       this.$createActionSheet({
@@ -320,28 +324,28 @@ export default {
                 params: {
                   comment: comment
                 }
-              });
+              })
             }
           }
         }
-      }).show();
+      }).show()
     },
     onScrollHandle (pos) {
-      let y = -pos.y;
+      let y = -pos.y
       if (y > window.innerHeight) {
-        this.scrollToTopVisible = true;
+        this.scrollToTopVisible = true
       } else {
-        this.scrollToTopVisible = false;
+        this.scrollToTopVisible = false
       }
     },
     previewImagesInArticle (index) {
       this.$previewImage.show({
         images: this.imageList,
         idx: index
-      });
+      })
     }
   }
-};
+}
 </script>
 
 <style src='../../common.css' />

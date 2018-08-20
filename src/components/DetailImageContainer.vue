@@ -14,26 +14,26 @@ export default {
   data () {
     return {
       winWidth: window.innerWidth
-    };
+    }
   },
   computed: {
     imageClassName: function () {
       if (this.images.length === 1) {
-        return 'one';
+        return 'one'
       } else if (this.images.length === 2 || this.images.length === 4) {
-        return 'two';
+        return 'two'
       } else {
-        return 'three';
+        return 'three'
       }
     }
   },
   methods: {
     previewImage (idx) {
-      let _images = this.images.map(item => item.url || item.localUrl);
-      this.$previewImage.show({ images: _images, idx }, this.previewCallBack);
+      let _images = this.images.map(item => item.url || item.localUrl)
+      this.$previewImage.show({ images: _images, idx }, this.previewCallBack)
     }
   }
-};
+}
 </script>
 <style lang="scss" type="text/scss" scoped>
 .one {

@@ -44,7 +44,7 @@ axios.interceptors.response.use(function (res) {
   }
   if (res.data.msg && res.data.error !== 0 && res.data.error !== '0') {
     if (res.config.dontToast !== true) {
-      toast(res.data.msg, 2000, () => { });
+      toast(res.data.msg, 2000, () => { })
     }
     return Promise.reject(res)
   }
