@@ -218,7 +218,6 @@ export default {
       },30)
     },
     onPullingUp () {
-      console.log('onPullingUp', this.tabs[0].paging)
       if (!(this.tabs[0].paging && this.tabs[0].paging.pn && !this.tabs[0].paging.is_end)) { // 未生成paging，或者paging.pn不存在，或者已是最后一页     终止操作
         return false
       }

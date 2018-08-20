@@ -101,56 +101,61 @@ Vue.use(TabBar)
 Vue.use(TabPanels)
 Vue.use(Slide)
 Vue.use(Sticky)
-const tabs = [
-  {
-    title: '动态',
-    data: [],
-    paging: {},
-    fetching: false
+
+const initialData = {
+  showBackTop: false,
+  circle: {
+    cover: {
+      compress: ''
+    }
   },
-  {
-    title: '活动',
-    data: [],
-    paging: {},
-    fetching: false
-  }
-]
+  tabs: [
+    {
+      title: '动态',
+      data: [],
+      paging: {},
+      fetching: false
+    },
+    {
+      title: '活动',
+      data: [],
+      paging: {},
+      fetching: false
+    }
+  ],
+  tabBarHeight: parseInt((window.innerWidth / 750) * 88),
+  selectedLabel: '动态',
+  selectedIdx: 0,
+  tabSlideX: -window.innerWidth + 'px',
+  options: {
+    pullDownRefresh: {
+      threshold: (window.innerWidth / 750) * 89,
+      stopTime: 0
+    },
+    pullUpLoad: {
+      threshold: (window.innerWidth / 750) * 100
+    },
+    probType: 3,
+    stopPropagation: true
+  },
+  previewInstance: null,
+  showTabbar: false,
+  showBanner: true
+}
 export default {
   data() {
     let selectedIdx = parseInt(this.$route.query.jump_tab || 0)
     let selectedLabel = (this.$route.query.jump_tab && this.$route.query.jump_tab.toString() === '1') ? '活动' : '动态'
-    return {
-      showBackTop: false,
-      circle: {
-        cover: {
-          compress: ''
-        }
-      },
-      tabs: tabs,
-      tabBarHeight: parseInt((window.innerWidth / 750) * 88),
-      selectedLabel: selectedLabel,
-      selectedIdx: selectedIdx,
-      tabSlideX: -window.innerWidth + 'px',
-      options: {
-        pullDownRefresh: {
-          threshold: (window.innerWidth / 750) * 89,
-          stopTime: 0
-        },
-        pullUpLoad: {
-          threshold: (window.innerWidth / 750) * 100
-        },
-        probType: 3,
-        stopPropagation: true
-      },
-      previewInstance: null,
-      showTabbar: false,
-      showBanner: true
-    }
+    let _initialData = JSON.parse(JSON.stringify(initialData))
+    let _obj = Object.assign({}, _initialData, {selectedIdx, selectedLabel})
+    return _obj
   },
   components: {DynamicItem, ActivityItem, DownloadBox, LoadingView, ScrollToTop},
   watch: {
-    'circle.id': function () {
-      console.log('this.tabs', this.tabs, this.selectedIdx, this.selectedLabel)
+    'circle.id': function (val, oldVal) {
+      if (!val) { // 如果circle的重置了，不一定存在id，置空时终止
+        return false
+      }
       if (this.$route.query.jump_tab && this.$route.query.jump_tab.toString() === '1') { // 有指定首先显示的tab则刷新该tab数据,否则默认刷新动态tab
         if (this.tabs[1]) {
           this.fetchActivity(1)
@@ -161,12 +166,15 @@ export default {
         this.fetchDynamic(1)
       }
     },
-    '$route.query.previewImage': function (val, oldVal) {
-      if (!val && oldVal) {
+    '$route.query': function (val, oldVal) {
+      if (!val.previewImage && oldVal.previewImage) { // 点击大图后返回
         if (this.previewInstance) {
           this.$previewImage.hide(this.previewInstance)
           this.previewInstance = null
         }
+      }
+      if (val.topic_id !== oldVal.topic_id || val.jump_tab !== oldVal.jump_tab) { // circle_id或jump_tab变化时重置数据
+        this.refreshData()
       }
     }
   },
@@ -240,6 +248,17 @@ export default {
           clearInterval(this.timer)
         }
       },30)
+    },
+    refreshData () {
+      let selectedIdx = parseInt(this.$route.query.jump_tab || 0)
+      let selectedLabel = (this.$route.query.jump_tab && this.$route.query.jump_tab.toString() === '1') ? '最热' : '最新'
+      let _initialData = JSON.parse(JSON.stringify(initialData))
+      let _obj = Object.assign({}, _initialData, {selectedIdx, selectedLabel})
+      for (let item in _obj) {
+        this[item] = _obj[item]
+      }
+      this.fetchCircle()
+      this.initSlideBlock()
     },
     fetchCircle () {
       let rData = {
@@ -418,9 +437,13 @@ export default {
     }
   },
   created () {
-    console.log('window.devicePixelRatio', window.devicePixelRatio)
     this.fetchCircle()
     this.initSlideBlock()
+  },
+  activated () {
+    utils.checkReloadWithKeepAlive(this, ['circle_id', 'jump_tab'], () => {
+      this.refreshData()
+    })
   }
 }
 </script>

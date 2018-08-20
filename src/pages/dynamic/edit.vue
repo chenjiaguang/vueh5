@@ -148,7 +148,7 @@ export default {
           let formData = new FormData()
           formData.append('file', files[i])
           this.$ajax('/jv/image/upload', {
-            token: 'lcaKiq5GIC_FHqubOBcI6FUKaL8N171U',
+            token: window.localStorage.token || '',
             contentType: 'multipart/form-data',
             data: formData,
             cancelToken: new CancelToken(function executor(cancel) {

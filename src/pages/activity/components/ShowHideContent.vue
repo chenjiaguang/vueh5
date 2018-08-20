@@ -133,7 +133,6 @@ export default {
       this.$nextTick(() => {
         let btnHeight = (84 / 750) * window.innerWidth
         let wrapperHeight = this.$refs['contentContainer'].offsetHeight
-        console.log('wrapperHeight', wrapperHeight, this.halfScreenHeight)
         if (wrapperHeight > this.halfScreenHeight) { // 大于半屏
           this.contentWrapperHeight = wrapperHeight + btnHeight
         }

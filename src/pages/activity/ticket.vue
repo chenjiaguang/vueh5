@@ -88,7 +88,6 @@ import Vue from 'vue';
         this.showWeixinTip = !this.showWeixinTip
       },
       downloadIamge (name) {
-        console.log('触发了保存')
         let image = new Image()
         // 解决跨域 Canvas 污染问题
         image.setAttribute('crossOrigin', 'anonymous')
@@ -127,7 +126,6 @@ import Vue from 'vue';
         if (res && Boolean(res.error) && res.msg) {
           this.$toast(res.msg)
         } else if (res && !Boolean(res.error)) {
-          console.log('获取成功', res)
           this.codeImage = res.data.QRCode
           this.ticket.downloadImage = res.data.ticket_image
           this.ticket.statusText = res.data.state_text

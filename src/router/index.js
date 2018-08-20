@@ -12,7 +12,6 @@ import ActivityTicket from '@/pages/activity/ticket'
 import MapPage from '@/pages/mapPage'
 import Agreement from '@/pages/agreement'
 import UserCenter from '@/pages/user/center'
-import TestImageContainer from '@/pages/testImageContainer'
 import EditDynamic from '@/pages/dynamic/edit'
 import EditDynamicRange from '@/pages/dynamic/chooseRange'
 import DynamicDetail from '@/pages/dynamic/detail'
@@ -43,7 +42,8 @@ const router = new Router({
       name: 'ActivityDetail',
       component: ActivityDetail,
       meta: {
-        title: '范团活动'
+        title: '范团活动',
+        keepAlive: true
       }
     },
     {
@@ -51,7 +51,8 @@ const router = new Router({
       name: 'ActivityDynamic',
       component: ActivityDynamic,
       meta: {
-        title: '大家都在晒'
+        title: '大家都在晒',
+        keepAlive: true
       }
     },
     {
@@ -100,14 +101,6 @@ const router = new Router({
       component: Agreement,
       meta: {
         title: ''
-      }
-    },
-    {
-      path: prefix + '/test/image',
-      name: 'TestImageContainer',
-      component: TestImageContainer,
-      meta: {
-        title: '图片测试'
       }
     },
     {
@@ -188,7 +181,6 @@ const router = new Router({
 
 router.beforeEach((to, from, next) => {
   /* 路由发生变化修改页面title */
-  console.log('beforeEach')
   if (to.meta.title) {
     let i = document.createElement('iframe');
     i.src = 'https://www.baidu.com/favicon.ico';

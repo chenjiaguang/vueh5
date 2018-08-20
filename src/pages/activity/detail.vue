@@ -421,7 +421,6 @@ export default {
       })
     },
     goMap (option) { // option: lng, lat, title
-      console.log('goMap', option)
       if (!option.lng || !option.lat) { // 未传入经纬度则返回
         return false
       }
