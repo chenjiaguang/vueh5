@@ -258,6 +258,7 @@
 <script>
 import ImageContainer from '../../../components/ImageContainer'
 import ShowHideContent from './ShowHideContent'
+import utils from '@/lib/utils'
 import {
   Style,
   Button
@@ -288,10 +289,15 @@ export default {
   },
   methods: {
     changeLike () {
+      if (this.itemData.submitting) {
+        return false
+      }
       this.$emit('changeLike', this.itemData)
     },
     addComment () {
-      this.router.push({name: 'DynamicSendComment', query:{dy_id: this.itemData.id}, params: {dynamic: this.itemData}})
+      if (utils.checkLogin()) {
+        this.router.push({name: 'DynamicSendComment', query:{dy_id: this.itemData.id}, params: {dynamic: this.itemData}})
+      }
     },
     goDynamic () {
       this.router.push({ name: 'DynamicDetail', query: { id: this.itemData.id, isArticle: this.itemData.type.toString() === '18' ? true : false } })
