@@ -76,6 +76,11 @@ export default {
     }
     document.title = this.texts.title;
   },
+  destroyed () {
+    if (this.sendBtnTimer) {
+      clearInterval(this.sendBtnTimer);
+    }
+  },
   methods: {
     sendCode () {
       if (this.sendBtnTime <= 0) {
@@ -93,6 +98,7 @@ export default {
             this.sendBtnTime = 60;
             this.sendBtnText = `重新获取(${this.sendBtnTime})`;
             this.sendBtnTimer = setInterval(() => {
+              console.log('setInterval');
               this.sendBtnTime--;
               this.sendBtnText = `重新获取(${this.sendBtnTime})`;
               if (this.sendBtnTime === 0) {
