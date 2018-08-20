@@ -47,12 +47,15 @@
             </div>
             <div class="user-info-item clearfix">
               <div class="user-left fl"><i class="require-icon iconfont icon-xinghao"></i>手机</div>
-              <input class="phone-input fl" type="number" v-model="form.userInfo.phone" />
-              <div class="get-code-btn fl" :class="{'get-code-btn-disabled': disabledSend}" @click="!disabledSend && sendCode()">{{btnText}}</div>
+              <input class="user-full-input fl" type="number" v-model="form.userInfo.phone" />
             </div>
-            <div class="user-info-item clearfix">
+            <!-- <div class="user-info-item clearfix">
               <div class="user-left fl"><i class="require-icon iconfont icon-xinghao"></i>验证码</div>
               <input class="user-full-input fl" type="number" v-model="form.userInfo.code" />
+            </div> -->
+            <div class="user-info-item clearfix" v-if="form.userInfo.needWeChat">
+              <div class="user-left fl"><i class="require-icon iconfont icon-xinghao"></i>微信号</div>
+              <input class="user-full-input fl" type="number" v-model="form.userInfo.weChat" />
             </div>
             <div class="user-info-item clearfix" v-if="form.userInfo.needIdCard">
               <div class="user-left fl"><i class="require-icon iconfont icon-xinghao"></i>身份证号</div>
@@ -454,6 +457,7 @@
 
 <script>
   import '@/iconfont/iconfont.css'
+  import utils from '@/lib/utils'
   export default {
     name: 'ActivityDetail',
     data () {
@@ -473,10 +477,12 @@
             needName: false,
             needIdCard: false,
             needSex: false,
+            needWeChat: false,
             name: '',
             phone: '',
             code: '',
             idCard: '',
+            weChat: '',
             sex: 0 // 0表示未选，1表示男，2表示女
           },
           payWay: 1, // 1表示微信支付，2表示支付宝支付     如果微信内则微信支付，否则支付宝支付:this.$browserUA.isWeixin() ? 1 : 2
@@ -522,6 +528,7 @@
           this.form.userInfo.needName = res.data.nead_name
           this.form.userInfo.needIdCard = res.data.nead_idcard
           this.form.userInfo.needSex = res.data.nead_sex
+          this.form.userInfo.needWeChat = res.data.need_wechat
         }).catch(err => {
           console.log('获取数据失败')
         })
@@ -607,32 +614,35 @@
       goAgreement () {
         this.$router.push({path: '/agreement', query: {type: 'activity'}})
       },
-      orderPay (res, successCallback) {
-        if (this.$browserUA.isWeixin()) { // 微信内置浏览器内
-          this.publicAccountPay(res, successCallback)
-        } else {
-          this.otherWebPay(res, successCallback)
-        }
-      },
-      otherWebPay (res, successCallback) { // 微信外支付
-        successCallback && successCallback()
-      },
-      publicAccountPay (res, successCallback) { // 微信内支付
-        successCallback && successCallback()
-      },
-      completeOrder () { // 完成订单
-        console.log('完成订单')
-      },
+      // orderPay (res, successCallback) {
+      //   if (this.$browserUA.isWeixin()) { // 微信内置浏览器内
+      //     this.publicAccountPay(res, successCallback)
+      //   } else {
+      //     this.otherWebPay(res, successCallback)
+      //   }
+      // },
+      // otherWebPay (res, successCallback) { // 微信外支付
+      //   successCallback && successCallback()
+      // },
+      // publicAccountPay (res, successCallback) { // 微信内支付
+      //   successCallback && successCallback()
+      // },
+      // completeOrder () { // 完成订单
+      //   console.log('完成订单')
+      // },
       orderSubmit () { // 验证并提交订单
+        if (!utils.checkLogin()) { // 未登陆终止
+          return false
+        }
         let {selectedTicket} = this
         let {payWay, agreement, shouldPay} = this.form
         let {id} = this.activity
-        let {name, needName, phone, code, idCard, needIdCard, sex, needSex} = this.form.userInfo
+        let {name, needName, phone, code, idCard, needIdCard, weChat, needWeChat, sex, needSex} = this.form.userInfo
         let toastObject = {
           selectedTicket: !selectedTicket && '请选择购买的票',
           name: !name && needName && '请输入正确的姓名',
           phone: !phone && '请输入正确的手机号码',
-          code: !code && '请输入正确的验证码',
+          weChat: !weChat && needWeChat && '请输入正确的微信号',
           idCard: !idCard && needIdCard && '请输入正确的身份证号',
           sex: (!sex || sex.toString() === '0') && needSex && '请选择你的性别'
         }
@@ -655,8 +665,8 @@
           name: name,
           sex: sex,
           idCard: idCard,
-          phone: phone,
-          phoneCode: code
+          wechat: weChat,
+          phone: phone
         }
         this.submitting = true
         this.$ajax('/jv/anonymous/qz/v21/apply', {data: rData}).then(res => { // 请求后端下单接口,接受返回参数,如果有error,则提示，无error，则判断是否应调起支付

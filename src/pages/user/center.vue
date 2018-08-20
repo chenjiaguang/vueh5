@@ -55,6 +55,7 @@ import Vue from 'vue'
 import DownloadBox from '../../components/DownloadBox'
 import DynamicItem from './components/DynamicItem'
 import ScrollToTop from '@/components/ScrollToTop'
+import utils from '@/lib/utils'
 import {
     /* eslint-disable no-unused-vars */
     Style,
@@ -170,7 +171,6 @@ export default {
       let _type = tabIdx === 0 ? 1 : 2
       let rData = { // type  1,动态  2,文章
         id: this.$route.query.user_id,
-        token: 'lcaKiq5GIC_FHqubOBcI6FUKaL8N171U',
         type: _type,
         pn: pn,
         snapshot: this.tabs[tabIdx].paging.snapshot || '',
@@ -178,7 +178,7 @@ export default {
         lastYear: ''
       }
       this.tabs[tabIdx].fetching = true
-      this.$ajax('/jv/user/social', {data: rData}).then(res => {
+      this.$ajax('/jv/anonymous/user/social', {data: rData}).then(res => {
         if (res && res.msg) {
           this.$toast(res.msg)
         }
@@ -226,8 +226,10 @@ export default {
       this.fetchList(0, pn)
     },
     changeLike (item) {
+      if (!utils.checkLogin()) {
+        return false
+      }
       let rData = {
-        token: 'lcaKiq5GIC_FHqubOBcI6FUKaL8N171U',
         id: item.id,
         like: !item.has_like,
         type: 0
@@ -272,11 +274,10 @@ export default {
       }
     },
     changeFollow () {
-      if (this.following) { // 关注/取关接口不允许多次调用
+      if (this.following || !utils.checkLogin()) { // 关注/取关接口不允许多次调用,未登陆先跳登陆
         return false
       }
       let rData = {
-        token: 'lcaKiq5GIC_FHqubOBcI6FUKaL8N171U',
         follow: this.user.is_following ? 0 : 1,
         following_id: this.user.id
       }

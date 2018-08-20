@@ -78,6 +78,7 @@
 import imageContainer from '@/components/ImageContainer'
 import EditOption from './components/EditOption'
 import axios from 'axios'
+import utils from '@/lib/utils'
 
 // 接受参数(params) topic: [{id: 2, title: '测试话题'}]    activity: {id: 2, title: '屯昌木色湖一日游'}    circle: {id: 2, title: '舌尖上的海口'}    range: 0||1|2  
 export default {
@@ -233,6 +234,9 @@ export default {
       this.$router.push({name: 'EditDynamicRange', query: {selected: this.range}})
     },
     submitDynamic () {
+      if (!utils.checkLogin()) {
+        return false
+      }
       let flat = false // 标记是否可提交,false可提交
       let content = ''
       let image_ids = ''
@@ -276,7 +280,6 @@ export default {
         return false
       }
       let rData = {
-        token: 'lcaKiq5GIC_FHqubOBcI6FUKaL8N171U',
         content: content,
         image_ids: image_ids,
         range: this.range || '',

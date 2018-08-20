@@ -79,6 +79,7 @@ import TopicItem from './components/TopicItem'
 import DownloadBox from '../../components/DownloadBox'
 import LoadingView from '@/components/LoadingView'
 import ScrollToTop from '@/components/ScrollToTop'
+import utils from '@/lib/utils'
 import {
     /* eslint-disable no-unused-vars */
     Style,
@@ -228,11 +229,10 @@ export default {
         limit: 20,
         topicId: this.$route.query.topic_id,
         snapshot: this.tabs[idx].paging.snapshot || '',
-        token: 'lcaKiq5GIC_FHqubOBcI6FUKaL8N171U',
         type: idx
       }
       this.tabs[idx].fetching = true
-      this.$ajax('/jv/qz/topic/find', {data: rData}).then(res => { // 获取动态列表
+      this.$ajax('/jv/anonymous/qz/topic/find', {data: rData}).then(res => { // 获取动态列表
         if (res && res.msg) {
           this.$toast(res.msg)
         }
@@ -269,8 +269,10 @@ export default {
       this.fetchTopic(idx, pn)
     },
     changeLike (item, idx) {
+      if (!utils.checkLogin()) {
+        return false
+      }
       let rData = {
-        token: 'lcaKiq5GIC_FHqubOBcI6FUKaL8N171U',
         id: item.id,
         like: !item.has_like,
         type: 0
@@ -330,7 +332,9 @@ export default {
       }
     },
     goPublish () {
-      this.$router.push({name: 'EditDynamic', params: {topic: [{id: this.topicInfo.id, title: this.topicInfo.title}]}})
+      if (utils.checkLogin()) {
+        this.$router.push({name: 'EditDynamic', params: {topic: [{id: this.topicInfo.id, title: this.topicInfo.title}]}})
+      }
     }
   },
   created () {

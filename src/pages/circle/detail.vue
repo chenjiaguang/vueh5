@@ -84,6 +84,7 @@ import ActivityItem from './components/ActivityItem'
 import DownloadBox from '../../components/DownloadBox'
 import LoadingView from '@/components/LoadingView'
 import ScrollToTop from '@/components/ScrollToTop'
+import utils from '@/lib/utils'
 import {
     /* eslint-disable no-unused-vars */
     Style,
@@ -354,8 +355,10 @@ export default {
       }
     },
     changeLike (item) {
+      if (!utils.checkLogin()) { // 未登陆终止
+        return false
+      }
       let rData = {
-        token: 'lcaKiq5GIC_FHqubOBcI6FUKaL8N171U',
         id: item.id,
         like: !item.has_like,
         type: 0
@@ -409,7 +412,9 @@ export default {
       }
     },
     goPublish () {
-      this.$router.push({name: 'EditDynamic', params: {circle: {id: this.circle.id, title: this.circle.name}}})
+      if (utils.checkLogin()) { // 登陆后跳转
+        this.$router.push({name: 'EditDynamic', params: {circle: {id: this.circle.id, title: this.circle.name}}})
+      }
     }
   },
   created () {

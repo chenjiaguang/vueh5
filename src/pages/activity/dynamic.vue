@@ -33,6 +33,7 @@ import DynamicItem from './components/DynamicItem'
 import DownloadBox from '@/components/DownloadBox'
 import LoadingView from '@/components/LoadingView'
 import ScrollToTop from '@/components/ScrollToTop'
+import utils from '@/lib/utils'
 import {
     /* eslint-disable no-unused-vars */
     Style,
@@ -85,11 +86,10 @@ export default {
         pn: pn,
         limit: 10,
         id: this.$route.query.activity_id,
-        snapshot: this.paging.snapshot || '',
-        token: 'lcaKiq5GIC_FHqubOBcI6FUKaL8N171U'
+        snapshot: this.paging.snapshot || ''
       }
       this.fetching = true
-      this.$ajax('/jv/qz/v21/activitydynamics', {data: rData}).then(res => { // 获取动态列表
+      this.$ajax('/jv/anonymous/qz/v21/activitydynamics', {data: rData}).then(res => { // 获取动态列表
         if (res && res.msg) {
           this.$toast(res.msg)
         }
@@ -121,8 +121,10 @@ export default {
       this.fetchDynamic(pn)
     },
     changeLike (item) {
+      if (!utils.checkLogin()) {
+        return false
+      }
       let rData = {
-        token: 'lcaKiq5GIC_FHqubOBcI6FUKaL8N171U',
         id: item.id,
         like: !item.has_like,
         type: 0

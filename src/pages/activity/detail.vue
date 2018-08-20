@@ -331,6 +331,7 @@
 <script>
 import '@/iconfont/iconfont.css'
 import ShowHideContent from './components/ShowHideContent'
+import utils from '@/lib/utils'
 export default {
   name: 'ActivityDetail',
   data () {
@@ -427,13 +428,15 @@ export default {
       this.$router.push({name: 'mapPage', query: { lng: option.lng, lat: option.lat, title: option.title || '' }})
     },
     goPublish () {
-      this.$router.push({name: 'EditDynamic', params: {activity: {id: this.activity.id, title: this.activity.title}}})
+      if (utils.checkLogin()) {
+        this.$router.push({name: 'EditDynamic', params: {activity: {id: this.activity.id, title: this.activity.title}}})
+      }
     },
     goDynamicList () {
       this.$router.push({name: 'ActivityDynamic', query: {activity_id: this.activity.id}})
     },
     goOrder () {
-      if (this.activity.statusText !== '购票') {
+      if (this.activity.statusText !== '购票' || !utils.checkLogin()) { // 未登陆或不可购票时终止
         return false
       }
       this.$router.push({name: 'ActivityOrder', query: {id: this.$route.query.id}})
