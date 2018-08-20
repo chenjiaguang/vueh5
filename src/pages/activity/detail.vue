@@ -32,16 +32,6 @@
         <div class="fl tag-item" v-for="(item, idx) in activity.tags" :key="idx">{{item}}<div class="tag-border"></div></div>
       </div>
       <show-hide-content :content="activity.content" v-if="activity.content && activity.content.length > 0" />
-      <!-- <div ref="contentContainer" class="content-container" v-if="activity.content && activity.content.length > 0">
-        <div ref="contentHeader" class="header">活动介绍</div>
-        <div ref="contentContext" class="content-context">
-          <template v-for="(item, idx) in activity.content">
-            <p :key="idx" v-if="item.type === '1'">{{item.content}}</p>
-            <img :key="idx" v-else-if="item.type === '2'" :src="item.content.image" />
-          </template>
-        </div>
-        <div v-if="contentWrapperHeight && contentWrapperHeight > halfScreenHeight" ref="contentBtn" class="show-hide-btn" @click="changeShowContext"><span class="show-hide-text">{{showMore ? '收起' : '查看更多图文详情'}}<i class="pull-sign iconfont icon-pull_down" :style="{transform: showMore ? 'scale(0.25) rotate(180deg)' : 'scale(0.25) rotate(0)'}"></i></span></div>
-      </div> -->
     </div>
     <div class="join-wrapper" v-if="activity.join && activity.join.length > 0">
       <div class="color-block"></div>
@@ -50,7 +40,38 @@
         <div class="join-avatar fl" v-for="(item, idx) in activity.join" :key="idx" :style="{backgroundImage: 'url(' + item.avatar + ')'}"></div>
       </div>
     </div>
-    <div @click="goOrder" class="fixed-button" :style="{backgroundColor: activity.statusText === '购票' ? '#ff3f53' : '#bbbbbb'}">{{activity.statusText}}</div>
+    <div class="dynamic-wrapper" v-if="activity.activityHasDynamic">
+      <div @click.stop="goDynamicList" class="dynamic-header clearfix">
+        <div class="fl">大家都在晒</div>
+        <div class="more-dynamic-text fr">更多<i class="iconfont icon-next more-dynamic-icon"></i></div>
+      </div>
+      <div class="dynamic-images clearfix">
+        <div class="top-border"></div>
+        <div class="bottom-border"></div>
+        <div class="dynamic-image-item fl" v-for="(item, idx) in activity.activityDynamic" :key="idx" :style="{backgroundImage: 'url(' + item.compress + ')'}"></div>
+        <div @click.stop="goPublish" class="dynamic-image-item fl">
+          <div class="dynamic-btn">
+            <i class="iconfont icon-camera1 dynamic-btn-icon"></i>
+            <div class="dynamic-btn-text">晒美照</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="fixed-button clearfix">
+      <a v-if="activity.sponsor.tel" class="tel-btn fl" :href="'tel:' + activity.sponsor.tel" :style="{width: '26.66%'}">
+        <div class="tel-btn-content">
+           <i class="iconfont icon-phone-w tel-btn-icon"></i>
+          <div>电话咨询</div>
+        </div>
+      </a>
+      <div @click.stop="goPublish" v-if="activity.activityHasDynamic" class="go-dynamic-btn fl" :style="{width: '26.66%'}">
+        <div class="go-dynamic-btn-content">
+          <i class="iconfont icon-camera-w go-dynamic-btn-icon"></i>
+          <div>晒图</div>
+        </div>
+      </div>
+      <div @click="goOrder" class="order-btn fl" :style="{backgroundColor: activity.statusText === '购票' ? '#ff3f53' : '#bbbbbb', width: (activity.sponsor.tel && activity.activityHasDynamic) ? '46.68%' : (activity.sponsor.tel || activity.activityHasDynamic ? '73.34%' : '100%')}">{{activity.statusText}}</div>
+    </div>
   </div>
 </template>
 
@@ -154,15 +175,15 @@
     z-index: 0;
   }
   .join-partner{
-    padding: 30px 23px 25px;
+    padding: 20px 19px 25px;
   }
   .join-avatar{
-    width: 42px;
-    height: 42px;
+    width: 60px;
+    height: 60px;
     background-position: center;
     background-size: cover;
     background-repeat: no-repeat;
-    margin: 5px 11px;
+    margin: 15px;
     border-radius: 50%;
   }
   .color-block{
@@ -176,10 +197,77 @@
     padding-top: 55px;
     padding-left: 34px;
   }
+  .dynamic-header{
+    font-size: 32px;
+    line-height: 42px;
+    font-weight: 600;
+    padding-top: 20px;
+    padding-left: 34px;
+  }
+  .more-dynamic-text{
+    font-size: 28px;
+    font-weight: normal;
+    padding-right: 30px;
+    color: #666;
+  }
+  .more-dynamic-icon{
+    font-size: 24px;
+    color: #666;
+  }
+  .dynamic-images{
+    position: relative;
+    margin: 35px 24px 25px;
+  }
+  .dynamic-image-item{
+    width: 22.08%;
+    height: 155px;
+    margin: 20px 1.46%;
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-color: #F4F4F4;
+    font-size: 24px;
+    line-height: 40px;
+    text-align: center;
+    color: #999;
+    position: relative;
+  }
+  .dynamic-btn{
+    position: absolute;
+    width: 100%;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+  .dynamic-btn-icon{
+    font-size: 48px;
+    line-height: 60px;
+    color: #999;
+  }
+  .top-border{
+    position: absolute;
+    top: 0;
+    left: 10px;
+    width: 690px;
+    height: 2px;
+    transform: scale(1, 0.5);
+    transform-origin: 0 0;
+    background: #E5E5E5;
+  }
+  .bottom-border{
+    position: absolute;
+    bottom: 0;
+    left: 10px;
+    width: 690px;
+    height: 2px;
+    transform: scale(1, 0.5);
+    transform-origin: 0 100%;
+    background: #E5E5E5;
+  }
   .fixed-button{
     height: 100px;
     width: 100%;
-    background-color: #ff3f53;
+    background-color: #fff;
     font-size: 30px;
     color: #fff;
     font-weight: 600;
@@ -188,6 +276,55 @@
     position: fixed;
     left: 0;
     bottom: 0;
+  }
+  .fixed-button:before{
+    content: "";
+    display: block;
+    width: 100%;
+    height: 2px;
+    position: absolute;
+    left: 0;
+    top: 0;
+    background: #CBCBCB;
+    transform: scale(1, 0.5);
+    transform-origin: 0 0;
+    z-index: 0;
+  }
+  .tel-btn, .go-dynamic-btn{
+    display: block;
+    font-size: 24px;
+    line-height: 30px;
+    color: #666;
+    text-align: center;
+    position: relative;
+    height: 100%;
+    z-index: 1;
+  }
+  .order-btn{
+    position: relative;
+    height: 100%;
+    z-index: 1;
+  }
+  .go-dynamic-btn:before{
+    content: "";
+    display: block;
+    width: 2px;
+    height: 60px;
+    background: #E1E1E1;
+    position: absolute;
+    left: 0;
+    top: 20px;
+  }
+  .tel-btn-content, .go-dynamic-btn-content{
+    position: absolute;
+    width: 100%;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+  .tel-btn-icon, .go-dynamic-btn-icon{
+    font-size: 34px;
+    line-height: 40px;
   }
 </style>
 
@@ -221,6 +358,8 @@ export default {
         tags: [],
         joinTotal: 0,
         join: [],
+        activityHasDynamic: false,
+        activityDynamic: [],
         statusText: '',
         ticket: []
       },
@@ -265,6 +404,8 @@ export default {
         })
         this.activity.joinTotal = res.data.joined_total
         this.activity.join = res.data.joined_users
+        this.activity.activityHasDynamic = res.data.activity_has_dynamic
+        this.activity.activityDynamic = res.data.activity_images.filter((item, idx) => idx < 3)
         this.activity.statusText = res.data.status_text
         let tagsArr = []
         if (res.data.insurance) {
@@ -284,6 +425,12 @@ export default {
         return false
       }
       this.$router.push({name: 'mapPage', query: { lng: option.lng, lat: option.lat, title: option.title || '' }})
+    },
+    goPublish () {
+      this.$router.push({name: 'EditDynamic', params: {activity: {id: this.activity.id, title: this.activity.title}}})
+    },
+    goDynamicList () {
+      this.$router.push({name: 'ActivityDynamic', query: {activity_id: this.activity.id}})
     },
     goOrder () {
       if (this.activity.statusText !== '购票') {

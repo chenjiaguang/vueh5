@@ -5,12 +5,13 @@ axios.defaults.method = 'post'
 axios.interceptors.request.use(function (config) {
   if (!config.data) config.data = {}
   // 在发送请求之前做些什么
-  window.localStorage.token = 'c46bb5b5d0f54013bcdf75a6ebf967b1'
+  // window.localStorage.token = 'c46bb5b5d0f54013bcdf75a6ebf967b1'
   if (config.data instanceof FormData) {
     config.data.append('token', config.data.token || window.localStorage.token || '')
   } else {
     config.data = JSON.parse(JSON.stringify(config.data))
     config.data.token = config.data.token || window.localStorage.token || ''
+    config.data.origin = 'H5'
   }
   if (config.token || config.data.token) { // 如果传入了token，将token放入headers中
     config.headers.token = config.token || config.data.token

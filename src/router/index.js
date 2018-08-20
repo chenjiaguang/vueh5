@@ -4,6 +4,7 @@ import NotFoundPage from '@/pages/notFoundPage'
 import Home from '@/pages/home'
 import CircleDetail from '@/pages/circle/detail'
 import ActivityDetail from '@/pages/activity/detail'
+import ActivityDynamic from '@/pages/activity/dynamic'
 import ActivityOrder from '@/pages/activity/order'
 import WebPay from '@/pages/activity/webPay'
 import ActivitySuccess from '@/pages/activity/success'
@@ -43,6 +44,14 @@ const router = new Router({
       component: ActivityDetail,
       meta: {
         title: '范团活动'
+      }
+    },
+    {
+      path: prefix + '/activity/dynamic',
+      name: 'ActivityDynamic',
+      component: ActivityDynamic,
+      meta: {
+        title: '大家都在晒'
       }
     },
     {
