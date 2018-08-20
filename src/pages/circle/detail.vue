@@ -242,10 +242,9 @@ export default {
     },
     fetchCircle () {
       let rData = {
-        cid: this.$route.query.circle_id,
-        token: 'lcaKiq5GIC_FHqubOBcI6FUKaL8N171U'
+        cid: this.$route.query.circle_id
       }
-      this.$ajax('/jv/qz/v21/circleinfo', {data: rData}).then(res => {
+      this.$ajax('/jv/anonymous/qz/v21/circleinfo', {data: rData}).then(res => {
         if (res && res.msg) {
           this.$toast(res.msg)
         }
@@ -274,11 +273,10 @@ export default {
         pn: pn,
         limit: 20,
         cid: this.circle.id,
-        snapshot: this.tabs[0].paging.snapshot || '',
-        token: 'lcaKiq5GIC_FHqubOBcI6FUKaL8N171U'
+        snapshot: this.tabs[0].paging.snapshot || ''
       }
       this.tabs[0].fetching = true
-      this.$ajax('/jv/qz/v21/circledynamics', {data: rData}).then(res => { // 获取动态列表
+      this.$ajax('/jv/anonymous/qz/v21/circledynamics', {data: rData}).then(res => { // 获取动态列表
         if (res && res.msg) {
           this.$toast(res.msg)
         }
@@ -287,7 +285,6 @@ export default {
           this.tabs[0].paging = res.data.paging
           if (pn.toString() === '1') { // 刷新
             this.tabs[0].data = res.data.list
-            this.tabs[0].data[2].title = '收到了饭就水电费圣诞快乐风景阿斯顿了深刻理解水电费阿莱克斯的肌肤拉丝粉就撒了肯德基发牢骚的咖啡机拉上看的风景 离开手机地方沙拉发生撒开了发动机阿酸辣粉就阿三分，水电费家阿三分阿酸辣粉多久 ，。水电费 拉丝粉  阿斯顿 死了快递费就阿酸辣粉就是垃圾发电 三分短裤三闾大夫就撒的发了几 。'
           } else {
             this.tabs[0].data = this.tabs[0].data.concat(res.data.list)
           }
@@ -311,11 +308,10 @@ export default {
         pn: pn,
         limit: 20,
         cid: this.circle.id,
-        snapshot: this.tabs[1].paging.snapshot || '',
-        token: 'lcaKiq5GIC_FHqubOBcI6FUKaL8N171U'
+        snapshot: this.tabs[1].paging.snapshot || ''
       }
       this.tabs[1].fetching = true
-      this.$ajax('/jv/qz/v21/circleactivities', {data: rData}).then(res => { // 获取活动列表
+      this.$ajax('/jv/anonymous/qz/v21/circleactivities', {data: rData}).then(res => { // 获取活动列表
         if (res && res.msg) {
           this.$toast(res.msg)
         }

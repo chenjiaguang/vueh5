@@ -21,6 +21,7 @@ axios.interceptors.request.use(function (config) {
   } else {
     config.data = JSON.parse(JSON.stringify(config.data))
     config.data.token = config.data.token || window.localStorage.token || ''
+    config.data.origin = 'H5'
   }
   if (config.token || config.data.token) { // 如果传入了token，将token放入headers中
     config.headers.token = config.token || config.data.token
