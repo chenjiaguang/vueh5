@@ -1,8 +1,18 @@
 import axios from 'axios'
 import toast from '../components/toast'
+import utils from './utils'
 
+// config自定义参数:
+// dontToast:bool:不显示默认的错误toast
+// checkLogin:bool:检查登陆
 axios.defaults.method = 'post'
+const loginText = '请登录'
 axios.interceptors.request.use(function (config) {
+  if (config.checkLogin) {
+    if (!utils.checkLogin()) {
+      return Promise.reject(loginText)
+    }
+  }
   if (!config.data) config.data = {}
   // 在发送请求之前做些什么
   // window.localStorage.token = 'c46bb5b5d0f54013bcdf75a6ebf967b1'
@@ -27,12 +37,14 @@ axios.interceptors.request.use(function (config) {
 axios.interceptors.response.use(function (res) {
   // 对响应数据做点什么
   // 如果返回403错误，则清空登录状态
-  if (res.data.error && res.data.error.toString() === '403') {
+  if (res.data.error && (res.data.error.toString() === '403' || res.data.error.toString() === '401')) {
     window.localStorage.token = ''
+    utils.checkLogin()
+    return Promise.reject(loginText)
   }
   if (res.data.msg && res.data.error !== 0 && res.data.error !== '0') {
     if (res.config.dontToast !== true) {
-      toast(res.data.msg, 2000, () => {});
+      toast(res.data.msg, 2000, () => { });
     }
     return Promise.reject(res)
   }

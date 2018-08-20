@@ -145,6 +145,7 @@ import DynamicFixedBox from '../../components/DynamicFixedBox';
 import ScrollToTop from '../../components/ScrollToTop';
 import TopicTagBox from '../../components/TopicTagBox';
 import DetailImageContainer from '../../components/DetailImageContainer';
+import utils from '../../lib/utils';
 import NotFoundPage from '../notFoundPage';
 import { Scroll, ActionSheet } from 'cube-ui';
 Vue.use(Scroll);
@@ -175,15 +176,22 @@ export default {
     DetailImageContainer,
     NotFoundPage
   },
+  beforeRouteEnter (to, from, next) {
+    if (to.query.isArticle && to.query.isArticle !== 'false') {
+      utils.beforeRouteEnterHandleShareOpen(to, from, next, 4);
+    } else {
+      utils.beforeRouteEnterHandleShareOpen(to, from, next, 3);
+    }
+  },
   mounted () {
     this.fetch();
   },
   activated () {
     if (!this._refreshId) {
-      this._refreshId = this.$route.query.id
+      this._refreshId = this.$route.query.id;
     }
     if (this._refreshId !== this.$route.query.id) {
-      this._refreshId = this.$route.query.id
+      this._refreshId = this.$route.query.id;
       this.dynamic = null;
       this.isLoad = false;
       this.fetch();
@@ -247,7 +255,7 @@ export default {
       this.replyData.commentId = comment.id;
       comment.pn = comment.pn ? comment.pn + 1 : 2;
       this.replyData.pn = comment.pn;
-      this.$ajax('/jv/qz/replays', { data: this.replyData })
+      this.$ajax('/jv/anonymous/qz/replays', { data: this.replyData })
         .then(res => {
           res.data.list.forEach(element => {
             comment.replys.list.push(element);
@@ -616,6 +624,7 @@ export default {
   font-size: 30px;
   line-height: 42px;
   margin-bottom: 14px;
+  word-break: break-all;
 }
 .comment-time {
   color: #999999;
@@ -630,6 +639,7 @@ export default {
   padding-right: 24px;
   background-color: #f6f6f6;
   border-radius: 4px;
+  word-break: break-all;
 }
 .reply-box {
   background-color: transparent;
