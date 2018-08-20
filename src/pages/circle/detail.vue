@@ -1,6 +1,6 @@
 <template>
-  <div :style="{height: winHeight + 'px'}">
-    <cube-scroll class="toutiao" ref="pageScroller" :scrollEvents="['scroll']" :options="{bounce: false}">
+  <div :style="{height: $winHeight + 'px'}">
+    <cube-scroll class="toutiao" ref="pageScroller" :options="{bounce: false}">
       <div ref="topBanner">
         <download-box />
         <header class="top-header">
@@ -18,7 +18,7 @@
           </div>
         </header>
       </div>
-      <div ref="innerWrapper" class="scroll-wrapper" :style="{height: winHeight + 'px'}">
+      <div ref="innerWrapper" class="scroll-wrapper" :style="{height: $winHeight + 'px'}">
         <div class="nav-scroll-list-wrap" ref="navWrapper" :style="{height: tabBarHeight + 'px'}" v-if="tabs && tabs.length > 1 && showTabbar">
           <cube-tab-bar v-model="selectedLabel" class="tab-box" @change="changeTabBar" :style="{height: tabBarHeight + 'px'}">
             <cube-tab v-for="(item) in tabs" ref="tabItem" :label="item.title" :key="item.title">
@@ -27,11 +27,11 @@
           <div class="tab-slider">
             <div class="tab-slider-body" :style="{transform: 'translateX(' + tabSlideX + ')'}"></div>
           </div>
-          <div class="tab-border"></div>
+          <div class="tab-border" :style="{transform: 'scale(1,' + $tranScale + ')'}"></div>
         </div>
-        <div class="tabs-wrapper" ref="slideWrapper" :style="{height: (winHeight - ((tabs && tabs.length) > 1 ? tabBarHeight : 0)) + 'px'}">
-          <cube-slide ref="slideInstance" :data="tabs" :initialIndex="selectedIdx" :autoPlay="false" :allow-vertical="false" :refreshResetCurrent="true" :loop="false" :speed="500" :options="{listenScroll: true, probeType: 3, stopPropagation: true}" @change="changeSlide" @scroll="slideScroll">
-            <cube-slide-item v-for="(item, index) in tabs" :key="item.title" :style="{height: (winHeight - ((tabs && tabs.length) > 1 ? tabBarHeight : 0)) + 'px'}">
+        <div class="tabs-wrapper" ref="slideWrapper" :style="{height: ($winHeight - ((tabs && tabs.length) > 1 ? tabBarHeight : 0)) + 'px'}">
+          <cube-slide ref="slideInstance" :data="tabs" :initialIndex="selectedIdx" :threshold="1" :autoPlay="false" :allowVertical="false" :showDots="false" :loop="false" :speed="500" :options="{listenScroll: true, probeType: 3, click: false}" @change="changeSlide" @scroll="slideScroll">
+            <cube-slide-item v-for="(item, index) in tabs" :key="item.title" :style="{height: ($winHeight - ((tabs && tabs.length) > 1 ? tabBarHeight : 0)) + 'px'}">
               <cube-scroll
                 ref="contentScroll"
                 :data="tabs[index].data"
@@ -46,7 +46,7 @@
                   </div>
                 </transition>
                 <div v-if="tabs[index].paging && tabs[index].paging.is_end && tabs[index].data && tabs[index].data.length === 0" class="empty-box">该圈子暂无{{index === 0 ? '动态' : '活动'}}</div>
-                <dynamic-item v-if="index === 0" v-for="(item, idx) in tabs[index].data" :key="idx" :itemData="item" @changeLike="changeLike" @showPreview="showPreview" @hidePreview="hidePreview" />
+                <dynamic-item v-if="index === 0" v-for="(item, idx) in tabs[index].data" :key="idx" :itemData="item" :router="$router" @changeLike="changeLike" @showPreview="showPreview" @hidePreview="hidePreview" />
                 <activity-item v-if="index === 1" v-for="(item, idx) in tabs[index].data" :key="idx" :itemData="item" />
                 <template slot="pulldown" slot-scope="props">
                   <div class="cube-pulldown-wrapper" :style="props.pullDownStyle">
@@ -72,7 +72,7 @@
         </div>
       </div>
     </cube-scroll>
-    <scroll-to-top v-if="$refs['contentScroll']" :visible="showBackTop" :position="{bottom: (winWidth / 750) * 178, right: (winWidth / 750) * 54}" :scroll="$refs['contentScroll'][selectedIdx]"/>
+    <scroll-to-top v-if="$refs['contentScroll']" :visible="showBackTop" :position="{bottom: ($winWidth / 750) * 178, right: ($winWidth / 750) * 54}" :scroll="$refs['contentScroll'][selectedIdx]"/>
     <i class="iconfont icon-camera publish-icon" @click="goPublish"></i>
   </div>
 </template>
@@ -125,8 +125,6 @@ export default {
           compress: ''
         }
       },
-      winHeight: window.innerHeight,
-      winWidth: window.innerWidth,
       tabs: tabs,
       tabBarHeight: parseInt((window.innerWidth / 750) * 88),
       selectedLabel: selectedLabel,
@@ -140,10 +138,12 @@ export default {
         pullUpLoad: {
           threshold: (window.innerWidth / 750) * 100
         },
-        click: false
+        probType: 3,
+        stopPropagation: true
       },
       previewInstance: null,
-      showTabbar: false
+      showTabbar: false,
+      showBanner: true
     }
   },
   components: {DynamicItem, ActivityItem, DownloadBox, LoadingView, ScrollToTop},
@@ -208,9 +208,9 @@ export default {
       let current = this.$refs['tabItem'][this.selectedIdx]
       let position = {pre: pre ? pre.$el.getBoundingClientRect() : null, next: next ? next.$el.getBoundingClientRect() : null, current: current.$el.getBoundingClientRect()}
       let relativeX = this.selectedIdx === 0 ? 0 : -this.$refs['slideInstance'].$el.getBoundingClientRect().width * this.selectedIdx // 基准x位置
-      let relativeSlideX = position.current.x + position.current.width / 2
-      let preSlideX = position.pre ? (position.pre.x + position.pre.width / 2) : null
-      let nextSlideX = position.next ? (position.next.x + position.next.width / 2) : null
+      let relativeSlideX = position.current.left + position.current.width / 2
+      let preSlideX = position.pre ? (position.pre.left + position.pre.width / 2) : null
+      let nextSlideX = position.next ? (position.next.left + position.next.width / 2) : null
       let touchX = x - relativeX
       let slideX = 0
       if (this.selectedIdx === 0) {
@@ -233,8 +233,9 @@ export default {
         const initialTab = parseInt(this.$route.query.jump_tab || 0)
         if (this.$refs['tabItem']) {
           let pos = this.$refs['tabItem'][initialTab].$el.getBoundingClientRect()
-          let slideX = pos.x + pos.width / 2
+          let slideX = pos.left + pos.width / 2
           this.tabSlideX = slideX + 'px'
+          this.$refs['pageScroller'].disable()
           clearInterval(this.timer)
         }
       },30)
@@ -286,6 +287,7 @@ export default {
           this.tabs[0].paging = res.data.paging
           if (pn.toString() === '1') { // 刷新
             this.tabs[0].data = res.data.list
+            this.tabs[0].data[2].title = '收到了饭就水电费圣诞快乐风景阿斯顿了深刻理解水电费阿莱克斯的肌肤拉丝粉就撒了肯德基发牢骚的咖啡机拉上看的风景 离开手机地方沙拉发生撒开了发动机阿酸辣粉就阿三分，水电费家阿三分阿酸辣粉多久 ，。水电费 拉丝粉  阿斯顿 死了快递费就阿酸辣粉就是垃圾发电 三分短裤三闾大夫就撒的发了几 。'
           } else {
             this.tabs[0].data = this.tabs[0].data.concat(res.data.list)
           }
@@ -302,7 +304,7 @@ export default {
       })
     },
     fetchActivity (pn) {
-      if (!this.tabs[1]) {
+      if (!this.tabs[1] || this.tabs[1] && this.tabs[1].fetching) {
         return false
       }
       let rData = {
@@ -402,9 +404,11 @@ export default {
       } else {
         this.showBackTop = false
       }
-      if (-y > window.innerHeight / 200) { // 超过半屏隐藏顶部banner
+      if (y < -1 && this.showBanner) { // 不在最顶时隐藏banner
+        this.showBanner = false
         this.$refs['pageScroller'].scrollTo(0, -bannerPos.height, 500)
-      } else {
+      } else if (y >= 0) {
+        this.showBanner = true
         this.$refs['pageScroller'].scrollTo(0, 0, 500)
       }
     },
@@ -413,6 +417,7 @@ export default {
     }
   },
   created () {
+    console.log('window.devicePixelRatio', window.devicePixelRatio)
     this.fetchCircle()
     this.initSlideBlock()
   }
@@ -511,6 +516,8 @@ fl{
 }
 .tab-box{
   height: 88px;
+  position: relative;
+  z-index: 1;
 }
 .tab-slider{
   width: 100%;
@@ -518,10 +525,11 @@ fl{
   position: absolute;
   left: 0;
   bottom: 0;
+  z-index: 2;
 }
 .tab-slider-body{
   width: 40px;
-  height: 100%;
+  height: 6px;
   position: absolute;
   left: -20px;
   bottom: 0;
@@ -529,14 +537,14 @@ fl{
   border-radius: 4px;
 }
 .tab-border{
-  width: 300%;
-  height: 3px;
+  width: 100%;
+  height: 2px;
   position: absolute;
-  left: 0;
-  bottom: 0;
-  transform: scale(0.3333, 0.3333);
+  transform: scale(0.5, 0.5);
   transform-origin: 0 100%;
   background: #e5e5e5;
+  left: 0;
+  bottom: 0;
 }
 .cube-tab{
   font-size: 36px;
