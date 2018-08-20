@@ -312,18 +312,20 @@ export default {
         ],
         onSelect: (item, index) => {
           if (index === 0) {
-            this.$router.push({
-              name: 'DynamicSendComment',
-              query: {
-                commentId: comment.id,
-                pid: pid,
-                isReply: true,
-                replyName: replyName
-              },
-              params: {
-                comment: comment
-              }
-            });
+            if (utils.checkLogin()) {
+              this.$router.push({
+                name: 'DynamicSendComment',
+                query: {
+                  commentId: comment.id,
+                  pid: pid,
+                  isReply: true,
+                  replyName: replyName
+                },
+                params: {
+                  comment: comment
+                }
+              });
+            }
           }
         }
       }).show();
