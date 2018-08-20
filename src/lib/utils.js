@@ -1,20 +1,20 @@
-import browserUA from './browserUA';
+import browserUA from './browserUA'
 
 import router from '../router'
 import ajax from './ajax'
 
 export default {
   isPoneAvailable: function (phone) {
-    var myreg = /^[1][0-9]{10}$/;
+    var myreg = /^[1][0-9]{10}$/
     if (!myreg.test(phone)) {
-      return false;
+      return false
     } else {
-      return true;
+      return true
     }
   },
   checkLogin: function () {
     if (window.localStorage.token) {
-      return true;
+      return true
     }
     if (browserUA.isWeixin()) {
       let APPID = 'wx0aa5b5708df88bd9'
@@ -29,7 +29,7 @@ export default {
         query: { type: 'login' }
       })
     }
-    return false;
+    return false
   },
   checkReloadWithKeepAlive (vm, checkQueryKeys, reloadCallback) {
     if (!vm._refresh) {
@@ -40,10 +40,10 @@ export default {
       if (!vm._refresh[checkQueryKey]) {
         vm._refresh[checkQueryKey] = vm.$route.query[checkQueryKey]
       }
-    });
+    })
     // 记录初始刷新时间
     if (!vm._refreshTime) {
-      vm._refreshTime = Number(new Date());
+      vm._refreshTime = Number(new Date())
     }
 
     // 判断是否需要reload
@@ -59,16 +59,16 @@ export default {
         if (vm._refresh[checkQueryKey] !== vm.$route.query[checkQueryKey]) {
           reload = true
         }
-      });
+      })
     }
 
     if (reload) {
       // 重新记录参数
       checkQueryKeys.forEach(checkQueryKey => {
         vm._refresh[checkQueryKey] = vm.$route.query[checkQueryKey]
-      });
+      })
       // 重新记录时间
-      vm._refreshTime = Number(new Date());
+      vm._refreshTime = Number(new Date())
       reloadCallback()
     }
   },
@@ -83,9 +83,9 @@ export default {
         query: to.query,
         params: to.params,
         replace: true
-      });
+      })
     } else {
-      next();
+      next()
     }
   },
   /**
@@ -94,8 +94,8 @@ export default {
    */
   beforeRouteEnterHandleShareOpenDontNext: function (to, from, next, type) {
     if (to.query.isShareOpen && to.query.isShareOpen !== 'false') {
-      ajax('/jv/share/anonymous/open', { data: { type: type } });
-      delete to.query.isShareOpen;
+      ajax('/jv/share/anonymous/open', { data: { type: type } })
+      delete to.query.isShareOpen
       return true
     } else {
       return false

@@ -25,7 +25,7 @@ export default {
       isReply: this.$route.query.isReply,
       replyName: this.$route.query.replyName,
       winHeight: window.innerHeight
-    };
+    }
   },
   computed: {
     sendCommentData: function () {
@@ -34,49 +34,49 @@ export default {
         dy_id: this.dy_id,
         commentId: this.commentId,
         pid: this.pid
-      };
+      }
     }
   },
   components: {},
   methods: {
     back () {
-      this.$router.back();
+      this.$router.back()
     },
     focus () {
-      this.$refs.input.focus();
+      this.$refs.input.focus()
     },
     sendComment () {
       if (this.content && !this.isSended) {
-        let url = '';
+        let url = ''
         if (this.isReply) {
-          url = '/jv/qz/publish/reply';
+          url = '/jv/qz/publish/reply'
         } else {
-          url = '/jv/qz/publish/comment';
+          url = '/jv/qz/publish/comment'
         }
-        this.isSended = true;
+        this.isSended = true
         this.$ajax(url, { data: this.sendCommentData })
           .then(res => {
             this.$toast(res.msg ? res.msg : '发送成功', 1500, () => {
-              this.$router.back();
-              let params = this.$route.params;
+              this.$router.back()
+              let params = this.$route.params
               setTimeout(() => {
                 if (this.isReply) {
-                  params.comment.replys.list.splice(0, 0, res.data.reply);
+                  params.comment.replys.list.splice(0, 0, res.data.reply)
                 } else {
-                  params.dynamic.comment_list && params.dynamic.comment_list.splice(0, 0, res.data.comment);
-                  params.dynamic.comment_num++;
+                  params.dynamic.comment_list && params.dynamic.comment_list.splice(0, 0, res.data.comment)
+                  params.dynamic.comment_num++
                 }
-              }, 500);
-            });
+              }, 500)
+            })
           })
           .catch(e => {
-            this.isSended = false;
-            console.log(e);
-          });
+            this.isSended = false
+            console.log(e)
+          })
       }
     }
   }
-};
+}
 </script>
 
 <style src='../../common.css' />

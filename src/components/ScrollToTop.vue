@@ -8,14 +8,14 @@
 export default {
   props: ['visible', 'position', 'scroll'],
   data () {
-    return {};
+    return {}
   },
   methods: {
     handleClick (event) {
-      this.scroll.scrollTo(0, 0, 500);
+      this.scroll.scrollTo(0, 0, 500)
     }
   }
-};
+}
 </script>
 
 <style src='../common.css' />

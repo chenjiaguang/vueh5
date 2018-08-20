@@ -28,7 +28,7 @@
 </template>
 
 <script>
-import utils from '../lib/utils';
+import utils from '../lib/utils'
 export default {
   data () {
     return {
@@ -44,13 +44,13 @@ export default {
       sendBtnText: '获取验证码',
       sendBtnTime: 0,
       sendBtnTimer: null
-    };
+    }
   },
   computed: {
     sendSMSCodeData: function () {
       return {
         phone: this.phone
-      };
+      }
     },
     submitData: function () {
       return {
@@ -58,94 +58,94 @@ export default {
         code: this.code,
         token: '',
         origin: 'H5'
-      };
+      }
     },
     canSubmit: function () {
-      return this.phone.length === 11 && this.code.length === 6;
+      return this.phone.length === 11 && this.code.length === 6
     }
   },
   components: {},
   mounted () {
     if (this.type === 'bindPhone') {
-      this.texts.title = '绑定手机';
-      this.texts.btnText = '立即绑定';
+      this.texts.title = '绑定手机'
+      this.texts.btnText = '立即绑定'
     } else {
       // login
-      this.texts.title = '手机验证码登陆';
-      this.texts.btnText = '立即登陆';
+      this.texts.title = '手机验证码登陆'
+      this.texts.btnText = '立即登陆'
     }
-    document.title = this.texts.title;
+    document.title = this.texts.title
   },
   destroyed () {
     if (this.sendBtnTimer) {
-      clearInterval(this.sendBtnTimer);
+      clearInterval(this.sendBtnTimer)
     }
   },
   methods: {
     sendCode () {
       if (this.sendBtnTime <= 0) {
         if (!utils.isPoneAvailable(this.phone)) {
-          this.$toast('请输入正确的手机号', 2000);
-          return;
+          this.$toast('请输入正确的手机号', 2000)
+          return
         }
 
         this.$ajax('/jv/sms/send', { data: this.sendSMSCodeData })
           .then(res => {
-            this.$toast('发送成功', 2000);
+            this.$toast('发送成功', 2000)
             if (this.sendBtnTimer) {
-              clearInterval(this.sendBtnTimer);
+              clearInterval(this.sendBtnTimer)
             }
-            this.sendBtnTime = 60;
-            this.sendBtnText = `重新获取(${this.sendBtnTime})`;
+            this.sendBtnTime = 60
+            this.sendBtnText = `重新获取(${this.sendBtnTime})`
             this.sendBtnTimer = setInterval(() => {
-              console.log('setInterval');
-              this.sendBtnTime--;
-              this.sendBtnText = `重新获取(${this.sendBtnTime})`;
+              console.log('setInterval')
+              this.sendBtnTime--
+              this.sendBtnText = `重新获取(${this.sendBtnTime})`
               if (this.sendBtnTime === 0) {
-                clearInterval(this.sendBtnTimer);
-                this.sendBtnText = `获取验证码`;
+                clearInterval(this.sendBtnTimer)
+                this.sendBtnText = `获取验证码`
               }
-            }, 1000);
+            }, 1000)
           })
           .catch(e => {
-            console.log(e);
-          });
+            console.log(e)
+          })
       }
     },
     submit () {
-      let url = '';
-      let callback = null;
+      let url = ''
+      let callback = null
       if (this.type === 'bindPhone') {
-        url = '/jv/anonymous/user/phone/bind';
+        url = '/jv/anonymous/user/phone/bind'
         callback = res => {
-          console.log(res);
+          console.log(res)
           this.$store.commit('login/login', {
             token: this.$route.params.token
-          });
+          })
           // 需要授权的操作-中转页-当前页
-          this.$router.back();
-        };
+          this.$router.back()
+        }
       } else {
         // login
-        url = '/jv/anonymous/login/vcode';
+        url = '/jv/anonymous/login/vcode'
         callback = res => {
           this.$store.commit('login/login', {
             token: res.data.token
-          });
+          })
           // 需要授权的操作-当前页
-          this.$router.back();
-        };
+          this.$router.back()
+        }
       }
       this.$ajax(url, { data: this.submitData })
         .then(res => {
-          callback(res);
+          callback(res)
         })
         .catch(e => {
-          console.log(e);
-        });
+          console.log(e)
+        })
     }
   }
-};
+}
 </script>
 
 <style src='../common.css' />
