@@ -31,7 +31,7 @@
       <div class="tag-container clearfix">
         <div class="fl tag-item" v-for="(item, idx) in activity.tags" :key="idx">{{item}}<div class="tag-border"></div></div>
       </div>
-      <show-hide-content :content="activity.content" v-if="activity.content && activity.content.length > 0" />
+      <show-hide-content :content="activity.content" v-if="activity.content && activity.content.length > 0" @showPreview="showPreview" @hidePreview="hidePreview" />
     </div>
     <div class="join-wrapper" v-if="activity.join && activity.join.length > 0">
       <div class="color-block"></div>
@@ -374,13 +374,27 @@ export default {
   },
   components: { ShowHideContent },
   watch: {
-    '$route.query.id': function (val, oldVal) {
-      if (val && val !== oldVal) {
+    '$route': function (val, oldVal) {
+      if (!val.query.previewImage && oldVal.query.previewImage) { // 点击大图后返回
+        if (this.previewInstance) {
+          this.$previewImage.hide(this.previewInstance)
+          this.previewInstance = null
+        }
+      }
+      if (val.query.id && val.query.id !== oldVal.query.id) { // 登陆不刷新，只有id变化才刷新
         this.refreshData()
       }
     }
   },
   methods: {
+    showPreview (instance) {
+      this.previewInstance = instance
+      this.$router.push({name: this.$route.name, query: Object.assign({}, this.$route.query, {previewImage: true})})
+    },
+    hidePreview () {
+      this.previewInstance = null
+      this.$router.go(-1)
+    },
     fetchActivity () {
       let rData = {
         id: this.$route.query.id
@@ -483,6 +497,9 @@ export default {
         }
       }, 100)
     }
+  },
+  beforeRouteEnter (to, from, next) {
+    utils.beforeRouteEnterHandleShareOpen(to, from, next, 5)
   },
   created () {
     this.fetchActivity()

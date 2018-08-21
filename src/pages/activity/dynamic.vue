@@ -1,5 +1,5 @@
 <template>
-  <div :style="{height: $winHeight + 'px'}">
+  <div :style="{height: widHeight + 'px'}">
     <cube-scroll :data="dynamic" class="activity-dynamic" ref="pageScroller" :scrollEvents="['scroll']" :options="options" @scroll="pageScroll" @pulling-up="onPullingUp">
       <div ref="topBanner">
         <download-box />
@@ -23,7 +23,7 @@
         </div>
       </template>
     </cube-scroll>
-    <scroll-to-top :visible="showBackTop" :position="{bottom: ($winWidth / 750) * 178, right: ($winWidth / 750) * 54}" :scroll="$refs['pageScroller']"/>
+    <scroll-to-top :visible="showBackTop" :position="{bottom: (winWidth / 750) * 178, right: (winWidth / 750) * 54}" :scroll="$refs['pageScroller']"/>
   </div>
 </template>
 
@@ -46,6 +46,8 @@ const initialData = {
   dynamic: [],
   paging: {},
   fetching: false,
+  winWidth: window.innerWidth,
+  widHeight: window.innerHeight,
   options: {
     pullDownRefresh: false,
     pullUpLoad: {
@@ -78,7 +80,7 @@ export default {
   methods: {
     showPreview (instance) {
       this.previewInstance = instance
-      this.$router.push({name: 'ActivityDynamic', query: {previewImage: true}, params: {previewImage: true}})
+      this.$router.push({name: this.$route.name, query: Object.assign({}, this.$route.query, {previewImage: true})})
     },
     hidePreview () {
       this.previewInstance = null

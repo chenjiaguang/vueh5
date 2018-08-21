@@ -1,5 +1,5 @@
 <template>
-  <div :style="{height: $winHeight + 'px'}">
+  <div :style="{height: winHeight + 'px'}">
     <cube-scroll class="toutiao" ref="pageScroller" :scrollEvents="['scroll']" :options="{bounce: false}">
       <div class="banner" ref="topBanner">
         <download-box />
@@ -13,7 +13,7 @@
           </div>
         </header>
       </div>
-      <div ref="innerWrapper" class="scroll-wrapper" :style="{height: $winHeight + 'px'}">
+      <div ref="innerWrapper" class="scroll-wrapper" :style="{height: winHeight + 'px'}">
         <div class="nav-scroll-list-wrap" ref="navWrapper" :style="{height: tabBarHeight + 'px'}" v-if="tabs && tabs.length > 1">
           <cube-tab-bar v-model="selectedLabel" class="tab-box clearfix" @change="changeTabBar" :style="{height: tabBarHeight + 'px'}">
             <cube-tab v-for="(item) in tabs" class="fl" ref="tabItem" :label="item.title" :key="item.title">
@@ -24,9 +24,9 @@
           </div>
           <div class="tab-border" :style="{transform: 'scale(1,' + $tranScale + ')'}"></div>
         </div>
-        <div class="tabs-wrapper" ref="slideWrapper" :style="{height: ($winHeight - ((tabs && tabs.length) > 1 ? tabBarHeight : 0)) + 'px'}">
+        <div class="tabs-wrapper" ref="slideWrapper" :style="{height: (winHeight - ((tabs && tabs.length) > 1 ? tabBarHeight : 0)) + 'px'}">
           <cube-slide ref="slideInstance" :data="tabs" :initialIndex="selectedIdx" :autoPlay="false" :showDots="false" :allow-vertical="false" :loop="false" :speed="500" :options="{listenScroll: true, probeType: 3, click: false}" @change="changeSlide" @scroll="slideScroll">
-            <cube-slide-item v-for="(item, index) in tabs" :key="item.title" :style="{height: ($winHeight - ((tabs && tabs.length) > 1 ? tabBarHeight : 0)) + 'px'}">
+            <cube-slide-item v-for="(item, index) in tabs" :key="item.title" :style="{height: (winHeight - ((tabs && tabs.length) > 1 ? tabBarHeight : 0)) + 'px'}">
               <cube-scroll
                 ref="contentScroll"
                 :data="tabs[index].data"
@@ -66,7 +66,7 @@
         </div>
       </div>
     </cube-scroll>
-    <scroll-to-top v-if="$refs['contentScroll']" :visible="showBackTop" :position="{bottom: ($winWidth / 750) * 278, right: ($winWidth / 750) * 54}" :scroll="$refs['contentScroll'][selectedIdx]"/>
+    <scroll-to-top v-if="$refs['contentScroll']" :visible="showBackTop" :position="{bottom: (winWidth / 750) * 278, right: (winWidth / 750) * 54}" :scroll="$refs['contentScroll'][selectedIdx]"/>
     <div class="discuss-box" @click="goPublish">
       <i class="iconfont icon-discuss discuss-icon"></i><span>参与讨论</span>
     </div>
@@ -117,6 +117,8 @@ const initialData = {
       fetching: false
     }
   ],
+  winWidth: window.innerWidth,
+  winHeight: window.innerHeight,
   tabBarHeight: parseInt((window.innerWidth / 750) * 96),
   selectedLabel: '最新',
   selectedIdx: 0,
@@ -159,7 +161,7 @@ export default {
   methods: {
     showPreview (instance) {
       this.previewInstance = instance
-      this.$router.push({name: this.$route.name, query: {previewImage: true}, params: {previewImage: true}})
+      this.$router.push({name: this.$route.name, query: Object.assign({}, this.$route.query, {previewImage: true})})
     },
     hidePreview () {
       this.previewInstance = null
@@ -357,6 +359,9 @@ export default {
         this.$router.push({name: 'EditDynamic', params: {topic: [{id: this.topicInfo.id, title: this.topicInfo.title}]}})
       }
     }
+  },
+  beforeRouteEnter (to, from, next) {
+    utils.beforeRouteEnterHandleShareOpen(to, from, next, 2)
   },
   created () {
     this.fetchTopic(this.selectedIdx, 1)

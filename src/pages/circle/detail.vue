@@ -1,5 +1,5 @@
 <template>
-  <div :style="{height: $winHeight + 'px'}">
+  <div :style="{height: winHeight + 'px'}">
     <cube-scroll class="toutiao" ref="pageScroller" :options="{bounce: false}">
       <div ref="topBanner">
         <download-box />
@@ -18,7 +18,7 @@
           </div>
         </header>
       </div>
-      <div ref="innerWrapper" class="scroll-wrapper" :style="{height: $winHeight + 'px'}">
+      <div ref="innerWrapper" class="scroll-wrapper" :style="{height: winHeight + 'px'}">
         <div class="nav-scroll-list-wrap" ref="navWrapper" :style="{height: tabBarHeight + 'px'}" v-if="tabs && tabs.length > 1 && showTabbar">
           <cube-tab-bar v-model="selectedLabel" class="tab-box" @change="changeTabBar" :style="{height: tabBarHeight + 'px'}">
             <cube-tab v-for="(item) in tabs" ref="tabItem" :label="item.title" :key="item.title">
@@ -29,9 +29,9 @@
           </div>
           <div class="tab-border" :style="{transform: 'scale(1,' + $tranScale + ')'}"></div>
         </div>
-        <div class="tabs-wrapper" ref="slideWrapper" :style="{height: ($winHeight - ((tabs && tabs.length) > 1 ? tabBarHeight : 0)) + 'px'}">
+        <div class="tabs-wrapper" ref="slideWrapper" :style="{height: (winHeight - ((tabs && tabs.length) > 1 ? tabBarHeight : 0)) + 'px'}">
           <cube-slide ref="slideInstance" :data="tabs" :initialIndex="selectedIdx" :threshold="1" :autoPlay="false" :allowVertical="false" :showDots="false" :loop="false" :speed="500" :options="{listenScroll: true, probeType: 3, click: false}" @change="changeSlide" @scroll="slideScroll">
-            <cube-slide-item v-for="(item, index) in tabs" :key="item.title" :style="{height: ($winHeight - ((tabs && tabs.length) > 1 ? tabBarHeight : 0)) + 'px'}">
+            <cube-slide-item v-for="(item, index) in tabs" :key="item.title" :style="{height: (winHeight - ((tabs && tabs.length) > 1 ? tabBarHeight : 0)) + 'px'}">
               <cube-scroll
                 ref="contentScroll"
                 :data="tabs[index].data"
@@ -72,7 +72,7 @@
         </div>
       </div>
     </cube-scroll>
-    <scroll-to-top v-if="$refs['contentScroll']" :visible="showBackTop" :position="{bottom: ($winWidth / 750) * 178, right: ($winWidth / 750) * 54}" :scroll="$refs['contentScroll'][selectedIdx]"/>
+    <scroll-to-top v-if="$refs['contentScroll']" :visible="showBackTop" :position="{bottom: (winWidth / 750) * 178, right: (winWidth / 750) * 54}" :scroll="$refs['contentScroll'][selectedIdx]"/>
     <i class="iconfont icon-camera publish-icon" @click="goPublish"></i>
   </div>
 </template>
@@ -123,6 +123,8 @@ const initialData = {
       fetching: false
     }
   ],
+  winWidth: window.innerWidth,
+  winHeight: window.innerHeight,
   tabBarHeight: parseInt((window.innerWidth / 750) * 88),
   selectedLabel: '动态',
   selectedIdx: 0,
@@ -181,7 +183,7 @@ export default {
   methods: {
     showPreview (instance) {
       this.previewInstance = instance
-      this.$router.push({name: 'CircleDetail', query: {previewImage: true}, params: {previewImage: true}})
+      this.$router.push({name: this.$route.name, query: Object.assign({}, this.$route.query, {previewImage: true})})
     },
     hidePreview () {
       this.previewInstance = null
@@ -438,6 +440,9 @@ export default {
         this.$router.push({name: 'EditDynamic', params: {circle: {id: this.circle.id, title: this.circle.name}}})
       }
     }
+  },
+  beforeRouteEnter (to, from, next) {
+    utils.beforeRouteEnterHandleShareOpen(to, from, next, 1)
   },
   created () {
     this.fetchCircle()

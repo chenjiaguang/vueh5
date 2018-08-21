@@ -118,7 +118,7 @@ export default {
   methods: {
     showPreview (instance) {
       this.previewInstance = instance
-      this.$router.push({name: 'EditDynamic', query: {previewImage: true}, params: {previewImage: true}})
+      this.$router.push({name: this.$route.name, query: Object.assign({}, this.$route.query, {previewImage: true})})
     },
     hidePreview () {
       this.previewInstance = null

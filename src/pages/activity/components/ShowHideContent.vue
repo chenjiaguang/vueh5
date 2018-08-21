@@ -6,14 +6,14 @@
               <template v-for="(item, idx) in content">
                 <p :key="idx" v-if="item.type === '1'" class="content-text" @load="load">{{item.content}}</p>
                 <div :key="idx" v-else-if="item.type === '2' && item.content" class="image-box">
-                  <img :src="item.content.image" class="image" @load="load" @click="() => preview(idx)" />
+                  <img :src="item.content.image" class="image" @load="load" @click.stop="() => preview(idx)" />
                   <div v-if="item.content.description" class="description" @load="load">{{item.content.description}}</div>
                 </div>
               </template>
               <img src="" @error="load" style="width:0;height:0;display:none;" />
           </div>
         </div>
-        <div v-if="contentWrapperHeight && contentWrapperHeight > halfScreenHeight" ref="contentBtn" class="show-hide-btn" @click="changeShowContext"><span class="show-hide-text">{{showMore ? '收起' : '查看更多图文详情'}}<i class="pull-sign iconfont icon-pull_down" :style="{transform: showMore ? 'scale(0.25) rotate(180deg)' : 'scale(0.25) rotate(0)'}"></i></span></div>
+        <div v-if="contentWrapperHeight && contentWrapperHeight > halfScreenHeight" ref="contentBtn" class="show-hide-btn" @click.stop="changeShowContext"><span class="show-hide-text">{{showMore ? '收起' : '查看更多图文详情'}}<i class="pull-sign iconfont icon-pull_down" :style="{transform: showMore ? 'scale(0.25) rotate(180deg)' : 'scale(0.25) rotate(0)'}"></i></span></div>
     </div>
 </template>
 
@@ -140,7 +140,7 @@ export default {
     },
     preview (index) {
       let idx = this.contentImages.idxArr.indexOf(index)
-      this.$previewImage.show({images: this.contentImages.imageArr, idx: idx})
+      this.$previewImage.show({images: this.contentImages.imageArr, idx: idx}, (instance) => this.$emit('showPreview', instance), () => this.$emit('hidePreview'))
     }
   },
   computed: {

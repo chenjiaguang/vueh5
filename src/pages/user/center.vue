@@ -1,5 +1,5 @@
 <template>
-  <div :style="{height: $winHeight + 'px'}">
+  <div :style="{height: winHeight + 'px'}">
     <cube-scroll :data="tabs" ref="pageScroller" :scrollEvents="['scroll']" :options="options" @scroll="outerScroll" @pulling-up="onPullingUp">
       <div ref="topBanner">
         <download-box />
@@ -87,6 +87,8 @@ const initialData = {
       fetching: false
     }
   ],
+  winWidth: window.innerWidth,
+  winHeight: window.innerHeight,
   selectedLabel: '动态',
   selectedIdx: 0,
   tabSlideX: -window.innerWidth + 'px',
@@ -123,7 +125,7 @@ export default {
   methods: {
     showPreview (instance) {
       this.previewInstance = instance
-      this.$router.push({name: this.$route.name, query: {previewImage: true}, params: {previewImage: true}})
+      this.$router.push({name: this.$route.name, query: Object.assign({}, this.$route.query, {previewImage: true})})
     },
     hidePreview () {
       this.previewInstance = null
@@ -280,7 +282,7 @@ export default {
       })
     },
     outerScroll ({x, y}) {
-      if (-y > this.$winHeight) { // 超过一屏显示返回顶部
+      if (-y > this.winHeight) { // 超过一屏显示返回顶部
         this.showBackTop = true
       } else {
         this.showBackTop = false

@@ -19,8 +19,6 @@ if (process.env.NODE_ENV !== 'production') { // 非正式环境包，就实例�
 }
 Vue.prototype.$assetsPublicPath = '/h5'
 Vue.prototype.$tranScale = 1 / window.devicePixelRatio
-Vue.prototype.$winHeight = window.innerHeight
-Vue.prototype.$winWidth = window.innerWidth
 Vue.prototype.$apiDomain = process.env.API_DOMAIN
 Vue.prototype.$locationDomain = process.env.LOCATION_DOMAIN
 Vue.prototype.$ajax = ajax

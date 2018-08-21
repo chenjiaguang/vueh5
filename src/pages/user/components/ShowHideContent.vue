@@ -1,7 +1,7 @@
 <template>
     <div class="content-container" ref="contentWrapper">
         <div ref="contentContainer" class="content-text clearfix"><img v-if="isLongDynamic" :src="$assetsPublicPath + '/cwebassets/image/long_dynamic.png'" class="long-dynamic-icon" />{{content}}</div>
-        <div v-if="contentHeight && contentHeight > contentMaxHeight" ref="contentBtn" class="show-hide-btn clearfix"><span @click="changeShowContext" class="show-hide-btn-text fr">{{showMore ? '收起' : '展开'}}</span></div>
+        <div v-if="contentHeight && contentHeight > contentMaxHeight" ref="contentBtn" class="show-hide-btn clearfix"><span @click.stop="changeShowContext" class="show-hide-btn-text fr">{{showMore ? '收起' : '展开'}}</span></div>
     </div>
 </template>
 
