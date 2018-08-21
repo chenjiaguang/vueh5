@@ -1,4 +1,3 @@
-//
 <template>
   <div class="box">
     <div class="row space-between center">
@@ -9,6 +8,7 @@
       <div class="go" @click="openFantTuanC">
         立即打开
       </div>
+      <weixin :show="showWeixinTip" @changeShow="showHideTip" />
     </div>
   </div>
 </template>
