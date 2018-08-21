@@ -81,9 +81,7 @@ export default {
           extensions: 'all'
         })
         geocoder.getAddress(position, (status, result) => {
-          console.log('status', status, result)
           if (status === 'complete' && result.info === 'OK') {
-            console.log('result', result.regeocode.formattedAddress)
             // 将创建的点标记添加到已有的地图实例：
             let marker = new AMap.Marker({
               position: new AMap.LngLat(lng, lat), // 经纬度对象，也可以是经纬度构成的一维数组[116.39, 39.9]
@@ -142,7 +140,7 @@ export default {
         })
         geocoder.getLocation('海南省海口市观澜湖新城', function (status, result) {
           if (status === 'complete' && result.info === 'OK') {
-            console.log('result2', result)
+            
           }
         })
       })

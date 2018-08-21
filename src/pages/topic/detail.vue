@@ -96,57 +96,63 @@ Vue.use(TabBar)
 Vue.use(TabPanels)
 Vue.use(Slide)
 Vue.use(Sticky)
-const tabs = [
-  {
-    title: '最新',
-    data: [],
-    paging: {},
-    fetching: false
+
+const initialData = {
+  topicInfo: {
+    beginColor: 'B0B0B0',
+    endColor: 'F9F9F9'
   },
-  {
-    title: '最热',
-    data: [],
-    paging: {},
-    fetching: false
-  }
-]
+  showBackTop: false,
+  tabs: [
+    {
+      title: '最新',
+      data: [],
+      paging: {},
+      fetching: false
+    },
+    {
+      title: '最热',
+      data: [],
+      paging: {},
+      fetching: false
+    }
+  ],
+  tabBarHeight: parseInt((window.innerWidth / 750) * 96),
+  selectedLabel: '最新',
+  selectedIdx: 0,
+  tabSlideX: -window.innerWidth + 'px',
+  options: {
+    pullDownRefresh: {
+      threshold: (window.innerWidth / 750) * 89,
+      stopTime: 0
+    },
+    pullUpLoad: {
+      threshold: (window.innerWidth / 750) * 100
+    },
+    probeType: 3,
+    stopPropagation: true
+  },
+  previewInstance: null
+}
 export default {
   data() {
     let selectedIdx = parseInt(this.$route.query.jump_tab || 0)
     let selectedLabel = (this.$route.query.jump_tab && this.$route.query.jump_tab.toString() === '1') ? '最热' : '最新'
-    return {
-      topicInfo: {
-        beginColor: 'B0B0B0',
-        endColor: 'F9F9F9'
-      },
-      showBackTop: false,
-      tabs: tabs,
-      tabBarHeight: parseInt((window.innerWidth / 750) * 96),
-      selectedLabel: selectedLabel,
-      selectedIdx: selectedIdx,
-      tabSlideX: -window.innerWidth + 'px',
-      options: {
-        pullDownRefresh: {
-          threshold: (window.innerWidth / 750) * 89,
-          stopTime: 0
-        },
-        pullUpLoad: {
-          threshold: (window.innerWidth / 750) * 100
-        },
-        probeType: 3,
-        stopPropagation: true
-      },
-      previewInstance: null
-    }
+    let _initialData = JSON.parse(JSON.stringify(initialData))
+    let _obj = Object.assign({}, _initialData, {selectedIdx, selectedLabel})
+    return _obj
   },
   components: {TopicItem, DownloadBox, LoadingView, ScrollToTop},
   watch: {
-    '$route.query.previewImage': function (val, oldVal) {
-      if (!val && oldVal) {
+    '$route.query': function (val, oldVal) {
+      if (!val.previewImage && oldVal.previewImage) { // 点击大图后返回
         if (this.previewInstance) {
           this.$previewImage.hide(this.previewInstance)
           this.previewInstance = null
         }
+      }
+      if (val.topic_id !== oldVal.topic_id || val.jump_tab !== oldVal.jump_tab) { // topic_id或jump_tab变化时重置数据
+        this.refreshData()
       }
     }
   },
@@ -220,7 +226,19 @@ export default {
         }
       },30)
     },
+    refreshData () {
+      let selectedIdx = parseInt(this.$route.query.jump_tab || 0)
+      let selectedLabel = (this.$route.query.jump_tab && this.$route.query.jump_tab.toString() === '1') ? '最热' : '最新'
+      let _initialData = JSON.parse(JSON.stringify(initialData))
+      let _obj = Object.assign({}, _initialData, {selectedIdx, selectedLabel})
+      for (let item in _obj) {
+        this[item] = _obj[item]
+      }
+      this.fetchTopic(this.selectedIdx, 1)
+      this.initSlideBlock()
+    },
     fetchTopic (idx, pn) {
+      console.log('11this.$route.query.topic_id', this.$route.query.topic_id)
       if (this.tabs[idx].fetching) { // 正在拉取动态数据
         return false
       }
@@ -340,6 +358,11 @@ export default {
   created () {
     this.fetchTopic(this.selectedIdx, 1)
     this.initSlideBlock()
+  },
+  activated () {
+    utils.checkReloadWithKeepAlive(this, ['topic_id', 'jump_tab'], () => {
+      this.refreshData()
+    })
   }
 }
 </script>

@@ -34,9 +34,6 @@ export default {
     }
   },
   methods: {
-    test () {
-      console.log('test')
-    },
     addImage () {
       let files = this.$refs['upload'].files
       this.$emit('addFunc', files)
