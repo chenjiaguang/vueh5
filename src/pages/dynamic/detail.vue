@@ -39,7 +39,7 @@
               <!-- 右 -->
               <div>
                 <transition name="fade-quick">
-                  <div class="follow-button" v-if="!dynamic.is_following"  @click="clickFollow(dynamic.uid)">+ 关注</div>
+                  <div class="follow-button" v-if="!dynamic.is_following&&!dynamic.is_owner"  @click="clickFollow(dynamic.uid)">+ 关注</div>
                 </transition>
               </div>
             </div>
