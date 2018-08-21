@@ -33,7 +33,19 @@ export default {
   },
   checkReloadWithKeepAliveNew (vm, $route, $oldRoute, routeName, checkQueryKeys, reloadCallback) {
     let route = null
-    if ($route.name === routeName) {
+    if ($route.name === routeName && $oldRoute.name === routeName) {
+      route = $oldRoute
+      if (!vm._refresh) {
+        vm._refresh = {}
+      }
+      // 写入初始值
+      checkQueryKeys.forEach(checkQueryKey => {
+        if (!vm._refresh[checkQueryKey]) {
+          vm._refresh[checkQueryKey] = route.query[checkQueryKey]
+        }
+      })
+      route = $route
+    } else if ($route.name === routeName) {
       route = $route
     } else if ($oldRoute.name === routeName) {
       route = $oldRoute
@@ -45,7 +57,6 @@ export default {
       // 写入初始值
       checkQueryKeys.forEach(checkQueryKey => {
         if (!vm._refresh[checkQueryKey]) {
-          console.log('id', route.query[checkQueryKey])
           vm._refresh[checkQueryKey] = route.query[checkQueryKey]
         }
       })
