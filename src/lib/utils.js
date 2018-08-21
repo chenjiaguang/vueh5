@@ -35,6 +35,9 @@ export default {
     let route = null
     if ($route.name === routeName && $oldRoute.name === routeName) {
       route = $oldRoute
+      if (!vm._refresh) {
+        vm._refresh = {}
+      }
       // 写入初始值
       checkQueryKeys.forEach(checkQueryKey => {
         if (!vm._refresh[checkQueryKey]) {
