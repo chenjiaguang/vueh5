@@ -163,9 +163,7 @@ export default {
       winHeight: window.innerHeight,
       winWidth: window.innerWidth,
       pn: 1,
-      scrollToTopVisible: false,
-      isArticle:
-        this.$route.query.isArticle && this.$route.query.isArticle !== 'false'
+      scrollToTopVisible: false
     }
   },
   components: {
@@ -203,6 +201,9 @@ export default {
     }
   },
   computed: {
+    isArticle: function () {
+      return this.$route.query.isArticle && this.$route.query.isArticle !== 'false'
+    },
     followData: function () {
       return {
         follow: '1',
