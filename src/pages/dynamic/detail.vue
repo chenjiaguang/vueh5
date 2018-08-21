@@ -80,8 +80,8 @@
               <i class="iconfont icon-location" ></i>
               <div class="location">{{dynamic.location}}</div>
             </div>
-            <div class="row">
-              <span class="circle-name" v-if="dynamic.circle_name">{{dynamic.circle_name}}</span>
+            <div class="row circle-box" v-if="dynamic.circle_name">
+              <span class="circle-name">{{dynamic.circle_name}}</span>
             </div>
           </div>
 
@@ -246,6 +246,7 @@ export default {
           this.dynamic = res.data
           let i = 0
           this.dynamic.isArticle = this.isArticle
+
           if (this.isArticle) {
             this.imageList = this.dynamic.contents
               .filter(content => {
@@ -452,7 +453,7 @@ export default {
   margin-bottom: 13px;
 }
 .foot-info-box {
-  margin-top: 30px;
+  margin-bottom: 24px;
 }
 .location {
   font-size: 24px;
@@ -492,8 +493,10 @@ export default {
   color: #1eb0fd;
   margin-right: 10px;
 }
+.circle-box{
+  margin-bottom: 24px;
+}
 .circle-name {
-  margin-top: 24px;
   border-radius: 6px;
   border-width: 1px;
   border-color: #1eb0fd;
@@ -504,7 +507,7 @@ export default {
 }
 /*************************************************************************/
 #content-container {
-  margin-bottom: 60px;
+  margin-bottom: 36px;
 }
 .dynamic-content {
   color: #333333;
@@ -516,10 +519,12 @@ export default {
 .detail-image-container {
   margin-left: -30px;
   margin-right: -30px;
+  margin-bottom: 24px;
 }
 .content-article-box {
   background-color: #f5f5f5;
   height: 128px;
+  margin-bottom: 24px;
 }
 .content-article-img {
   height: 100px;
@@ -544,6 +549,7 @@ export default {
 .content-activity-box {
   background-color: #f5f5f5;
   height: 128px;
+  margin-bottom: 24px;
 }
 .content-activity-img {
   height: 100px;
