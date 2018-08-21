@@ -19,7 +19,6 @@ export default {
     })
       .then(res => {
         if (res.data.phone) {
-          this.$toast(res.data.phone + res.data.token, 2000, () => {})
           this.$store.commit('login/login', {
             token: res.data.token
           })

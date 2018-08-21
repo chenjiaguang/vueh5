@@ -56,7 +56,7 @@ export default {
       return {
         phone: this.phone,
         code: this.code,
-        token: '',
+        token: this.$route.params.token,
         origin: 'H5'
       }
     },
@@ -217,7 +217,7 @@ export default {
   color: #1eb0fd;
   font-size: 30px;
   line-height: 30px;
-  padding-left: 30px;
+  text-align: center;
 }
 .send-btn-disable {
   color: #999999;

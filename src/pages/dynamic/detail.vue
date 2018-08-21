@@ -90,7 +90,7 @@
             <div class="row space-between">
               <div class="row center">
                 <div class="image-avatar-box row flex-wrap-wrap">
-                  <img class="image-avatar" v-for="(image,index) in dynamic.like_list" :src="image.avatar" :key="index" @click="clickUser(image.uid)"/>
+                  <img class="image-avatar" v-for="(image) in dynamic.like_list" :src="image.avatar" :key="image.uid" @click="clickUser(image.uid)"/>
                   <i class="iconfont icon-more" v-if="dynamic.like_num>20"></i>
                 </div>
               </div>
@@ -163,9 +163,7 @@ export default {
       winHeight: window.innerHeight,
       winWidth: window.innerWidth,
       pn: 1,
-      scrollToTopVisible: false,
-      isArticle:
-        this.$route.query.isArticle && this.$route.query.isArticle !== 'false'
+      scrollToTopVisible: false
     }
   },
   components: {
@@ -203,6 +201,9 @@ export default {
     }
   },
   computed: {
+    isArticle: function () {
+      return this.$route.query.isArticle && this.$route.query.isArticle !== 'false'
+    },
     followData: function () {
       return {
         follow: '1',
@@ -420,6 +421,7 @@ export default {
   color: #333333;
   margin-bottom: 21px;
   white-space: pre-wrap;
+  word-break: break-all;
 }
 .article-desc {
   font-size: 24px;
@@ -499,6 +501,7 @@ export default {
   font-size: 32px;
   line-height: 46px;
   margin-bottom: 17px;
+  word-break: break-all;
 }
 .detail-image-container {
   margin-left: -30px;

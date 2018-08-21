@@ -47,10 +47,9 @@ export default {
   components: {},
   methods: {
     clickLike (id) {
-      let nowHasLike = this.likeData.like
-      this.$ajax('/jv/qz/like', { data: this.likeData })
+      let nowHasLike = this.dynamic.has_like = this.likeData.like
+      this.$ajax('/jv/qz/like', { data: this.likeData, checkLogin: true })
         .then(res => {
-          this.dynamic.has_like = nowHasLike
           if (nowHasLike) {
             // 增加
             this.dynamic.like_list.splice(0, 0, res.data)
@@ -63,6 +62,9 @@ export default {
             this.dynamic.like_list.splice(i, 1)
             this.dynamic.like_num--
           }
+        })
+        .catch(() => {
+          this.dynamic.has_like = !nowHasLike
         })
     },
     clickComment (id) {
