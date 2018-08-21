@@ -186,9 +186,9 @@ router.beforeEach((to, from, next) => {
     i.src = 'https://www.baidu.com/favicon.ico';
     i.style.display = 'none';
     i.onload = () => {
-        setTimeout(() => {
-            i.remove()
-        }, 9)
+      setTimeout(() => {
+        i.remove()
+      }, 9)
     }
     document.title = to.meta.title
     document.body.appendChild(i)

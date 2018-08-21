@@ -144,16 +144,16 @@ export default {
   },
   components: {TopicItem, DownloadBox, LoadingView, ScrollToTop},
   watch: {
-    '$route.query': function (val, oldVal) {
-      if (!val.previewImage && oldVal.previewImage) { // 点击大图后返回
+    '$route': function (val, oldVal) {
+      if (!val.query.previewImage && oldVal.query.previewImage) { // 点击大图后返回
         if (this.previewInstance) {
           this.$previewImage.hide(this.previewInstance)
           this.previewInstance = null
         }
       }
-      if (val.topic_id !== oldVal.topic_id || val.jump_tab !== oldVal.jump_tab) { // topic_id或jump_tab变化时重置数据
+      utils.checkReloadWithKeepAliveNew(this, val, oldVal, 'TopicDetail', ['topic_id', 'jump_tab'], () => {
         this.refreshData()
-      }
+      })
     }
   },
   methods: {
@@ -236,6 +236,9 @@ export default {
       }
       this.fetchTopic(this.selectedIdx, 1)
       this.initSlideBlock()
+      for (let i = 0; i < this.tabs.length; i++) {
+        this.$refs['contentScroll'][i].scrollTo(0, 0, 10)
+      }
     },
     fetchTopic (idx, pn) {
       console.log('11this.$route.query.topic_id', this.$route.query.topic_id)
@@ -358,11 +361,6 @@ export default {
   created () {
     this.fetchTopic(this.selectedIdx, 1)
     this.initSlideBlock()
-  },
-  activated () {
-    utils.checkReloadWithKeepAlive(this, ['topic_id', 'jump_tab'], () => {
-      this.refreshData()
-    })
   }
 }
 </script>

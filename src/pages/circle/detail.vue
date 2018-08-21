@@ -166,16 +166,16 @@ export default {
         this.fetchDynamic(1)
       }
     },
-    '$route.query': function (val, oldVal) {
-      if (!val.previewImage && oldVal.previewImage) { // 点击大图后返回
+    '$route': function (val, oldVal) {
+      if (!val.query.previewImage && oldVal.query.previewImage) { // 点击大图后返回
         if (this.previewInstance) {
           this.$previewImage.hide(this.previewInstance)
           this.previewInstance = null
         }
       }
-      if (val.topic_id !== oldVal.topic_id || val.jump_tab !== oldVal.jump_tab) { // circle_id或jump_tab变化时重置数据
+      utils.checkReloadWithKeepAliveNew(this, val, oldVal, 'CircleDetail', ['circle_id', 'jump_tab'], () => {
         this.refreshData()
-      }
+      })
     }
   },
   methods: {
@@ -259,6 +259,9 @@ export default {
       }
       this.fetchCircle()
       this.initSlideBlock()
+      for (let i = 0; i < this.tabs.length; i++) {
+        this.$refs['contentScroll'][i].scrollTo(0, 0, 10)
+      }
     },
     fetchCircle () {
       let rData = {
@@ -439,11 +442,6 @@ export default {
   created () {
     this.fetchCircle()
     this.initSlideBlock()
-  },
-  activated () {
-    utils.checkReloadWithKeepAlive(this, ['circle_id', 'jump_tab'], () => {
-      this.refreshData()
-    })
   }
 }
 </script>

@@ -72,47 +72,52 @@ Vue.use(TabBar)
 Vue.use(TabPanels)
 Vue.use(Slide)
 Vue.use(Sticky)
-const tabs = [
-  {
-    title: '动态',
-    data: [],
-    paging: {},
-    fetching: false
-  }
-]
+
+const initialData = {
+  lastYear: '',
+  user: {
+    is_owner: true
+  },
+  showBackTop: false,
+  tabs: [
+    {
+      title: '动态',
+      data: [],
+      paging: {},
+      fetching: false
+    }
+  ],
+  selectedLabel: '动态',
+  selectedIdx: 0,
+  tabSlideX: -window.innerWidth + 'px',
+  options: {
+    pullDownRefresh: false,
+    pullUpLoad: {
+      threshold: (window.innerWidth / 750) * 100
+    },
+    stopPropagation: true
+  },
+  timer: null,
+  previewInstance: null,
+  following: false
+}
 export default {
   data() {
-    return {
-      lastYear: '',
-      user: {
-        is_owner: true
-      },
-      showBackTop: false,
-      tabs: tabs,
-      selectedLabel: '动态',
-      selectedIdx: 0,
-      tabSlideX: -window.innerWidth + 'px',
-      options: {
-        pullDownRefresh: false,
-        pullUpLoad: {
-          threshold: (window.innerWidth / 750) * 100
-        },
-        stopPropagation: true
-      },
-      timer: null,
-      previewInstance: null,
-      following: false
-    }
+    let _initialData = JSON.parse(JSON.stringify(initialData))
+    return _initialData
   },
   components: {DownloadBox, DynamicItem, ScrollToTop},
   watch: {
-    '$route.query.previewImage': function (val, oldVal) {
-      if (!val && oldVal) {
+    '$route': function (val, oldVal) {
+      if (!val.query.previewImage && oldVal.query.previewImage) { // 点击大图后返回
         if (this.previewInstance) {
           this.$previewImage.hide(this.previewInstance)
           this.previewInstance = null
         }
       }
+      utils.checkReloadWithKeepAliveNew(this, val, oldVal, 'UserCenter', ['user_id', 'jump_tab'], () => {
+        this.refreshData()
+      })
     }
   },
   methods: {
@@ -216,6 +221,15 @@ export default {
           clearInterval(this.timer)
         }
       },30)
+    },
+    refreshData () {
+      let _initialData = JSON.parse(JSON.stringify(initialData))
+      for (let item in _initialData) {
+        this[item] = _initialData[item]
+      }
+      this.fetchList(0, 1)
+      this.initSlideBlock()
+      this.$refs['pageScroller'].scrollTo(0, 0, 10)
     },
     onPullingUp () {
       if (!(this.tabs[0].paging && this.tabs[0].paging.pn && !this.tabs[0].paging.is_end)) { // 未生成paging，或者paging.pn不存在，或者已是最后一页     终止操作

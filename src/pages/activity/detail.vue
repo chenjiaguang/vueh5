@@ -332,44 +332,54 @@
 import '@/iconfont/iconfont.css'
 import ShowHideContent from './components/ShowHideContent'
 import utils from '@/lib/utils'
+
+const initialData = {
+  setted: false,
+  activity: {
+    id: '',
+    banner: '',
+    content: [],
+    title: '',
+    sponsor: { // 主办方
+      name: '',
+      tel: ''
+    },
+    address: {
+      title: '',
+      coordinate: {
+        lng: '',
+        lat: ''
+      }
+    },
+    date: '',
+    cost: '',
+    deadline: '',
+    tags: [],
+    joinTotal: 0,
+    join: [],
+    activityHasDynamic: false,
+    activityDynamic: [],
+    statusText: '',
+    ticket: []
+  },
+  showMore: false, // 显示更多
+  contentWrapperHeight: null,
+  halfScreenHeight: parseInt(window.innerHeight * 0.5)
+}
 export default {
   name: 'ActivityDetail',
   data () {
-    return {
-      setted: false,
-      activity: {
-        id: '',
-        banner: '',
-        content: [],
-        title: '',
-        sponsor: { // 主办方
-          name: '',
-          tel: ''
-        },
-        address: {
-          title: '',
-          coordinate: {
-            lng: '',
-            lat: ''
-          }
-        },
-        date: '',
-        cost: '',
-        deadline: '',
-        tags: [],
-        joinTotal: 0,
-        join: [],
-        activityHasDynamic: false,
-        activityDynamic: [],
-        statusText: '',
-        ticket: []
-      },
-      showMore: false, // 显示更多
-      contentWrapperHeight: null,
-      halfScreenHeight: parseInt(window.innerHeight * 0.5),
-    }
+    let _initialData = JSON.parse(JSON.stringify(initialData))
+    return _initialData
   },
   components: { ShowHideContent },
+  watch: {
+    '$route.query.id': function (val, oldVal) {
+      if (val && val !== oldVal) {
+        this.refreshData()
+      }
+    }
+  },
   methods: {
     fetchActivity () {
       let rData = {
@@ -419,6 +429,13 @@ export default {
       }).catch(err => {
         console.log('获取数据失败')
       })
+    },
+    refreshData () {
+      let _initialData = JSON.parse(JSON.stringify(initialData))
+      for (let item in _initialData) {
+        this[item] = _initialData[item]
+      }
+      this.fetchActivity()
     },
     goMap (option) { // option: lng, lat, title
       if (!option.lng || !option.lat) { // 未传入经纬度则返回
