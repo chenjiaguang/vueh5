@@ -45,7 +45,7 @@
             </div>
           </div>
 
-          <div v-if="dynamic&&isArticle" id="article-content-container" class="column">
+          <div v-if="dynamic&&dynamic.isArticle" id="article-content-container" class="column">
             <div v-for="(content,index) in dynamic.contents" :key="index">
               <div class="article-image-container">
                 <img class="article-image" v-if="content.type==2" :src="content.imageUrl" @click="previewImagesInArticle(content.imageIndex)"/>
@@ -60,7 +60,7 @@
             </div>
           </div>
 
-          <div v-if="dynamic&&!isArticle" id="content-container" class="column">
+          <div v-if="dynamic&&!dynamic.isArticle" id="content-container" class="column">
             <div class="dynamic-content">{{dynamic.content}}</div>
             <TopicTagBox :topicInfo="dynamic.topicInfo" />
             <DetailImageContainer class="detail-image-container"  :images="dynamic.covers"/>
@@ -185,12 +185,19 @@ export default {
     this.fetch()
   },
   watch: {
-    '$route': function (val, oldVal) {
-      utils.checkReloadWithKeepAliveNew(this, val, oldVal, 'DynamicDetail', ['id'], () => {
-        this.dynamic = null
-        this.isLoad = false
-        this.fetch()
-      })
+    $route: function (val, oldVal) {
+      utils.checkReloadWithKeepAliveNew(
+        this,
+        val,
+        oldVal,
+        'DynamicDetail',
+        ['id'],
+        () => {
+          this.dynamic = null
+          this.isLoad = false
+          this.fetch()
+        }
+      )
     }
   },
   activated () {
@@ -202,7 +209,9 @@ export default {
   },
   computed: {
     isArticle: function () {
-      return this.$route.query.isArticle && this.$route.query.isArticle !== 'false'
+      return (
+        this.$route.query.isArticle && this.$route.query.isArticle !== 'false'
+      )
     },
     followData: function () {
       return {
@@ -236,6 +245,7 @@ export default {
         .then(res => {
           this.dynamic = res.data
           let i = 0
+          this.dynamic.isArticle = this.isArticle
           if (this.isArticle) {
             this.imageList = this.dynamic.contents
               .filter(content => {
