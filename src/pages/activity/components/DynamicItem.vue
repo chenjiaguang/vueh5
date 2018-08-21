@@ -12,7 +12,7 @@
     </div>
     <show-hide-dynamic-content :content="(itemData.type && itemData.type.toString() === '18') ? itemData.title : (itemData.content || '')" :isLongDynamic="(itemData.type && itemData.type.toString() === '18') ? true : false" />
     <div class="dynamic-pinture" v-if="itemData.covers && itemData.covers.length > 0">
-      <image-container :images="itemData.covers" :appearAnimation="false" :showDelete="false" @showPreview="showPreview" @hidePreview="hidePreview" />
+      <image-container :images="itemData.covers" :router="router" :appearAnimation="false" :showDelete="false" />
     </div>
     <div v-if="itemData.location" class="publish-address">{{itemData.location}}</div>
     <div v-if="itemData.activity" class="at-activity"><i class="iconfont icon-activity activity-sign"></i>{{itemData.activity.title}}</div>
@@ -276,12 +276,6 @@ export default {
     },
     goCircle () {
       this.router.push({ name: 'CircleDetail', query: { circle_id: this.itemData.circle_id } })
-    },
-    showPreview (instance) {
-      this.$emit('showPreview', instance)
-    },
-    hidePreview () {
-      this.$emit('hidePreview')
     }
   }
 }

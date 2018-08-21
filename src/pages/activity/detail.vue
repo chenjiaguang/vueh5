@@ -31,7 +31,7 @@
       <div class="tag-container clearfix">
         <div class="fl tag-item" v-for="(item, idx) in activity.tags" :key="idx">{{item}}<div class="tag-border"></div></div>
       </div>
-      <show-hide-content :content="activity.content" v-if="activity.content && activity.content.length > 0" @showPreview="showPreview" @hidePreview="hidePreview" />
+      <show-hide-content :content="activity.content" :router="$router" v-if="activity.content && activity.content.length > 0" />
     </div>
     <div class="join-wrapper" v-if="activity.join && activity.join.length > 0">
       <div class="color-block"></div>
@@ -376,9 +376,9 @@ export default {
   watch: {
     '$route': function (val, oldVal) {
       if (!val.query.previewImage && oldVal.query.previewImage) { // 点击大图后返回
-        if (this.previewInstance) {
-          this.$previewImage.hide(this.previewInstance)
-          this.previewInstance = null
+        if (window.previewImageId) {
+          this.$previewImage.hide(window.previewImageId)
+          window.previewImageId = null
         }
       }
       if (val.query.id && val.query.id !== oldVal.query.id) { // 登陆不刷新，只有id变化才刷新
@@ -387,14 +387,6 @@ export default {
     }
   },
   methods: {
-    showPreview (instance) {
-      this.previewInstance = instance
-      this.$router.push({name: this.$route.name, query: Object.assign({}, this.$route.query, {previewImage: true})})
-    },
-    hidePreview () {
-      this.previewInstance = null
-      this.$router.go(-1)
-    },
     fetchActivity () {
       let rData = {
         id: this.$route.query.id

@@ -41,7 +41,7 @@
                   </div>
                 </transition>
                 <div v-if="tabs[index].paging && tabs[index].paging.is_end && tabs[index].data && tabs[index].data.length === 0" class="empty-box">该话题暂无{{index === 0 ? '最新动态' : '最热动态'}}</div>
-                <topic-item v-for="(item, idx) in tabs[index].data" :key="idx" :itemData="item" :router="$router" @changeLike="(data) => changeLike(data, index)" @showPreview="showPreview" @hidePreview="hidePreview" />
+                <topic-item v-for="(item, idx) in tabs[index].data" :key="idx" :itemData="item" :router="$router" @changeLike="(data) => changeLike(data, index)" />
                 <template slot="pulldown" slot-scope="props">
                   <div class="cube-pulldown-wrapper" :style="props.pullDownStyle">
                     <img v-show="!props.isPullingDown" class="pull-down-icon" :style="{transform: 'translateY(' + props.bubbleY + 'px)'}" :src="$assetsPublicPath + '/cwebassets/image/refresh_icon.png'" />
@@ -133,8 +133,7 @@ const initialData = {
     },
     probeType: 3,
     stopPropagation: true
-  },
-  previewInstance: null
+  }
 }
 export default {
   data() {
@@ -148,9 +147,9 @@ export default {
   watch: {
     '$route': function (val, oldVal) {
       if (!val.query.previewImage && oldVal.query.previewImage) { // 点击大图后返回
-        if (this.previewInstance) {
-          this.$previewImage.hide(this.previewInstance)
-          this.previewInstance = null
+        if (window.previewImageId) {
+          this.$previewImage.hide(window.previewImageId)
+          window.previewImageId = null
         }
       }
       utils.checkReloadWithKeepAliveNew(this, val, oldVal, 'TopicDetail', ['topic_id', 'jump_tab'], () => {
@@ -159,14 +158,6 @@ export default {
     }
   },
   methods: {
-    showPreview (instance) {
-      this.previewInstance = instance
-      this.$router.push({name: this.$route.name, query: Object.assign({}, this.$route.query, {previewImage: true})})
-    },
-    hidePreview () {
-      this.previewInstance = null
-      this.$router.go(-1)
-    },
     changeTabBar (tabTitle) { // 点击tab切换
       let wrapperWidth = this.$refs['navWrapper'] ? this.$refs['navWrapper'].offsetWidth : window.innerWidth
       this.tabs.forEach((item, index) => {

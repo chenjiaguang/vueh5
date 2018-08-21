@@ -26,7 +26,7 @@
         <img :src="$assetsPublicPath + '/cwebassets/image/empty_dynamic.png'" class="empty-image" />
         暂无动态
       </div>
-      <dynamic-item v-for="(item, idx) in tabs[0].data" :key="idx" :itemData="item" :router="$router" @changeLike="changeLike" @showPreview="showPreview" @hidePreview="hidePreview" />
+      <dynamic-item v-for="(item, idx) in tabs[0].data" :key="idx" :itemData="item" :router="$router" @changeLike="changeLike" />
       <template slot="pulldown" slot-scope="props">
         <div class="cube-pulldown-wrapper" :style="props.pullDownStyle">
           <img v-show="!props.isPullingDown" class="pull-down-icon" :style="{transform: 'translateY(' + props.bubbleY + 'px)'}" :src="$assetsPublicPath + '/cwebassets/image/refresh_icon.png'" />
@@ -47,6 +47,7 @@
       </template>
     </cube-scroll>
     <scroll-to-top v-if="$refs['pageScroller']" :visible="showBackTop" :scroll="$refs['pageScroller']"/>
+    <router-view></router-view>
   </div>
 </template>
 
@@ -100,7 +101,6 @@ const initialData = {
     stopPropagation: true
   },
   timer: null,
-  previewInstance: null,
   following: false
 }
 export default {
@@ -112,9 +112,9 @@ export default {
   watch: {
     '$route': function (val, oldVal) {
       if (!val.query.previewImage && oldVal.query.previewImage) { // 点击大图后返回
-        if (this.previewInstance) {
-          this.$previewImage.hide(this.previewInstance)
-          this.previewInstance = null
+        if (window.previewImageId) {
+          this.$previewImage.hide(window.previewImageId)
+          window.previewImageId = null
         }
       }
       utils.checkReloadWithKeepAliveNew(this, val, oldVal, 'UserCenter', ['user_id', 'jump_tab'], () => {
@@ -123,14 +123,6 @@ export default {
     }
   },
   methods: {
-    showPreview (instance) {
-      this.previewInstance = instance
-      this.$router.push({name: this.$route.name, query: Object.assign({}, this.$route.query, {previewImage: true})})
-    },
-    hidePreview () {
-      this.previewInstance = null
-      this.$router.go(-1)
-    },
     changeTabBar (tabTitle) { // 点击tab切换
       const tabSlidePos = this.$refs['tabSlide'].getBoundingClientRect()
       this.tabs.forEach((item, index) => {

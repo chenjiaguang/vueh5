@@ -15,7 +15,7 @@
       <div v-for="(item, idx) in itemData.topicInfo" :key="idx" @click.stop="goTopic(idx)" class="topic-item fl"><i class="iconfont icon-topic relative-topic-icon"></i>{{item.title}}</div>
     </div>
     <div class="dynamic-picture" v-if="itemData.covers && itemData.covers.length > 0">
-      <image-container :images="itemData.covers" :appearAnimation="false" :showDelete="false" @showPreview="showPreview" @hidePreview="hidePreview" />
+      <image-container :images="itemData.covers" :router="router" :appearAnimation="false" :showDelete="false" />
     </div>
     <div v-if="itemData.location" class="publish-address">{{itemData.location}}</div>
     <div v-if="itemData.activity" class="at-activity"><i class="iconfont icon-activity activity-sign"></i>{{itemData.activity.title}}</div>
@@ -310,12 +310,6 @@ export default {
     },
     goTopic (idx) {
       this.router.push({ name: 'TopicDetail', query: { topic_id: this.itemData.topicInfo[idx].id } })
-    },
-    showPreview (instance) {
-      this.$emit('showPreview', instance)
-    },
-    hidePreview () {
-      this.$emit('hidePreview')
     }
   }
 }
