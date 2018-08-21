@@ -46,7 +46,7 @@
                   </div>
                 </transition>
                 <div v-if="tabs[index].paging && tabs[index].paging.is_end && tabs[index].data && tabs[index].data.length === 0" class="empty-box">该圈子暂无{{index === 0 ? '动态' : '活动'}}</div>
-                <dynamic-item v-if="index === 0" v-for="(item, idx) in tabs[index].data" :key="idx" :itemData="item" :router="$router" @changeLike="changeLike" @showPreview="showPreview" @hidePreview="hidePreview" />
+                <dynamic-item v-if="index === 0" v-for="(item, idx) in tabs[index].data" :key="idx" :itemData="item" :router="$router" @changeLike="changeLike" />
                 <activity-item v-if="index === 1" v-for="(item, idx) in tabs[index].data" :key="idx" :itemData="item" />
                 <template slot="pulldown" slot-scope="props">
                   <div class="cube-pulldown-wrapper" :style="props.pullDownStyle">
@@ -140,7 +140,6 @@ const initialData = {
     probType: 3,
     stopPropagation: true
   },
-  previewInstance: null,
   showTabbar: false,
   showBanner: true
 }
@@ -170,9 +169,9 @@ export default {
     },
     '$route': function (val, oldVal) {
       if (!val.query.previewImage && oldVal.query.previewImage) { // 点击大图后返回
-        if (this.previewInstance) {
-          this.$previewImage.hide(this.previewInstance)
-          this.previewInstance = null
+        if (window.previewImageId) {
+          this.$previewImage.hide(window.previewImageId)
+          window.previewImageId = null
         }
       }
       utils.checkReloadWithKeepAliveNew(this, val, oldVal, 'CircleDetail', ['circle_id', 'jump_tab'], () => {
@@ -181,14 +180,6 @@ export default {
     }
   },
   methods: {
-    showPreview (instance) {
-      this.previewInstance = instance
-      this.$router.push({name: this.$route.name, query: Object.assign({}, this.$route.query, {previewImage: true})})
-    },
-    hidePreview () {
-      this.previewInstance = null
-      this.$router.go(-1)
-    },
     changeTabBar (tabTitle) { // 点击tab切换
       let wrapperWidth = this.$refs['navWrapper'] ? this.$refs['navWrapper'].offsetWidth : window.innerWidth
       this.tabs.forEach((item, index) => {

@@ -24,7 +24,7 @@
 
 <script>
 export default {
-  props: ['images', 'showDelete', 'deleteFunc', 'appearAnimation', 'addFunc', 'isUpload'],
+  props: ['images', 'showDelete', 'deleteFunc', 'appearAnimation', 'addFunc', 'isUpload', 'router'],
   data () {
     return {
       statusText: {
@@ -43,7 +43,7 @@ export default {
     },
     previewImage (idx) {
       let _images = this.images.map(item => (item.url || item.localUrl))
-      this.$previewImage.show({images: _images, idx}, (instance) => this.$emit('showPreview', instance), () => this.$emit('hidePreview'))
+      this.$previewImage.show({images: _images, idx}, this.router)
     }
   }
 }

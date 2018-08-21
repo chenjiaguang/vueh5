@@ -9,7 +9,7 @@
           <loading-view />
         </div>
       </transition>
-      <dynamic-item v-for="(item, idx) in dynamic" :key="idx" :itemData="item" :router="$router" @changeLike="changeLike" @showPreview="showPreview" @hidePreview="hidePreview" />
+      <dynamic-item v-for="(item, idx) in dynamic" :key="idx" :itemData="item" :router="$router" @changeLike="changeLike" />
       <template slot="pullup" slot-scope="props">
         <!-- 可以下拉继续加载 -->
         <div class="cube-pullup-wrapper pullup-wrapper" :style="props.pullUpStyle" v-if="paging && paging.pn && !paging.is_end">
@@ -55,8 +55,7 @@ const initialData = {
     },
     probType: 3,
     stopPropagation: true
-  },
-  previewInstance: null
+  }
 }
 export default {
   data() {
@@ -67,9 +66,9 @@ export default {
   watch: {
     '$route': function (val, oldVal) {
       if (!val.query.previewImage && oldVal.query.previewImage) { // 点击大图后返回
-        if (this.previewInstance) {
-          this.$previewImage.hide(this.previewInstance)
-          this.previewInstance = null
+        if (window.previewImageId) {
+          this.$previewImage.hide(window.previewImageId)
+          window.previewImageId = null
         }
       }
       utils.checkReloadWithKeepAliveNew(this, val, oldVal, 'ActivityDynamic', ['activity_id'], () => {
@@ -78,14 +77,6 @@ export default {
     }
   },
   methods: {
-    showPreview (instance) {
-      this.previewInstance = instance
-      this.$router.push({name: this.$route.name, query: Object.assign({}, this.$route.query, {previewImage: true})})
-    },
-    hidePreview () {
-      this.previewInstance = null
-      this.$router.go(-1)
-    },
     fetchDynamic (pn) {
       if (this.fetching) { // 正在拉取动态数据
         return false

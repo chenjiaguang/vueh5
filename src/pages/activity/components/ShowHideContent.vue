@@ -107,6 +107,9 @@ export default {
     content: {
       type: Array,
       required: true
+    },
+    router: {
+      required: false
     }
   },
   data () {
@@ -140,7 +143,7 @@ export default {
     },
     preview (index) {
       let idx = this.contentImages.idxArr.indexOf(index)
-      this.$previewImage.show({images: this.contentImages.imageArr, idx: idx}, (instance) => this.$emit('showPreview', instance), () => this.$emit('hidePreview'))
+      this.$previewImage.show({images: this.contentImages.imageArr, idx: idx}, this.router)
     }
   },
   computed: {
