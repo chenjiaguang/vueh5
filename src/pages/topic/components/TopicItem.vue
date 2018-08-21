@@ -28,10 +28,17 @@
     <div class="comment-and-like clearfix">
       <div @click.stop="changeLike" class="comment-and-like-item fl" :style="{paddingLeft: 0, color: itemData.has_like ? '#FE5273' : '#333'}">
         <div class="comment-and-like-icon-box">
-          <transition-group name="fade" mode="in-out">
+          <!-- <transition-group name="fade" mode="in-out">
             <i v-if="itemData.has_like" key="like" class="iconfont icon-like comment-and-like-icon"></i>
             <i v-else key="dislike" class="iconfont icon-dislike comment-and-like-icon"></i>
-          </transition-group>
+          </transition-group> -->
+          <transition
+            enter-active-class="animated wobble"
+            leave-active-class="hide"
+          >
+            <i v-if="itemData.has_like" class='iconfont icon-like comment-and-like-icon'></i>
+          </transition>
+          <i v-if="!itemData.has_like" class='iconfont icon-dislike comment-and-like-icon'></i>
           <span>{{likeNumber || '赞'}}</span>
         </div>
       </div>
@@ -224,7 +231,8 @@
   overflow: hidden;
   text-align: center;
   position: absolute;
-  padding-left: 50px;
+  padding-left: 70px;
+  padding-right: 20px;
   left: 50%;
   top: 0;
   transform: translateX(-50%);
@@ -232,9 +240,9 @@
 .comment-and-like-icon{
   display: block;
   position: absolute;
-  left: 0;
-  top: 50%;
-  transform: translateY(-50%);
+  left: 20px;
+  // top: 50%;
+  // transform: translateY(-50%);
   font-size: 32px;
   line-height: 66px;
   color: inherit;

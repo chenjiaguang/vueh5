@@ -370,28 +370,29 @@ export default {
       }
     },
     changeLike (item) {
-      if (!utils.checkLogin()) { // 未登陆终止
+      if (!utils.checkLogin()) {
         return false
       }
+      const isLike = item.has_like
+      const likeNum = parseInt(item.like_num)
       let rData = {
         id: item.id,
-        like: !item.has_like,
+        like: !isLike,
         type: 0
       }
       this.tabs[0].data.forEach(i => {
         if (i.id === item.id) {
+          i.has_like = !isLike
+          i.like_num = likeNum + (isLike ? -1 : 1)
           i.submitting = true
         }
       })
       this.$ajax('/jv/qz/like', {data: rData}).then(res => {
-        if (res && res.msg) {
-          this.$toast(res.msg)
-        }
-        if (res && !Boolean(res.error)) {
+        if (!res || (res && Boolean(res.error))) { // 出错时重置点赞
           this.tabs[0].data.forEach(i => {
             if (i.id === item.id) {
-              i.has_like = !item.has_like
-              i.like_num = parseInt(item.like_num) + (item.has_like ? 1 : -1)
+              i.has_like = isLike
+              i.like_num = likeNum
               i.submitting = false
             }
           })
@@ -405,6 +406,8 @@ export default {
       }).catch(err => {
         this.tabs[0].data.forEach(i => {
           if (i.id === item.id) {
+            i.has_like = isLike
+            i.like_num = likeNum
             i.submitting = false
           }
         })

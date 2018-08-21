@@ -286,49 +286,44 @@ export default {
       if (!utils.checkLogin()) {
         return false
       }
+      const isLike = item.has_like
+      const likeNum = parseInt(item.like_num)
       let rData = {
         id: item.id,
-        like: !item.has_like,
+        like: !isLike,
         type: 0
       }
-      for (let i = 0; i < this.tabs.length; i++) {
-        this.tabs[i].data.forEach(listItem => {
-          if (listItem.id === item.id) {
-            listItem.submitting = true
-          }
-        })
-      }
+      this.tabs[idx].data.forEach(i => {
+        if (i.id === item.id) {
+          i.has_like = !isLike
+          i.like_num = likeNum + (isLike ? -1 : 1)
+          i.submitting = true
+        }
+      })
       this.$ajax('/jv/qz/like', {data: rData}).then(res => {
-        if (res && res.msg) {
-          this.$toast(res.msg)
-        }
-        if (res && !Boolean(res.error)) {
-          for(let i = 0; i < this.tabs.length; i++) {
-            this.tabs[i].data.forEach(listItem => {
-              if (listItem.id === item.id) {
-                listItem.has_like = !listItem.has_like
-                listItem.like_num = parseInt(listItem.like_num) + (listItem.has_like ? 1 : -1)
-                listItem.submitting = false
-              }
-            })
-          }
+        if (!res || (res && Boolean(res.error))) { // 出错时重置点赞
+          this.tabs[idx].data.forEach(i => {
+            if (i.id === item.id) {
+              i.has_like = isLike
+              i.like_num = likeNum
+              i.submitting = false
+            }
+          })
         } else {
-          for(let i = 0; i < this.tabs.length; i++) {
-            this.tabs[i].data.forEach(listItem => {
-              if (listItem.id === item.id) {
-                listItem.submitting = false
-              }
-            })
-          }
-        }
-      }).catch(err => {
-        for(let i = 0; i < this.tabs.length; i++) {
-          this.tabs[i].data.forEach(listItem => {
-            if (listItem.id === item.id) {
-              listItem.submitting = false
+          this.tabs[idx].data.forEach(i => {
+            if (i.id === item.id) {
+              i.submitting = false
             }
           })
         }
+      }).catch(err => {
+        this.tabs[idx].data.forEach(i => {
+          if (i.id === item.id) {
+            i.has_like = isLike
+            i.like_num = likeNum
+            i.submitting = false
+          }
+        })
       })
     },
     innerScroll ({x, y}) {
