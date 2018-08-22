@@ -71,8 +71,8 @@ export default {
       this.texts.btnText = '立即绑定'
     } else {
       // login
-      this.texts.title = '手机验证码登陆'
-      this.texts.btnText = '立即登陆'
+      this.texts.title = '手机验证码登录'
+      this.texts.btnText = '立即登录'
     }
     document.title = this.texts.title
   },
