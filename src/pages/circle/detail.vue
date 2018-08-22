@@ -86,15 +86,15 @@ import LoadingView from '@/components/LoadingView'
 import ScrollToTop from '@/components/ScrollToTop'
 import utils from '@/lib/utils'
 import {
-    /* eslint-disable no-unused-vars */
-    Style,
-    Scroll,
-    Loading,
-    TabBar,
-    TabPanels,
-    Slide,
-    Sticky
-  } from 'cube-ui'
+  /* eslint-disable no-unused-vars */
+  Style,
+  Scroll,
+  Loading,
+  TabBar,
+  TabPanels,
+  Slide,
+  Sticky
+} from 'cube-ui'
 Vue.use(Scroll)
 Vue.use(Loading)
 Vue.use(TabBar)
@@ -144,7 +144,7 @@ const initialData = {
   showBanner: true
 }
 export default {
-  data() {
+  data () {
     let selectedIdx = parseInt(this.$route.query.jump_tab || 0)
     let selectedLabel = (this.$route.query.jump_tab && this.$route.query.jump_tab.toString() === '1') ? '活动' : '动态'
     let _initialData = JSON.parse(JSON.stringify(initialData))
@@ -240,7 +240,7 @@ export default {
           this.$refs['pageScroller'].disable()
           clearInterval(this.timer)
         }
-      },30)
+      }, 30)
     },
     refreshData () {
       let selectedIdx = parseInt(this.$route.query.jump_tab || 0)
@@ -264,7 +264,7 @@ export default {
         if (res && res.msg) {
           this.$toast(res.msg)
         }
-        if (res && !Boolean(res.error) && res.data) { // 成功获取数据
+        if (res && !res.error && res.data) { // 成功获取数据
           this.circle = res.data
           if (!res.data.circle_has_activity) { // 有活动tab
             this.tabs.splice(1, 1)
@@ -296,7 +296,7 @@ export default {
         if (res && res.msg) {
           this.$toast(res.msg)
         }
-        if (res && !Boolean(res.error) && res.data) { // 成功获取数据
+        if (res && !res.error && res.data) { // 成功获取数据
           this.tabs[0].fetching = false
           this.tabs[0].paging = res.data.paging
           if (pn.toString() === '1') { // 刷新
@@ -331,7 +331,7 @@ export default {
         if (res && res.msg) {
           this.$toast(res.msg)
         }
-        if (res && !Boolean(res.error) && res.data) { // 成功获取数据
+        if (res && !res.error && res.data) { // 成功获取数据
           this.tabs[1].fetching = false
           this.tabs[1].paging = res.data.paging
           if (pn.toString() === '1') { // 刷新
@@ -430,7 +430,7 @@ export default {
       }
     },
     goPublish () {
-      if (utils.checkLogin()) { // 登陆后跳转
+      if (utils.checkLogin()) { // 登录后跳转
         this.$router.push({name: 'EditDynamic', params: {circle: {id: this.circle.id, title: this.circle.name}}})
       }
     }

@@ -4,7 +4,7 @@ import utils from './utils'
 
 // config自定义参数:
 // dontToast:bool:不显示默认的错误toast
-// checkLogin:bool:检查登陆
+// checkLogin:bool:检查登录
 axios.defaults.method = 'post'
 const loginText = '请登录'
 axios.interceptors.request.use(function (config) {

@@ -381,7 +381,7 @@ export default {
           window.previewImageId = null
         }
       }
-      if (val.query.id && val.query.id !== oldVal.query.id) { // 登陆不刷新，只有id变化才刷新
+      if (val.query.id && val.query.id !== oldVal.query.id) { // 登录不刷新，只有id变化才刷新
         this.refreshData()
       }
     }
@@ -458,7 +458,7 @@ export default {
       this.$router.push({name: 'ActivityDynamic', query: {activity_id: this.activity.id}})
     },
     goOrder () {
-      if (this.activity.statusText !== '购票' || !utils.checkLogin()) { // 未登陆或不可购票时终止
+      if (this.activity.statusText !== '购票' || !utils.checkLogin()) { // 未登录或不可购票时终止
         return false
       }
       this.$router.push({name: 'ActivityOrder', query: {id: this.$route.query.id}})

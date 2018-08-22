@@ -58,15 +58,15 @@ import DynamicItem from './components/DynamicItem'
 import ScrollToTop from '@/components/ScrollToTop'
 import utils from '@/lib/utils'
 import {
-    /* eslint-disable no-unused-vars */
-    Style,
-    Scroll,
-    Loading,
-    TabBar,
-    TabPanels,
-    Slide,
-    Sticky
-  } from 'cube-ui'
+  /* eslint-disable no-unused-vars */
+  Style,
+  Scroll,
+  Loading,
+  TabBar,
+  TabPanels,
+  Slide,
+  Sticky
+} from 'cube-ui'
 Vue.use(Scroll)
 Vue.use(Loading)
 Vue.use(TabBar)
@@ -104,7 +104,7 @@ const initialData = {
   following: false
 }
 export default {
-  data() {
+  data () {
     let _initialData = JSON.parse(JSON.stringify(initialData))
     return _initialData
   },
@@ -181,7 +181,7 @@ export default {
         if (res && res.msg) {
           this.$toast(res.msg)
         }
-        if (res && !Boolean(res.error) && res.data) { // 成功获取数据
+        if (res && !res.error && res.data) { // 成功获取数据
           this.lastYear = res.data.lastYear
           res.data.user && (this.user = res.data.user)
           let _tabs = [].concat(this.tabs)
@@ -214,7 +214,7 @@ export default {
           this.tabSlideX = slideX + 'px'
           clearInterval(this.timer)
         }
-      },30)
+      }, 30)
     },
     refreshData () {
       let _initialData = JSON.parse(JSON.stringify(initialData))
@@ -284,7 +284,7 @@ export default {
       }
     },
     changeFollow () {
-      if (this.following || !utils.checkLogin()) { // 关注/取关接口不允许多次调用,未登陆先跳登陆
+      if (this.following || !utils.checkLogin()) { // 关注/取关接口不允许多次调用,未登录先跳登录
         return false
       }
       let rData = {
@@ -297,7 +297,7 @@ export default {
         if (res && res.msg) {
           this.$toast(res.msg)
         }
-        if (res && !Boolean(res.error)) { // 请求成功
+        if (res && !res.error) { // 请求成功
           this.user.is_following = !this.user.is_following
         }
       }).catch(err => {

@@ -529,7 +529,7 @@ export default {
         this.form.userInfo.needIdCard = res.data.nead_idcard
         this.form.userInfo.needSex = res.data.nead_sex
         this.form.userInfo.needWeChat = res.data.need_wechat
-      }).catch(() => {
+      }).catch(err => {
         console.log('获取数据失败')
       })
     },
@@ -596,7 +596,7 @@ export default {
             _this.counting = false
           })
         }
-      }).catch(() => {
+      }).catch(err => {
         // 获取失败
         console.log('发送失败了')
         _this.counting = false
@@ -631,13 +631,13 @@ export default {
     //   console.log('完成订单')
     // },
     orderSubmit () { // 验证并提交订单
-      if (!utils.checkLogin()) { // 未登陆终止
+      if (!utils.checkLogin()) { // 未登录终止
         return false
       }
       let {selectedTicket} = this
-      let {agreement} = this.form
+      let {payWay, agreement, shouldPay} = this.form
       let {id} = this.activity
-      let {name, needName, phone, idCard, needIdCard, weChat, needWeChat, sex, needSex} = this.form.userInfo
+      let {name, needName, phone, code, idCard, needIdCard, weChat, needWeChat, sex, needSex} = this.form.userInfo
       let toastObject = {
         selectedTicket: !selectedTicket && '请选择购买的票',
         name: !name && needName && '请输入正确的姓名',
@@ -697,7 +697,7 @@ export default {
                   let _href = res.data.mweb_url
                   window.location.href = _href
                 }
-              }).catch(() => {
+              }).catch(err => {
                 console.log('微信外h5 err')
               })
             } else { // 允许调用微信公众号支付,微信浏览器
@@ -710,7 +710,7 @@ export default {
             }
           }
         }
-      }).catch(() => {
+      }).catch(err => {
         this.submitting = false
       })
     },
