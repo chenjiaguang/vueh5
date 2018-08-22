@@ -21,6 +21,12 @@ module.exports = {
   ],
   // add your custom rules here
   rules: {
+    // 是否强制回调错误处理
+    "handle-callback-err":"off",
+    // 是否强制变量使用驼峰命名
+    "camelcase":"off",
+    // 是否强制使用三等号
+    "eqeqeq": "off",
     // 是否禁止多个空格
     'no-multi-spaces': 'off',
     // 是否开启分号检查, off不检查, always强制使用分号, never强制不使用分号，还有其他选项 http://eslint.cn/docs/rules/semi
