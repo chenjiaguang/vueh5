@@ -81,15 +81,15 @@ import LoadingView from '@/components/LoadingView'
 import ScrollToTop from '@/components/ScrollToTop'
 import utils from '@/lib/utils'
 import {
-    /* eslint-disable no-unused-vars */
-    Style,
-    Scroll,
-    Loading,
-    TabBar,
-    TabPanels,
-    Slide,
-    Sticky
-  } from 'cube-ui'
+  /* eslint-disable no-unused-vars */
+  Style,
+  Scroll,
+  Loading,
+  TabBar,
+  TabPanels,
+  Slide,
+  Sticky
+} from 'cube-ui'
 Vue.use(Scroll)
 Vue.use(Loading)
 Vue.use(TabBar)
@@ -131,12 +131,13 @@ const initialData = {
     pullUpLoad: {
       threshold: (window.innerWidth / 750) * 100
     },
-    probeType: 3,
+    probeType: 1,
     stopPropagation: true
-  }
+  },
+  showBanner: true
 }
 export default {
-  data() {
+  data () {
     let selectedIdx = parseInt(this.$route.query.jump_tab || 0)
     let selectedLabel = (this.$route.query.jump_tab && this.$route.query.jump_tab.toString() === '1') ? '最热' : '最新'
     let _initialData = JSON.parse(JSON.stringify(initialData))
@@ -217,7 +218,7 @@ export default {
           this.$refs['pageScroller'].disable()
           clearInterval(this.timer)
         }
-      },30)
+      }, 30)
     },
     refreshData () {
       let selectedIdx = parseInt(this.$route.query.jump_tab || 0)
@@ -250,7 +251,7 @@ export default {
         if (res && res.msg) {
           this.$toast(res.msg)
         }
-        if (res && !Boolean(res.error) && res.data) { // 成功获取数据
+        if (res && !res.error && res.data) { // 成功获取数据
           this.tabs[idx].fetching = false
           this.tabs[idx].paging = res.data.paging
           if (pn.toString() === '1') { // 刷新
@@ -316,7 +317,7 @@ export default {
             }
           })
         }
-      }).catch(err => {
+      }).catch(() => {
         this.tabs[idx].data.forEach(i => {
           if (i.id === item.id) {
             i.has_like = isLike
@@ -327,16 +328,19 @@ export default {
       })
     },
     innerScroll ({x, y}) {
-      let bannerPos = this.$refs['topBanner'].getBoundingClientRect()
+      // let bannerPos = this.$refs['topBanner'].getBoundingClientRect()
       // let outerWrapperPos = this.$refs['pageScroller'].scrollTo(0, -innerWrapperPos.top, 500)
       if (-y > window.innerHeight) { // 超过一屏显示返回顶部
         this.showBackTop = true
       } else {
         this.showBackTop = false
       }
-      if (-y > window.innerHeight / 200) { // 超过半屏隐藏顶部banner
+      if (-y > window.innerHeight / 200 && this.showBanner) { // 超过半屏隐藏顶部banner
+        let bannerPos = this.$refs['topBanner'].getBoundingClientRect()
+        this.showBanner = false
         this.$refs['pageScroller'].scrollTo(0, -bannerPos.height, 500)
-      } else {
+      } else if (-y < window.innerHeight / 200 && !this.showBanner) {
+        this.showBanner = true
         this.$refs['pageScroller'].scrollTo(0, 0, 500)
       }
     },

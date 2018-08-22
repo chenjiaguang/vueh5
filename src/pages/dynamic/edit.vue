@@ -80,7 +80,7 @@ import EditOption from './components/EditOption'
 import axios from 'axios'
 import utils from '@/lib/utils'
 
-// 接受参数(params) topic: [{id: 2, title: '测试话题'}]    activity: {id: 2, title: '屯昌木色湖一日游'}    circle: {id: 2, title: '舌尖上的海口'}    range: 0||1|2  
+// 接受参数(params) topic: [{id: 2, title: '测试话题'}]    activity: {id: 2, title: '屯昌木色湖一日游'}    circle: {id: 2, title: '舌尖上的海口'}    range: 0||1||2
 export default {
   data () {
     let topic = this.$route.params.topic ? this.$route.params.topic.concat([]) : null
@@ -143,7 +143,7 @@ export default {
             token: window.localStorage.token || '',
             contentType: 'multipart/form-data',
             data: formData,
-            cancelToken: new CancelToken(function executor(cancel) {
+            cancelToken: new CancelToken(function executor (cancel) {
               // An executor function receives a cancel function as a parameter
               _this.cancelRequest[sign.toString()] = cancel
             })
@@ -154,7 +154,7 @@ export default {
             if (res && res.msg) {
               _this.$toast(res.msg)
             }
-            if (!Boolean(res.error) && res.data) {
+            if (!res.error && res.data) {
               status = 'success'
               id = res.data.id[0]
               url = res.data.url[0]
@@ -175,7 +175,7 @@ export default {
             this.cancelRequest[sign.toString()] = null
           }).catch(err => {
             if (err && err.msg) {
-              _this.$toast(res.msg)
+              _this.$toast(err.msg)
             }
             _this.images = _this.images.map((item, idx) => {
               if (item.sign === sign) {
@@ -237,7 +237,7 @@ export default {
       if (!this.dynamicText && uploadImages.length === 0) {
         this.$toast('请输入至少10个字哦~')
         flat = true
-      } else if (this.dynamicText && this.dynamicText.length > 2000){
+      } else if (this.dynamicText && this.dynamicText.length > 2000) {
         this.$toast('输入太多了，不能多于2000个字哦~')
         flat = true
       } else {
@@ -282,7 +282,7 @@ export default {
       this.submitting = true
       this.$ajax('/jv/qz/publish/dynamic', {data: rData}).then(res => {
         if (res && res.msg) {
-          if (!Boolean(res.error)) { // 发布成功
+          if (!res.error) { // 发布成功
             this.$toast(res.msg, 2000, () => {
               this.$router.go(-1)
             })
@@ -290,7 +290,7 @@ export default {
             this.$toast(res.msg)
           }
         }
-        if (res && !res.msg && !Boolean(res.error)) { // 发布成功
+        if (res && !res.msg && !res.error) { // 发布成功
           this.$router.go(-1)
         }
         this.submitting = false
@@ -328,13 +328,13 @@ export default {
       } else {
         title = '发动态'
       }
-      let i = document.createElement('iframe');
-      i.src = 'https://www.baidu.com/favicon.ico';
-      i.style.display = 'none';
+      let i = document.createElement('iframe')
+      i.src = 'https://www.baidu.com/favicon.ico'
+      i.style.display = 'none'
       i.onload = () => {
-          setTimeout(() => {
-              i.remove()
-          }, 9)
+        setTimeout(() => {
+          i.remove()
+        }, 9)
       }
       document.title = title
       document.body.appendChild(i)
@@ -354,7 +354,3 @@ export default {
   }
 }
 </script>
-
-
-
-

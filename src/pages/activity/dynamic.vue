@@ -35,10 +35,10 @@ import LoadingView from '@/components/LoadingView'
 import ScrollToTop from '@/components/ScrollToTop'
 import utils from '@/lib/utils'
 import {
-    /* eslint-disable no-unused-vars */
-    Style,
-    Scroll,
-  } from 'cube-ui'
+  /* eslint-disable no-unused-vars */
+  Style,
+  Scroll
+} from 'cube-ui'
 Vue.use(Scroll)
 
 const initialData = {
@@ -58,7 +58,7 @@ const initialData = {
   }
 }
 export default {
-  data() {
+  data () {
     let _initialData = JSON.parse(JSON.stringify(initialData))
     return _initialData
   },
@@ -92,7 +92,7 @@ export default {
         if (res && res.msg) {
           this.$toast(res.msg)
         }
-        if (res && !Boolean(res.error) && res.data) { // 成功获取数据
+        if (res && !res.error && res.data) { // 成功获取数据
           this.fetching = false
           this.paging = res.data.paging
           if (pn.toString() === '1') { // 刷新
@@ -161,7 +161,7 @@ export default {
             }
           })
         }
-      }).catch(err => {
+      }).catch(() => {
         this.dynamic.forEach(i => {
           if (i.id === item.id) {
             i.has_like = isLike
@@ -177,7 +177,7 @@ export default {
       } else {
         this.showBackTop = false
       }
-    },
+    }
   },
   created () {
     this.fetchDynamic(1)
