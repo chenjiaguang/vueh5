@@ -6,7 +6,7 @@
     </div>
     <div class="comment-box">
       <i class="iconfont icon-comment_icon"></i>
-      <div class="badge-container">
+      <div class="badge-container" v-if="dynamic.comment_num">
         <div class="badge">{{dynamic.comment_num}}</div>
       </div>
 
