@@ -498,7 +498,7 @@ export default {
 }
 .circle-name {
   border-radius: 6px;
-  border-width: 1px;
+  border-width: 1.2px;
   border-color: #1eb0fd;
   border-style: solid;
   color: #1eb0fd;
