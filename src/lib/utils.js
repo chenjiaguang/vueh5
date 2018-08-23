@@ -33,12 +33,13 @@ export default {
   },
   handleNumberInput: function (event, length, setter) {
     let value = ''
-    if (isNaN(event.data)) {
-      value = event.currentTarget._value
-    } else {
-      value = event.target.value
-    }
-    value = value.replace(/[^\d]/g, '')
+    value = event.target.value
+    // if (isNaN(event.data)) {
+    //   value = event.currentTarget._value
+    // } else {
+    //   value = event.target.value
+    // }
+    // value = value.replace(/[^\d]/g, '')
     if (value.length > length) {
       value = value.slice(0, length)
     }
