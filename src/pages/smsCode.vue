@@ -6,14 +6,14 @@
       </div>
 
       <div class="phone-input-box row center relative">
-        <input type="number" maxlength="11" class="phone-input"  v-model="phone" placeholder="请输入手机号"  @input="(event)=>{handleFilterLetters(event.target.value,11,(newValue)=>phone=newValue)}" @blur="phoneInputing=false" @focus="phoneInputing=true"/>
+        <input type="number" maxlength="11" class="phone-input"  v-model="phone" placeholder="请输入手机号"  @input="(event)=>{handleNumberInput(event,11,(newValue)=>phone=newValue)}" @blur="phoneInputing=false" @focus="phoneInputing=true"/>
         <i v-if="phone&&phoneInputing" class="iconfont icon-guanbi" @click="()=>phone=''"/>
       </div>
     </div>
 
     <div class="code-box row center">
       <div class="code-input-box row center relative">
-        <input type="number" maxlength="6" class="code-input" v-model="code" placeholder="请输入验证码" @input="(event)=>{handleFilterLetters(event.target.value,6,(newValue)=>code=newValue)}" @blur="codeInputing=false" @focus="codeInputing=true"/>
+        <input type="number" maxlength="6" class="code-input" v-model="code" placeholder="请输入验证码" @input="(event)=>{handleNumberInput(event,6,(newValue)=>code=newValue)}" @blur="codeInputing=false" @focus="codeInputing=true"/>
         <i v-if="code&&codeInputing" class="iconfont icon-guanbi" @click="()=>code=''" />
       </div>
       <div :class="['send-btn',(sendBtnTime > 0|| isSending)?'send-btn-disable':null]" @click="sendCode">
@@ -83,11 +83,8 @@ export default {
     }
   },
   methods: {
-    log (r1, r2, r3) {
-      console.log(r1, r2, r3)
-    },
-    handleFilterLetters (value, length, setter) {
-      setter(utils.handleFilterLetters(value, length))
+    handleNumberInput (event, length, setter) {
+      utils.handleNumberInput(event, length, setter)
     },
     sendCode () {
       if (this.sendBtnTime <= 0 && !this.isSending) {
