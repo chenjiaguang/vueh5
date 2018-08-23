@@ -103,7 +103,8 @@ export default {
 
   color: #333333;
   font-size: 34px;
-  outline: none;
+  outline: 0;
+  position: relative;
 }
 .fix-box-bg {
   position: absolute;
