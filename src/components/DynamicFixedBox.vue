@@ -39,15 +39,14 @@ export default {
     likeData: function () {
       return {
         type: '0',
-        id: this.dynamic.id,
-        like: !this.dynamic.has_like
+        id: this.dynamic.id
       }
     }
   },
   components: {},
   methods: {
     clickLike (id) {
-      let nowHasLike = this.dynamic.has_like = this.likeData.like
+      let nowHasLike = this.likeData.like = this.dynamic.has_like = !this.dynamic.has_like
       this.$ajax('/jv/qz/like', { data: this.likeData, checkLogin: true })
         .then(res => {
           if (nowHasLike) {

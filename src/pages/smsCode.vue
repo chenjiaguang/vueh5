@@ -5,24 +5,24 @@
         +86
       </div>
 
-      <div class="phone-input-box row center">
-        <input type="text" maxlength="11" class="phone-input" v-model="phone" placeholder="请输入手机号" @blur="phoneInputing=false" @focus="phoneInputing=true"/>
+      <div class="phone-input-box row center relative">
+        <input type="number" maxlength="11" class="phone-input"  v-model="phone" placeholder="请输入手机号"  @input="(event)=>{handleNumberInput(event,11,(newValue)=>phone=newValue)}" @blur="phoneInputing=false" @focus="phoneInputing=true"/>
         <i v-if="phone&&phoneInputing" class="iconfont icon-guanbi" @click="()=>phone=''"/>
       </div>
     </div>
 
     <div class="code-box row center">
-      <div class="code-input-box row center">
-        <input type="text" maxlength="6" class="code-input" v-model="code" placeholder="请输入验证码" @blur="codeInputing=false" @focus="codeInputing=true"/>
+      <div class="code-input-box row center relative">
+        <input type="number" maxlength="6" class="code-input" v-model="code" placeholder="请输入验证码" @input="(event)=>{handleNumberInput(event,6,(newValue)=>code=newValue)}" @blur="codeInputing=false" @focus="codeInputing=true"/>
         <i v-if="code&&codeInputing" class="iconfont icon-guanbi" @click="()=>code=''" />
       </div>
-      <div :class="['send-btn',sendBtnTime > 0?'send-btn-disable':null]" @click="sendCode">
+      <div :class="['send-btn',(sendBtnTime > 0|| isSending)?'send-btn-disable':null]" @click="sendCode">
         {{sendBtnText}}
       </div>
     </div>
 
-    <div :class="['submit-btn',this.canSubmit?null:'submit-btn-disable']" @click="submit">
-      {{this.texts.btnText}}
+    <div :class="['submit-btn',canSubmit?null:'submit-btn-disable']" @click="canSubmit&&submit()" >
+      {{texts.btnText}}
     </div>
   </div>
 </template>
@@ -41,6 +41,7 @@ export default {
         title: '',
         btnText: ''
       },
+      isSending: false,
       sendBtnText: '获取验证码',
       sendBtnTime: 0,
       sendBtnTimer: null
@@ -82,13 +83,16 @@ export default {
     }
   },
   methods: {
+    handleNumberInput (event, length, setter) {
+      utils.handleNumberInput(event, length, setter)
+    },
     sendCode () {
-      if (this.sendBtnTime <= 0) {
+      if (this.sendBtnTime <= 0 && !this.isSending) {
         if (!utils.isPoneAvailable(this.phone)) {
           this.$toast('请输入正确的手机号', 2000)
           return
         }
-
+        this.isSending = true
         this.$ajax('/jv/sms/send', { data: this.sendSMSCodeData })
           .then(res => {
             this.$toast('发送成功', 2000)
@@ -106,9 +110,11 @@ export default {
                 this.sendBtnText = `获取验证码`
               }
             }, 1000)
+            this.isSending = false
           })
           .catch(e => {
             console.log(e)
+            this.isSending = false
           })
       }
     },
@@ -156,9 +162,12 @@ export default {
   padding-top: 88px;
 }
 .icon-guanbi {
+  position: absolute;
   color: #c8cacf;
+  top: 50%;
+  transform: translateY(-50%);
+  right: 20px;
   font-size: 26px;
-  margin-right: 20px;
 }
 .phone-box {
   height: 90px;
@@ -191,6 +200,7 @@ export default {
 }
 
 .code-box {
+  flex: 1;
   height: 90px;
   margin-bottom: 80px;
   border-bottom-width: 1px;
@@ -198,7 +208,7 @@ export default {
   border-bottom-style: solid;
 }
 .code-input-box {
-  width: 420px;
+  flex: 1
 }
 .code-input {
   flex: 1;
@@ -208,7 +218,6 @@ export default {
   border: 0;
 }
 .send-btn {
-  flex: 1;
   border-left-color: #cccccc;
   border-left-width: 1px;
   border-left-style: solid;

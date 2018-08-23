@@ -31,6 +31,20 @@ export default {
     }
     return false
   },
+  handleNumberInput: function (event, length, setter) {
+    let value = ''
+    if (isNaN(event.data)) {
+      value = event.currentTarget._value
+    } else {
+      value = event.target.value
+    }
+    value = value.replace(/[^\d]/g, '')
+    if (value.length > length) {
+      value = value.slice(0, length)
+    }
+    setter(value)
+    event.target.value = value
+  },
   checkReloadWithKeepAliveNew (vm, $route, $oldRoute, routeName, checkQueryKeys, reloadCallback) {
     let route = null
     if ($route.name === routeName && $oldRoute.name === routeName) {
