@@ -117,6 +117,7 @@ export default {
   },
   methods: {
     addImage (files) {
+      console.log('addImage')
       let _this = this
       let currentLength = this.images.length
       let addLength = 9 - currentLength // 最多9图
@@ -139,7 +140,7 @@ export default {
           var CancelToken = axios.CancelToken
           let formData = new FormData()
           formData.append('file', files[i])
-          this.$ajax('/jv/image/upload', {
+          this.$ajax('/jv/image/compressupload', {
             token: window.localStorage.token || '',
             contentType: 'multipart/form-data',
             data: formData,

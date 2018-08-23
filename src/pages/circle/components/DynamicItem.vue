@@ -141,6 +141,9 @@
   width: 100px;
   height: 100px;
   position: absolute;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
   left: 14px;
   top: 14px;
 }

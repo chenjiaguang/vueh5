@@ -8,7 +8,7 @@
         <img v-if="itemData.is_owner" :src="$assetsPublicPath + '/cwebassets/image/circle_owner.png'" class="user-tag fl" />
         <img v-if="itemData.is_settop" :src="$assetsPublicPath + '/cwebassets/image/settop.png'" class="user-tag fl" /> -->
       </div>
-      <div class="publish-time-and-circle">{{itemData.time}}<span class="from-circle" v-if="itemData.circle_name">发布于<span @click.stop="goCircle" class="from-circle-text">{{itemData.circle_name}}</span></span></div>
+      <div class="publish-time-and-circle">{{itemData.time}}<span class="from-circle" v-if="itemData.circle_name">发布于<span class="from-circle-text">{{itemData.circle_name}}</span></span></div>
     </div>
     <show-hide-content :content="(itemData.type && itemData.type.toString() === '18') ? itemData.title : (itemData.content || '')" :isLongDynamic="(itemData.type && itemData.type.toString() === '18') ? true : false" />
     <div v-if="itemData.topicInfo && itemData.topicInfo.length > 0" class="topic-box clearfix">
@@ -167,6 +167,9 @@
   width: 100px;
   height: 100px;
   position: absolute;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
   left: 14px;
   top: 14px;
 }
@@ -270,7 +273,7 @@ export default {
       required: false
     }
   },
-  data() {
+  data () {
     return {}
   },
   components: {ImageContainer, ShowHideContent},
@@ -293,11 +296,11 @@ export default {
     },
     addComment () {
       if (utils.checkLogin()) {
-        this.router.push({name: 'DynamicSendComment', query:{dy_id: this.itemData.id}, params: {dynamic: this.itemData}})
+        this.router.push({name: 'DynamicSendComment', query: {dy_id: this.itemData.id}, params: {dynamic: this.itemData}})
       }
     },
     goDynamic () {
-      this.router.push({ name: 'DynamicDetail', query: { id: this.itemData.id, isArticle: this.itemData.type.toString() === '18' ? true : false } })
+      this.router.push({ name: 'DynamicDetail', query: { id: this.itemData.id, isArticle: this.itemData.type.toString() === '18' } })
     },
     goUser () {
       this.router.push({ name: 'UserCenter', query: { user_id: this.itemData.uid } })

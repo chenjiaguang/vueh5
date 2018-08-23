@@ -268,8 +268,6 @@ import ImageContainer from '../../../components/ImageContainer'
 import ShowHideContent from './ShowHideContent'
 import utils from '@/lib/utils'
 import {
-  Style,
-  Button
 } from 'cube-ui'
 export default {
   props: {
@@ -281,7 +279,7 @@ export default {
       required: false
     }
   },
-  data() {
+  data () {
     return {}
   },
   components: {ImageContainer, ShowHideContent},
@@ -304,11 +302,11 @@ export default {
     },
     addComment () {
       if (utils.checkLogin()) {
-        this.router.push({name: 'DynamicSendComment', query:{dy_id: this.itemData.id}, params: {dynamic: this.itemData}})
+        this.router.push({name: 'DynamicSendComment', query: {dy_id: this.itemData.id}, params: {dynamic: this.itemData}})
       }
     },
     goDynamic () {
-      this.router.push({ name: 'DynamicDetail', query: { id: this.itemData.id, isArticle: this.itemData.type.toString() === '18' ? true : false } })
+      this.router.push({ name: 'DynamicDetail', query: { id: this.itemData.id, isArticle: this.itemData.type.toString() === '18' } })
     },
     goUser () {
       this.router.push({ name: 'UserCenter', query: { user_id: this.itemData.uid } })

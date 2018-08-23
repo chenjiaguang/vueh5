@@ -6,5 +6,21 @@ export default {
     } else {
       return false
     }
+  },
+  isAndroid: function () {
+    const ua = navigator.userAgent.toLowerCase()
+    if (/android/.test(ua)) {
+      return true
+    } else {
+      return false
+    }
+  },
+  isIos: function () {
+    const ua = navigator.userAgent.toLowerCase()
+    if (/iphone|ipad|ipod/.test(ua)) {
+      return true
+    } else {
+      return false
+    }
   }
 }

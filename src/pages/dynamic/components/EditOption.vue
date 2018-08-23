@@ -40,7 +40,7 @@
   overflow: visible;
 }
 .left-icon{
-  font-size: 44px;
+  font-size: 40px;
   color: #4B4B4B;
   position: absolute;
   left: 0.3%;
@@ -114,4 +114,3 @@ export default {
   }
 }
 </script>
-
