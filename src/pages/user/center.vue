@@ -16,7 +16,7 @@
             </div>
             <transition v-if="!user.is_owner" appear appear-class="follow-appear">
               <div class="follow-btn-wrapper">
-                <div @click="changeFollow" class="follow-btn" :style="{color: followStatusText === '未关注' ? '#fff' : '#666', backgroundColor: followStatusText === '未关注' ? '#1EB0FD' : '#fff', borderColor: followStatusText === '未关注' ? '#1EB0FD' : '#B7B7B7'}"><i class="iconfont follow-btn-icon" :class="{'icon-add_focus': followStatusText === '未关注', 'icon-focused': followStatusText === '已关注', 'icon-transform': followStatusText === '互相关注'}"></i>{{followStatusText}}</div>
+                <div @click="changeFollow" class="follow-btn" :style="{color: followStatusText === '关注' ? '#fff' : '#666', backgroundColor: followStatusText === '关注' ? '#1EB0FD' : '#fff', borderColor: followStatusText === '关注' ? '#1EB0FD' : '#B7B7B7'}"><i class="iconfont follow-btn-icon" :class="{'icon-add_focus': followStatusText === '关注', 'icon-focused': followStatusText === '已关注', 'icon-transform': followStatusText === '互相关注'}"></i>{{followStatusText}}</div>
               </div>
             </transition>
           </div>
@@ -327,7 +327,7 @@ export default {
     followStatusText: function () { // status 1未关注，2已关注，3互相关注
       let text = null
       if (!this.user.is_following) { // 未关注该用户
-        text = '未关注'
+        text = '关注'
       } else if (this.user.is_following && !this.user.is_being_followed) { // 已关注该用户，但该用户未关注我
         text = '已关注'
       } else if (this.user.is_following && this.user.is_being_followed) { // 已关注该用户，且该用户关注我

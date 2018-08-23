@@ -3,6 +3,7 @@ import Router from 'vue-router'
 import NotFoundPage from '@/pages/notFoundPage'
 import Home from '@/pages/home'
 import CircleDetail from '@/pages/circle/detail'
+import CircleDetailTest from '@/pages/circle/detailTest'
 import ActivityDetail from '@/pages/activity/detail'
 import ActivityDynamic from '@/pages/activity/dynamic'
 import ActivityOrder from '@/pages/activity/order'
@@ -113,6 +114,15 @@ const router = new Router({
       }
     },
     {
+      path: prefix + '/circle/detail/test',
+      name: 'CircleDetailTest',
+      component: CircleDetailTest,
+      meta: {
+        title: '范团圈子test',
+        keepAlive: true
+      }
+    },
+    {
       path: prefix + '/user/center',
       name: 'UserCenter',
       component: UserCenter,
@@ -182,9 +192,9 @@ const router = new Router({
 router.beforeEach((to, from, next) => {
   /* 路由发生变化修改页面title */
   if (to.meta.title) {
-    let i = document.createElement('iframe');
-    i.src = 'https://www.baidu.com/favicon.ico';
-    i.style.display = 'none';
+    let i = document.createElement('iframe')
+    i.src = 'https://www.baidu.com/favicon.ico'
+    i.style.display = 'none'
     i.onload = () => {
       setTimeout(() => {
         i.remove()

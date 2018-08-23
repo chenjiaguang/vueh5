@@ -57,14 +57,14 @@
         </div>
       </div>
     </div>
-    <div class="fixed-button clearfix">
+    <div class="fixed-button clearfix" v-if="activity.id">
       <a v-if="activity.sponsor.tel" class="tel-btn fl" :href="'tel:' + activity.sponsor.tel" :style="{width: '26.66%'}">
         <div class="tel-btn-content">
            <i class="iconfont icon-phone-w tel-btn-icon"></i>
           <div>电话咨询</div>
         </div>
       </a>
-      <div @click.stop="goPublish" v-if="activity.activityHasDynamic" class="go-dynamic-btn fl" :style="{width: '26.66%'}">
+      <div @click.stop="goPublish" class="go-dynamic-btn fl" :style="{width: '26.66%'}">
         <div class="go-dynamic-btn-content">
           <i class="iconfont icon-camera-w go-dynamic-btn-icon"></i>
           <div>晒图</div>
@@ -305,14 +305,14 @@
     height: 100%;
     z-index: 1;
   }
-  .go-dynamic-btn:before{
+  .tel-btn:before{
     content: "";
     display: block;
     width: 2px;
     height: 60px;
     background: #E1E1E1;
     position: absolute;
-    left: 0;
+    right: 0;
     top: 20px;
   }
   .tel-btn-content, .go-dynamic-btn-content{
@@ -362,6 +362,7 @@ const initialData = {
     statusText: '',
     ticket: []
   },
+  circle: {},
   showMore: false, // 显示更多
   contentWrapperHeight: null,
   halfScreenHeight: parseInt(window.innerHeight * 0.5)
@@ -392,6 +393,7 @@ export default {
         id: this.$route.query.id
       }
       this.$ajax('/jv/anonymous/qz/v21/activity', {data: rData}).then(res => { // 获取活动数据
+        this.circle = res.data.circle
         this.activity.id = res.data.id
         this.activity.banner = res.data.covers[0].compress
         let largeBanner = new Image()
@@ -451,7 +453,7 @@ export default {
     },
     goPublish () {
       if (utils.checkLogin()) {
-        this.$router.push({name: 'EditDynamic', params: {activity: {id: this.activity.id, title: this.activity.title}}})
+        this.$router.push({name: 'EditDynamic', params: {circle: {id: this.circle.id, title: this.circle.name}, activity: {id: this.activity.id, title: this.activity.title}}})
       }
     },
     goDynamicList () {
