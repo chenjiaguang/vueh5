@@ -38,6 +38,7 @@
       <div class="join-header">已经报名的小伙伴({{activity.joinTotal}})</div>
       <div class="join-partner clearfix">
         <div class="join-avatar fl" v-for="(item, idx) in activity.join" :key="idx" :style="{backgroundImage: 'url(' + item.avatar + ')'}"></div>
+        <img class="join-avatar fl" v-if="activity.joinTotal && parseInt(activity.joinTotal) > 20"  :src="$assetsPublicPath + '/cwebassets/image/more_avatar.png'" style="border-radius:0" />
       </div>
     </div>
     <div class="dynamic-wrapper" v-if="activity.activityHasDynamic">
@@ -175,15 +176,16 @@
     z-index: 0;
   }
   .join-partner{
-    padding: 20px 19px 25px;
+    padding: 20px 0 25px;
+    margin: 0 19px;
   }
   .join-avatar{
-    width: 60px;
+    width: 8.43%;
     height: 60px;
     background-position: center;
     background-size: cover;
     background-repeat: no-repeat;
-    margin: 15px;
+    margin: 15px 2.035%;
     border-radius: 50%;
   }
   .color-block{

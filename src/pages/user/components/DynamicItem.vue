@@ -19,7 +19,7 @@
     </div>
     <div v-if="itemData.location" class="publish-address">{{itemData.location}}</div>
     <div v-if="itemData.activity" class="at-activity"><i class="iconfont icon-activity activity-sign"></i>{{itemData.activity.title}}</div>
-    <div v-if="itemData.newsArticle && itemData.newsArticle.name" class="with-article">
+    <div @click.stop :href="itemData.newsArticle.article_url" v-if="itemData.newsArticle && itemData.newsArticle.name" class="with-article">
       <div class="with-article-cover" :style="{backgroundImage: 'url(' + ((itemData.newsArticle.covers && itemData.newsArticle.covers[0]) ? itemData.newsArticle.covers[0].compress : '') + ')'}"></div>
       <div class="with-article-title">
         <div class="with-article-title-text">{{itemData.newsArticle.name}}</div>
@@ -42,7 +42,7 @@
           <span>{{likeNumber || '赞'}}</span>
         </div>
       </div>
-      <div @click.stop="addComment" class="comment-and-like-item fl" style="padding-right: 0;">
+      <div @click.stop="goDynamic" class="comment-and-like-item fl" style="padding-right: 0;">
         <div class="comment-and-like-icon-box">
           <i class="iconfont icon-comment_icon comment-and-like-icon"></i>
           <span>{{commentNumber || '评论'}}</span>

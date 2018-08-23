@@ -235,6 +235,18 @@ export default {
       let image_ids = ''
       let topic_ids = ''
       let uploadImages = this.images.filter(item => item.status === 'success')
+      let imageIds = this.images.map((item, idx) => {
+        if (item.status === 'submitting') {
+          flat = true
+        }
+        if (item.id) {
+          return item.id
+        }
+      })
+      if (flat) {
+        this.$toast('图片正在上传中，请稍候发布')
+        return false
+      }
       if ((!this.dynamicText || (this.dynamicText && this.dynamicText.length < 10)) && uploadImages.length === 0) {
         this.$toast('内容还不够10个字~')
         flat = true
@@ -244,14 +256,6 @@ export default {
       } else {
         content = this.dynamicText
       }
-      let imageIds = this.images.map((item, idx) => {
-        if (item.status === 'submitting') {
-          flat = true
-        }
-        if (item.id) {
-          return item.id
-        }
-      })
       if (this.topic) {
         let topicIds = this.topic.map((item, idx) => {
           if (item.id) {
@@ -266,7 +270,6 @@ export default {
         image_ids = imageIds.join(',')
       }
       if (this.submitting) {
-        this.$toast('正在提交...')
         return false
       }
       if (flat) {
@@ -285,16 +288,18 @@ export default {
         if (res && res.msg) {
           if (!res.error) { // 发布成功
             this.$toast(res.msg, 2000, () => {
+              this.submitting = false
               this.$router.go(-1)
             })
           } else {
+            this.submitting = false
             this.$toast(res.msg)
           }
         }
         if (res && !res.msg && !res.error) { // 发布成功
+          this.submitting = false
           this.$router.go(-1)
         }
-        this.submitting = false
       }).catch(err => {
         this.submitting = false
       })
