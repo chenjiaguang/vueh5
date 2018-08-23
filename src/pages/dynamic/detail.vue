@@ -4,7 +4,7 @@
     <div v-if="dynamic" :style="{height: winHeight-(100/750*winWidth) + 'px'}">
       <cube-scroll
         ref="contentScroll"
-        :data="[dynamic,dynamic.comment_list]"
+        :data="[dynamic,dynamic.comment_list,dynamic.like_list]"
         :options="options"
         :scroll-events="['scroll']"
         @scroll="onScrollHandle"
