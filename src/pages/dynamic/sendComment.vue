@@ -90,7 +90,9 @@ export default {
 }
 .input {
   flex: 1;
-  margin-top: 100px;
+  margin-top: 108px;
+  padding-left: 40px;
+  padding-right: 40px;
   width: 100%;
 
   box-sizing: border-box;
