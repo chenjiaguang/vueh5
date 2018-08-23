@@ -38,16 +38,19 @@ export default {
 <style lang="scss" type="text/scss" scoped>
 .one {
   width: 100%;
+  position: relative;
 }
 .two {
   width: 372px;
   height: 372px;
   margin-bottom: 6px;
+  position: relative;
 }
 .three {
   width: 246px;
   height: 246px;
   margin-bottom: 12px;
+  position: relative;
 }
 
 .image-item {
@@ -67,7 +70,7 @@ export default {
   background-color: rgba(0, 0, 0, 0.5);
   text-align: center;
   position: absolute;
-  right: 0;
+  right: 1px;
   bottom: 0;
   transform: scale(0.5, 0.5);
   transform-origin: 100% 100%;
