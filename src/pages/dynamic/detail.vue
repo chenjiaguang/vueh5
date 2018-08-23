@@ -54,9 +54,20 @@
               <div class="article-desc" v-if="content.type==2&&content.des">{{content.des}}</div>
               <div class="article-content" v-if="content.type==1">{{content.content}}</div>
             </div>
+            <a class="content-activity-box row center" v-if="dynamic.actid" href="javascript:void(0)" @click="clickActivity(dynamic.actid)">
+              <div class="content-activity-img" :style="`background-image:url(${dynamic.activity.covers[0].compress})`"/>
+              <div class="content-activity-right column space-between">
+                <div class="content-activity-title">{{dynamic.activity.title}}</div>
+                <div class="content-activity-address">{{dynamic.activity.address}}</div>
+                <div class="content-activity-time_text">{{dynamic.activity.time_text}}</div>
+              </div>
+            </a>
             <div class="row foot-info-box" v-if="dynamic.location">
               <i class="iconfont icon-location"></i>
               <div class="location">{{dynamic.location}}</div>
+            </div>
+            <div class="row circle-box" v-if="dynamic.circle_name">
+              <span class="circle-name">{{dynamic.circle_name}}</span>
             </div>
           </div>
 
@@ -70,7 +81,7 @@
             </a>
             <a class="content-activity-box row center" v-if="dynamic.actid" href="javascript:void(0)" @click="clickActivity(dynamic.actid)">
               <div class="content-activity-img" :style="`background-image:url(${dynamic.activity.covers[0].compress})`"/>
-              <div class="content-activity-right">
+              <div class="content-activity-right column space-between">
                 <div class="content-activity-title">{{dynamic.activity.title}}</div>
                 <div class="content-activity-address">{{dynamic.activity.address}}</div>
                 <div class="content-activity-time_text">{{dynamic.activity.time_text}}</div>
@@ -571,7 +582,9 @@ export default {
   text-overflow: ellipsis;
   color: #333333;
   font-size: 28px;
+  line-height: 34px;
   margin-bottom: 14px;
+
 }
 .content-activity-address {
   flex: 1;
