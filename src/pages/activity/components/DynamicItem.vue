@@ -16,7 +16,7 @@
     </div>
     <div v-if="itemData.location" class="publish-address">{{itemData.location}}</div>
     <div v-if="itemData.activity" class="at-activity"><i class="iconfont icon-activity activity-sign"></i>{{itemData.activity.title}}</div>
-    <div @click.stop="goArticle" v-if="itemData.newsArticle && itemData.newsArticle.name" class="with-article">
+    <div @click.stop :href="itemData.newsArticle.article_url" v-if="itemData.newsArticle && itemData.newsArticle.name" class="with-article">
       <div class="with-article-cover" :style="{backgroundImage: 'url(' + ((itemData.newsArticle.covers && itemData.newsArticle.covers[0]) ? itemData.newsArticle.covers[0].compress : '') + ')'}"></div>
       <div class="with-article-title">
         <div class="with-article-title-text">{{itemData.newsArticle.name}}</div>
@@ -137,6 +137,7 @@
   padding: 4px 0 20px;
 }
 .with-article{
+  display: block;
   width: 100%;
   height: 128px;
   background-color: #F5F5F5;
