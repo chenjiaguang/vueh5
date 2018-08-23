@@ -1,5 +1,5 @@
 <template>
-  <div :style="{height: winHeight + 'px', overflowY: 'auto', overflowX: 'hidden'}" id="page-scroll" class="page-scroll circle-page mescroll">
+  <div :style="{height: winHeight + 'px', overflowY: 'auto', overflowX: 'hidden'}" class="circle-page">
     <div ref="topBanner">
       <download-box />
       <header class="top-header">
@@ -29,7 +29,7 @@
         <div class="tab-border" :style="{transform: 'scale(1,' + $tranScale + ')'}"></div>
       </div>
       <div class="tabs-wrapper" ref="slideWrapper" :style="{height: (winHeight - ((tabs && tabs.length) > 1 ? tabBarHeight : 0)) + 'px'}">
-        <cube-slide ref="slideInstance" :data="tabs" :initialIndex="selectedIdx" :threshold="1" :autoPlay="false" :allowVertical="false" :showDots="false" :loop="false" :speed="500" :options="{listenScroll: true, probeType: 3, click: false, preventDefault: false}" @change="changeSlide" @scroll="slideScroll">
+        <cube-slide ref="slideInstance" :data="tabs" :initialIndex="selectedIdx" :threshold="1" :autoPlay="false" :allowVertical="false" :showDots="false" :loop="false" :speed="500" :options="{listenScroll: true, probeType: 3, stopPropagation: true, click: false, preventDefault: false}" @change="changeSlide" @scroll="slideScroll">
           <cube-slide-item v-for="(item, index) in tabs" :key="item.title" :style="{height: (winHeight - ((tabs && tabs.length) > 1 ? tabBarHeight : 0)) + 'px'}">
             <!-- <cube-scroll
               ref="contentScroll"
@@ -156,20 +156,20 @@ export default {
   },
   components: {DynamicItem, ActivityItem, DownloadBox, LoadingView, ScrollToTop},
   watch: {
-    'circle.id': function (val, oldVal) {
-      if (!val) { // 如果circle的重置了，不一定存在id，置空时终止
-        return false
-      }
-      if (this.$route.query.jump_tab && this.$route.query.jump_tab.toString() === '1') { // 有指定首先显示的tab则刷新该tab数据,否则默认刷新动态tab
-        if (this.tabs[1]) {
-          this.fetchActivity(1)
-        } else {
-          this.fetchDynamic(1)
-        }
-      } else {
-        this.fetchDynamic(1)
-      }
-    },
+    // 'circle.id': function (val, oldVal) {
+    //   if (!val) { // 如果circle的重置了，不一定存在id，置空时终止
+    //     return false
+    //   }
+    //   if (this.$route.query.jump_tab && this.$route.query.jump_tab.toString() === '1') { // 有指定首先显示的tab则刷新该tab数据,否则默认刷新动态tab
+    //     if (this.tabs[1]) {
+    //       this.fetchActivity(1)
+    //     } else {
+    //       this.fetchDynamic(1)
+    //     }
+    //   } else {
+    //     this.fetchDynamic(1)
+    //   }
+    // },
     '$route': function (val, oldVal) {
       if (!val.query.previewImage && oldVal.query.previewImage) { // 点击大图后返回
         if (window.previewImageId) {
@@ -196,11 +196,7 @@ export default {
       this.selectedLabel = this.tabs[idx].title
       this.selectedIdx = idx
       if (!this.tabs[idx].paging.pn) {
-        if (idx === 0) {
-          this.fetchDynamic(1)
-        } else if (idx === 1) {
-          this.fetchActivity(1)
-        }
+        this.mescroll[idx].triggerDownScroll()
       }
     },
     slideScroll ({x, y}) { // 华东slide
@@ -271,17 +267,13 @@ export default {
           if (!res.data.circle_has_activity) { // 没有活动tab
             this.tabs.splice(1, 1)
             this.showTabbar = true
-            this.initPageScroll()
-            const len = this.tabs.length.toString()
-            console.log('this.tabs.length', parseInt(len))
+            // this.initPageScroll()
             this.initMeScroll(0)
           } else {
-            const len = this.tabs.length.toString()
-            console.log('this.tabs.length', parseInt(len))
             this.showTabbar = true
-            this.initPageScroll()
+            const len = this.tabs.length.toString()
+            // this.initPageScroll()
             for (let i = 0; i < len; i++) {
-              console.log(998)
               this.initMeScroll(i)
             }
           }
@@ -475,25 +467,36 @@ export default {
     initPageScroll () {
       this.pagescroll = new MeScroll('page-scroll', { // 在vue的mounted生命周期初始化mescroll,确保此处配置的id能够被找到
         down: {
-          isLock: true
+          use: false
         },
         up: {
-          isLock: true
+          use: false
         }
       })
     },
     initMeScroll (idx) {
-      console.log('initMeScroll')
+      let downAuto = false
+      if (this.$route.query.jump_tab && this.$route.query.jump_tab.toString() === '1' && idx === 1 && this.tabs[idx]) { // 初始tab为1
+        downAuto = true
+      } else if ((!this.$route.query.jump_tab || (this.$route.query.jump_tab && this.$route.query.jump_tab.toString() === '0')) && idx === 0) { // 初始tab为0
+        downAuto = true
+      }
+      console.log('downAuto', downAuto)
       this.mescroll[idx] = new MeScroll('mescroll' + idx, { // 在vue的mounted生命周期初始化mescroll,确保此处配置的id能够被找到
         down: {
-          isLock: false,
+          auto: downAuto,
+          autoShowLoading: downAuto,
           callback: () => this.onPullingDown(idx) // 下拉刷新的回调,别写成downCallback(),多了括号就自动执行方法了
         },
         up: {
-          isLock: false,
-          callback: () => this.onPullingUp(idx)
+          auto: false,
+          callback: () => this.onPullingUp(idx),
+          onScroll: this.onMeScroll
         }
       })
+    },
+    onMeScroll (mescroll, y, isUp) {
+      console.log('onScroll', mescroll, y, isUp)
     }
   },
   beforeRouteEnter (to, from, next) {

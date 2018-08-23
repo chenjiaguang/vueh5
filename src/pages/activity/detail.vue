@@ -362,6 +362,7 @@ const initialData = {
     statusText: '',
     ticket: []
   },
+  circle: {},
   showMore: false, // 显示更多
   contentWrapperHeight: null,
   halfScreenHeight: parseInt(window.innerHeight * 0.5)
@@ -392,6 +393,7 @@ export default {
         id: this.$route.query.id
       }
       this.$ajax('/jv/anonymous/qz/v21/activity', {data: rData}).then(res => { // 获取活动数据
+        this.circle = res.data.circle
         this.activity.id = res.data.id
         this.activity.banner = res.data.covers[0].compress
         let largeBanner = new Image()
@@ -451,7 +453,7 @@ export default {
     },
     goPublish () {
       if (utils.checkLogin()) {
-        this.$router.push({name: 'EditDynamic', params: {activity: {id: this.activity.id, title: this.activity.title}}})
+        this.$router.push({name: 'EditDynamic', params: {circle: {id: this.circle.id, title: this.circle.name}, activity: {id: this.activity.id, title: this.activity.title}}})
       }
     },
     goDynamicList () {

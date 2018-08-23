@@ -346,7 +346,7 @@ export default {
     },
     goPublish () {
       if (utils.checkLogin()) {
-        this.$router.push({name: 'EditDynamic', params: {topic: [{id: this.topicInfo.id, title: this.topicInfo.title}]}})
+        this.$router.push({name: 'EditDynamic', params: {topic: [{id: this.topicInfo.id, title: this.topicInfo.title}], range: 0}})
       }
     }
   },

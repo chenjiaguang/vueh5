@@ -234,11 +234,11 @@ export default {
       let image_ids = ''
       let topic_ids = ''
       let uploadImages = this.images.filter(item => item.status === 'success')
-      if (!this.dynamicText && uploadImages.length === 0) {
-        this.$toast('请输入至少10个字哦~')
+      if ((!this.dynamicText || (this.dynamicText && this.dynamicText.length < 10)) && uploadImages.length === 0) {
+        this.$toast('内容还不够10个字~')
         flat = true
       } else if (this.dynamicText && this.dynamicText.length > 2000) {
-        this.$toast('输入太多了，不能多于2000个字哦~')
+        this.$toast('内容太多了，不能多于2000个字哦~')
         flat = true
       } else {
         content = this.dynamicText
