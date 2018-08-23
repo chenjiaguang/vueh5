@@ -1,7 +1,21 @@
 <template>
   <div style="width: 100%;overflow: hidden;">
     <template v-for="(item, idx) in images">
-      <transition :key="item.sign || item.id || idx" :appear="appearAnimation" appear-class="before-appear">
+      <div :key="item.sign || item.id || idx" v-if="isAndroid">
+        <div v-if="isUpload" :key="item.sign || item.id || idx" @click.stop="previewImage(idx)" :style="{marginTop: idx < 3 ? 0 : '1.055%'}" class="item-container fl" :class="{disabled: !(item.localUrl || item.url), one: images.length === 1 && !isUpload, 'two-and-more': images.length > 1 || isUpload, left: idx % 3 === 0, horizontal: Number(item.width) >= Number(item.height), vertical: Number(item.width) < Number(item.height)}">
+          <img :src="item.localUrl || item.url" class="image-item" :class="{horizontal: images.length === 1 && (Number(item.width) / Number(item.height) >= 1.44) || images.length > 1 && Number(item.width) >= Number(item.height), vertical: images.length === 1 && (Number(item.width) / Number(item.height) < 1.44) || images.length > 1 && Number(item.width) < Number(item.height)}" />
+          <div class="long-tag" v-if="Number(item.height) / Number(item.width) > 4">长图</div>
+          <div class="delete-btn iconfont icon-guanbi" v-if="showDelete" @click.stop="deleteImage(item, idx)"></div>
+          <div class="status-box" v-if="item.status === 'submitting' || item.status === 'error'"><span class="status-text">{{statusText[item.status]}}</span></div>
+        </div>
+        <div v-else v-lazy-container="{selector: 'img'}" :key="item.sign || item.id || idx" @click.stop="previewImage(idx)" :style="{marginTop: idx < 3 ? 0 : '1.055%'}" class="item-container fl" :class="{disabled: !(item.localUrl || item.url), one: images.length === 1 && !isUpload, 'two-and-more': images.length > 1 || isUpload, left: idx % 3 === 0, horizontal: Number(item.width) >= Number(item.height), vertical: Number(item.width) < Number(item.height)}">
+          <img :data-src="item.localUrl || item.url" class="image-item" :class="{horizontal: images.length === 1 && (Number(item.width) / Number(item.height) >= 1.44) || images.length > 1 && Number(item.width) >= Number(item.height), vertical: images.length === 1 && (Number(item.width) / Number(item.height) < 1.44) || images.length > 1 && Number(item.width) < Number(item.height)}" />
+          <div class="long-tag" v-if="Number(item.height) / Number(item.width) > 4">长图</div>
+          <div class="delete-btn iconfont icon-guanbi" v-if="showDelete" @click.stop="deleteImage(item, idx)"></div>
+          <div class="status-box" v-if="item.status === 'submitting' || item.status === 'error'"><span class="status-text">{{statusText[item.status]}}</span></div>
+        </div>
+      </div>
+      <transition :key="item.sign || item.id || idx" :appear="appearAnimation" appear-class="before-appear" v-else>
         <div v-if="isUpload" :key="item.sign || item.id || idx" @click.stop="previewImage(idx)" :style="{marginTop: idx < 3 ? 0 : '1.055%'}" class="item-container fl" :class="{disabled: !(item.localUrl || item.url), one: images.length === 1 && !isUpload, 'two-and-more': images.length > 1 || isUpload, left: idx % 3 === 0, horizontal: Number(item.width) >= Number(item.height), vertical: Number(item.width) < Number(item.height)}">
           <img :src="item.localUrl || item.url" class="image-item" :class="{horizontal: images.length === 1 && (Number(item.width) / Number(item.height) >= 1.44) || images.length > 1 && Number(item.width) >= Number(item.height), vertical: images.length === 1 && (Number(item.width) / Number(item.height) < 1.44) || images.length > 1 && Number(item.width) < Number(item.height)}" />
           <div class="long-tag" v-if="Number(item.height) / Number(item.width) > 4">长图</div>
@@ -17,12 +31,14 @@
       </transition>
     </template>
     <div v-if="isUpload && images.length < 9" :style="{marginTop: images.length < 3 ? 0 : '1.055%'}" :class="{left: images.length % 3 === 0}" class="item-container add-btn two-and-more fl">
-      <input ref="upload" @change="addImage" multiple class="input-image" type="file" accept="image/gif, image/jpeg, image/jpe, image/png" />
+      <input ref="upload" @change="addImage" multiple class="input-image" type="file" accept="image/*" />
+      <!-- accept如果写image/gif, image/jpeg, image/jpe, image/png的话在android微信浏览器里面会无法触发onchange事件 -->
     </div>
   </div>
 </template>
 
 <script>
+import browserUA from '@/lib/browserUA'
 export default {
   props: ['images', 'showDelete', 'deleteFunc', 'appearAnimation', 'addFunc', 'isUpload', 'router'],
   data () {
@@ -35,6 +51,7 @@ export default {
   },
   methods: {
     addImage () {
+      console.log('change')
       let files = this.$refs['upload'].files
       this.$emit('addFunc', files)
     },
@@ -44,6 +61,9 @@ export default {
     previewImage (idx) {
       let _images = this.images.map(item => (item.url || item.localUrl))
       this.$previewImage.show({images: _images, idx}, this.router)
+    },
+    isAndroid () {
+      return browserUA.isAndroid()
     }
   }
 }

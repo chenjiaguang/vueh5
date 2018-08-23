@@ -16,7 +16,7 @@
     </div>
     <div v-if="itemData.location" class="publish-address">{{itemData.location}}</div>
     <div v-if="itemData.activity" class="at-activity"><i class="iconfont icon-activity activity-sign"></i>{{itemData.activity.title}}</div>
-    <div v-if="itemData.newsArticle && itemData.newsArticle.name" class="with-article">
+    <div @click.stop="goArticle" v-if="itemData.newsArticle && itemData.newsArticle.name" class="with-article">
       <div class="with-article-cover" :style="{backgroundImage: 'url(' + ((itemData.newsArticle.covers && itemData.newsArticle.covers[0]) ? itemData.newsArticle.covers[0].compress : '') + ')'}"></div>
       <div class="with-article-title">
         <div class="with-article-title-text">{{itemData.newsArticle.name}}</div>
@@ -39,7 +39,7 @@
           <span>{{likeNumber || '赞'}}</span>
         </div>
       </div>
-      <div @click.stop="addComment" class="comment-and-like-item fl" style="padding-right: 0;">
+      <div @click.stop="goDynamic" class="comment-and-like-item fl" style="padding-right: 0;">
         <div class="comment-and-like-icon-box">
           <i class="iconfont icon-comment_icon comment-and-like-icon"></i>
           <span>{{commentNumber || '评论'}}</span>
@@ -147,6 +147,9 @@
   width: 100px;
   height: 100px;
   position: absolute;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
   left: 14px;
   top: 14px;
 }
@@ -250,7 +253,7 @@ export default {
       required: false
     }
   },
-  data() {
+  data () {
     return {}
   },
   components: {ImageContainer, ShowHideDynamicContent},
@@ -273,11 +276,14 @@ export default {
     },
     addComment () {
       if (utils.checkLogin()) {
-        this.router.push({name: 'DynamicSendComment', query:{dy_id: this.itemData.id}, params: {dynamic: this.itemData}})
+        this.router.push({name: 'DynamicSendComment', query: {dy_id: this.itemData.id}, params: {dynamic: this.itemData}})
       }
     },
     goDynamic () {
-      this.router.push({ name: 'DynamicDetail', query: { id: this.itemData.id, isArticle: this.itemData.type.toString() === '18' ? true : false } })
+      this.router.push({ name: 'DynamicDetail', query: { id: this.itemData.id, isArticle: this.itemData.type.toString() === '18' } })
+    },
+    goArticle () {
+      console.log('goArticle')
     },
     goUser () {
       this.router.push({ name: 'UserCenter', query: { user_id: this.itemData.uid } })

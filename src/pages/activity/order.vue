@@ -55,7 +55,7 @@
             </div> -->
             <div class="user-info-item clearfix" v-if="form.userInfo.needWeChat">
               <div class="user-left fl"><i class="require-icon iconfont icon-xinghao"></i>微信号</div>
-              <input class="user-full-input fl" type="number" v-model="form.userInfo.weChat" />
+              <input class="user-full-input fl" type="text" v-model="form.userInfo.weChat" />
             </div>
             <div class="user-info-item clearfix" v-if="form.userInfo.needIdCard">
               <div class="user-left fl"><i class="require-icon iconfont icon-xinghao"></i>身份证号</div>
@@ -524,7 +524,12 @@ export default {
         if (!res.data.refund) {
           tagsArr.push('不可退票')
         }
+        if (res.data.max_ticket && parseInt(res.data.max_ticket)) {
+          tagsArr.push('限购' + res.data.max_ticket + '张')
+        }
         this.activity.tags = tagsArr
+        this.activity.buyNum = res.data.buynum
+        this.activity.maxTicket = res.data.max_ticket
         this.form.userInfo.needName = res.data.nead_name
         this.form.userInfo.needIdCard = res.data.nead_idcard
         this.form.userInfo.needSex = res.data.nead_sex
@@ -636,7 +641,7 @@ export default {
       }
       let {selectedTicket} = this
       let {agreement} = this.form
-      let {id} = this.activity
+      let {id, buyNum, maxTicket} = this.activity
       let {name, needName, phone, idCard, needIdCard, weChat, needWeChat, sex, needSex} = this.form.userInfo
       let toastObject = {
         selectedTicket: !selectedTicket && '请选择购买的票',
@@ -644,7 +649,8 @@ export default {
         phone: !phone && '请输入正确的手机号码',
         weChat: !weChat && needWeChat && '请输入正确的微信号',
         idCard: !idCard && needIdCard && '请输入正确的身份证号',
-        sex: (!sex || sex.toString() === '0') && needSex && '请选择你的性别'
+        sex: (!sex || sex.toString() === '0') && needSex && '请选择你的性别',
+        buynum: maxTicket && parseInt(maxTicket) && selectedTicket && ((selectedTicket.putAmount + parseInt(buyNum)) > parseInt(maxTicket)) && '您已超过限购数量'
       }
       if (!(id.toString() && agreement)) { // 活动id必须存在,需同意范团活动参与协议
         return false

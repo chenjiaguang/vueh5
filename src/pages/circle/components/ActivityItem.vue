@@ -114,12 +114,12 @@ export default {
       required: true
     }
   },
-  data() {
+  data () {
     return {}
   },
   methods: {
     goActivity () { // 跳转活动详情页
-      this.$router.push({name: 'ActivityDetail', query: { id: this.itemData.id}})
+      this.$router.push({name: 'ActivityDetail', query: {id: this.itemData.id}})
     }
   }
 }

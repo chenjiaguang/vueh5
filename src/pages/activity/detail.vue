@@ -70,7 +70,7 @@
           <div>晒图</div>
         </div>
       </div>
-      <div @click="goOrder" class="order-btn fl" :style="{backgroundColor: activity.statusText === '购票' ? '#ff3f53' : '#bbbbbb', width: (activity.sponsor.tel && activity.activityHasDynamic) ? '46.68%' : (activity.sponsor.tel || activity.activityHasDynamic ? '73.34%' : '100%')}">{{activity.statusText}}</div>
+      <div @click="goOrder" class="order-btn fl" :style="{backgroundColor: activity.statusText === '购票' ? '#ff3f53' : '#bbbbbb', width: activity.sponsor.tel ? '46.68%' : '73.34%'}">{{activity.statusText}}</div>
     </div>
   </div>
 </template>
@@ -432,6 +432,9 @@ export default {
         }
         if (!res.data.refund) {
           tagsArr.push('不可退票')
+        }
+        if (res.data.max_ticket && parseInt(res.data.max_ticket)) {
+          tagsArr.push('限购' + res.data.max_ticket + '张')
         }
         this.activity.tags = tagsArr
       }).catch(err => {
