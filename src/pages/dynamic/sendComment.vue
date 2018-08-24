@@ -9,7 +9,7 @@
     </div>
     <div class="fix-box-bg" @click="focus">
     </div>
-    <textarea :style="{height: winHeight/2 + 'px'}" ref="input" class="input" :placeholder="replyName?'回复 '+replyName+':':'来说点什么吧~'" v-model="content" :maxlength="1000"/>
+    <textarea  ref="input" class="input" :placeholder="replyName?'回复 '+replyName+':':'来说点什么吧~'" v-model="content" :maxlength="1000"/>
   </div>
 </template>
 
@@ -79,7 +79,6 @@ export default {
 }
 </script>
 
-<style src='../../common.css' />
 <style scoped>
 .container {
   position: absolute;
@@ -94,6 +93,7 @@ export default {
   padding-left: 40px;
   padding-right: 40px;
   width: 100%;
+  height: 298px;
 
   box-sizing: border-box;
   border: none;

@@ -13,7 +13,6 @@
   </div>
 </template>
 
-<style src='../common.css' />
 <style lang="scss" type="text/scss" scoped>
 .box {
   height: 128px;

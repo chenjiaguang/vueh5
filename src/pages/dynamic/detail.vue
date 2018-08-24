@@ -2,148 +2,138 @@
   <div :style="{height: winHeight + 'px'}">
 
     <div v-if="dynamic" :style="{height: winHeight-(100/750*winWidth) + 'px'}">
-      <cube-scroll
-        ref="contentScroll"
-        :data="[dynamic,dynamic.comment_list,dynamic.like_list]"
-        :options="options"
-        :scroll-events="['scroll']"
-        @scroll="onScrollHandle"
-        @pulling-up="fetchMoreComments()">
-        <template slot="pullup" slot-scope="props">
-          <div class="cube-pullup-wrapper pullup-wrapper" :style="props.pullUpStyle">
-            <div class="pullup-content" v-if="!dynamic.paging.is_end">正在加载...</div>
-            <div class="pullup-content" v-if="dynamic.paging.is_end">再刷也没有了</div>
-          </div>
-        </template>
-        <DownloadBox />
-        <div class="container">
-          <div v-if="dynamic" id="title-container" class="column">
-            <div v-if="dynamic.title" class="title">{{dynamic.title}}</div>
-            <div class="row space-between center">
-              <!-- 左 -->
-              <div class="row">
-                <img class="avatar" :src="dynamic.avatar" @click="clickUser(dynamic.uid)"/>
-                <div class="flex column space-between">
-                  <!-- 上 -->
-                  <div class="row">
-                    <div class="username" @click="clickUser(dynamic.uid)">{{dynamic.username}}</div>
-                  </div>
-                  <!-- 下 -->
-                  <div class="row">
-                    <div class="time">{{dynamic.time}}</div>
-                    <!-- <div class="fromPrefix" v-if="dynamic.fromQz">发布于</div>
-                    <div class="fromQz" v-if="dynamic.fromQz" @click="clickQz(dynamic.circle_id)">{{dynamic.fromQz}}</div> -->
-                  </div>
-                </div>
-              </div>
-              <!-- 右 -->
-              <div>
-                <transition name="fade-quick">
-                  <div class="follow-button" v-if="!dynamic.is_following&&!dynamic.is_owner"  @click="clickFollow(dynamic.uid)">+ 关注</div>
-                </transition>
-              </div>
-            </div>
-          </div>
-
-          <div v-if="dynamic&&dynamic.isArticle" id="article-content-container" class="column">
-            <div v-for="(content,index) in dynamic.contents" :key="index">
-              <div class="article-image-container">
-                <img class="article-image" v-if="content.type==2" :src="content.imageUrl" @click="previewImagesInArticle(content.imageIndex)"/>
-              </div>
-
-              <div class="article-desc" v-if="content.type==2&&content.des">{{content.des}}</div>
-              <div class="article-content" v-if="content.type==1">{{content.content}}</div>
-            </div>
-            <a class="content-activity-box row center" v-if="dynamic.actid" href="javascript:void(0)" @click="clickActivity(dynamic.actid)">
-              <div class="content-activity-img" :style="`background-image:url(${dynamic.activity.covers[0].compress})`"/>
-              <div class="content-activity-right column space-between">
-                <div class="content-activity-title">{{dynamic.activity.title}}</div>
-                <div class="content-activity-address">{{dynamic.activity.address}}</div>
-                <div class="content-activity-time_text">{{dynamic.activity.time_text}}</div>
-              </div>
-            </a>
-            <div class="row foot-info-box" v-if="dynamic.location">
-              <i class="iconfont icon-location"></i>
-              <div class="location">{{dynamic.location}}</div>
-            </div>
-            <div class="row circle-box" v-if="dynamic.circle_name">
-              <span class="circle-name">{{dynamic.circle_name}}</span>
-            </div>
-          </div>
-
-          <div v-if="dynamic&&!dynamic.isArticle" id="content-container" class="column">
-            <div class="dynamic-content">{{dynamic.content}}</div>
-            <TopicTagBox :topicInfo="dynamic.topicInfo" />
-            <DetailImageContainer class="detail-image-container"  :images="dynamic.covers"/>
-            <a class="content-article-box row center" v-if="dynamic.aid" :href="dynamic.newsArticle.article_url">
-              <div class="content-article-img" :style="`background-image:url(${dynamic.newsArticle.covers[0].compress})`"/>
-              <div class="content-article-content">{{dynamic.newsArticle.name}}</div>
-            </a>
-            <a class="content-activity-box row center" v-if="dynamic.actid" href="javascript:void(0)" @click="clickActivity(dynamic.actid)">
-              <div class="content-activity-img" :style="`background-image:url(${dynamic.activity.covers[0].compress})`"/>
-              <div class="content-activity-right column space-between">
-                <div class="content-activity-title">{{dynamic.activity.title}}</div>
-                <div class="content-activity-address">{{dynamic.activity.address}}</div>
-                <div class="content-activity-time_text">{{dynamic.activity.time_text}}</div>
-              </div>
-            </a>
-            <div class="row foot-info-box" v-if="dynamic.location">
-              <i class="iconfont icon-location" ></i>
-              <div class="location">{{dynamic.location}}</div>
-            </div>
-            <div class="row circle-box" v-if="dynamic.circle_name">
-              <span class="circle-name">{{dynamic.circle_name}}</span>
-            </div>
-          </div>
-
-          <div v-if="dynamic&&dynamic.like_num>0" class="like-box" id="like-container">
-            <div class="like-text">{{dynamic.like_num}}个人点了赞</div>
-            <div class="row space-between">
-              <div class="row center">
-                <div class="image-avatar-box row flex-wrap-wrap">
-                  <img class="image-avatar" v-for="(image) in dynamic.like_list" :src="image.avatar" :key="image.uid" @click="clickUser(image.uid)"/>
-                  <i class="iconfont icon-more" v-if="dynamic.like_num>20"></i>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div v-if="dynamic&&dynamic.comment_num>0" id="comment-container" class="column" >
-            <div class="comment-text" >{{dynamic.comment_num}}条评论</div>
-            <transition-group name="fade-slow" tag="div">
-              <div v-for="(comment) in dynamic.comment_list" :key="'comments'+comment.id">
-                <div class="comment-box row space-between">
-                  <div class="column">
-                    <img class="user-avatar" :src="comment.avatar" @click="clickUser(comment.uid)" />
-                  </div>
-                  <div class="comment-right-box column" >
+      <div id="mescroll" class="mescroll" >
+        <div>
+          <DownloadBox />
+          <div class="container">
+            <div v-if="dynamic" id="title-container" class="column">
+              <div v-if="dynamic.title" class="title">{{dynamic.title}}</div>
+              <div class="row space-between center">
+                <!-- 左 -->
+                <div class="row">
+                  <img class="avatar" :src="dynamic.avatar" @click="clickUser(dynamic.uid)"/>
+                  <div class="flex column space-between">
+                    <!-- 上 -->
                     <div class="row">
-                      <div class="comment-username" @click="clickUser(comment.uid)">{{comment.username}}</div>
+                      <div class="username" @click="clickUser(dynamic.uid)">{{dynamic.username}}</div>
                     </div>
-                    <div class="comment-content" @click="()=>showReplyActionSheet(comment,comment.username)">{{comment.content}}</div>
-                    <div class="comment-time">{{comment.time}}</div>
+                    <!-- 下 -->
+                    <div class="row">
+                      <div class="time">{{dynamic.time}}</div>
+                      <!-- <div class="fromPrefix" v-if="dynamic.fromQz">发布于</div>
+                      <div class="fromQz" v-if="dynamic.fromQz" @click="clickQz(dynamic.circle_id)">{{dynamic.fromQz}}</div> -->
+                    </div>
+                  </div>
+                </div>
+                <!-- 右 -->
+                <div>
+                  <transition name="fade-quick">
+                    <div class="follow-button" v-if="!dynamic.is_following&&!dynamic.is_owner"  @click="clickFollow(dynamic.uid)">+ 关注</div>
+                  </transition>
+                </div>
+              </div>
+            </div>
 
-                    <transition name="fade-slow">
-                      <div v-if="comment.replys.list.length>0" class="comment-replies-box">
-                        <transition-group name="fade-slow" tag="div">
-                          <div class="reply-box" v-for="(reply) in comment.replys.list" :key="'replys'+reply.id" @click.stop="()=>showReplyActionSheet(comment,reply.username,reply.id)">
-                            <span class="reply-from" v-if="reply.pusername" @click.stop="clickUser(reply.uid)">{{reply.username}}</span><span class="reply-from" v-if="!reply.pusername" @click.stop="clickUser(reply.uid)">{{reply.username}}:</span><span class="reply-reply" v-if="reply.pusername">回复</span><span class="reply-to" v-if="reply.pusername" @click.stop="clickUser(reply.puid)">{{reply.pusername}}:</span><span class="reply-content">{{reply.content}}</span>
-                          </div>
-                        </transition-group>
-                        <div class="reply-box" v-if="!comment.replys.paging.is_end">
-                          <span class="reply-more" v-if="!comment.replys.paging.is_end" @click.stop="()=>fetchMoreReplies(comment)">查看更多回复></span>
-                        </div>
-                      </div>
-                    </transition>
+            <div v-if="dynamic&&dynamic.isArticle" id="article-content-container" class="column">
+              <div v-for="(content,index) in dynamic.contents" :key="index">
+                <div class="article-image-container">
+                  <img class="article-image" v-if="content.type==2" :src="content.imageUrl" @click="previewImagesInArticle(content.imageIndex)"/>
+                </div>
+
+                <div class="article-desc" v-if="content.type==2&&content.des">{{content.des}}</div>
+                <div class="article-content" v-if="content.type==1">{{content.content}}</div>
+              </div>
+              <a class="content-activity-box row center" v-if="dynamic.actid" href="javascript:void(0)" @click="clickActivity(dynamic.actid)">
+                <div class="content-activity-img" :style="`background-image:url(${dynamic.activity.covers[0].compress})`"/>
+                <div class="content-activity-right column space-between">
+                  <div class="content-activity-title">{{dynamic.activity.title}}</div>
+                  <div class="content-activity-address">{{dynamic.activity.address}}</div>
+                  <div class="content-activity-time_text">{{dynamic.activity.time_text}}</div>
+                </div>
+              </a>
+              <div class="row foot-info-box" v-if="dynamic.location">
+                <i class="iconfont icon-location"></i>
+                <div class="location">{{dynamic.location}}</div>
+              </div>
+              <div class="row circle-box" v-if="dynamic.circle_name">
+                <span class="circle-name">{{dynamic.circle_name}}</span>
+              </div>
+            </div>
+
+            <div v-if="dynamic&&!dynamic.isArticle" id="content-container" class="column">
+              <div class="dynamic-content">{{dynamic.content}}</div>
+              <TopicTagBox :topicInfo="dynamic.topicInfo" />
+              <DetailImageContainer class="detail-image-container"  :images="dynamic.covers"/>
+              <a class="content-article-box row center" v-if="dynamic.aid" :href="dynamic.newsArticle.article_url">
+                <div class="content-article-img" :style="`background-image:url(${dynamic.newsArticle.covers[0].compress})`"/>
+                <div class="content-article-content">{{dynamic.newsArticle.name}}</div>
+              </a>
+              <a class="content-activity-box row center" v-if="dynamic.actid" href="javascript:void(0)" @click="clickActivity(dynamic.actid)">
+                <div class="content-activity-img" :style="`background-image:url(${dynamic.activity.covers[0].compress})`"/>
+                <div class="content-activity-right column space-between">
+                  <div class="content-activity-title">{{dynamic.activity.title}}</div>
+                  <div class="content-activity-address">{{dynamic.activity.address}}</div>
+                  <div class="content-activity-time_text">{{dynamic.activity.time_text}}</div>
+                </div>
+              </a>
+              <div class="row foot-info-box" v-if="dynamic.location">
+                <i class="iconfont icon-location" ></i>
+                <div class="location">{{dynamic.location}}</div>
+              </div>
+              <div class="row circle-box" v-if="dynamic.circle_name">
+                <span class="circle-name">{{dynamic.circle_name}}</span>
+              </div>
+            </div>
+
+            <div v-if="dynamic&&dynamic.like_num>0" class="like-box" id="like-container">
+              <div class="like-text">{{dynamic.like_num}}个人点了赞</div>
+              <div class="row space-between">
+                <div class="row center">
+                  <div class="image-avatar-box row flex-wrap-wrap">
+                    <img class="image-avatar" v-for="(image) in dynamic.like_list" :src="image.avatar" :key="image.uid" @click="clickUser(image.uid)"/>
+                    <i class="iconfont icon-more" v-if="dynamic.like_num>20"></i>
                   </div>
                 </div>
               </div>
-            </transition-group>
+            </div>
+
+            <div v-if="dynamic&&dynamic.comment_num>0" id="comment-container" class="column" >
+              <div class="comment-text" >{{dynamic.comment_num}}条评论</div>
+              <transition-group name="fade-slow" tag="div">
+                <div v-for="(comment) in dynamic.comment_list" class="transition-quick" :key="'comments'+comment.id">
+                  <div class="comment-box row space-between">
+                    <div class="column">
+                      <img class="user-avatar" :src="comment.avatar" @click="clickUser(comment.uid)" />
+                    </div>
+                    <div class="comment-right-box column" >
+                      <div class="row">
+                        <div class="comment-username" @click="clickUser(comment.uid)">{{comment.username}}</div>
+                      </div>
+                      <div class="comment-content" @click="()=>showReplyActionSheet(comment,comment.username)">{{comment.content}}</div>
+                      <div class="comment-time">{{comment.time}}</div>
+
+                      <transition name="fade-slow">
+                        <div v-if="comment.replys.list.length>0" class="comment-replies-box">
+                          <transition-group name="fade-slow" tag="div">
+                            <div class="reply-box transition-quick" v-for="(reply) in comment.replys.list" :key="'replys'+reply.id" @click.stop="()=>showReplyActionSheet(comment,reply.username,reply.id)">
+                              <span class="reply-from" v-if="reply.pusername" @click.stop="clickUser(reply.uid)">{{reply.username}}</span><span class="reply-from" v-if="!reply.pusername" @click.stop="clickUser(reply.uid)">{{reply.username}}:</span><span class="reply-reply" v-if="reply.pusername">回复</span><span class="reply-to" v-if="reply.pusername" @click.stop="clickUser(reply.puid)">{{reply.pusername}}:</span><span class="reply-content">{{reply.content}}</span>
+                            </div>
+                          </transition-group>
+                          <div class="reply-box transition-quick" v-if="!comment.replys.paging.is_end">
+                            <span class="reply-more" v-if="!comment.replys.paging.is_end" @click.stop="()=>fetchMoreReplies(comment)">查看更多回复></span>
+                          </div>
+                        </div>
+                      </transition>
+                    </div>
+                  </div>
+                </div>
+              </transition-group>
+            </div>
           </div>
         </div>
-      </cube-scroll>
+      </div>
     </div>
-    <ScrollToTop v-if="dynamic" :visible="scrollToTopVisible" :scroll="$refs.contentScroll"/>
+    <ScrollToTop v-if="dynamic" :visible="scrollToTopVisible" :scroll="this.mescroll" :isMeScroll="true"/>
     <DynamicFixedBox v-if="dynamic" :dynamic="dynamic"/>
     <NotFoundPage v-if="isLoad&&!dynamic"/>
   </div>
@@ -152,24 +142,28 @@
 <script>
 import Vue from 'vue'
 import DownloadBox from '../../components/DownloadBox'
+import MeScrollSupport from '../../mixin/MeScrollSupport'
 import DynamicFixedBox from '../../components/DynamicFixedBox'
 import ScrollToTop from '../../components/ScrollToTop'
 import TopicTagBox from '../../components/TopicTagBox'
 import DetailImageContainer from '../../components/DetailImageContainer'
 import utils from '../../lib/utils'
 import NotFoundPage from '../notFoundPage'
-import { Scroll, ActionSheet } from 'cube-ui'
-Vue.use(Scroll)
+import MeScroll from 'mescroll.js'
+import { ActionSheet } from 'cube-ui'
 Vue.use(ActionSheet)
 export default {
+  mixins: [MeScrollSupport],
   data () {
     return {
+      mescroll: null, // mescroll实例对象
       dynamic: null,
       isLoad: false,
       imageList: [],
       options: {
         pullDownRefresh: false,
-        pullUpLoad: true
+        pullUpLoad: true,
+        useTransition: false
       },
       winHeight: window.innerHeight,
       winWidth: window.innerWidth,
@@ -268,7 +262,23 @@ export default {
                 return content.imageUrl
               })
           }
+
           this.isLoad = true
+          this.$nextTick(() => {
+            this.mescroll = new MeScroll('mescroll', {
+              down: {
+                use: false
+              },
+              up: {
+                callback: this.fetchMoreComments,
+                htmlLoading: '<p class="">正在加载...</p>',
+                htmlNodata: '<p class="">再刷也没有了</p>',
+                onScroll: (mescroll, y, isUp) => {
+                  this.onScrollHandle({y: y})
+                }
+              }
+            })
+          })
         })
         .catch(e => {
           this.isLoad = true
@@ -305,9 +315,8 @@ export default {
             this.dynamic.comment_list.push(element)
           })
           this.dynamic.paging.is_end = res.data.paging.is_end
-          if (res.data.paging.is_end) {
-            this.$refs.contentScroll.forceUpdate()
-          }
+
+          this.mescroll.endSuccess(res.data.comment_list.length, !res.data.paging.is_end)
         })
         .catch()
     },
@@ -354,7 +363,7 @@ export default {
       }).show()
     },
     onScrollHandle (pos) {
-      let y = -pos.y
+      let y = pos.y
       if (y > window.innerHeight) {
         this.scrollToTopVisible = true
       } else {
@@ -371,7 +380,6 @@ export default {
 }
 </script>
 
-<style src='../../common.css' />
 <style scoped>
 .container {
   margin-left: 30px;
@@ -504,10 +512,11 @@ export default {
   color: #1eb0fd;
   margin-right: 10px;
 }
-.circle-box{
+.circle-box {
   margin-bottom: 24px;
 }
 .circle-name {
+  margin-top: 1px;
   border-radius: 6px;
   border-width: 1.2px;
   border-color: #1eb0fd;
@@ -584,7 +593,6 @@ export default {
   font-size: 28px;
   line-height: 34px;
   margin-bottom: 14px;
-
 }
 .content-activity-address {
   flex: 1;
@@ -678,7 +686,6 @@ export default {
 .reply-box {
   background-color: transparent;
   margin-bottom: 8px;
-  transition: all 0.1s;
 }
 .reply-box:active {
   background-color: #cccccc;

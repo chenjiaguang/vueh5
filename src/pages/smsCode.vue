@@ -154,7 +154,6 @@ export default {
 }
 </script>
 
-<style src='../common.css' />
 <style scoped>
 .container {
   margin-left: 60px;

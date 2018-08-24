@@ -164,7 +164,10 @@ const router = new Router({
     {
       path: prefix + '/weixinLoginJump',
       name: 'WeixinLoginJump',
-      component: WeixinLoginJump
+      component: WeixinLoginJump,
+      meta: {
+        title: '正在登陆'
+      }
     },
     {
       path: prefix + '/dynamic/sendComment',
