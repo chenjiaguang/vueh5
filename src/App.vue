@@ -25,6 +25,7 @@ export default {
 }
 </script>
 
+<style src='./common.css' />
 <style>
 body {
   margin: 0;

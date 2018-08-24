@@ -111,7 +111,7 @@
           <div v-if="dynamic&&dynamic.comment_num>0" id="comment-container" class="column" >
             <div class="comment-text" >{{dynamic.comment_num}}条评论</div>
             <transition-group name="fade-slow" tag="div">
-              <div v-for="(comment) in dynamic.comment_list" :key="'comments'+comment.id">
+              <div v-for="(comment) in dynamic.comment_list" class="transition-quick" :key="'comments'+comment.id">
                 <div class="comment-box row space-between">
                   <div class="column">
                     <img class="user-avatar" :src="comment.avatar" @click="clickUser(comment.uid)" />
@@ -126,11 +126,11 @@
                     <transition name="fade-slow">
                       <div v-if="comment.replys.list.length>0" class="comment-replies-box">
                         <transition-group name="fade-slow" tag="div">
-                          <div class="reply-box" v-for="(reply) in comment.replys.list" :key="'replys'+reply.id" @click.stop="()=>showReplyActionSheet(comment,reply.username,reply.id)">
+                          <div class="reply-box transition-quick" v-for="(reply) in comment.replys.list" :key="'replys'+reply.id" @click.stop="()=>showReplyActionSheet(comment,reply.username,reply.id)">
                             <span class="reply-from" v-if="reply.pusername" @click.stop="clickUser(reply.uid)">{{reply.username}}</span><span class="reply-from" v-if="!reply.pusername" @click.stop="clickUser(reply.uid)">{{reply.username}}:</span><span class="reply-reply" v-if="reply.pusername">回复</span><span class="reply-to" v-if="reply.pusername" @click.stop="clickUser(reply.puid)">{{reply.pusername}}:</span><span class="reply-content">{{reply.content}}</span>
                           </div>
                         </transition-group>
-                        <div class="reply-box" v-if="!comment.replys.paging.is_end">
+                        <div class="reply-box transition-quick" v-if="!comment.replys.paging.is_end">
                           <span class="reply-more" v-if="!comment.replys.paging.is_end" @click.stop="()=>fetchMoreReplies(comment)">查看更多回复></span>
                         </div>
                       </div>
@@ -371,7 +371,6 @@ export default {
 }
 </script>
 
-<style src='../../common.css' />
 <style scoped>
 .container {
   margin-left: 30px;
@@ -508,6 +507,7 @@ export default {
   margin-bottom: 24px;
 }
 .circle-name {
+  margin-top: 1px;
   border-radius: 6px;
   border-width: 1.2px;
   border-color: #1eb0fd;
@@ -678,7 +678,6 @@ export default {
 .reply-box {
   background-color: transparent;
   margin-bottom: 8px;
-  transition: all 0.1s;
 }
 .reply-box:active {
   background-color: #cccccc;

@@ -79,7 +79,6 @@ export default {
 }
 </script>
 
-<style src='../../common.css' />
 <style scoped>
 .container {
   position: absolute;

@@ -18,7 +18,6 @@ export default {
 }
 </script>
 
-<style src='../common.css' />
 <style scoped>
 .fix-box {
   display: block;
