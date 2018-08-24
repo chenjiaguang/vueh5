@@ -1,74 +1,78 @@
 <template>
-  <div :style="{height: winHeight + 'px', overflowY: 'auto', overflowX: 'hidden'}" class="circle-page">
-    <div ref="topBanner">
-      <download-box />
-      <header class="top-header">
-        <div class="top-header-bg" :style="{backgroundImage: 'url(' + circle.cover.compress + ')'}"></div>
-        <div class="top-header-content">
-          <div class="top-header-avatar" :style="{backgroundImage: 'url(' + circle.cover.compress + ')'}"></div>
-          <div class="top-header-text">
-            <div class="top-header-name">{{circle.name}}</div>
-            <div class="top-header-intro">{{circle.intro}}</div>
-            <div class="top-header-overview">
-              <span>{{circle.followed_num || 0}}人关注</span>
-              <span>{{circle.dynamic_num || 0}}条动态</span>
+  <div id="page-scroll" :style="{height: winHeight + 'px'}" class="circle-page">
+    <div ref="pageContainer" style="transition: all 300ms">
+      <div ref="topBanner">
+        <download-box />
+        <header class="top-header">
+          <div class="top-header-bg" :style="{backgroundImage: 'url(' + circle.cover.compress + ')'}"></div>
+          <div class="top-header-content">
+            <div class="top-header-avatar" :style="{backgroundImage: 'url(' + circle.cover.compress + ')'}"></div>
+            <div class="top-header-text">
+              <div class="top-header-name">{{circle.name}}</div>
+              <div class="top-header-intro">{{circle.intro}}</div>
+              <div class="top-header-overview">
+                <span>{{circle.followed_num || 0}}人关注</span>
+                <span>{{circle.dynamic_num || 0}}条动态</span>
+              </div>
             </div>
           </div>
-        </div>
-      </header>
-    </div>
-    <div ref="innerWrapper" class="scroll-wrapper" :style="{height: winHeight + 'px'}">
-      <div class="nav-scroll-list-wrap" ref="navWrapper" :style="{height: tabBarHeight + 'px'}" v-if="tabs && tabs.length > 1 && showTabbar">
-        <cube-tab-bar v-model="selectedLabel" class="tab-box" @change="changeTabBar" :style="{height: tabBarHeight + 'px'}">
-          <cube-tab v-for="(item) in tabs" ref="tabItem" :label="item.title" :key="item.title">
-          </cube-tab>
-        </cube-tab-bar>
-        <div class="tab-slider">
-          <div class="tab-slider-body" :style="{transform: 'translateX(' + tabSlideX + ')'}"></div>
-        </div>
-        <div class="tab-border" :style="{transform: 'scale(1,' + $tranScale + ')'}"></div>
+        </header>
       </div>
-      <div class="tabs-wrapper" ref="slideWrapper" :style="{height: (winHeight - ((tabs && tabs.length) > 1 ? tabBarHeight : 0)) + 'px'}">
-        <cube-slide ref="slideInstance" :data="tabs" :initialIndex="selectedIdx" :threshold="1" :autoPlay="false" :allowVertical="false" :showDots="false" :loop="false" :speed="500" :options="{listenScroll: true, probeType: 3, stopPropagation: true, click: false, preventDefault: false}" @change="changeSlide" @scroll="slideScroll">
-          <cube-slide-item v-for="(item, index) in tabs" :key="item.title" :style="{height: (winHeight - ((tabs && tabs.length) > 1 ? tabBarHeight : 0)) + 'px'}">
-            <!-- <cube-scroll
-              ref="contentScroll"
-              :data="tabs[index].data"
-              :scrollEvents="['scroll']"
-              :options="options"
-              @scroll="innerScroll"
-              @pulling-down="onPullingDown(index)"
-              @pulling-up="onPullingUp(index)">
-              <transition name="loading-scale">
-                <div class="first-loading-box" v-if="!tabs[index].paging.pn">
-                  <loading-view />
+      <div ref="innerWrapper" class="scroll-wrapper" :style="{height: winHeight + 'px'}">
+        <div class="nav-scroll-list-wrap" ref="navWrapper" :style="{height: tabBarHeight + 'px'}" v-if="tabs && tabs.length > 1 && showTabbar">
+          <cube-tab-bar v-model="selectedLabel" class="tab-box" @change="changeTabBar" :style="{height: tabBarHeight + 'px'}">
+            <cube-tab v-for="(item) in tabs" ref="tabItem" :label="item.title" :key="item.title">
+            </cube-tab>
+          </cube-tab-bar>
+          <div class="tab-slider">
+            <div class="tab-slider-body" :style="{transform: 'translateX(' + tabSlideX + ')'}"></div>
+          </div>
+          <div class="tab-border" :style="{transform: 'scale(1,' + $tranScale + ')'}"></div>
+        </div>
+        <div class="tabs-wrapper" ref="slideWrapper" :style="{height: (winHeight - ((tabs && tabs.length) > 1 ? tabBarHeight : 0)) + 'px'}">
+          <cube-slide ref="slideInstance" :data="tabs" :initialIndex="selectedIdx" :autoPlay="false" :allowVertical="false" :showDots="false" :loop="false" :speed="200" :options="{listenScroll: true, probeType: 3, stopPropagation: true, click: false, preventDefault: false}" @change="changeSlide" @scroll="slideScroll">
+            <cube-slide-item v-for="(item, index) in tabs" :key="item.title" :style="{height: (winHeight - ((tabs && tabs.length) > 1 ? tabBarHeight : 0)) + 'px'}">
+              <!-- <cube-scroll
+                ref="contentScroll"
+                :data="tabs[index].data"
+                :scrollEvents="['scroll']"
+                :options="options"
+                @scroll="innerScroll"
+                @pulling-down="onPullingDown(index)"
+                @pulling-up="onPullingUp(index)">
+                <transition name="loading-scale">
+                  <div class="first-loading-box" v-if="!tabs[index].paging.pn">
+                    <loading-view />
+                  </div>
+                </transition>
+                <div v-if="tabs[index].paging && tabs[index].paging.is_end && tabs[index].data && tabs[index].data.length === 0" class="empty-box">该圈子暂无{{index === 0 ? '动态' : '活动'}}</div>
+                <dynamic-item v-if="index === 0" v-for="(item, idx) in tabs[index].data" :key="idx" :itemData="item" :router="$router" @changeLike="changeLike" />
+                <activity-item v-if="index === 1" v-for="(item, idx) in tabs[index].data" :key="idx" :itemData="item" />
+                <template slot="pulldown" slot-scope="props">
+                  <div class="cube-pulldown-wrapper" :style="props.pullDownStyle">
+                    <img v-show="!props.isPullingDown" class="pull-down-icon" :style="{transform: 'translateY(' + props.bubbleY + 'px)'}" :src="$assetsPublicPath + '/cwebassets/image/refresh_icon.png'" />
+                    <img v-show="props.isPullingDown" class="pull-down-icon refreshing" :src="$assetsPublicPath + '/cwebassets/image/refreshing_icon.png'" />
+                  </div>
+                </template>
+                <template slot="pullup" slot-scope="props">
+                  <div class="cube-pullup-wrapper pullup-wrapper" :style="props.pullUpStyle" v-if="tabs[index].paging && tabs[index].paging.pn && !tabs[index].paging.is_end">
+                    <div class="pullup-content"><img class="pull-up-icon" :src="$assetsPublicPath + '/cwebassets/image/loading_icon.png'" />正在加载...</div>
+                  </div>
+                  <div v-else-if="tabs[index].paging && tabs[index].paging.is_end && tabs[index].data && tabs[index].data.length === 0" style="height: 0;"></div>
+                  <div v-else class="pullup-wrapper">
+                    <div class="pullup-content">再刷也没有了</div>
+                  </div>
+                </template>
+              </cube-scroll> -->
+              <div :id="'mescroll' + index" class="mescroll content-scroll-wrapper" :style="{width: winWidth + 'px', height: '100%', overflowY: 'auto', overflowX: 'hidden'}">
+                <div>
+                  <dynamic-item v-if="index === 0" v-for="(item, idx) in tabs[index].data" :key="idx" :itemData="item" :router="$router" @changeLike="changeLike" />
+                  <activity-item v-if="index === 1" v-for="(item, idx) in tabs[index].data" :key="idx" :itemData="item" />
                 </div>
-              </transition>
-              <div v-if="tabs[index].paging && tabs[index].paging.is_end && tabs[index].data && tabs[index].data.length === 0" class="empty-box">该圈子暂无{{index === 0 ? '动态' : '活动'}}</div>
-              <dynamic-item v-if="index === 0" v-for="(item, idx) in tabs[index].data" :key="idx" :itemData="item" :router="$router" @changeLike="changeLike" />
-              <activity-item v-if="index === 1" v-for="(item, idx) in tabs[index].data" :key="idx" :itemData="item" />
-              <template slot="pulldown" slot-scope="props">
-                <div class="cube-pulldown-wrapper" :style="props.pullDownStyle">
-                  <img v-show="!props.isPullingDown" class="pull-down-icon" :style="{transform: 'translateY(' + props.bubbleY + 'px)'}" :src="$assetsPublicPath + '/cwebassets/image/refresh_icon.png'" />
-                  <img v-show="props.isPullingDown" class="pull-down-icon refreshing" :src="$assetsPublicPath + '/cwebassets/image/refreshing_icon.png'" />
-                </div>
-              </template>
-              <template slot="pullup" slot-scope="props">
-                <div class="cube-pullup-wrapper pullup-wrapper" :style="props.pullUpStyle" v-if="tabs[index].paging && tabs[index].paging.pn && !tabs[index].paging.is_end">
-                  <div class="pullup-content"><img class="pull-up-icon" :src="$assetsPublicPath + '/cwebassets/image/loading_icon.png'" />正在加载...</div>
-                </div>
-                <div v-else-if="tabs[index].paging && tabs[index].paging.is_end && tabs[index].data && tabs[index].data.length === 0" style="height: 0;"></div>
-                <div v-else class="pullup-wrapper">
-                  <div class="pullup-content">再刷也没有了</div>
-                </div>
-              </template>
-            </cube-scroll> -->
-            <div :id="'mescroll' + index" :class="'mescroll' + index" :style="{width: winWidth + 'px', height: '100%', overflowY: 'auto', overflowX: 'hidden'}">
-              <dynamic-item v-if="index === 0" v-for="(item, idx) in tabs[index].data" :key="idx" :itemData="item" :router="$router" @changeLike="changeLike" />
-              <activity-item v-if="index === 1" v-for="(item, idx) in tabs[index].data" :key="idx" :itemData="item" />
-            </div>
-          </cube-slide-item>
-        </cube-slide>
+              </div>
+            </cube-slide-item>
+          </cube-slide>
+        </div>
       </div>
     </div>
     <scroll-to-top v-if="$refs['contentScroll']" :visible="showBackTop" :position="{bottom: (winWidth / 750) * 178, right: (winWidth / 750) * 54}" :scroll="$refs['contentScroll'][selectedIdx]"/>
@@ -484,6 +488,8 @@ export default {
       console.log('downAuto', downAuto)
       this.mescroll[idx] = new MeScroll('mescroll' + idx, { // 在vue的mounted生命周期初始化mescroll,确保此处配置的id能够被找到
         down: {
+          offset: (window.innerWidth / 750) * 89,
+          htmlContent: LoadingView,
           auto: downAuto,
           autoShowLoading: downAuto,
           callback: () => this.onPullingDown(idx) // 下拉刷新的回调,别写成downCallback(),多了括号就自动执行方法了
@@ -496,7 +502,15 @@ export default {
       })
     },
     onMeScroll (mescroll, y, isUp) {
-      console.log('onScroll', mescroll, y, isUp)
+      if (y === 0 && !isUp && !this.showBanner) {
+        this.showBanner = true
+        this.$refs['pageContainer'].style.transform = 'translateY(0)'
+      } else if (isUp && this.showBanner) {
+        let bannerPos = this.$refs['topBanner'].getBoundingClientRect()
+        let bannerHeight = bannerPos.height
+        this.showBanner = false
+        this.$refs['pageContainer'].style.transform = 'translateY(-' + bannerHeight + 'px)'
+      }
     }
   },
   beforeRouteEnter (to, from, next) {
@@ -524,6 +538,7 @@ fl{
 .circle-page{
   width: 100%;
   height: 100%;
+  overflow: hidden;
 }
 .top-header{
   width: 100%;
@@ -774,5 +789,8 @@ fl{
   line-height: 48px;
   padding: 50px 0;
   text-align: center;
+}
+.content-scroll-wrapper{
+  -webkit-overflow-scrolling: touch;
 }
 </style>
