@@ -421,7 +421,6 @@ export default {
       } else {
         this.showBackTop = false
       }
-      console.log(this.showBanner, y, bannerPos.height)
       if (y < -1 && this.showBanner) { // 不在最顶时隐藏banner
         this.showBanner = false
         this.$refs['pageScroller'].scrollTo(0, -bannerPos.height, 500)
