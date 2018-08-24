@@ -157,6 +157,7 @@
   padding: 4px 0 20px;
 }
 .with-article{
+  display: block;
   width: 100%;
   height: 128px;
   background-color: #F5F5F5;

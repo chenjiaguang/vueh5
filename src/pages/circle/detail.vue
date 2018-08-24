@@ -440,6 +440,7 @@ export default {
       let bannerHeight = this.$refs['topBanner'].getBoundingClientRect().height
       this.$refs['pageScroller'].scrollTo(0, -bannerHeight, 0)
     }
+    this.$refs['slideInstance'].refresh()
   },
   beforeRouteEnter (to, from, next) {
     utils.beforeRouteEnterHandleShareOpen(to, from, next, 1)
