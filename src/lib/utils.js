@@ -108,47 +108,6 @@ export default {
       }
     }
   },
-  checkReloadWithKeepAlive (vm, checkQueryKeys, reloadCallback) {
-    if (!vm._refresh) {
-      vm._refresh = {}
-    }
-    // 写入初始值
-    checkQueryKeys.forEach(checkQueryKey => {
-      if (!vm._refresh[checkQueryKey]) {
-        vm._refresh[checkQueryKey] = vm.$route.query[checkQueryKey]
-      }
-    })
-    // 记录初始刷新时间
-    if (!vm._refreshTime) {
-      vm._refreshTime = Number(new Date())
-    }
-
-    // 判断是否需要reload
-    let reload = false
-    if ((window.localStorage.userChangeTime &&
-      vm._refreshTime < window.localStorage.userChangeTime)) {
-      // 发生了登入登出 需要reload
-      reload = true
-    }
-    if (!reload) {
-      // 参数发生变化 需要reload
-      checkQueryKeys.forEach(checkQueryKey => {
-        if (vm._refresh[checkQueryKey] !== vm.$route.query[checkQueryKey]) {
-          reload = true
-        }
-      })
-    }
-
-    if (reload) {
-      // 重新记录参数
-      checkQueryKeys.forEach(checkQueryKey => {
-        vm._refresh[checkQueryKey] = vm.$route.query[checkQueryKey]
-      })
-      // 重新记录时间
-      vm._refreshTime = Number(new Date())
-      reloadCallback()
-    }
-  },
   /**
    * 分享打开计数功能 自带next
    * type: 1：圈子 2：话题 3：短动态 4：长文 5：活动

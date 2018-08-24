@@ -6,13 +6,17 @@
 </template>
 <script>
 export default {
-  props: ['visible', 'position', 'scroll'],
+  props: ['visible', 'position', 'scroll', 'isMeScroll'],
   data () {
     return {}
   },
   methods: {
     handleClick (event) {
-      this.scroll.scrollTo(0, 0, 500)
+      if (this.isMeScroll) {
+        this.scroll.scrollTo(0, 500)
+      } else {
+        this.scroll.scrollTo(0, 0, 500)
+      }
     }
   }
 }
