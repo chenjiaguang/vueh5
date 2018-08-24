@@ -41,6 +41,7 @@
   min-height: 100%;
   border: none;
   resize: none;
+  outline: none;
 }
 .options-box{
   padding-top: 88px;

@@ -2,7 +2,7 @@
   <div :style="{height: winHeight + 'px'}">
     <cube-scroll :data="tabs" ref="pageScroller" :scrollEvents="['scroll']" :options="options" @scroll="outerScroll" @pulling-up="onPullingUp">
       <div ref="topBanner">
-        <download-box />
+        <download-box v-if="$route.params.isShareOpen" />
         <header ref="topHeader" class="top-header">
           <div class="top-header-bg" :style="{backgroundImage: 'url(' + user.cover + ')'}">
             <div class="top-header-avatar" :style="{backgroundImage: 'url(' + user.avatar_url + ')', opacity: user.avatar_url ? 1 : 0}"></div>
@@ -334,6 +334,12 @@ export default {
         text = '互相关注'
       }
       return text
+    }
+  },
+  activated () {
+    if (!this.showBanner) {
+      let bannerHeight = this.$refs['topBanner'].getBoundingClientRect().height
+      this.$refs['pageScroller'].scrollTo(0, -bannerHeight, 0)
     }
   },
   created () {

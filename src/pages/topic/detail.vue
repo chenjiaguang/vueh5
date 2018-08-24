@@ -2,7 +2,7 @@
   <div :style="{height: winHeight + 'px'}">
     <cube-scroll class="toutiao" ref="pageScroller" :scrollEvents="['scroll']" :options="{bounce: false}">
       <div class="banner" ref="topBanner">
-        <download-box />
+        <download-box v-if="$route.params.isShareOpen" />
         <header ref="topHeader" class="top-header">
           <div class="top-header-bg" :style="{backgroundImage: 'linear-gradient(60deg,#' + topicInfo.beginColor + ',#' + topicInfo.endColor + ')'}"></div>
           <div class="top-header-content-wrapper">
@@ -348,6 +348,12 @@ export default {
       if (utils.checkLogin()) {
         this.$router.push({name: 'EditDynamic', params: {topic: [{id: this.topicInfo.id, title: this.topicInfo.title}], range: 0}})
       }
+    }
+  },
+  activated () {
+    if (!this.showBanner) {
+      let bannerHeight = this.$refs['topBanner'].getBoundingClientRect().height
+      this.$refs['pageScroller'].scrollTo(0, -bannerHeight, 0)
     }
   },
   beforeRouteEnter (to, from, next) {

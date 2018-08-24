@@ -510,7 +510,7 @@ export default {
           return {
             id: item.id,
             name: item.name,
-            price: item.prices,
+            price: item.prices.replace(',', ''),
             amount: item.last_num,
             selected: false,
             max: item.max,

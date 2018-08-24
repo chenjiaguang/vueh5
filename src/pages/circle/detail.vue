@@ -2,7 +2,7 @@
   <div :style="{height: winHeight + 'px'}">
     <cube-scroll class="toutiao" ref="pageScroller" :options="{bounce: false}">
       <div ref="topBanner">
-        <download-box />
+        <download-box v-if="$route.params.isShareOpen" />
         <header class="top-header">
           <div class="top-header-bg" :style="{backgroundImage: 'url(' + circle.cover.compress + ')'}"></div>
           <div class="top-header-content">
@@ -317,7 +317,7 @@ export default {
       })
     },
     fetchActivity (pn) {
-      if (!this.tabs[1] || this.tabs[1] && this.tabs[1].fetching) {
+      if (!this.tabs[1] || (this.tabs[1] && this.tabs[1].fetching)) {
         return false
       }
       let rData = {
@@ -421,6 +421,7 @@ export default {
       } else {
         this.showBackTop = false
       }
+      console.log(this.showBanner, y, bannerPos.height)
       if (y < -1 && this.showBanner) { // 不在最顶时隐藏banner
         this.showBanner = false
         this.$refs['pageScroller'].scrollTo(0, -bannerPos.height, 500)
@@ -433,6 +434,12 @@ export default {
       if (utils.checkLogin()) { // 登录后跳转
         this.$router.push({name: 'EditDynamic', params: {circle: {id: this.circle.id, title: this.circle.name}}})
       }
+    }
+  },
+  activated () {
+    if (!this.showBanner) {
+      let bannerHeight = this.$refs['topBanner'].getBoundingClientRect().height
+      this.$refs['pageScroller'].scrollTo(0, -bannerHeight, 0)
     }
   },
   beforeRouteEnter (to, from, next) {
