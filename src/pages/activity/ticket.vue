@@ -38,7 +38,7 @@
       <div class="attention-item">3.暂不支持退票，有需要请联系主办方</div>
     </div>
     <div class="fixed-button">
-      <img src="/cwebassets/image/van_logo.png" class="van-logo" />
+      <img :src="$assetsPublicPath + '/cwebassets/image/van_logo.png'" class="van-logo" />
       有范又有趣的海南生活圈
       <div class="open-btn" @click="openFantTuanC">立即打开</div>
     </div>
@@ -88,7 +88,6 @@ import Vue from 'vue';
         this.showWeixinTip = !this.showWeixinTip
       },
       downloadIamge (name) {
-        console.log('触发了保存')
         let image = new Image()
         // 解决跨域 Canvas 污染问题
         image.setAttribute('crossOrigin', 'anonymous')
@@ -127,7 +126,6 @@ import Vue from 'vue';
         if (res && Boolean(res.error) && res.msg) {
           this.$toast(res.msg)
         } else if (res && !Boolean(res.error)) {
-          console.log('获取成功', res)
           this.codeImage = res.data.QRCode
           this.ticket.downloadImage = res.data.ticket_image
           this.ticket.statusText = res.data.state_text

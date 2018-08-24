@@ -1,0 +1,88 @@
+
+/************BASE CSS************/
+.row {
+  display: flex;
+  flex-direction: row;
+}
+.row-reverse {
+  flex-direction: row-reverse;
+}
+.column {
+  display: flex;
+  flex-direction: column;
+}
+.space-between {
+  justify-content: space-between;
+}
+.center{
+  align-items: center;
+}
+.flex-start{
+  align-items: flex-start;
+}
+.flex-end {
+  align-items: flex-end;
+}
+.stretch{
+  align-items:stretch;
+}
+.flex-wrap-wrap{
+  flex-wrap:wrap;
+}
+.hide{
+  display: none;
+}
+.relative{
+  position: relative;;
+}
+
+
+
+
+
+
+.fade-slow-enter-active, .fade-slow-leave-active {
+  transition: all 1s;
+}
+.fade-slow-enter, .fade-slow-leave-to /* .fade-leave-active below version 2.1.8 */ {
+  opacity: 0;
+}
+
+.fade-normal-enter-active, .fade-normal-leave-active {
+  transition: all .5s;
+}
+.fade-normal-enter, .fade-normal-leave-to /* .fade-leave-active below version 2.1.8 */ {
+  opacity: 0;
+}
+
+.fade-quick-enter-active, .fade-quick-leave-active {
+  transition: all .3s;
+}
+.fade-quick-enter, .fade-quick-leave-to /* .fade-leave-active below version 2.1.8 */ {
+  opacity: 0;
+}
+
+.transition-quick{
+  transition: all .3s;
+}
+
+
+/************主题 CSS************/
+.action-sheet-item {
+  padding: 0 !important;
+  height: 100px !important;
+  line-height: 100px !important;
+  font-size: 34px !important;
+  color: #333333 !important;
+}
+.cube-action-sheet-space{
+  height: 10px !important;
+  background-color:#E1E1E1 !important;
+}
+.cube-action-sheet-cancel span {
+  padding: 0 !important;
+  height: 100px !important;
+  line-height: 100px !important;
+  font-size: 34px !important;
+  color: #333333 !important;
+}

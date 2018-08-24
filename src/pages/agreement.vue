@@ -27,14 +27,13 @@
         winHeight: window.innerHeight,
         src: '',
         srcObject: {
-          user: '/cwebassets/userAgreement.html',
-          author: '/cwebassets/authorAgreement.html',
-          activity: '/cwebassets/activityAgreement.html'
+          user: this.$assetsPublicPath + '/cwebassets/userAgreement.html',
+          author: this.$assetsPublicPath + '/cwebassets/authorAgreement.html',
+          activity: this.$assetsPublicPath + '/cwebassets/activityAgreement.html'
         }
       }
     },
     created () {
-      console.log('route', this.$route)
       let _type = this.$route.query && this.$route.query.type
       if (_type) {
         this.src = this.srcObject[_type]

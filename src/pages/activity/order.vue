@@ -47,12 +47,15 @@
             </div>
             <div class="user-info-item clearfix">
               <div class="user-left fl"><i class="require-icon iconfont icon-xinghao"></i>手机</div>
-              <input class="phone-input fl" type="number" v-model="form.userInfo.phone" />
-              <div class="get-code-btn fl" :class="{'get-code-btn-disabled': disabledSend}" @click="!disabledSend && sendCode()">{{btnText}}</div>
+              <input class="user-full-input fl" type="number" v-model="form.userInfo.phone" />
             </div>
-            <div class="user-info-item clearfix">
+            <!-- <div class="user-info-item clearfix">
               <div class="user-left fl"><i class="require-icon iconfont icon-xinghao"></i>验证码</div>
               <input class="user-full-input fl" type="number" v-model="form.userInfo.code" />
+            </div> -->
+            <div class="user-info-item clearfix" v-if="form.userInfo.needWeChat">
+              <div class="user-left fl"><i class="require-icon iconfont icon-xinghao"></i>微信号</div>
+              <input class="user-full-input fl" type="text" v-model="form.userInfo.weChat" />
             </div>
             <div class="user-info-item clearfix" v-if="form.userInfo.needIdCard">
               <div class="user-left fl"><i class="require-icon iconfont icon-xinghao"></i>身份证号</div>
@@ -453,285 +456,298 @@
 </style>
 
 <script>
-  import '@/iconfont/iconfont.css'
-  export default {
-    name: 'ActivityDetail',
-    data () {
-      return {
-        winWidth: window.innerWidth,
-        winHeight: window.innerHeight,
-        activity: {
-          id: '',
-          title: '',
-          address: '',
-          date: '',
-          tags: []
+import '@/iconfont/iconfont.css'
+import utils from '@/lib/utils'
+export default {
+  name: 'ActivityDetail',
+  data () {
+    return {
+      winWidth: window.innerWidth,
+      winHeight: window.innerHeight,
+      activity: {
+        id: '',
+        title: '',
+        address: '',
+        date: '',
+        tags: []
+      },
+      form: {
+        ticket: [],
+        userInfo: {
+          needName: false,
+          needIdCard: false,
+          needSex: false,
+          needWeChat: false,
+          name: '',
+          phone: '',
+          code: '',
+          idCard: '',
+          weChat: '',
+          sex: 0 // 0表示未选，1表示男，2表示女
         },
-        form: {
-          ticket: [],
-          userInfo: {
-            needName: false,
-            needIdCard: false,
-            needSex: false,
-            name: '',
-            phone: '',
-            code: '',
-            idCard: '',
-            sex: 0 // 0表示未选，1表示男，2表示女
-          },
-          payWay: 1, // 1表示微信支付，2表示支付宝支付     如果微信内则微信支付，否则支付宝支付:this.$browserUA.isWeixin() ? 1 : 2
-          agreement: true
-        },
-        timer: null,
-        countNum: -1,
-        btnText: '获取验证码',
-        counting: false,
-        submitting: false
-      }
-    },
-    methods: {
-      fetchActivity () {
-        let rData = {
-          id: this.$route.query.id
-        }
-        this.$ajax('/jv/anonymous/qz/v21/activity', {data: rData}).then(res => { // 获取活动数据
-          this.activity.id = res.data.id
-          this.activity.title = res.data.title
-          this.activity.address = res.data.address_text
-          this.activity.date = res.data.time_text
-          this.activity.deadline = res.data.deadline_text
-          this.form.ticket = res.data.activity_fees.map((item, idx) => {
-            return {
-              id: item.id,
-              name: item.name,
-              price: item.prices,
-              amount: item.last_num,
-              selected: false,
-              max: item.max,
-              putAmount: 1
-            }
-          })
-          let tagsArr = []
-          if (res.data.insurance) {
-            tagsArr.push('费用中包含保险')
-          }
-          if (!res.data.refund) {
-            tagsArr.push('不可退票')
-          }
-          this.activity.tags = tagsArr
-          this.form.userInfo.needName = res.data.nead_name
-          this.form.userInfo.needIdCard = res.data.nead_idcard
-          this.form.userInfo.needSex = res.data.nead_sex
-        }).catch(err => {
-          console.log('获取数据失败')
-        })
+        payWay: 1, // 1表示微信支付，2表示支付宝支付     如果微信内则微信支付，否则支付宝支付:this.$browserUA.isWeixin() ? 1 : 2
+        agreement: true
       },
-      selectTicket (item) {
-        let currentId = this.selectedTicket ? this.selectedTicket.id : null
-        if (item.id === currentId ||  item.amount <= 0) {
-          return false
-        }
-        this.form.ticket.forEach(it => {
-          it.selected = Boolean(it.id === item.id)
-        })
-      },
-      minus () {
-        let selected = this.form.ticket.filter(item => item.selected)[0]
-        if (selected.putAmount <= 1) {
-          return false
-        }
-        selected.putAmount -= 1
-      },
-      add () {
-        let selected = this.form.ticket.filter(item => item.selected)[0]
-        if (selected.putAmount >= selected.amount && selected.max && selected.max.toString() !== '0') {
-          return false
-        }
-        selected.putAmount += 1
-      },
-      startCounting (callback) {
-        if (this.countNum >= 0) { // 还在显示倒计时
-          return false
-        }
-        this.countNum = 59
-        this.timer && clearInterval(this.timer)
-        this.timer = setInterval(() => {
-          let text = '重新获取(' + (this.countNum > 9 ? this.countNum : '0' + this.countNum) + ')'
-          this.btnText = text
-          this.countNum -= 1
-          if (this.countNum < 0) {
-            clearInterval(this.timer)
-            this.btnText = '获取验证码'
-            callback && callback()
-          }
-        }, 1000)
-      },
-      sendCode () {
-        let {phone} = this.form.userInfo
-        if (!/^1[34578][0-9]\d{8}$/.test(phone)) { // 输入的不是手机号
-          this.$toast('请输入正确手机号')
-          return false
-        }
-        let rData = {
-          phone: phone
-        }
-        this.counting = true
-        let _this = this
-        this.$ajax('/jv/sms/send', {data: rData}).then(res => {
-          // 请求成功
-          console.log('发送成功了')
-          if (res && Boolean(res.error) && res.msg) {
-            this.$toast(res.msg)
-            this.counting = false
-          } else if (res && !Boolean(res.error)) {
-            this.$toast('验证码已发送，请注意查收')
-            this.startCounting(() => {
-              _this.counting = false
-            })
-          }
-        }).catch(err => {
-          // 获取失败
-          console.log('发送失败了')
-          _this.counting = false
-        })
-      },
-      changePayWay (way) {
-        if (this.form.payWay.toString() === way.toString()) {
-          return false
-        }
-        this.form.payWay = way
-      },
-      changeAgreement () {
-        this.form.agreement = !this.form.agreement
-      },
-      goAgreement () {
-        this.$router.push({path: '/agreement', query: {type: 'activity'}})
-      },
-      orderPay (res, successCallback) {
-        if (this.$browserUA.isWeixin()) { // 微信内置浏览器内
-          this.publicAccountPay(res, successCallback)
-        } else {
-          this.otherWebPay(res, successCallback)
-        }
-      },
-      otherWebPay (res, successCallback) { // 微信外支付
-        successCallback && successCallback()
-      },
-      publicAccountPay (res, successCallback) { // 微信内支付
-        successCallback && successCallback()
-      },
-      completeOrder () { // 完成订单
-        console.log('完成订单')
-      },
-      orderSubmit () { // 验证并提交订单
-        let {selectedTicket} = this
-        let {payWay, agreement, shouldPay} = this.form
-        let {id} = this.activity
-        let {name, needName, phone, code, idCard, needIdCard, sex, needSex} = this.form.userInfo
-        let toastObject = {
-          selectedTicket: !selectedTicket && '请选择购买的票',
-          name: !name && needName && '请输入正确的姓名',
-          phone: !phone && '请输入正确的手机号码',
-          code: !code && '请输入正确的验证码',
-          idCard: !idCard && needIdCard && '请输入正确的身份证号',
-          sex: (!sex || sex.toString() === '0') && needSex && '请选择你的性别'
-        }
-        if (!(id.toString() && agreement)) { // 活动id必须存在,需同意范团活动参与协议
-          return false
-        }
-        for (let item in toastObject) {
-          if (toastObject[item]) { // 有一项出错，停止提交并提示
-            this.$toast(toastObject[item])
-            return false
-          }
-        }
-        if (this.submitting) {
-          return false
-        }
-        let rData = {
-          aid: this.$route.query.id,
-          feeId: selectedTicket.id,
-          num: selectedTicket.putAmount,
-          name: name,
-          sex: sex,
-          idCard: idCard,
-          phone: phone,
-          phoneCode: code
-        }
-        this.submitting = true
-        this.$ajax('/jv/anonymous/qz/v21/apply', {data: rData}).then(res => { // 请求后端下单接口,接受返回参数,如果有error,则提示，无error，则判断是否应调起支付
-          this.submitting = false
-          if (res && res.msg) {
-            if (Boolean(res.error)) { // 出错时仅提示
-              this.$toast(res.msg)
-            } else {
-              if (res.data && res.data.needToPlay) { // 无错且需支付时仅提示
-                this.$toast(res.msg)
-              } else if (res.data && !res.data.needToPlay) { // 无措且不需支付时提示后跳转
-                this.$toast(res.msg, 2000, () => this.goSuccess(res))
-              }
-            }
-          }
-          if (res && !Boolean(res.error)) {
-            if (res.data && res.data.needToPlay) { // 需要支付
-              if (typeof WeixinJSBridge == "undefined") { // 不允许调用微信公众号支付,其他浏览器
-                let _rData = {
-                  checkcode: res.data.checkcode,
-                  payType: '1',
-                  tradeType: 'MWEB'
-                }
-                this.$ajax('/jv/anonymous/qz/v21/activity/pay', {data: _rData}).then(res => {
-                  if (res && Boolean(res.error) && res.msg) {
-                    this.$toast(res.msg)
-                  } else if (res && !Boolean(res.error)) {
-                    let _href = res.data.mweb_url
-                    window.location.href = _href
-                  }
-                }).catch(err => {
-                  console.log('微信外h5 err')
-                })
-              } else { // 允许调用微信公众号支付,微信浏览器
-                let _href = this.$apiDomain + '/jv/qz/v21/activity/weixin/JSAPI/pay/' + res.data.checkcode
-                window.location.href = _href
-              }
-            } else if (res.data && !res.data.needToPlay) {
-              if (res.msg) { // 如果无msg则直接跳转
-                this.goSuccess(res)
-              }
-            }
-          }
-        }).catch(err => {
-          this.submitting = false
-        })
-      },
-      goSuccess (res) {
-        this.$router.replace({name: 'ActivityTicket', query: {checkcode: res.data.checkcode}})
-      },
-      resize () {
-        this.winWidth = window.innerWidth
-        this.winHeight = window.innerHeight
-      }
-    },
-    computed: {
-      selectedTicket () {
-        return this.form.ticket.filter(item => item.selected)[0]
-      },
-      shouldPay () {
-        let selected = this.form.ticket.filter(item => item.selected)[0]
-        return (selected && Number((Number(selected.putAmount) * Number(selected.price)).toFixed(2))) || 0
-      },
-      disabledSend () {
-        return !/^1[34578][0-9]\d{8}$/.test(this.form.userInfo.phone) || this.counting
-      }
-    },
-    created () {
-      this.fetchActivity()
-    },
-    mounted () {
-      window.addEventListener('resize', this.resize)
-    },
-    beforeDestroy () {
-      window.removeEventListener('resize', this.resize)
+      timer: null,
+      countNum: -1,
+      btnText: '获取验证码',
+      counting: false,
+      submitting: false
     }
+  },
+  methods: {
+    fetchActivity () {
+      let rData = {
+        id: this.$route.query.id
+      }
+      this.$ajax('/jv/anonymous/qz/v21/activity', {data: rData}).then(res => { // 获取活动数据
+        this.activity.id = res.data.id
+        this.activity.title = res.data.title
+        this.activity.address = res.data.address_text
+        this.activity.date = res.data.time_text
+        this.activity.deadline = res.data.deadline_text
+        this.form.ticket = res.data.activity_fees.map((item, idx) => {
+          return {
+            id: item.id,
+            name: item.name,
+            price: item.prices.replace(',', ''),
+            amount: item.last_num,
+            selected: false,
+            max: item.max,
+            putAmount: 1
+          }
+        })
+        let tagsArr = []
+        if (res.data.insurance) {
+          tagsArr.push('费用中包含保险')
+        }
+        if (!res.data.refund) {
+          tagsArr.push('不可退票')
+        }
+        if (res.data.max_ticket && parseInt(res.data.max_ticket)) {
+          tagsArr.push('限购' + res.data.max_ticket + '张')
+        }
+        this.activity.tags = tagsArr
+        this.activity.buyNum = res.data.buynum
+        this.activity.maxTicket = res.data.max_ticket
+        this.form.userInfo.needName = res.data.nead_name
+        this.form.userInfo.needIdCard = res.data.nead_idcard
+        this.form.userInfo.needSex = res.data.nead_sex
+        this.form.userInfo.needWeChat = res.data.need_wechat
+      }).catch(() => {
+        console.log('获取数据失败')
+      })
+    },
+    selectTicket (item) {
+      let currentId = this.selectedTicket ? this.selectedTicket.id : null
+      if (item.id === currentId ||  item.amount <= 0) {
+        return false
+      }
+      this.form.ticket.forEach(it => {
+        it.selected = Boolean(it.id === item.id)
+      })
+    },
+    minus () {
+      let selected = this.form.ticket.filter(item => item.selected)[0]
+      if (selected.putAmount <= 1) {
+        return false
+      }
+      selected.putAmount -= 1
+    },
+    add () {
+      let selected = this.form.ticket.filter(item => item.selected)[0]
+      if (selected.putAmount >= selected.amount && selected.max && selected.max.toString() !== '0') {
+        return false
+      }
+      selected.putAmount += 1
+    },
+    startCounting (callback) {
+      if (this.countNum >= 0) { // 还在显示倒计时
+        return false
+      }
+      this.countNum = 59
+      this.timer && clearInterval(this.timer)
+      this.timer = setInterval(() => {
+        let text = '重新获取(' + (this.countNum > 9 ? this.countNum : '0' + this.countNum) + ')'
+        this.btnText = text
+        this.countNum -= 1
+        if (this.countNum < 0) {
+          clearInterval(this.timer)
+          this.btnText = '获取验证码'
+          callback && callback()
+        }
+      }, 1000)
+    },
+    sendCode () {
+      let {phone} = this.form.userInfo
+      if (!/^1[34578][0-9]\d{8}$/.test(phone)) { // 输入的不是手机号
+        this.$toast('请输入正确手机号')
+        return false
+      }
+      let rData = {
+        phone: phone
+      }
+      this.counting = true
+      let _this = this
+      this.$ajax('/jv/sms/send', {data: rData}).then(res => {
+        // 请求成功
+        console.log('发送成功了')
+        if (res && Boolean(res.error) && res.msg) {
+          this.$toast(res.msg)
+          this.counting = false
+        } else if (res && !res.error) {
+          this.$toast('验证码已发送，请注意查收')
+          this.startCounting(() => {
+            _this.counting = false
+          })
+        }
+      }).catch(() => {
+        // 获取失败
+        console.log('发送失败了')
+        _this.counting = false
+      })
+    },
+    changePayWay (way) {
+      if (this.form.payWay.toString() === way.toString()) {
+        return false
+      }
+      this.form.payWay = way
+    },
+    changeAgreement () {
+      this.form.agreement = !this.form.agreement
+    },
+    goAgreement () {
+      this.$router.push({path: '/agreement', query: {type: 'activity'}})
+    },
+    // orderPay (res, successCallback) {
+    //   if (this.$browserUA.isWeixin()) { // 微信内置浏览器内
+    //     this.publicAccountPay(res, successCallback)
+    //   } else {
+    //     this.otherWebPay(res, successCallback)
+    //   }
+    // },
+    // otherWebPay (res, successCallback) { // 微信外支付
+    //   successCallback && successCallback()
+    // },
+    // publicAccountPay (res, successCallback) { // 微信内支付
+    //   successCallback && successCallback()
+    // },
+    // completeOrder () { // 完成订单
+    //   console.log('完成订单')
+    // },
+    orderSubmit () { // 验证并提交订单
+      if (!utils.checkLogin()) { // 未登录终止
+        return false
+      }
+      let {selectedTicket} = this
+      let {agreement} = this.form
+      let {id, buyNum, maxTicket} = this.activity
+      let {name, needName, phone, idCard, needIdCard, weChat, needWeChat, sex, needSex} = this.form.userInfo
+      let toastObject = {
+        selectedTicket: !selectedTicket && '请选择购买的票',
+        name: !name && needName && '请输入正确的姓名',
+        phone: !phone && '请输入正确的手机号码',
+        weChat: !weChat && needWeChat && '请输入正确的微信号',
+        idCard: !idCard && needIdCard && '请输入正确的身份证号',
+        sex: (!sex || sex.toString() === '0') && needSex && '请选择你的性别',
+        buynum: maxTicket && parseInt(maxTicket) && selectedTicket && ((selectedTicket.putAmount + parseInt(buyNum)) > parseInt(maxTicket)) && '您已超过限购数量'
+      }
+      if (!(id.toString() && agreement)) { // 活动id必须存在,需同意范团活动参与协议
+        return false
+      }
+      for (let item in toastObject) {
+        if (toastObject[item]) { // 有一项出错，停止提交并提示
+          this.$toast(toastObject[item])
+          return false
+        }
+      }
+      if (this.submitting) {
+        return false
+      }
+      let rData = {
+        aid: this.$route.query.id,
+        feeId: selectedTicket.id,
+        num: selectedTicket.putAmount,
+        name: name,
+        sex: sex,
+        idCard: idCard,
+        wechat: weChat,
+        phone: phone
+      }
+      this.submitting = true
+      this.$ajax('/jv/anonymous/qz/v21/apply', {data: rData}).then(res => { // 请求后端下单接口,接受返回参数,如果有error,则提示，无error，则判断是否应调起支付
+        this.submitting = false
+        if (res && res.msg) {
+          if (res.error) { // 出错时仅提示
+            this.$toast(res.msg)
+          } else {
+            if (res.data && res.data.needToPlay) { // 无错且需支付时仅提示
+              this.$toast(res.msg)
+            } else if (res.data && !res.data.needToPlay) { // 无措且不需支付时提示后跳转
+              this.$toast(res.msg, 2000, () => this.goSuccess(res))
+            }
+          }
+        }
+        if (res && !res.error) {
+          if (res.data && res.data.needToPlay) { // 需要支付
+            if (typeof WeixinJSBridge == 'undefined') { // 不允许调用微信公众号支付,其他浏览器
+              let _rData = {
+                checkcode: res.data.checkcode,
+                payType: '1',
+                tradeType: 'MWEB'
+              }
+              this.$ajax('/jv/anonymous/qz/v21/activity/pay', {data: _rData}).then(res => {
+                if (res && Boolean(res.error) && res.msg) {
+                  this.$toast(res.msg)
+                } else if (res && !res.error) {
+                  let _href = res.data.mweb_url
+                  window.location.href = _href
+                }
+              }).catch(() => {
+                console.log('微信外h5 err')
+              })
+            } else { // 允许调用微信公众号支付,微信浏览器
+              let _href = this.$apiDomain + '/jv/qz/v21/activity/weixin/JSAPI/pay/' + res.data.checkcode
+              window.location.href = _href
+            }
+          } else if (res.data && !res.data.needToPlay) {
+            if (res.msg) { // 如果无msg则直接跳转
+              this.goSuccess(res)
+            }
+          }
+        }
+      }).catch(() => {
+        this.submitting = false
+      })
+    },
+    goSuccess (res) {
+      this.$router.replace({name: 'ActivityTicket', query: {checkcode: res.data.checkcode}})
+    },
+    resize () {
+      this.winWidth = window.innerWidth
+      this.winHeight = window.innerHeight
+    }
+  },
+  computed: {
+    selectedTicket () {
+      return this.form.ticket.filter(item => item.selected)[0]
+    },
+    shouldPay () {
+      let selected = this.form.ticket.filter(item => item.selected)[0]
+      return (selected && Number((Number(selected.putAmount) * Number(selected.price)).toFixed(2))) || 0
+    },
+    disabledSend () {
+      return !/^1[34578][0-9]\d{8}$/.test(this.form.userInfo.phone) || this.counting
+    }
+  },
+  created () {
+    this.fetchActivity()
+  },
+  mounted () {
+    window.addEventListener('resize', this.resize)
+  },
+  beforeDestroy () {
+    window.removeEventListener('resize', this.resize)
   }
+}
 </script>

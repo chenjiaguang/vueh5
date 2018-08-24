@@ -1,8 +1,8 @@
 <template>
     <transition appear appear-class="before-appear">
-        <div class="container" :id="id" ref="mySwiper" :style="{width: swiperOption.width + 'px', height: swiperOption.height + 'px'}" @click="close">
+        <div class="container" :id="id" ref="mySwiper" :style="{width: swiperOption.width + 'px', height: swiperOption.height + 'px', zIndex: timestap}" @click="close">
             <swiper class="swiper-wrapper" :options="swiperOption">
-                <!-- slides --> 
+                <!-- slides -->
                 <swiper-slide class="swiper-item" v-for="(item, idx) in images" :key="idx">
                     <div class="swiper-item-content">
                         <img class="image" :src="item" />
@@ -23,31 +23,33 @@ import 'swiper/dist/css/swiper.css'
 import { swiper, swiperSlide } from 'vue-awesome-swiper'
 
 export default {
-    data () {
-        return {
-            id: '',
-            images: [],
-            swiperOption: {
-                initialSlide: 0,
-                setWrapperSize: true,
-                width: window.innerWidth,
-                height: window.innerHeight,
-                pagination: {
-                    el: '.swiper-pagination',
-                    type: 'fraction'
-                }
-            }
+  data () {
+    return {
+      id: '',
+      images: [],
+      swiperOption: {
+        initialSlide: 0,
+        setWrapperSize: true,
+        width: window.innerWidth,
+        height: window.innerHeight,
+        pagination: {
+          el: '.swiper-pagination',
+          type: 'fraction'
         }
-    },
-    components: {
-        swiper,
-        swiperSlide
-    },
-    methods: {
-        close () {
-            this.$previewImage.hide(this.id)
-        }
+      },
+      timestap: 999
     }
+  },
+  components: {
+    swiper,
+    swiperSlide
+  },
+  methods: {
+    close () {
+      this.$previewImage.hide(this.id)
+      this.onHide()
+    }
+  }
 }
 </script>
 
