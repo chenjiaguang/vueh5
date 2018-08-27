@@ -41,6 +41,7 @@
   min-height: 100%;
   border: none;
   resize: none;
+  outline: none;
 }
 .options-box{
   padding-top: 88px;
@@ -289,6 +290,7 @@ export default {
           if (!res.error) { // 发布成功
             this.$toast(res.msg, 2000, () => {
               this.submitting = false
+              console.log('发布成功,返回')
               this.$router.go(-1)
             })
           } else {
@@ -298,6 +300,7 @@ export default {
         }
         if (res && !res.msg && !res.error) { // 发布成功
           this.submitting = false
+          console.log('发布成功,返回')
           this.$router.go(-1)
         }
       }).catch(err => {

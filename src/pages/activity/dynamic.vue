@@ -2,7 +2,7 @@
   <div :style="{height: widHeight + 'px'}">
     <cube-scroll :data="dynamic" class="activity-dynamic" ref="pageScroller" :scrollEvents="['scroll']" :options="options" @scroll="pageScroll" @pulling-up="onPullingUp">
       <div ref="topBanner">
-        <download-box />
+        <download-box v-if="$route.params.isShareOpen" />
       </div>
       <transition name="loading-scale">
         <div class="first-loading-box" v-if="!paging.pn">
@@ -177,6 +177,12 @@ export default {
       } else {
         this.showBackTop = false
       }
+    }
+  },
+  activated () {
+    if (!this.showBanner) {
+      let bannerHeight = this.$refs['topBanner'].getBoundingClientRect().height
+      this.$refs['pageScroller'].scrollTo(0, -bannerHeight, 0)
     }
   },
   created () {

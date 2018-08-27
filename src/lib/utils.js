@@ -132,6 +132,7 @@ export default {
     if (to.query.isShareOpen && to.query.isShareOpen !== 'false') {
       ajax('/jv/share/anonymous/open', { data: { type: type } })
       delete to.query.isShareOpen
+      to.params.isShareOpen = true
       return true
     } else {
       return false
