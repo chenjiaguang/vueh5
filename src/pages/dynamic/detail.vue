@@ -55,7 +55,7 @@
               </a>
             </div>
 
-            <div v-if="dynamic">
+            <div v-if="dynamic" id="foot-container" class="column">
               <a class="content-activity-box row center" v-if="dynamic.actid" href="javascript:void(0)" @click="clickActivity(dynamic.actid)">
                 <div class="content-activity-img" :style="`background-image:url(${dynamic.activity.covers[0].compress})`"/>
                 <div class="content-activity-right column space-between">
@@ -515,9 +515,11 @@ export default {
   font-size: 24px;
   padding: 12px 20px 12px 20px;
 }
+#foot-container{
+  margin-bottom: 36px;
+}
 /*************************************************************************/
 #content-container {
-  margin-bottom: 36px;
 }
 .dynamic-content {
   color: #333333;
