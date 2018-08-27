@@ -1,7 +1,7 @@
 <template>
   <div id="page-scroll" :style="{height: winHeight + 'px'}" class="circle-page">
     <div ref="pageContainer" style="transition: all 300ms">
-      <div ref="topBanner">
+      <div ref="topBanner" @touchmove="bannerTouchMove" @touchstart="bannerTouchStart" @touchend="bannerTouchEnd">
         <download-box />
         <header class="top-header">
           <div class="top-header-bg" :style="{backgroundImage: 'url(' + circle.cover.compress + ')'}"></div>
@@ -19,7 +19,7 @@
         </header>
       </div>
       <div ref="innerWrapper" class="scroll-wrapper" :style="{height: winHeight + 'px'}">
-        <div class="nav-scroll-list-wrap" ref="navWrapper" :style="{height: tabBarHeight + 'px'}" v-if="tabs && tabs.length > 1 && showTabbar">
+        <div @touchmove="bannerTouchMove" @touchstart="bannerTouchStart" @touchend="bannerTouchEnd" class="nav-scroll-list-wrap" ref="navWrapper" :style="{height: tabBarHeight + 'px'}" v-if="tabs && tabs.length > 1 && showTabbar">
           <cube-tab-bar v-model="selectedLabel" class="tab-box" @change="changeTabBar" :style="{height: tabBarHeight + 'px'}">
             <cube-tab v-for="(item) in tabs" ref="tabItem" :label="item.title" :key="item.title">
             </cube-tab>
@@ -32,44 +32,8 @@
         <div class="tabs-wrapper" ref="slideWrapper" :style="{height: (winHeight - ((tabs && tabs.length) > 1 ? tabBarHeight : 0)) + 'px'}">
           <cube-slide ref="slideInstance" :data="tabs" :initialIndex="selectedIdx" :autoPlay="false" :allowVertical="false" :showDots="false" :loop="false" :speed="200" :options="{listenScroll: true, probeType: 3, stopPropagation: true, click: false, preventDefault: false}" @change="changeSlide" @scroll="slideScroll">
             <cube-slide-item v-for="(item, index) in tabs" :key="item.title" :style="{height: (winHeight - ((tabs && tabs.length) > 1 ? tabBarHeight : 0)) + 'px'}">
-              <!-- <cube-scroll
-                ref="contentScroll"
-                :data="tabs[index].data"
-                :scrollEvents="['scroll']"
-                :options="options"
-                @scroll="innerScroll"
-                @pulling-down="onPullingDown(index)"
-                @pulling-up="onPullingUp(index)">
-                <transition name="loading-scale">
-                  <div class="first-loading-box" v-if="!tabs[index].paging.pn">
-                    <loading-view />
-                  </div>
-                </transition>
-                <div v-if="tabs[index].paging && tabs[index].paging.is_end && tabs[index].data && tabs[index].data.length === 0" class="empty-box">该圈子暂无{{index === 0 ? '动态' : '活动'}}</div>
-                <dynamic-item v-if="index === 0" v-for="(item, idx) in tabs[index].data" :key="idx" :itemData="item" :router="$router" @changeLike="changeLike" />
-                <activity-item v-if="index === 1" v-for="(item, idx) in tabs[index].data" :key="idx" :itemData="item" />
-                <template slot="pulldown" slot-scope="props">
-                  <div class="cube-pulldown-wrapper" :style="props.pullDownStyle">
-                    <img v-show="!props.isPullingDown" class="pull-down-icon" :style="{transform: 'translateY(' + props.bubbleY + 'px)'}" :src="$assetsPublicPath + '/cwebassets/image/refresh_icon.png'" />
-                    <img v-show="props.isPullingDown" class="pull-down-icon refreshing" :src="$assetsPublicPath + '/cwebassets/image/refreshing_icon.png'" />
-                  </div>
-                </template>
-                <template slot="pullup" slot-scope="props">
-                  <div class="cube-pullup-wrapper pullup-wrapper" :style="props.pullUpStyle" v-if="tabs[index].paging && tabs[index].paging.pn && !tabs[index].paging.is_end">
-                    <div class="pullup-content"><img class="pull-up-icon" :src="$assetsPublicPath + '/cwebassets/image/loading_icon.png'" />正在加载...</div>
-                  </div>
-                  <div v-else-if="tabs[index].paging && tabs[index].paging.is_end && tabs[index].data && tabs[index].data.length === 0" style="height: 0;"></div>
-                  <div v-else class="pullup-wrapper">
-                    <div class="pullup-content">再刷也没有了</div>
-                  </div>
-                </template>
-              </cube-scroll> -->
-              <div class="cube-pulldown-wrapper" :style="props.pullDownStyle">
-                    <img v-show="!props.isPullingDown" class="pull-down-icon" :style="{transform: 'translateY(' + props.bubbleY + 'px)'}" :src="$assetsPublicPath + '/cwebassets/image/refresh_icon.png'" />
-                    <img v-show="props.isPullingDown" class="pull-down-icon refreshing" :src="$assetsPublicPath + '/cwebassets/image/refreshing_icon.png'" />
-                  </div>
               <div :id="'mescroll' + index" class="mescroll content-scroll-wrapper" :style="{width: winWidth + 'px', height: '100%', overflowY: 'auto', overflowX: 'hidden'}">
-                <div>
+                <div :style="{minHeight: (winHeight - ((tabs && tabs.length) > 1 ? tabBarHeight : 0)) + 0.5 + 'px'}">
                   <dynamic-item v-if="index === 0" v-for="(item, idx) in tabs[index].data" :key="idx" :itemData="item" :router="$router" @changeLike="changeLike" />
                   <activity-item v-if="index === 1" v-for="(item, idx) in tabs[index].data" :key="idx" :itemData="item" />
                 </div>
@@ -79,7 +43,7 @@
         </div>
       </div>
     </div>
-    <scroll-to-top v-if="$refs['contentScroll']" :visible="showBackTop" :position="{bottom: (winWidth / 750) * 178, right: (winWidth / 750) * 54}" :scroll="$refs['contentScroll'][selectedIdx]"/>
+    <scroll-to-top v-if="mescroll && mescroll.length > 0" :visible="showBackTop" :position="{bottom: (winWidth / 750) * 178, right: (winWidth / 750) * 54}" :scroll="mescroll[selectedIdx]"/>
     <i class="iconfont icon-camera publish-icon" @click="goPublish"></i>
   </div>
 </template>
@@ -164,20 +128,6 @@ export default {
   },
   components: {DynamicItem, ActivityItem, DownloadBox, LoadingView, ScrollToTop},
   watch: {
-    // 'circle.id': function (val, oldVal) {
-    //   if (!val) { // 如果circle的重置了，不一定存在id，置空时终止
-    //     return false
-    //   }
-    //   if (this.$route.query.jump_tab && this.$route.query.jump_tab.toString() === '1') { // 有指定首先显示的tab则刷新该tab数据,否则默认刷新动态tab
-    //     if (this.tabs[1]) {
-    //       this.fetchActivity(1)
-    //     } else {
-    //       this.fetchDynamic(1)
-    //     }
-    //   } else {
-    //     this.fetchDynamic(1)
-    //   }
-    // },
     '$route': function (val, oldVal) {
       if (!val.query.previewImage && oldVal.query.previewImage) { // 点击大图后返回
         if (window.previewImageId) {
@@ -489,21 +439,44 @@ export default {
       } else if ((!this.$route.query.jump_tab || (this.$route.query.jump_tab && this.$route.query.jump_tab.toString() === '0')) && idx === 0) { // 初始tab为0
         downAuto = true
       }
-      console.log('downAuto', downAuto)
+      let downOffset = (window.innerWidth / 750) * 94
+      let upOffset = (window.innerWidth / 750) * 100
+      let htmlContent = '<div class="pull-down-wrapper" style="height:' + downOffset + 'px">'
+      htmlContent += '<img class="pull-down-icon" src="/h5/cwebassets/image/refresh_icon.png" />'
+      htmlContent += '<img class="pull-down-icon refreshing" src="/h5/cwebassets/image/refreshing_icon.png" />'
+      htmlContent += '</div>'
       this.mescroll[idx] = new MeScroll('mescroll' + idx, { // 在vue的mounted生命周期初始化mescroll,确保此处配置的id能够被找到
         down: {
-          offset: (window.innerWidth / 750) * 89,
-          htmlContent: LoadingView,
+          inited: (mescroll, downwarp) => {
+            mescroll.refreshDom = downwarp.getElementsByClassName('pull-down-icon')[0]
+            mescroll.refreshingDom = downwarp.getElementsByClassName('pull-down-icon')[1]
+          },
+          inOffset: (mescroll) => {
+            mescroll.refreshDom.style.display = 'block'
+            mescroll.refreshingDom.style.display = 'none'
+          },
+          showLoading: (mescroll) => {
+            mescroll.refreshDom.style.display = 'none'
+            mescroll.refreshingDom.style.display = 'block'
+          },
+          offset: downOffset,
+          htmlContent: htmlContent,
           auto: downAuto,
           autoShowLoading: downAuto,
           callback: () => this.onPullingDown(idx) // 下拉刷新的回调,别写成downCallback(),多了括号就自动执行方法了
         },
         up: {
           auto: false,
+          offset: upOffset,
           callback: () => this.onPullingUp(idx),
-          onScroll: this.onMeScroll
+          onScroll: this.onMeScroll,
+          htmlLoading: '<div class="pull-up-wrapper" style="height:' + downOffset + 'px"><div class="loading-content"><img class="loading-icon" src="/h5/cwebassets/image/loading_icon.png" />正在加载...</div></div>',
+          htmlNodata: '<div class="pull-up-wrapper" style="height:' + downOffset + 'px"><div class="loading-content">再刷也没有了</div></div>'
         }
       })
+    },
+    addScrollData () {
+
     },
     onMeScroll (mescroll, y, isUp) {
       if (y === 0 && !isUp && !this.showBanner) {
@@ -515,8 +488,47 @@ export default {
         this.showBanner = false
         this.$refs['pageContainer'].style.transform = 'translateY(-' + bannerHeight + 'px)'
       }
+      if (y > window.innerHeight && !this.showBackTop) {
+        this.showBackTop = true
+      } else if (y < window.innerHeight && this.showBackTop) {
+        this.showBackTop = false
+      }
+      mescroll._scrollY = y
+    },
+    bannerTouchStart (e) {
+      this.wrapperScrollY = e.touches[0].screenY
+    },
+    bannerTouchMove (e) {
+      if (e.changedTouches[0].screenY < this.wrapperScrollY && this.showBanner) {
+        let bannerPos = this.$refs['topBanner'].getBoundingClientRect()
+        let bannerHeight = bannerPos.height
+        this.showBanner = false
+        this.$refs['pageContainer'].style.transform = 'translateY(-' + bannerHeight + 'px)'
+      } else if (e.changedTouches[0].screenY > this.wrapperScrollY && !this.showBanner) {
+        this.showBanner = true
+        this.$refs['pageContainer'].style.transform = 'translateY(0)'
+      }
+    },
+    bannerTouchEnd (e) {
+      this.wrapperScrollY = 0
     }
   },
+  activated () {
+    if (this.$route.query.isShareOpen || this.$route.params.isShareOpen || this.$route.params.refreshData) { // 刷新数据
+      this.refreshData()
+    } else {
+      for (let i = 0; i < this.mescroll.length; i++) {
+        this.mescroll[i].scrollTo(this.mescroll[i]._scrollY, 0)
+      }
+    }
+  },
+  // deactivated () {
+  //   let scrollTop = []
+  //   for (let i = 0; i < this.tabs.length; i++) {
+  //     scrollTop.push(this.mescroll[i].getScrollTop())
+  //   }
+  //   console.log('getScrollTop', this.mescroll[0].getScrollTop())
+  // },
   beforeRouteEnter (to, from, next) {
     utils.beforeRouteEnterHandleShareOpen(to, from, next, 1)
   },
@@ -796,5 +808,103 @@ fl{
 }
 .content-scroll-wrapper{
   -webkit-overflow-scrolling: touch;
+}
+</style>
+
+<style>
+.mescroll-upwarp, .mescroll-downwarp .downwarp-content{
+  padding: 0;
+  min-height: auto;
+}
+.mescroll-upwarp{
+  background-color: #fff;
+}
+.pull-down-wrapper{
+  position: relative;
+}
+.pull-up-wrapper{
+  font-size: 24px;
+  color: #666;
+  height: 100px;
+  position: relative;
+  background-color: #fff
+}
+.pull-down-icon{
+  display: block;
+  width: 44px;
+  height: 44px;
+  position: absolute;
+  bottom: 25px;
+  left: 50%;
+  margin-left: -22px;
+}
+.pull-down-icon.refreshing{
+  animation: refreshing 500ms infinite linear;
+}
+.loading-content{
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  padding-left: 42px;
+}
+.loading-icon{
+  display: block;
+  width: 32px;
+  height: 32px;
+  position: absolute;
+  left: 0;
+  top: 50%;
+  margin-top: -18px;
+  animation: loading 1000ms infinite cubic-bezier(0.5,0.5,0.5,0.5);
+}
+@keyframes refreshing {
+  0%{
+    transform: rotate(0deg)
+  }
+  100%{
+    transform: rotate(360deg)
+  }
+}
+@keyframes loading {
+  0%{
+    transform: rotate(0deg)
+  }
+  8.33%{
+    transform: rotate(30deg)
+  }
+  16.66%{
+    transform: rotate(60)
+  }
+  25%{
+    transform: rotate(90deg)
+  }
+  33.33%{
+    transform: rotate(120deg)
+  }
+  41.66%{
+    transform: rotate(150deg)
+  }
+  50%{
+    transform: rotate(180deg)
+  }
+  58.33%{
+    transform: rotate(210deg)
+  }
+  66.66%{
+    transform: rotate(240deg)
+  }
+  75%{
+    transform: rotate(270deg)
+  }
+  83.32%{
+    transform: rotate(300deg)
+  }
+  91.66%{
+    transform: rotate(330deg)
+  }
+  100%{
+    transform: rotate(360deg)
+  }
 }
 </style>

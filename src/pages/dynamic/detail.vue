@@ -206,6 +206,7 @@ export default {
     }
   },
   activated () {
+    console.log('window.history', window.history)
     if (this.isArticle) {
       document.title = '长文详情'
     } else {
