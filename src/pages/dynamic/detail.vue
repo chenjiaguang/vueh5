@@ -43,31 +43,19 @@
                 <div class="article-desc" v-if="content.type==2&&content.des">{{content.des}}</div>
                 <div class="article-content" v-if="content.type==1">{{content.content}}</div>
               </div>
-              <a class="content-activity-box row center" v-if="dynamic.actid" href="javascript:void(0)" @click="clickActivity(dynamic.actid)">
-                <div class="content-activity-img" :style="`background-image:url(${dynamic.activity.covers[0].compress})`"/>
-                <div class="content-activity-right column space-between">
-                  <div class="content-activity-title">{{dynamic.activity.title}}</div>
-                  <div class="content-activity-address">{{dynamic.activity.address}}</div>
-                  <div class="content-activity-time_text">{{dynamic.activity.time_text}}</div>
-                </div>
-              </a>
-              <div class="row foot-info-box" v-if="dynamic.location">
-                <i class="iconfont icon-location"></i>
-                <div class="location">{{dynamic.location}}</div>
-              </div>
-              <div class="row circle-box" v-if="dynamic.circle_name">
-                <span class="circle-name">{{dynamic.circle_name}}</span>
-              </div>
             </div>
 
             <div v-if="dynamic&&!dynamic.isArticle" id="content-container" class="column">
-              <div class="dynamic-content">{{dynamic.content}}</div>
+              <div class="dynamic-content" v-html="handleContentUrl(dynamic.content)"></div>
               <TopicTagBox :topicInfo="dynamic.topicInfo" />
               <DetailImageContainer class="detail-image-container"  :images="dynamic.covers"/>
               <a class="content-article-box row center" v-if="dynamic.aid" :href="dynamic.newsArticle.article_url">
                 <div class="content-article-img" :style="`background-image:url(${dynamic.newsArticle.covers[0].compress})`"/>
                 <div class="content-article-content">{{dynamic.newsArticle.name}}</div>
               </a>
+            </div>
+
+            <div v-if="dynamic">
               <a class="content-activity-box row center" v-if="dynamic.actid" href="javascript:void(0)" @click="clickActivity(dynamic.actid)">
                 <div class="content-activity-img" :style="`background-image:url(${dynamic.activity.covers[0].compress})`"/>
                 <div class="content-activity-right column space-between">
@@ -81,7 +69,7 @@
                 <div class="location">{{dynamic.location}}</div>
               </div>
               <div class="row circle-box" v-if="dynamic.circle_name">
-                <span class="circle-name">{{dynamic.circle_name}}</span>
+                <span class="circle-name" style="border-width: 1px">{{dynamic.circle_name}}</span>
               </div>
             </div>
 
@@ -109,14 +97,14 @@
                       <div class="row">
                         <div class="comment-username" @click="clickUser(comment.uid)">{{comment.username}}</div>
                       </div>
-                      <div class="comment-content" @click="()=>showReplyActionSheet(comment,comment.username)">{{comment.content}}</div>
+                      <div class="comment-content" @click="()=>showReplyActionSheet(comment,comment.username)" v-html="handleContentUrl(comment.content)"></div>
                       <div class="comment-time">{{comment.time}}</div>
 
                       <transition name="fade-slow">
                         <div v-if="comment.replys.list.length>0" class="comment-replies-box">
                           <transition-group name="fade-slow" tag="div">
                             <div class="reply-box transition-quick" v-for="(reply) in comment.replys.list" :key="'replys'+reply.id" @click.stop="()=>showReplyActionSheet(comment,reply.username,reply.id)">
-                              <span class="reply-from" v-if="reply.pusername" @click.stop="clickUser(reply.uid)">{{reply.username}}</span><span class="reply-from" v-if="!reply.pusername" @click.stop="clickUser(reply.uid)">{{reply.username}}:</span><span class="reply-reply" v-if="reply.pusername">回复</span><span class="reply-to" v-if="reply.pusername" @click.stop="clickUser(reply.puid)">{{reply.pusername}}:</span><span class="reply-content">{{reply.content}}</span>
+                              <span class="reply-from" v-if="reply.pusername" @click.stop="clickUser(reply.uid)">{{reply.username}}</span><span class="reply-from" v-if="!reply.pusername" @click.stop="clickUser(reply.uid)">{{reply.username}}:</span><span class="reply-reply" v-if="reply.pusername">回复</span><span class="reply-to" v-if="reply.pusername" @click.stop="clickUser(reply.puid)">{{reply.pusername}}:</span><span class="reply-content" v-html="handleContentUrl(reply.content)"></span>
                             </div>
                           </transition-group>
                           <div class="reply-box transition-quick" v-if="!comment.replys.paging.is_end">
@@ -239,6 +227,9 @@ export default {
     }
   },
   methods: {
+    handleContentUrl (content) {
+      return utils.handleContentUrl(content)
+    },
     fetch () {
       let url = ''
       if (this.isArticle) {
@@ -518,7 +509,6 @@ export default {
 .circle-name {
   margin-top: 1px;
   border-radius: 6px;
-  border-width: 1.2px;
   border-color: #1eb0fd;
   border-style: solid;
   color: #1eb0fd;
