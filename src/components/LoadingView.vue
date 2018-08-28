@@ -17,6 +17,7 @@
   top: 50%;
   transform: translate(-50%, -50%);
   padding-left: 42px;
+  margin: 0;
 }
 .loading-icon{
   display: block;
@@ -70,4 +71,3 @@
   }
 }
 </style>
-

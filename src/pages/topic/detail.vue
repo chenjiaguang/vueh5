@@ -41,7 +41,7 @@
                   </div>
                 </transition>
                 <div v-if="tabs[index].paging && tabs[index].paging.is_end && tabs[index].data && tabs[index].data.length === 0" class="empty-box">该话题暂无{{index === 0 ? '最新动态' : '最热动态'}}</div>
-                <topic-item v-for="(item, idx) in tabs[index].data" :key="idx" :itemData="item" :router="$router" @changeLike="(data) => changeLike(data, index)" />
+                <topic-item v-for="(item, idx) in tabs[index].data" :key="idx" :itemData="item" :hideBlock="idx === tabs[index].data.length - 1" :router="$router" @changeLike="(data) => changeLike(data, index)" />
                 <template slot="pulldown" slot-scope="props">
                   <div class="cube-pulldown-wrapper" :style="props.pullDownStyle">
                     <img v-show="!props.isPullingDown" class="pull-down-icon" :style="{transform: 'translateY(' + props.bubbleY + 'px)'}" :src="$assetsPublicPath + '/cwebassets/image/refresh_icon.png'" />

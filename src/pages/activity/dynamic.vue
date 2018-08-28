@@ -9,7 +9,7 @@
           <loading-view />
         </div>
       </transition>
-      <dynamic-item v-for="(item, idx) in dynamic" :key="idx" :itemData="item" :router="$router" @changeLike="changeLike" />
+      <dynamic-item v-for="(item, idx) in dynamic" :key="idx" :itemData="item" :hideBlock="idx === tabs[index].data.length - 1" :router="$router" @changeLike="changeLike" />
       <template slot="pullup" slot-scope="props">
         <!-- 可以下拉继续加载 -->
         <div class="cube-pullup-wrapper pullup-wrapper" :style="props.pullUpStyle" v-if="paging && paging.pn && !paging.is_end">
