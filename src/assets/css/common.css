@@ -33,14 +33,18 @@
   display: none;
 }
 .relative{
-  position: relative;;
+  position: relative;
+}
+.content-url{
+  font-size:inherit;
+  color: #1EB0FD;
+}
+.content-url .icon-icon_lianjie_min{
+  font-size:inherit
 }
 
 
-
-
-
-
+/************动画 CSS************/
 .fade-slow-enter-active, .fade-slow-leave-active {
   transition: all 1s;
 }
