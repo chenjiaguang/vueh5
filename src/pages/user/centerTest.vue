@@ -8,8 +8,8 @@
             <div class="top-header-avatar" :style="{backgroundImage: 'url(' + user.avatar_url + ')', opacity: user.avatar_url ? 1 : 0}"></div>
           </div>
           <div class="top-header-overview">
-            <div class="user-name"><span style="vertical-align: middle">{{user.username}}</span><img v-if="user.is_news" class="author-sign" :src="$assetsPublicPath + '/cwebassets/image/author_icon.png'" /></div>
-            <div class="user-intro">{{user.intro}}</div>
+            <div class="user-name"><span style="vertical-align: middle">{{user.username}}</span><img v-if="user.is_news" class="author-sign" :src="$assetsPublicPath + '/cwebassets/image/author_icon.png'" /><img v-if="!user.is_news" class="level-sign" :src="$assetsPublicPath + '/cwebassets/image/level' + user.level + '.png'" /></div>
+            <div class="user-intro" v-if="user.intro">{{user.intro}}</div>
             <div v-if="user.id" class="follow-and-fans clearfix">
               <div class="follow-box fl"><span class="follow-and-fans-text">关注</span><span class="follow-and-fans-number">{{followNumber}}</span></div>
               <div class="fans-box fl"><span class="follow-and-fans-text">粉丝</span><span class="follow-and-fans-number">{{fansNumber}}</span></div>
@@ -91,13 +91,14 @@ const initialData = {
       data: [],
       paging: {},
       fetching: false
-    },
-    {
-      title: '文章',
-      data: [],
-      paging: {},
-      fetching: false
     }
+    // {
+    //   title: '文章',
+    //   data: [],
+    //   paging: {},
+    //   fetching: false
+    // }
+    // 目前只显示动态
   ],
   winWidth: window.innerWidth,
   winHeight: window.innerHeight,
@@ -130,7 +131,7 @@ export default {
           window.previewImageId = null
         }
       }
-      utils.checkReloadWithKeepAliveNew(this, val, oldVal, 'UserCenter', ['user_id', 'jump_tab'], () => {
+      utils.checkReloadWithKeepAliveNew(this, val, oldVal, 'UserCenterTest', ['user_id', 'jump_tab'], () => {
         this.refreshData()
       })
     }
@@ -270,11 +271,13 @@ export default {
       for (let item in _obj) {
         this[item] = _obj[item]
       }
-      if (this.$route.query.jump_tab && this.$route.query.jump_tab.toString() === '1') { // 初始tab为1
-        this.initMeScroll(1)
-      } else if ((!this.$route.query.jump_tab || (this.$route.query.jump_tab && this.$route.query.jump_tab.toString() === '0'))) { // 初始tab为0
-        this.initMeScroll(0)
-      }
+      // if (this.$route.query.jump_tab && this.$route.query.jump_tab.toString() === '1') { // 初始tab为1
+      //   this.initMeScroll(1)
+      // } else if ((!this.$route.query.jump_tab || (this.$route.query.jump_tab && this.$route.query.jump_tab.toString() === '0'))) { // 初始tab为0
+      //   this.initMeScroll(0)
+      // }
+      // 目前只显示动态
+      this.initMeScroll(0)
       this.initSlideBlock()
     },
     onPullingDown (idx) {
@@ -433,11 +436,13 @@ export default {
     }
   },
   mounted () {
-    if (this.$route.query.jump_tab && this.$route.query.jump_tab.toString() === '1') { // 初始tab为1
-      this.initMeScroll(1)
-    } else if ((!this.$route.query.jump_tab || (this.$route.query.jump_tab && this.$route.query.jump_tab.toString() === '0'))) { // 初始tab为0
-      this.initMeScroll(0)
-    }
+    // if (this.$route.query.jump_tab && this.$route.query.jump_tab.toString() === '1') { // 初始tab为1
+    //   this.initMeScroll(1)
+    // } else if ((!this.$route.query.jump_tab || (this.$route.query.jump_tab && this.$route.query.jump_tab.toString() === '0'))) { // 初始tab为0
+    //   this.initMeScroll(0)
+    // }
+    // 目前只显示动态
+    this.initMeScroll(0)
     this.initSlideBlock()
   }
 }
@@ -474,6 +479,9 @@ export default {
   width: 100%;
   height: 386px;
   background-color:#292929;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
 }
 .top-header-avatar{
   position: absolute;
@@ -499,6 +507,15 @@ export default {
   height: 32px;
   margin-left:20px;
   vertical-align: middle;
+  position: relative;
+  bottom: -3px;
+}
+.level-sign{
+  height: 26px;
+  margin-left:20px;
+  vertical-align: middle;
+  position: relative;
+  bottom: -7px;
 }
 .user-intro{
   font-size: 28px;
@@ -547,6 +564,11 @@ export default {
   margin: 25px 0 5px;
   transition: all 300ms;
   &.follow-appear{
+    transform: scale(0, 0);
+    height: 0;
+  }
+  &.v-leave-to, &.v-leave-active{
+    transition: all 0ms;
     transform: scale(0, 0);
     height: 0;
   }

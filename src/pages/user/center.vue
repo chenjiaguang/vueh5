@@ -375,6 +375,9 @@ export default {
   width: 100%;
   height: 386px;
   background-color:#292929;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
 }
 .top-header-avatar{
   position: absolute;

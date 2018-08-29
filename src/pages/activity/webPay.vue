@@ -12,80 +12,81 @@
 </template>
 
 <script>
-  export default {
-    data () {
-      return {
-        query: this.$route.query
+export default {
+  data () {
+    return {
+      query: this.$route.query
+    }
+  },
+  methods: {
+    rePay () { // 重新支付
+      if (typeof WeixinJSBridge == 'undefined') { // 不允许调用微信公众号支付,其他浏览器
+        let _rData = {
+          checkcode: this.$route.query.checkcode,
+          payType: '1',
+          tradeType: 'MWEB'
+        }
+        this.$ajax('/jv/anonymous/qz/v21/activity/pay', {data: _rData}).then(res => {
+          if (res && Boolean(res.error) && res.msg) {
+            this.$toast(res.msg)
+          } else if (res && res.error) {
+            let _href = res.data.mweb_url
+            window.location.href = _href
+          }
+        }).catch(err => {
+          console.log('微信外h5 err')
+        })
+      } else { // 允许调用微信公众号支付,微信浏览器
+        let _href = this.$apiDomain + '/jv/qz/v21/activity/weixin/JSAPI/pay/' + this.$route.query.checkcode
+        window.location.href = _href
       }
     },
-    methods: {
-      rePay () { // 重新支付
-        if (typeof WeixinJSBridge == "undefined") { // 不允许调用微信公众号支付,其他浏览器
-          let _rData = {
-            checkcode: this.$route.query.checkcode,
-            payType: '1',
-            tradeType: 'MWEB'
-          }
-          this.$ajax('/jv/anonymous/qz/v21/activity/pay', {data: _rData}).then(res => {
-            if (res && Boolean(res.error) && res.msg) {
-              this.$toast(res.msg)
-            } else if (res && !Boolean(res.error)) {
-              let _href = res.data.mweb_url
-              window.location.href = _href
-            }
-          }).catch(err => {
-            console.log('微信外h5 err')
-          })
-        } else { // 允许调用微信公众号支付,微信浏览器
-          let _href = this.$apiDomain + '/jv/qz/v21/activity/weixin/JSAPI/pay/' + this.$route.query.checkcode
-          window.location.href = _href
+    complete (shouldConfirm) { // 完成订单，跳转票据二维码页面， shouldConfirm表示是否应该先验证
+      if (shouldConfirm) { // 需要验证先验证，通过了再跳转
+        let rData = {
+          checkcode: this.$route.query.checkcode,
+          payNo: this.$route.query.payNo
         }
-      },
-      complete (shouldConfirm) { // 完成订单，跳转票据二维码页面， shouldConfirm表示是否应该先验证
-        if (shouldConfirm) { // 需要验证先验证，通过了再跳转
-          let rData = {
-            checkcode: this.$route.query.checkcode,
-            payNo: this.$route.query.payNo
-          }
-          this.$ajax('/jv/qz/v21/activity/payResult', {data: rData}).then(res => {
-            if (res && Boolean(res.error) && res.msg) {
-              this.$toast(res.msg)
-            } else if (!Boolean(res.error)) {
-              if (res.data && res.data.success) {
-                if (res.msg) { // 成功且有提示信息，提示后跳转
-                  this.$toast(res.msg, 2000, () => {
-                    this.$router.replace({name: 'ActivityTicket', query: {checkcode: this.$route.query.checkcode}})
-                  })
-                } else { // 成功且无提示信息，直接跳转
+        this.$ajax('/jv/qz/v21/activity/payResult', {data: rData}).then(res => {
+          if (res && Boolean(res.error) && res.msg) {
+            this.$toast(res.msg)
+          } else if (!res.error) {
+            if (res.data && res.data.success) {
+              if (res.msg) { // 成功且有提示信息，提示后跳转
+                this.$toast(res.msg, 2000, () => {
                   this.$router.replace({name: 'ActivityTicket', query: {checkcode: this.$route.query.checkcode}})
-                }
-              } else if (res.data && !res.data.success) { // 不成功侧弹窗提示
-                this.$modal.showAlert('<div>支付失败，如遇到支付问题请拨打客服电话咨询：<a style="color:#1EB0FD" href="tel:4006806307">4006806307</a></div>')
+                })
+              } else { // 成功且无提示信息，直接跳转
+                this.$router.replace({name: 'ActivityTicket', query: {checkcode: this.$route.query.checkcode}})
               }
+            } else if (res.data && !res.data.success) { // 不成功侧弹窗提示
+              this.$modal.showAlert('<div>支付失败，如遇到支付问题请拨打客服电话咨询：<a style="color:#1EB0FD" href="tel:4006806307">4006806307</a></div>')
             }
-          }).catch(err => {
-            console.log('验证订单出错', err)
-          })
-        } else { // 不需要验证直接跳转
-          this.$router.replace({name: 'ActivityTicket', query: {checkcode: this.$route.query.checkcode}})
-        }
-      }
-    },
-    created () {
-      let {from, payResult, checkcode} = this.$route.query // from: JSAPI(微信公众号支付)、MWEB(微信h5支付)、APP（微信app支付）
-      if (from === 'JSAPI') { // 微信公众号支付
-        if (payResult === 'FAIL' || payResult === 'CANCEL') { // 未完成支付的逻辑,支付失败时提示，用户取消则不做任何提示
-          payResult === 'FAIL' && this.$toast('支付失败')
-        } else if (payResult === 'SUCCESS') { // 完成支付立即跳转成功页面
-          this.complete(true)
-        }
-      } else if (from === 'MWEB') { // 微信h5支付，不做任何操作，让用户自己选择
-        
-      } else if (from === 'APP') { // 微信app支付，不做任何操作
-
+          }
+        }).catch(err => {
+          console.log('验证订单出错', err)
+        })
+      } else { // 不需要验证直接跳转
+        this.$router.replace({name: 'ActivityTicket', query: {checkcode: this.$route.query.checkcode}})
       }
     }
+  },
+  created () {
+    // from: JSAPI(微信公众号支付)、MWEB(微信h5支付)、APP（微信app支付）
+    let {from, payResult} = this.$route.query
+    if (from === 'JSAPI') { // 微信公众号支付
+      if (payResult === 'FAIL' || payResult === 'CANCEL') { // 未完成支付的逻辑,支付失败时提示，用户取消则不做任何提示
+        payResult === 'FAIL' && this.$toast('支付失败')
+      } else if (payResult === 'SUCCESS') { // 完成支付立即跳转成功页面
+        this.complete(true)
+      }
+    } else if (from === 'MWEB') { // 微信h5支付，不做任何操作，让用户自己选择
+
+    } else if (from === 'APP') { // 微信app支付，不做任何操作
+
+    }
   }
+}
 </script>
 
 <style lang="scss" type="text/scss" scoped>

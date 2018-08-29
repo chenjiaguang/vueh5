@@ -42,12 +42,12 @@
           <div class="header info-header">报名人信息</div>
           <div class="user-info">
             <div class="user-info-item clearfix" v-if="form.userInfo.needName">
-              <div class="user-left fl"><i class="require-icon iconfont icon-xinghao"></i>姓名</div>
-              <input class="user-full-input fl" v-model="form.userInfo.name" />
+              <div class="user-left fl"><i class="require-icon iconfont icon-xinghao"></i>姓<span style="visibility:hidden">名</span>名</div>
+              <input class="user-full-input fl" v-model="form.userInfo.name" placeholder="请输入姓名" />
             </div>
             <div class="user-info-item clearfix">
-              <div class="user-left fl"><i class="require-icon iconfont icon-xinghao"></i>手机</div>
-              <input class="user-full-input fl" type="number" v-model="form.userInfo.phone" />
+              <div class="user-left fl"><i class="require-icon iconfont icon-xinghao"></i>手<span style="visibility:hidden">机</span>机</div>
+              <input class="user-full-input fl" type="number" v-model="form.userInfo.phone" placeholder="请输入手机号" />
             </div>
             <!-- <div class="user-info-item clearfix">
               <div class="user-left fl"><i class="require-icon iconfont icon-xinghao"></i>验证码</div>
@@ -55,14 +55,14 @@
             </div> -->
             <div class="user-info-item clearfix" v-if="form.userInfo.needWeChat">
               <div class="user-left fl"><i class="require-icon iconfont icon-xinghao"></i>微信号</div>
-              <input class="user-full-input fl" type="text" v-model="form.userInfo.weChat" />
+              <input class="user-full-input fl" type="text" v-model="form.userInfo.weChat" placeholder="请输入微信号" />
             </div>
             <div class="user-info-item clearfix" v-if="form.userInfo.needIdCard">
-              <div class="user-left fl"><i class="require-icon iconfont icon-xinghao"></i>身份证号</div>
-              <input class="user-full-input fl" type="number" v-model="form.userInfo.idCard" />
+              <div class="user-left fl"><i class="require-icon iconfont icon-xinghao"></i>身份证</div>
+              <input class="user-full-input fl" type="number" v-model="form.userInfo.idCard" placeholder="请输入身份证号" />
             </div>
             <div class="user-info-item clearfix" v-if="form.userInfo.needSex">
-              <div class="user-left fl"><i class="require-icon iconfont icon-xinghao"></i>性别</div>
+              <div class="user-left fl"><i class="require-icon iconfont icon-xinghao"></i>性<span style="visibility:hidden">别</span>别</div>
               <div @click="form.userInfo.sex = 1" class="sexual-option fl clearfix"><i class="iconfont fl" :class="{'icon-quanzi': form.userInfo.sex.toString() === '1', 'icon-quan': form.userInfo.sex.toString() !== '1'}"></i>男</div>
               <div @click="form.userInfo.sex = 2" class="sexual-option fl clearfix"><i class="iconfont fl" :class="{'icon-quanzi': form.userInfo.sex.toString() === '2', 'icon-quan': form.userInfo.sex.toString() !== '2'}"></i>女</div>
             </div>
@@ -297,7 +297,7 @@
     transform-origin: 0 100%;
   }
   .user-left{
-    width: 26.8%;
+    width: 23%;
     height: 100%;
     line-height: 112px;
     box-sizing: border-box;
@@ -318,10 +318,13 @@
     line-height: 200px;
   }
   .user-full-input{
-    width: 73.2%;
+    width: 77%;
     height: 100%;
     font-size: 32px;
     line-height: 52px;
+  }
+  .user-full-input::-webkit-input-placeholder{
+    color: #999
   }
   .get-code-btn{
     width: 32%;

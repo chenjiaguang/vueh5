@@ -1,6 +1,6 @@
 <template>
     <div class="content-container" ref="contentWrapper">
-        <div ref="contentContainer" class="content-text clearfix"><img v-if="isLongDynamic" :src="$assetsPublicPath + '/cwebassets/image/long_dynamic.png'" class="long-dynamic-icon" />{{content}}</div>
+        <div ref="contentContainer" class="content-text clearfix"><img v-if="isLongDynamic" :src="$assetsPublicPath + '/cwebassets/image/long_dynamic.png'" class="long-dynamic-icon" /><div style="display:inline" v-html="convertedContent"></div></div>
         <div v-if="contentHeight && contentHeight > contentMaxHeight && !showMore" ref="contentBtn" class="show-hide-btn clearfix"><span @click.stop="changeShowContext" class="show-hide-btn-text fr">{{showMore ? '收起' : '展开'}}</span></div>
     </div>
 </template>
@@ -59,6 +59,7 @@
 </style>
 
 <script>
+import utils from '@/lib/utils'
 export default {
   props: {
     content: {
@@ -102,6 +103,11 @@ export default {
           this.showMore = true
         }
       })
+    }
+  },
+  computed: {
+    convertedContent: function () {
+      return utils.handleContentUrl(this.content)
     }
   },
   mounted () {
