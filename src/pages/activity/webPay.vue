@@ -26,7 +26,7 @@
             payType: '1',
             tradeType: 'MWEB'
           }
-          this.$ajax('/jv/anonymous/qz/v21/activity/pay', {data: _rData}).then(res => {
+          this.$ajax('/jv/qz/v21/activity/pay', {data: _rData}).then(res => {
             if (res && Boolean(res.error) && res.msg) {
               this.$toast(res.msg)
             } else if (res && !Boolean(res.error)) {
