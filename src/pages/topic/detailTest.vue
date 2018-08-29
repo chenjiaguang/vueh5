@@ -125,7 +125,6 @@ export default {
   },
   methods: {
     changeTabBar (tabTitle) { // 点击tab切换
-      let wrapperWidth = this.$refs['navWrapper'] ? this.$refs['navWrapper'].offsetWidth : window.innerWidth
       this.tabs.forEach((item, index) => {
         if (item.title === tabTitle) {
           this.selectedLabel = tabTitle
@@ -195,7 +194,11 @@ export default {
       for (let item in _obj) {
         this[item] = _obj[item]
       }
-      this.fetchTopic(this.selectedIdx, 1)
+      if (this.$route.query.jump_tab && this.$route.query.jump_tab.toString() === '1') { // 初始tab为1
+        this.initMeScroll(1)
+      } else if ((!this.$route.query.jump_tab || (this.$route.query.jump_tab && this.$route.query.jump_tab.toString() === '0'))) { // 初始tab为0
+        this.initMeScroll(0)
+      }
       this.initSlideBlock()
     },
     fetchTopic (idx, pn) {
@@ -346,6 +349,10 @@ export default {
       if (e.changedTouches[0].screenY < this.wrapperTouchY && this.pageTop === 0) {
         let bannerPos = this.$refs['topBanner'].getBoundingClientRect()
         let bannerHeight = bannerPos.height
+        let currentTabScrollY = this.mescroll[this.selectedIdx].getScrollTop()
+        if (currentTabScrollY === 0) {
+          this.mescroll[this.selectedIdx].scrollTo(1, 0)
+        }
         this.pageTop = -bannerHeight
       } else if (e.changedTouches[0].screenY > this.wrapperTouchY && this.pageTop !== 0) {
         this.pageTop = 0
