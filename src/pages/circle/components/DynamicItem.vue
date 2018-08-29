@@ -282,7 +282,7 @@ export default {
       this.router.push({ name: 'DynamicDetail', query: { id: this.itemData.id, isArticle: this.itemData.type.toString() === '18' } })
     },
     goUser () {
-      this.router.push({ name: 'UserCenterTest', query: { user_id: this.itemData.uid }, params: {resetData: true} })
+      this.router.push({ name: 'UserCenter', query: { user_id: this.itemData.uid }, params: {resetData: true} })
     }
   }
 }

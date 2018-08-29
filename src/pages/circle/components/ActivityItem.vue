@@ -119,7 +119,7 @@ export default {
   },
   methods: {
     goActivity () { // 跳转活动详情页
-      this.$router.push({name: 'ActivityDetail', query: {id: this.itemData.id}})
+      this.$router.push({name: 'ActivityDetail', query: {id: this.itemData.id}, params: {resetData: true}})
     }
   }
 }

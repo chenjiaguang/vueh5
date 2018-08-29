@@ -3,10 +3,8 @@ import Router from 'vue-router'
 import NotFoundPage from '@/pages/notFoundPage'
 import Home from '@/pages/home'
 import CircleDetail from '@/pages/circle/detail'
-import CircleDetailTest from '@/pages/circle/detailTest'
 import ActivityDetail from '@/pages/activity/detail'
 import ActivityDynamic from '@/pages/activity/dynamic'
-import ActivityDynamicTest from '@/pages/activity/dynamicTest'
 import ActivityOrder from '@/pages/activity/order'
 import WebPay from '@/pages/activity/webPay'
 import ActivitySuccess from '@/pages/activity/success'
@@ -14,13 +12,11 @@ import ActivityTicket from '@/pages/activity/ticket'
 import MapPage from '@/pages/mapPage'
 import Agreement from '@/pages/agreement'
 import UserCenter from '@/pages/user/center'
-import UserCenterTest from '@/pages/user/centerTest'
 import EditDynamic from '@/pages/dynamic/edit'
 import EditDynamicRange from '@/pages/dynamic/chooseRange'
 import DynamicDetail from '@/pages/dynamic/detail'
 import DynamicSendComment from '@/pages/dynamic/sendComment'
 import TopicDetail from '@/pages/topic/detail'
-import TopicDetailTest from '@/pages/topic/detailTest'
 import SMSCode from '@/pages/smsCode'
 import WeixinLoginJump from '@/pages/weixinLoginJump'
 Vue.use(Router)
@@ -56,15 +52,6 @@ const router = new Router({
       component: ActivityDynamic,
       meta: {
         title: '大家都在晒',
-        keepAlive: true
-      }
-    },
-    {
-      path: prefix + '/activity/dynamic/test',
-      name: 'ActivityDynamicTest',
-      component: ActivityDynamicTest,
-      meta: {
-        title: '大家都在晒test',
         keepAlive: true
       }
     },
@@ -126,29 +113,11 @@ const router = new Router({
       }
     },
     {
-      path: prefix + '/circle/detail/test',
-      name: 'CircleDetailTest',
-      component: CircleDetailTest,
-      meta: {
-        title: '范团圈子test',
-        keepAlive: true
-      }
-    },
-    {
       path: prefix + '/user/center',
       name: 'UserCenter',
       component: UserCenter,
       meta: {
         title: '范团名片',
-        keepAlive: true
-      }
-    },
-    {
-      path: prefix + '/user/center/test',
-      name: 'UserCenterTest',
-      component: UserCenterTest,
-      meta: {
-        title: '范团名片test',
         keepAlive: true
       }
     },
@@ -204,15 +173,6 @@ const router = new Router({
       component: TopicDetail,
       meta: {
         title: '范团话题',
-        keepAlive: true
-      }
-    },
-    {
-      path: prefix + '/topic/detail/test',
-      name: 'TopicDetailTest',
-      component: TopicDetailTest,
-      meta: {
-        title: '范团话题test',
         keepAlive: true
       }
     }

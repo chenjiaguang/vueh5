@@ -312,7 +312,7 @@ export default {
         .catch()
     },
     clickUser (uid) {
-      this.$router.push({ name: 'UserCenter', query: { user_id: uid } })
+      this.$router.push({ name: 'UserCenter', query: { user_id: uid }, params: {resetData: true} })
     },
     clickFollow (uid) {
       this.$ajax('/jv/user/follow', { data: this.followData })
@@ -323,7 +323,7 @@ export default {
         .catch()
     },
     clickActivity (id) {
-      this.$router.push({ name: 'ActivityDetail', query: { id: id } })
+      this.$router.push({ name: 'ActivityDetail', query: { id: id }, params: {resetData: true} })
     },
     showReplyActionSheet (comment, replyName = '', pid = '') {
       this.$createActionSheet({

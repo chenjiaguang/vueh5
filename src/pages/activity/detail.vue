@@ -462,7 +462,7 @@ export default {
       }
     },
     goDynamicList () {
-      this.$router.push({name: 'ActivityDynamicTest', query: {activity_id: this.activity.id}, params: {resetData: true}})
+      this.$router.push({name: 'ActivityDynamic', query: {activity_id: this.activity.id}, params: {resetData: true}})
     },
     goOrder () {
       if (this.activity.statusText !== '购票' || !utils.checkLogin()) { // 未登录或不可购票时终止

@@ -290,10 +290,10 @@ export default {
       console.log('goArticle')
     },
     goUser () {
-      this.router.push({ name: 'UserCenter', query: { user_id: this.itemData.uid } })
+      this.router.push({ name: 'UserCenter', query: { user_id: this.itemData.uid }, params: {resetData: true} })
     },
     goCircle () {
-      this.router.push({ name: 'CircleDetail', query: { circle_id: this.itemData.circle_id } })
+      this.router.push({ name: 'CircleDetail', query: { circle_id: this.itemData.circle_id }, params: {resetData: true} })
     }
   }
 }
