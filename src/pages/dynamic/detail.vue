@@ -50,14 +50,14 @@
               <TopicTagBox :topicInfo="dynamic.topicInfo" />
               <DetailImageContainer class="detail-image-container"  :images="dynamic.covers"/>
               <a class="content-article-box row center" v-if="dynamic.aid" :href="dynamic.newsArticle.article_url">
-                <div class="content-article-img" :style="`background-image:url(${dynamic.newsArticle.covers[0].compress})`"/>
+                <div class="content-article-img" :style="`background-image:url(${dynamic.newsArticle.covers?dynamic.newsArticle.covers[0].compress:''})`"/>
                 <div class="content-article-content">{{dynamic.newsArticle.name}}</div>
               </a>
             </div>
 
             <div v-if="dynamic" id="foot-container" class="column">
               <a class="content-activity-box row center" v-if="dynamic.actid" href="javascript:void(0)" @click="clickActivity(dynamic.actid)">
-                <div class="content-activity-img" :style="`background-image:url(${dynamic.activity.covers[0].compress})`"/>
+                <div class="content-activity-img" :style="`background-image:url(${dynamic.activity.covers?dynamic.activity.covers[0].compress:''})`"/>
                 <div class="content-activity-right column space-between">
                   <div class="content-activity-title">{{dynamic.activity.title}}</div>
                   <div class="content-activity-address">{{dynamic.activity.address}}</div>
