@@ -50,7 +50,7 @@
       </div>
       <div class="comment-and-like-border" :style="{transform: 'scale(1,' + $tranScale + ')'}"></div>
     </div>
-    <div class="gray-block"></div>
+    <div class="gray-block" v-if="!hideBlock"></div>
   </div>
 </template>
 
@@ -71,7 +71,7 @@
 }
 .dynamic-item{
   width: 100%;
-  padding: 0 4% 4px;
+  padding: 0 4%;
   overflow: visible;
   text-align: left;
 }
@@ -269,6 +269,9 @@ export default {
     itemData: {
       type: Object,
       required: true
+    },
+    hideBlock: {
+      required: false
     },
     router: {
       required: false

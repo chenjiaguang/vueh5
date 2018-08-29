@@ -46,8 +46,8 @@
                   </div>
                 </transition>
                 <div v-if="tabs[index].paging && tabs[index].paging.is_end && tabs[index].data && tabs[index].data.length === 0" class="empty-box">该圈子暂无{{index === 0 ? '动态' : '活动'}}</div>
-                <dynamic-item v-if="index === 0" v-for="(item, idx) in tabs[index].data" :key="idx" :itemData="item" :router="$router" @changeLike="changeLike" />
-                <activity-item v-if="index === 1" v-for="(item, idx) in tabs[index].data" :key="idx" :itemData="item" />
+                <dynamic-item v-if="index === 0" v-for="(item, idx) in tabs[index].data" :key="idx" :itemData="item" :hideBlock="idx === tabs[index].data.length - 1" :router="$router" @changeLike="changeLike" />
+                <activity-item v-if="index === 1" v-for="(item, idx) in tabs[index].data" :key="idx" :itemData="item" :hideBlock="idx === tabs[index].data.length - 1" />
                 <template slot="pulldown" slot-scope="props">
                   <div class="cube-pulldown-wrapper" :style="props.pullDownStyle">
                     <img v-show="!props.isPullingDown" class="pull-down-icon" :style="{transform: 'translateY(' + props.bubbleY + 'px)'}" :src="$assetsPublicPath + '/cwebassets/image/refresh_icon.png'" />
@@ -243,6 +243,7 @@ export default {
       }, 30)
     },
     refreshData () {
+      console.log('refreshData')
       let selectedIdx = parseInt(this.$route.query.jump_tab || 0)
       let selectedLabel = (this.$route.query.jump_tab && this.$route.query.jump_tab.toString() === '1') ? '最热' : '最新'
       let _initialData = JSON.parse(JSON.stringify(initialData))
@@ -252,8 +253,13 @@ export default {
       }
       this.fetchCircle()
       this.initSlideBlock()
-      for (let i = 0; i < this.tabs.length; i++) {
-        this.$refs['contentScroll'][i].scrollTo(0, 0, 10)
+      console.log('this.tabs', this.tabs.length, this.$refs['contentScroll'])
+      if (this.tabs.length > 1) {
+        for (let i = 0; i < this.tabs.length; i++) {
+          this.$refs['contentScroll'][i] && this.$refs['contentScroll'][i].scrollTo(0, 0, 10)
+        }
+      } else {
+        this.$refs['contentScroll'].scrollTo(0, 0, 10)
       }
     },
     fetchCircle () {

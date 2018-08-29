@@ -26,7 +26,7 @@
         <img :src="$assetsPublicPath + '/cwebassets/image/empty_dynamic.png'" class="empty-image" />
         暂无动态
       </div>
-      <dynamic-item v-for="(item, idx) in tabs[0].data" :key="idx" :itemData="item" :router="$router" @changeLike="changeLike" />
+      <dynamic-item v-for="(item, idx) in tabs[0].data" :key="idx" :itemData="item" :hideBlock="idx === tabs[index].data.length - 1" :router="$router" @changeLike="changeLike" />
       <template slot="pulldown" slot-scope="props">
         <div class="cube-pulldown-wrapper" :style="props.pullDownStyle">
           <img v-show="!props.isPullingDown" class="pull-down-icon" :style="{transform: 'translateY(' + props.bubbleY + 'px)'}" :src="$assetsPublicPath + '/cwebassets/image/refresh_icon.png'" />

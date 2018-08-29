@@ -17,7 +17,8 @@ import EditDynamic from '@/pages/dynamic/edit'
 import EditDynamicRange from '@/pages/dynamic/chooseRange'
 import DynamicDetail from '@/pages/dynamic/detail'
 import DynamicSendComment from '@/pages/dynamic/sendComment'
-import TopicDetal from '@/pages/topic/detail'
+import TopicDetail from '@/pages/topic/detail'
+import TopicDetailTest from '@/pages/topic/detailTest'
 import SMSCode from '@/pages/smsCode'
 import WeixinLoginJump from '@/pages/weixinLoginJump'
 Vue.use(Router)
@@ -180,9 +181,18 @@ const router = new Router({
     {
       path: prefix + '/topic/detail',
       name: 'TopicDetail',
-      component: TopicDetal,
+      component: TopicDetail,
       meta: {
         title: '范团话题',
+        keepAlive: true
+      }
+    },
+    {
+      path: prefix + '/topic/detail/test',
+      name: 'TopicDetailTest',
+      component: TopicDetailTest,
+      meta: {
+        title: '范团话题test',
         keepAlive: true
       }
     }

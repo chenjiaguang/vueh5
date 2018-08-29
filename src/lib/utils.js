@@ -48,13 +48,13 @@ export default {
   },
   checkReloadWithKeepAliveNew (vm, $route, $oldRoute, routeName, checkQueryKeys, reloadCallback) {
     let route = null
-    if ($route.name === routeName && $oldRoute.name === routeName) {
-      route = $oldRoute
+    if ($route.name === routeName && $oldRoute.name === routeName) { // 相同路由
+      route = $oldRoute // 旧路由
       if (!vm._refresh) {
         vm._refresh = {}
       }
       // 写入初始值
-      checkQueryKeys.forEach(checkQueryKey => {
+      checkQueryKeys.forEach(checkQueryKey => { // 旧路由初始值
         if (!vm._refresh[checkQueryKey]) {
           vm._refresh[checkQueryKey] = route.query[checkQueryKey]
         }
@@ -91,10 +91,14 @@ export default {
       if (!reload) {
         // 参数发生变化 需要reload
         checkQueryKeys.forEach(checkQueryKey => {
-          if (vm._refresh[checkQueryKey] !== route.query[checkQueryKey]) {
+          if ((!vm._refresh[checkQueryKey] && route.query[checkQueryKey]) || (vm._refresh[checkQueryKey] && !route.query[checkQueryKey]) || (vm._refresh[checkQueryKey] && route.query[checkQueryKey] && vm._refresh[checkQueryKey].toString() !== route.query[checkQueryKey].toString())) { // 其中一个不存在，或者值不一样时
             reload = true
           }
         })
+        // 主动刷新时 需要reload
+        if ($route.name === routeName && $route.params.resetData) {
+          reload = true
+        }
       }
 
       if (reload) {
