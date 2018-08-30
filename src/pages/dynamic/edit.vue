@@ -82,28 +82,31 @@ import axios from 'axios'
 import utils from '@/lib/utils'
 
 // 接受参数(params) topic: [{id: 2, title: '测试话题'}]    activity: {id: 2, title: '屯昌木色湖一日游'}    circle: {id: 2, title: '舌尖上的海口'}    range: 0||1||2
+let initialData = {
+  dynamicText: '',
+  images: [],
+  cancelRequest: {},
+  topic: [],
+  activity: {},
+  circle: {},
+  range: 0,
+  rangeMap: {
+    0: '公开',
+    1: '仅好友可见',
+    2: '仅自己可见'
+  },
+  submitting: false
+}
 export default {
   data () {
-    let topic = this.$route.params.topic ? this.$route.params.topic.concat([]) : null
-    let activity = this.$route.params.activity ? Object.assign({}, this.$route.params.activity) : null
-    let circle = this.$route.params.circle ? Object.assign({}, this.$route.params.circle) : null
-    let range = this.$route.params.range !== undefined ? this.$route.params.range.toString() : null
-    return {
-      dynamicText: '',
-      images: [],
-      cancelRequest: {},
-      topic,
-      activity,
-      circle,
-      range,
-      rangeMap: {
-        0: '公开',
-        1: '仅好友可见',
-        2: '仅自己可见'
-      },
-      submitting: false,
-      previewInstance: null
-    }
+    let topic = this.$route.query.topic ? JSON.parse(this.$route.query.topic) : null
+    let activity = this.$route.query.activity ? JSON.parse(this.$route.query.activity) : null
+    let circle = this.$route.query.circle ? JSON.parse(this.$route.query.circle) : null
+    let range = this.$route.query.range !== undefined ? this.$route.query.range.toString() : null
+    let _initialData = JSON.parse(JSON.stringify(initialData))
+    let _obj = Object.assign({}, _initialData, {topic, activity, circle, range})
+    console.log('_obj', _obj)
+    return _obj
   },
   components: {imageContainer, EditOption},
   watch: {
@@ -282,7 +285,8 @@ export default {
         range: this.range || '',
         actid: this.activity ? (this.activity.id || '') : '',
         circle_id: this.circle ? (this.circle.id || '') : '',
-        topicId: topic_ids
+        topicId: topic_ids,
+        showAllways: true
       }
       this.submitting = true
       this.$ajax('/jv/qz/publish/dynamic', {data: rData}).then(res => {
@@ -307,33 +311,25 @@ export default {
         this.submitting = false
       })
     },
-    resetData () {
-      let topic = this.$route.params.topic || null
-      let activity = this.$route.params.activity || null
-      let circle = this.$route.params.circle || null
-      let range = this.$route.params.range !== undefined ? this.$route.params.range.toString() : null
-      this.dynamicText = ''
-      this.topic = topic
-      this.activity = activity
-      this.circle = circle
-      this.range = range
-      this.images = []
-      this.cancelRequest = {}
-      this.rangeMap = {
-        0: '公开',
-        1: '仅好友可见',
-        2: '仅自己可见'
+    refreshData () {
+      let topic = this.$route.query.topic ? JSON.parse(this.$route.query.topic) : null
+      let activity = this.$route.query.activity ? JSON.parse(this.$route.query.activity) : null
+      let circle = this.$route.query.circle ? JSON.parse(this.$route.query.circle) : null
+      let range = this.$route.query.range !== undefined ? this.$route.query.range.toString() : null
+      let _initialData = JSON.parse(JSON.stringify(initialData))
+      let _obj = Object({}, _initialData, {topic, activity, circle, range})
+      for (let item in _obj) {
+        this[item] = _obj[item]
       }
-      this.submitting = false
-      this.isPreview = false
     }
   },
   beforeRouteEnter (to, from, next) {
     if (from.name !== 'EditDynamicRange') {
       to.params.resetData = true
       let title = ''
-      if (to.params.circle && to.params.circle.title) {
-        title = to.params.circle.title
+      let circle = to.query.circle ? JSON.parse(to.query.circle) : null
+      if (circle && circle.title) {
+        title = circle.title
       } else {
         title = '发动态'
       }
@@ -358,7 +354,7 @@ export default {
   },
   activated () {
     if (this.$route.params.resetData) {
-      this.resetData()
+      this.refreshData()
     }
   }
 }

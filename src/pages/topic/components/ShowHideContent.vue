@@ -18,6 +18,7 @@
     transition: all 300ms;
     white-space: normal;
     word-wrap: break-word;
+    white-space: pre-wrap;
   }
   .clearfix:after{
     content: "";

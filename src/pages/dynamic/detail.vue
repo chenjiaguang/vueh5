@@ -525,6 +525,7 @@ export default {
   line-height: 46px;
   margin-bottom: 17px;
   word-break: break-all;
+  white-space: pre-wrap;
 }
 .detail-image-container {
   margin-left: -30px;

@@ -458,7 +458,9 @@ export default {
     },
     goPublish () {
       if (utils.checkLogin()) {
-        this.$router.push({name: 'EditDynamic', params: {circle: {id: this.circle.id, title: this.circle.name}, activity: {id: this.activity.id, title: this.activity.title}}})
+        let circleJson = JSON.stringify({id: this.circle.id, title: this.circle.name})
+        let activityJson = JSON.stringify({id: this.activity.id, title: this.activity.title})
+        this.$router.push({name: 'EditDynamic', query: {circle: circleJson, activity: activityJson}, params: {resetData: true}})
       }
     },
     goDynamicList () {

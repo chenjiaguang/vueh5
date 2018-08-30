@@ -24,7 +24,24 @@
           </div>
           <div class="tab-border" :style="{transform: 'scale(1,' + $tranScale + ')'}"></div>
         </div>
-        <div class="tabs-wrapper" ref="slideWrapper" :style="{height: ($winHeight - ((tabs && tabs.length) > 1 ? tabBarHeight : 0)) + 'px'}">
+        <div class="tabs-wrapper" :style="{height: ($winHeight - ((tabs && tabs.length) > 1 ? tabBarHeight : 0)) + 'px'}">
+          <swiper class="swiper-wrapper swiper-no-swiping" ref="swiper" :style="{width: '100%', height: '100%'}" :options="swiperOption">
+              <swiper-slide v-for="(item, index) in tabs" :key="item.title" :style="{width: '100%', height: '100%'}">
+                <div :id="'mescroll' + index" class="mescroll content-scroll-wrapper" :style="{width: '100%', height: '100%', overflowY: 'auto', overflowX: 'hidden'}">
+                  <transition name="loading-scale">
+                    <div class="first-loading-box" v-if="!tabs[index].paging.pn">
+                      <loading-view />
+                    </div>
+                  </transition>
+                  <div v-if="tabs[index].paging.pn && tabs[index].data && tabs[index].data.length !== 0" :style="{minHeight: ($winHeight - ((tabs && tabs.length) > 1 ? tabBarHeight : 0)) + 0.5 + 'px', backgroundColor: '#fff'}">
+                    <topic-item v-for="(item, idx) in tabs[index].data" :key="idx" :itemData="item" :router="$router" :hideBlock="idx === tabs[index].data.length - 1" @changeLike="(data) => changeLike(data, index)" />
+                  </div>
+                  <div v-else-if="tabs[index].paging.is_end && tabs[index].data && tabs[index].data.length === 0" class="empty-box">该话题暂无{{index === 0 ? '最新动态' : '最热动态'}}</div>
+                </div>
+              </swiper-slide>
+          </swiper>
+        </div>
+        <!-- <div class="tabs-wrapper" ref="slideWrapper" :style="{height: ($winHeight - ((tabs && tabs.length) > 1 ? tabBarHeight : 0)) + 'px'}">
           <cube-slide ref="slideInstance" :data="tabs" :initialIndex="selectedIdx" :autoPlay="false" :allowVertical="false" :showDots="false" :loop="false" :speed="200" :options="{listenScroll: true, probeType: 3, stopPropagation: true, click: false, preventDefault: false}" @change="changeSlide" @scroll="slideScroll">
             <cube-slide-item v-for="(item, index) in tabs" :key="item.title" :style="{height: ($winHeight - ((tabs && tabs.length) > 1 ? tabBarHeight : 0)) + 'px'}">
                <div :id="'mescroll' + index" class="mescroll content-scroll-wrapper" :style="{width: $winWidth + 'px', height: '100%', overflowY: 'auto', overflowX: 'hidden'}">
@@ -40,7 +57,7 @@
               </div>
             </cube-slide-item>
           </cube-slide>
-        </div>
+        </div> -->
       </div>
     </div>
     <scroll-to-top v-if="mescroll && mescroll.length > 0" :visible="showBackTop" :position="{bottom: ($winWidth / 750) * 278, right: ($winWidth / 750) * 54}" :scroll="mescroll[selectedIdx]"/>
@@ -51,6 +68,8 @@
 </template>
 
 <script type="text/ecmascript-6">
+import 'swiper/dist/css/swiper.css'
+import { swiper, swiperSlide } from 'vue-awesome-swiper'
 import Vue from 'vue'
 import TopicItem from './components/TopicItem'
 import DownloadBox from '../../components/DownloadBox'
@@ -90,6 +109,7 @@ const initialData = {
       fetching: false
     }
   ],
+  swiperOption: {},
   tabBarHeight: parseInt((window.innerWidth / 750) * 96),
   selectedLabel: '最新',
   selectedIdx: 0,
@@ -105,11 +125,29 @@ export default {
     let selectedIdx = parseInt(this.$route.query.jump_tab || 0)
     let selectedLabel = (this.$route.query.jump_tab && this.$route.query.jump_tab.toString() === '1') ? '最热' : '最新'
     let isShareOpen = this.$route.params.isShareOpen
+    let _this = this
+    let swiperOption = {
+      initialSlide: selectedIdx,
+      setWrapperSize: true,
+      pagination: {
+        el: '.swiper-pagination',
+        type: 'fraction'
+      },
+      on: {
+        slideChangeTransitionStart: function () {
+          let pos = _this.$refs['tabItem'][this.activeIndex].$el.getBoundingClientRect()
+          let slideX = pos.left + pos.width / 2
+          _this.selectedLabel = _this.tabs[this.activeIndex].title
+          _this.tabSlideX = slideX + 'px'
+          _this.$refs['swiper'].swiper.slideTo(this.activeIndex, 300)
+        }
+      }
+    }
     let _initialData = JSON.parse(JSON.stringify(initialData))
-    let _obj = Object.assign({}, _initialData, {selectedIdx, selectedLabel, isShareOpen})
+    let _obj = Object.assign({}, _initialData, {selectedIdx, selectedLabel, isShareOpen, swiperOption})
     return _obj
   },
-  components: {TopicItem, DownloadBox, LoadingView, ScrollToTop},
+  components: {TopicItem, DownloadBox, LoadingView, ScrollToTop, swiper, swiperSlide},
   watch: {
     '$route': function (val, oldVal) {
       if (!val.query.previewImage && oldVal.query.previewImage) { // 点击大图后返回
@@ -129,6 +167,13 @@ export default {
         if (item.title === tabTitle) {
           this.selectedLabel = tabTitle
           this.selectedIdx = index
+          let pos = this.$refs['tabItem'][index].$el.getBoundingClientRect()
+          let slideX = pos.left + pos.width / 2
+          this.tabSlideX = slideX + 'px'
+          this.$refs['swiper'].swiper.slideTo(index, 300)
+          if (!this.tabs[index].paging.pn) {
+            this.initMeScroll(index)
+          }
         }
       })
     },
@@ -189,8 +234,26 @@ export default {
       }
       let selectedIdx = parseInt(this.$route.query.jump_tab || 0)
       let selectedLabel = (this.$route.query.jump_tab && this.$route.query.jump_tab.toString() === '1') ? '最热' : '最新'
+      let _this = this
+      let swiperOption = {
+        initialSlide: selectedIdx,
+        setWrapperSize: true,
+        pagination: {
+          el: '.swiper-pagination',
+          type: 'fraction'
+        },
+        on: {
+          slideChangeTransitionStart: function () {
+            let pos = _this.$refs['tabItem'][this.activeIndex].$el.getBoundingClientRect()
+            let slideX = pos.left + pos.width / 2
+            _this.selectedLabel = _this.tabs[this.activeIndex].title
+            _this.tabSlideX = slideX + 'px'
+            _this.$refs['swiper'].swiper.slideTo(this.activeIndex, 300)
+          }
+        }
+      }
       let _initialData = JSON.parse(JSON.stringify(initialData))
-      let _obj = Object.assign({}, _initialData, {selectedIdx, selectedLabel})
+      let _obj = Object.assign({}, _initialData, {selectedIdx, selectedLabel, swiperOption})
       for (let item in _obj) {
         this[item] = _obj[item]
       }
@@ -311,7 +374,8 @@ export default {
     },
     goPublish () {
       if (utils.checkLogin()) {
-        this.$router.push({name: 'EditDynamic', params: {topic: [{id: this.topicInfo.id, title: this.topicInfo.title}], range: 0}})
+        let topicJson = JSON.stringify([{id: this.topicInfo.id, title: this.topicInfo.title}])
+        this.$router.push({name: 'EditDynamic', query: {topic: topicJson, range: 0}, params: {resetData: true}})
       }
     },
     initMeScroll (idx) {
@@ -479,6 +543,7 @@ fl{
   bottom: 0;
   background: #FF611A;
   border-radius: 4px;
+  transition: transform 300ms;
 }
 .tab-border{
   width: 100%;

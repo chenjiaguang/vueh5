@@ -37,6 +37,7 @@
     margin-bottom: 21px;
   }
   .content-text{
+    word-wrap: break-word;
     white-space: pre-wrap;
   }
   .image-box{
