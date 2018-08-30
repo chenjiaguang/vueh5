@@ -1,5 +1,5 @@
 <template>
-  <div :style="{height: winHeight + 'px'}" class="circle-page">
+  <div :style="{height: $winHeight + 'px'}" class="circle-page">
     <div ref="pageContainer" style="transition: all 300ms" :style="{transform: 'translateY(' + pageTop + 'px)'}">
       <div ref="topBanner" @touchmove="bannerTouchMove" @touchstart="bannerTouchStart" @touchend="bannerTouchEnd">
         <download-box v-if="$route.params.isShareOpen" />
@@ -18,7 +18,7 @@
           </div>
         </header>
       </div>
-      <div ref="innerWrapper" class="scroll-wrapper" :style="{height: winHeight + 'px'}">
+      <div ref="innerWrapper" class="scroll-wrapper" :style="{height: $winHeight + 'px'}">
         <div @touchmove="bannerTouchMove" @touchstart="bannerTouchStart" @touchend="bannerTouchEnd" class="nav-scroll-list-wrap" ref="navWrapper" :style="{height: tabBarHeight + 'px'}" v-if="tabs && tabs.length > 1 && showTabbar">
           <cube-tab-bar v-model="selectedLabel" class="tab-box" @change="changeTabBar" :style="{height: tabBarHeight + 'px'}">
             <cube-tab v-for="(item) in tabs" ref="tabItem" :label="item.title" :key="item.title">
@@ -29,16 +29,16 @@
           </div>
           <div class="tab-border" :style="{transform: 'scale(1,' + $tranScale + ')'}"></div>
         </div>
-        <div class="tabs-wrapper" ref="slideWrapper" :style="{height: (winHeight - ((tabs && tabs.length) > 1 ? tabBarHeight : 0)) + 'px'}">
+        <div class="tabs-wrapper" ref="slideWrapper" :style="{height: ($winHeight - ((tabs && tabs.length) > 1 ? tabBarHeight : 0)) + 'px'}">
           <cube-slide ref="slideInstance" :data="tabs" :initialIndex="selectedIdx" :autoPlay="false" :allowVertical="false" :showDots="false" :loop="false" :speed="200" :options="{listenScroll: true, probeType: 3, stopPropagation: true, click: false, preventDefault: false}" @change="changeSlide" @scroll="slideScroll">
-            <cube-slide-item v-for="(item, index) in tabs" :key="item.title" :style="{height: (winHeight - ((tabs && tabs.length) > 1 ? tabBarHeight : 0)) + 'px'}">
-              <div :id="'mescroll' + index" class="mescroll content-scroll-wrapper" :style="{width: winWidth + 'px', height: '100%', overflowY: 'auto', overflowX: 'hidden'}">
+            <cube-slide-item v-for="(item, index) in tabs" :key="item.title" :style="{height: ($winHeight - ((tabs && tabs.length) > 1 ? tabBarHeight : 0)) + 'px'}">
+              <div :id="'mescroll' + index" class="mescroll content-scroll-wrapper" :style="{width: $winWidth + 'px', height: '100%', overflowY: 'auto', overflowX: 'hidden'}">
                 <transition name="loading-scale">
                   <div class="first-loading-box" v-if="!tabs[index].paging.pn">
                     <loading-view />
                   </div>
                 </transition>
-                <div v-if="tabs[index].paging.pn && tabs[index].data && tabs[index].data.length !== 0" :style="{minHeight: (winHeight - ((tabs && tabs.length) > 1 ? tabBarHeight : 0)) + 0.5 + 'px', backgroundColor: '#fff'}">
+                <div v-if="tabs[index].paging.pn && tabs[index].data && tabs[index].data.length !== 0" :style="{minHeight: ($winHeight - ((tabs && tabs.length) > 1 ? tabBarHeight : 0)) + 0.5 + 'px', backgroundColor: '#fff'}">
                   <dynamic-item v-if="index === 0" v-for="(item, idx) in tabs[index].data" :key="idx" :itemData="item" :hideBlock="idx === tabs[index].data.length - 1" :router="$router" @changeLike="changeLike" />
                   <activity-item v-if="index === 1" v-for="(item, idx) in tabs[index].data" :key="idx" :itemData="item" :hideBlock="idx === tabs[index].data.length - 1" />
                 </div>
@@ -49,7 +49,7 @@
         </div>
       </div>
     </div>
-    <scroll-to-top v-if="mescroll && mescroll.length > 0" :visible="showBackTop" :position="{bottom: (winWidth / 750) * 178, right: (winWidth / 750) * 54}" :scroll="mescroll[selectedIdx]"/>
+    <scroll-to-top v-if="mescroll && mescroll.length > 0" :visible="showBackTop" :position="{bottom: ($winWidth / 750) * 178, right: ($winWidth / 750) * 54}" :scroll="mescroll[selectedIdx]"/>
     <i class="iconfont icon-camera publish-icon" @click="goPublish"></i>
   </div>
 </template>
@@ -96,8 +96,6 @@ const initialData = {
       fetching: false
     }
   ],
-  winWidth: window.innerWidth,
-  winHeight: window.innerHeight,
   tabBarHeight: parseInt((window.innerWidth / 750) * 88),
   selectedLabel: '动态',
   selectedIdx: 0,
@@ -419,16 +417,16 @@ export default {
       this.mescroll[idx] = new MeScroll('mescroll' + idx, {down: _down, up: _up})
     },
     onMeScroll (mescroll, y, isUp) {
-      if (y === 0 && !isUp && this.pageTop !== 0) {
+      if (y <= 0 && !isUp && this.pageTop !== 0) {
         this.pageTop = 0
-      } else if (isUp && this.pageTop === 0) {
+      } else if (y > 0 && isUp && this.pageTop === 0) {
         let bannerPos = this.$refs['topBanner'].getBoundingClientRect()
         let bannerHeight = bannerPos.height
         this.pageTop = -bannerHeight
       }
-      if (y > window.innerHeight && !this.showBackTop) {
+      if (y > this.$winHeight && !this.showBackTop) {
         this.showBackTop = true
-      } else if (y < window.innerHeight && this.showBackTop) {
+      } else if (y < this.winHeight && this.showBackTop) {
         this.showBackTop = false
       }
     },
@@ -458,6 +456,9 @@ export default {
   mounted () {
     this.fetchCircle()
     this.initSlideBlock()
+  },
+  activated () {
+    this.$forceUpdate()
   }
 }
 </script>

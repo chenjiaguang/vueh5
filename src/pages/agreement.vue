@@ -1,5 +1,5 @@
 <template>
-  <iframe v-if="src" ref="wrapper" :style="{height: winHeight + 'px'}" class="agreement-wrapper" :src="src"></iframe>
+  <iframe v-if="src" ref="wrapper" :style="{height: $winHeight + 'px'}" class="agreement-wrapper" :src="src"></iframe>
 </template>
 
 <style scoped>
@@ -20,24 +20,23 @@
 </style>
 
 <script>
-  export default {
-    name: 'Agreement',
-    data () {
-      return {
-        winHeight: window.innerHeight,
-        src: '',
-        srcObject: {
-          user: this.$assetsPublicPath + '/cwebassets/userAgreement.html',
-          author: this.$assetsPublicPath + '/cwebassets/authorAgreement.html',
-          activity: this.$assetsPublicPath + '/cwebassets/activityAgreement.html'
-        }
-      }
-    },
-    created () {
-      let _type = this.$route.query && this.$route.query.type
-      if (_type) {
-        this.src = this.srcObject[_type]
+export default {
+  name: 'Agreement',
+  data () {
+    return {
+      src: '',
+      srcObject: {
+        user: this.$assetsPublicPath + '/cwebassets/userAgreement.html',
+        author: this.$assetsPublicPath + '/cwebassets/authorAgreement.html',
+        activity: this.$assetsPublicPath + '/cwebassets/activityAgreement.html'
       }
     }
+  },
+  created () {
+    let _type = this.$route.query && this.$route.query.type
+    if (_type) {
+      this.src = this.srcObject[_type]
+    }
   }
+}
 </script>

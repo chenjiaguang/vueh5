@@ -95,7 +95,6 @@ export default {
         this.contentHeight = wrapperHeight
         let _lineHeight = parseFloat(window.getComputedStyle(this.$refs['contentContainer'], false).lineHeight)
         this.contentMaxHeight = Math.ceil(_lineHeight * 5)
-        console.log('line', wrapperHeight / _lineHeight)
         if (this.contentHeight > this.contentMaxHeight) {
           this.showMore = false
           this.$refs['contentContainer'].style.maxHeight = this.contentMaxHeight + 'px'

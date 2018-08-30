@@ -1,6 +1,6 @@
 <template>
-  <div :style="{height: widHeight + 'px'}">
-    <div id="mescroll" class="mescroll activity-dynamic" :style="{width: winWidth + 'px', height: '100%', overflowY: 'auto', overflowX: 'hidden'}">
+  <div :style="{height: $winHeight + 'px'}">
+    <div id="mescroll" class="mescroll activity-dynamic" :style="{width: $winWidth + 'px', height: '100%', overflowY: 'auto', overflowX: 'hidden'}">
       <download-box v-if="$route.params.isShareOpen" />
       <transition name="loading-scale">
         <div class="first-loading-box" v-if="!paging.pn">
@@ -12,7 +12,7 @@
       </div>
       <div v-else-if="paging.is_end && dynamic && dynamic.length === 0" class="empty-box">该活动暂无晒图</div>
     </div>
-    <scroll-to-top v-if="mescroll[0]" :visible="showBackTop" :position="{bottom: (winWidth / 750) * 178, right: (winWidth / 750) * 54}" :scroll="mescroll[0]"/>
+    <scroll-to-top v-if="mescroll[0]" :visible="showBackTop" :position="{bottom: ($winWidth / 750) * 178, right: ($winWidth / 750) * 54}" :scroll="mescroll[0]"/>
   </div>
 </template>
 
@@ -32,8 +32,6 @@ const initialData = {
   dynamic: [],
   paging: {},
   fetching: false,
-  winWidth: window.innerWidth,
-  widHeight: window.innerHeight,
   mescroll: []
 }
 export default {
@@ -186,9 +184,9 @@ export default {
       this.mescroll[0] = new MeScroll('mescroll', {down: _down, up: _up})
     },
     onMeScroll (mescroll, y, isUp) {
-      if (y > window.innerHeight && !this.showBackTop) {
+      if (y > this.$winHeight && !this.showBackTop) {
         this.showBackTop = true
-      } else if (y < window.innerHeight && this.showBackTop) {
+      } else if (y < this.$winHeight && this.showBackTop) {
         this.showBackTop = false
       }
     }

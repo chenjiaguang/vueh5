@@ -2,7 +2,7 @@
 <template>
   <div v-if="images&&images.length" class="row flex-wrap-wrap space-between">
     <div v-for="(item, idx) in images" :key="idx" @click="previewImage(idx)" :class="[imageClassName]">
-      <div :style="`background-image:url(${item.url});height:${images.length==1?((images[0].height/images[0].width*winWidth)+'px'):null}`" :class="['image-item']" />
+      <div :style="`background-image:url(${item.url});height:${images.length==1?((images[0].height/images[0].width*$winWidth)+'px'):null}`" :class="['image-item']" />
       <div class="long-tag" v-if="Number(item.height) / Number(item.width) > 4">长图</div>
     </div>
     <div v-if="images&&images.length&&(images.length==5||images.length==8)" :class="[imageClassName]"></div>
@@ -13,9 +13,7 @@
 export default {
   props: ['images'],
   data () {
-    return {
-      winWidth: window.innerWidth
-    }
+    return {}
   },
   computed: {
     imageClassName: function () {

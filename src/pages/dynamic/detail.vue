@@ -1,7 +1,7 @@
 <template>
-  <div :style="{height: winHeight + 'px'}">
+  <div :style="{height: $winHeight + 'px'}">
 
-    <div v-if="dynamic" :style="{height: winHeight-(100/750*winWidth) + 'px'}">
+    <div v-if="dynamic" :style="{height: $winHeight-(100/750*$winWidth) + 'px'}">
       <div id="mescroll" class="mescroll" >
         <div>
           <DownloadBox />
@@ -153,8 +153,6 @@ export default {
         pullUpLoad: true,
         useTransition: false
       },
-      winHeight: window.innerHeight,
-      winWidth: window.innerWidth,
       pn: 1,
       scrollToTopVisible: false
     }
@@ -355,7 +353,7 @@ export default {
     },
     onScrollHandle (pos) {
       let y = pos.y
-      if (y > window.innerHeight) {
+      if (y > this.$winHeight) {
         this.scrollToTopVisible = true
       } else {
         this.scrollToTopVisible = false

@@ -1,5 +1,5 @@
 <template>
-  <div class="activity-detail" :style="{width: winWidth + 'px', height: winHeight + 'px', position: 'relative'}">
+  <div class="activity-detail" :style="{width: $winWidth + 'px', height: $winHeight + 'px', position: 'relative'}">
     <div class="scroller-wrapper">
       <div class="scroller">
         <div class="activity-container" v-if="activity.id">
@@ -465,8 +465,6 @@ export default {
   name: 'ActivityDetail',
   data () {
     return {
-      winWidth: window.innerWidth,
-      winHeight: window.innerHeight,
       activity: {
         id: '',
         title: '',
@@ -725,10 +723,6 @@ export default {
     },
     goSuccess (res) {
       this.$router.replace({name: 'ActivityTicket', query: {checkcode: res.data.checkcode}})
-    },
-    resize () {
-      this.winWidth = window.innerWidth
-      this.winHeight = window.innerHeight
     }
   },
   computed: {
@@ -745,12 +739,6 @@ export default {
   },
   created () {
     this.fetchActivity()
-  },
-  mounted () {
-    window.addEventListener('resize', this.resize)
-  },
-  beforeDestroy () {
-    window.removeEventListener('resize', this.resize)
   }
 }
 </script>

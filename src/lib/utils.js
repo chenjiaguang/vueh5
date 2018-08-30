@@ -144,7 +144,7 @@ export default {
   },
   handleContentUrl: function (content) {
     var subStr = new RegExp('((http(s)?:)?//[a-zA-Z0-9\\.\\-]+(:\\d+)?(/[a-zA-Z0-9\\.\\-~!@|#$%^&*+?:_/=<>]*)?)', 'g')
-    content = content.replace(/[<>&"]/g, function (c) { return {'<': '&lt;', '>': '&gt;'}[c] })
+    content = content.replace(/[<>]/g, function (c) { return {'<': '&lt;', '>': '&gt;'}[c] })
     content = content.replace(subStr, `<a class="content-url" href="$1" onclick="event.stopPropagation()"><span class="iconfont icon-icon_lianjie_min"></span>网络链接</a>`)
 
     return content
