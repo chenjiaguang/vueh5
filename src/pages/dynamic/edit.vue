@@ -4,7 +4,7 @@
       <textarea class="text-content" placeholder="此刻，我想说..." v-model="dynamicText"></textarea>
     </div>
     <div class="pic-box">
-      <image-container :images="images" :router="$router" :showDelete="true" @deleteFunc="deleteImage" :appearAnimation="true" :isUpload="true" @addFunc="addImage" />
+      <image-container v-if="!$route.params.resetData" :images="images" :router="$router" :showDelete="true" @deleteFunc="deleteImage" :appearAnimation="true" :isUpload="true" @addFunc="addImage" />
     </div>
     <div class="options-box" v-if="topic || activity || circle || range">
       <edit-option :option="{leftIcon: 'topic_edit', title: '话题'}" v-if="topic">
@@ -121,6 +121,7 @@ export default {
     },
     submitSuccess: function (val, oldVal) {
       if (val && !oldVal) {
+        this.refreshData()
         this.$router.go(-1)
       }
     }
@@ -130,8 +131,9 @@ export default {
       console.log('addImage')
       let _this = this
       let currentLength = this.images.length
-      let addLength = 9 - currentLength // 最多9图
+      let addLength = 9 - currentLength
       if (addLength <= 0) { // 超过9图处理
+        console.log('超过9图处理')
         return false
       }
       for (let i = 0; i < files.length; i++) {
@@ -146,7 +148,8 @@ export default {
             localUrl: '',
             status: 'submitting'
           }
-          this.images.push(item) // 在添加按钮前插入图片
+          // 在添加按钮前插入图片
+          this.images.push(item)
           var CancelToken = axios.CancelToken
           let formData = new FormData()
           formData.append('file', files[i])
@@ -206,6 +209,7 @@ export default {
             img.src = this.result
             img.onload = function (imageData) {
               if (_this.images.length > 9) { // 大于9张图时终止，为防止其他错误
+                console.log('超过最大图片数')
                 return false
               }
               let data = imageData.target ? imageData.target : (imageData.path && imageData.path[0]) ? imageData.path[0] : {}
@@ -222,6 +226,8 @@ export default {
               })
             }
           }
+        } else {
+          console.log('超过了')
         }
       }
     },
@@ -326,10 +332,10 @@ export default {
       let range = this.$route.query.range !== undefined ? this.$route.query.range.toString() : null
       let _initialData = JSON.parse(JSON.stringify(initialData))
       let _obj = Object.assign({}, _initialData, {topic, activity, circle, range})
-      console.log('refreshData', _obj)
       for (let item in _obj) {
         this[item] = _obj[item]
       }
+      this.$route.params.resetData = false
     }
   },
   beforeRouteEnter (to, from, next) {
