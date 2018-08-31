@@ -162,7 +162,7 @@ export default {
     let _obj = Object.assign({}, _initialData, {selectedIdx, selectedLabel, isShareOpen, swiperOption})
     return _obj
   },
-  components: {DownloadBox, DynamicItem, LoadingView, ScrollToTop},
+  components: {DownloadBox, DynamicItem, LoadingView, ScrollToTop, swiper, swiperSlide},
   watch: {
     '$route': function (val, oldVal) {
       if (!val.query.previewImage && oldVal.query.previewImage) { // 点击大图后返回

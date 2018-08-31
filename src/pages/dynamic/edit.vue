@@ -139,7 +139,7 @@ export default {
       for (let i = 0; i < files.length; i++) {
         if (i < addLength) {
           let sign = new Date().getTime() + i
-          let item = {
+          let imageItem = {
             id: '',
             sign: new Date().getTime() + i,
             url: '',
@@ -148,41 +148,36 @@ export default {
             localUrl: '',
             status: 'reading'
           }
+          console.log('插入图片', sign)
           // 在添加按钮前插入图片
-          this.images.push(item)
+          this.images.push(imageItem)
           let fileReader = new FileReader()
           fileReader.readAsDataURL(files[i])
           fileReader.onload = function () {
+            console.log('读取成功', sign)
             let img = document.createElement('img')
             img.src = this.result
             img.onload = function (imageData) {
+              console.log('图片加载成功')
               if (_this.images.length > 9) { // 大于9张图时终止，为防止其他错误
                 console.log('超过最大图片数')
                 return false
               }
               let data = imageData.target ? imageData.target : (imageData.path && imageData.path[0]) ? imageData.path[0] : {}
-              _this.images = _this.images.map((item, idx) => {
+              _this.images.forEach((item, idx) => {
                 if (item.sign === sign) {
-                  return Object.assign({}, item, {
-                    width: data.width,
-                    height: data.height,
-                    localUrl: data.src
-                  })
-                } else {
-                  return item
+                  item.width = data.width
+                  item.height = data.height
+                  item.localUrl = data.src
                 }
               })
             }
             img.onerror = function () {
               console.log('图片加载错误')
             }
-            _this.images = _this.images.map((item, idx) => {
+            _this.images.forEach((item, idx) => {
               if (item.sign === sign) {
-                return Object.assign({}, item, {
-                  status: 'submitting'
-                })
-              } else {
-                return item
+                item.status = 'submitting'
               }
             })
             var CancelToken = axios.CancelToken
@@ -197,6 +192,7 @@ export default {
                 _this.cancelRequest[sign.toString()] = cancel
               })
             }).then(res => { // 上传返回数据处理
+              console.log('上传图片成功')
               let status = ''
               let id = ''
               let url = ''
@@ -210,15 +206,11 @@ export default {
               } else {
                 status = 'error'
               }
-              _this.images = _this.images.map((item, idx) => {
+              _this.images.forEach((item, idx) => {
                 if (item.sign === sign) {
-                  return Object.assign({}, item, {
-                    status: status,
-                    id: id,
-                    url: url
-                  })
-                } else {
-                  return item
+                  item.status = status
+                  item.id = id
+                  item.url = url
                 }
               })
               _this.cancelRequest[sign.toString()] = null
@@ -226,14 +218,10 @@ export default {
               if (err && err.msg) {
                 _this.$toast(err.msg)
               }
-              _this.images = _this.images.map((item, idx) => {
+              _this.images.forEach((item, idx) => {
                 if (item.sign === sign) {
                   console.log('catch错误')
-                  return Object.assign({}, item, {
-                    status: 'error'
-                  })
-                } else {
-                  return item
+                  item.status = 'error'
                 }
               })
               _this.cancelRequest[sign.toString()] = null
@@ -244,14 +232,10 @@ export default {
               console.log('超过最大图片数')
               return false
             }
-            _this.images = _this.images.map((item, idx) => {
+            _this.images.forEach((item, idx) => {
               if (item.sign === sign) {
                 console.log('读取失败')
-                return Object.assign({}, item, {
-                  status: 'error'
-                })
-              } else {
-                return item
+                item.status = 'error'
               }
             })
           }
