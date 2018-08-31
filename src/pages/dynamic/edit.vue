@@ -19,7 +19,6 @@
       <edit-option :option="{leftIcon: 'range_' + range, title: rangeMap[range.toString()], rightIcon: 'next'}" @tapFunc="changeRange" v-if="range || range === 0"></edit-option>
     </div>
     <div class="submit-btn" @click.stop="submitDynamic">发布</div>
-    <!-- <div style="display:none" ref="backBtn" @click="$router.go(-1)"></div> -->
   </div>
 </template>
 
@@ -96,7 +95,8 @@ let initialData = {
     1: '仅好友可见',
     2: '仅自己可见'
   },
-  submitting: false
+  submitting: false,
+  submitSuccess: false
 }
 export default {
   data () {
@@ -117,6 +117,11 @@ export default {
           this.$previewImage.hide(window.previewImageId)
           window.previewImageId = null
         }
+      }
+    },
+    submitSuccess: function (val, oldVal) {
+      if (val && !oldVal) {
+        this.$router.go(-1)
       }
     }
   },
@@ -293,12 +298,12 @@ export default {
       this.$ajax('/jv/qz/publish/dynamic', {data: rData}).then(res => {
         if (res && res.msg) {
           if (!res.error) { // 发布成功
-            setTimeout(() => {
+            this.$toast(res.msg, 2000, () => {
               this.submitting = false
               console.log('发布成功,返回')
-              this.$router.go(-1)
-            }, 2000)
-            this.$toast(res.msg, 2000)
+              // this.$router.go(-1)
+              this.submitSuccess = true
+            })
           } else {
             this.submitting = false
             this.$toast(res.msg)
@@ -307,7 +312,8 @@ export default {
         if (res && !res.msg && !res.error) { // 发布成功
           this.submitting = false
           console.log('发布成功,返回')
-          this.$router.go(-1)
+          // this.$router.go(-1)
+          this.submitSuccess = true
         }
       }).catch(err => {
         this.submitting = false
