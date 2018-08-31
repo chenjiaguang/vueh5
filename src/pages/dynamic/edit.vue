@@ -19,6 +19,7 @@
       <edit-option :option="{leftIcon: 'range_' + range, title: rangeMap[range.toString()], rightIcon: 'next'}" @tapFunc="changeRange" v-if="range || range === 0"></edit-option>
     </div>
     <div class="submit-btn" @click.stop="submitDynamic">发布</div>
+    <div style="display:none" ref="backBtn" @click="$router.go(-1)"></div>
   </div>
 </template>
 
@@ -295,7 +296,7 @@ export default {
             this.$toast(res.msg, 2000, () => {
               this.submitting = false
               console.log('发布成功,返回')
-              window.history.go(-1)
+              this.$refs['backBtn'].click()
             })
           } else {
             this.submitting = false
@@ -305,7 +306,7 @@ export default {
         if (res && !res.msg && !res.error) { // 发布成功
           this.submitting = false
           console.log('发布成功,返回')
-          window.history.go(-1)
+          this.$refs['backBtn'].click()
         }
       }).catch(err => {
         this.submitting = false
