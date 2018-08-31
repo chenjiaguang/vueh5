@@ -295,7 +295,7 @@ export default {
             this.$toast(res.msg, 2000, () => {
               this.submitting = false
               console.log('发布成功,返回')
-              this.$router.go(-1)
+              window.history.go(-1)
             })
           } else {
             this.submitting = false
@@ -305,7 +305,7 @@ export default {
         if (res && !res.msg && !res.error) { // 发布成功
           this.submitting = false
           console.log('发布成功,返回')
-          this.$router.go(-1)
+          window.history.go(-1)
         }
       }).catch(err => {
         this.submitting = false
@@ -317,7 +317,8 @@ export default {
       let circle = this.$route.query.circle ? JSON.parse(this.$route.query.circle) : null
       let range = this.$route.query.range !== undefined ? this.$route.query.range.toString() : null
       let _initialData = JSON.parse(JSON.stringify(initialData))
-      let _obj = Object({}, _initialData, {topic, activity, circle, range})
+      let _obj = Object.assign({}, _initialData, {topic, activity, circle, range})
+      console.log('refreshData', _obj)
       for (let item in _obj) {
         this[item] = _obj[item]
       }
