@@ -210,13 +210,14 @@ export default {
                   return item
                 }
               })
-              this.cancelRequest[sign.toString()] = null
+              _this.cancelRequest[sign.toString()] = null
             }).catch(err => {
               if (err && err.msg) {
                 _this.$toast(err.msg)
               }
               _this.images = _this.images.map((item, idx) => {
                 if (item.sign === sign) {
+                  console.log('catch错误')
                   return Object.assign({}, item, {
                     status: 'error'
                   })
@@ -234,6 +235,7 @@ export default {
             }
             _this.images = _this.images.map((item, idx) => {
               if (item.sign === sign) {
+                console.log('读取失败')
                 return Object.assign({}, item, {
                   status: 'error'
                 })
