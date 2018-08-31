@@ -8,7 +8,7 @@
             <div class="top-header-avatar" :style="{backgroundImage: 'url(' + user.avatar_url + ')', opacity: user.avatar_url ? 1 : 0}"></div>
           </div>
           <div class="top-header-overview">
-            <div class="user-name"><span style="vertical-align: middle">{{user.username}}</span><img v-if="user.is_news" class="author-sign" :src="$assetsPublicPath + '/cwebassets/image/author_icon.png'" /><img v-if="!user.is_news" class="level-sign" :src="$assetsPublicPath + '/cwebassets/image/level' + user.level + '.png'" /></div>
+            <div class="user-name"><span style="vertical-align: middle">{{user.username}}</span><img v-if="user.is_news" class="author-sign" :src="$assetsPublicPath + '/cwebassets/image/author_icon.png'" /><img v-if="!user.is_news && user.level" class="level-sign" :src="$assetsPublicPath + '/cwebassets/image/level' + user.level + '.png'" /></div>
             <div class="user-intro" v-if="user.intro">{{user.intro}}</div>
             <div v-if="user.id" class="follow-and-fans clearfix">
               <div class="follow-box fl"><span class="follow-and-fans-text">关注</span><span class="follow-and-fans-number">{{followNumber}}</span></div>
