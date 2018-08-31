@@ -146,10 +146,50 @@ export default {
             width: '',
             height: '',
             localUrl: '',
-            status: 'submitting'
+            status: 'reading'
           }
           // 在添加按钮前插入图片
           this.images.push(item)
+          let fileReader = new FileReader()
+          fileReader.readAsDataURL(files[i])
+          fileReader.onload = function () {
+            let img = document.createElement('img')
+            img.src = this.result
+            img.onload = function (imageData) {
+              if (_this.images.length > 9) { // 大于9张图时终止，为防止其他错误
+                console.log('超过最大图片数')
+                return false
+              }
+              let data = imageData.target ? imageData.target : (imageData.path && imageData.path[0]) ? imageData.path[0] : {}
+              _this.images = _this.images.map((item, idx) => {
+                if (item.sign === sign) {
+                  return Object.assign({}, item, {
+                    width: data.width,
+                    height: data.height,
+                    localUrl: data.src,
+                    status: 'submitting'
+                  })
+                } else {
+                  return item
+                }
+              })
+            }
+          }
+          fileReader.onerror = function () {
+            if (_this.images.length > 9) { // 大于9张图时终止，为防止其他错误
+              console.log('超过最大图片数')
+              return false
+            }
+            _this.images = _this.images.map((item, idx) => {
+              if (item.sign === sign) {
+                return Object.assign({}, item, {
+                  status: 'error'
+                })
+              } else {
+                return item
+              }
+            })
+          }
           var CancelToken = axios.CancelToken
           let formData = new FormData()
           formData.append('file', files[i])
@@ -202,30 +242,6 @@ export default {
             })
             this.cancelRequest[sign.toString()] = null
           })
-          let fileReader = new FileReader()
-          fileReader.readAsDataURL(files[i])
-          fileReader.onload = function () {
-            let img = document.createElement('img')
-            img.src = this.result
-            img.onload = function (imageData) {
-              if (_this.images.length > 9) { // 大于9张图时终止，为防止其他错误
-                console.log('超过最大图片数')
-                return false
-              }
-              let data = imageData.target ? imageData.target : (imageData.path && imageData.path[0]) ? imageData.path[0] : {}
-              _this.images = _this.images.map((item, idx) => {
-                if (item.sign === sign) {
-                  return Object.assign({}, item, {
-                    width: data.width,
-                    height: data.height,
-                    localUrl: data.src
-                  })
-                } else {
-                  return item
-                }
-              })
-            }
-          }
         } else {
           console.log('超过了')
         }
