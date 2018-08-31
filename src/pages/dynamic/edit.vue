@@ -177,7 +177,7 @@ export default {
             var CancelToken = axios.CancelToken
             let formData = new FormData()
             formData.append('file', files[i])
-            this.$ajax('/jv/image/compressupload', {
+            _this.$ajax('/jv/image/compressupload', {
               token: window.localStorage.token || '',
               contentType: 'multipart/form-data',
               data: formData,
@@ -224,7 +224,7 @@ export default {
                   return item
                 }
               })
-              this.cancelRequest[sign.toString()] = null
+              _this.cancelRequest[sign.toString()] = null
             })
           }
           fileReader.onerror = function () {
