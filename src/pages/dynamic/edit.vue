@@ -4,7 +4,7 @@
       <textarea class="text-content" placeholder="此刻，我想说..." v-model="dynamicText"></textarea>
     </div>
     <div class="pic-box">
-      <image-container v-if="!$route.params.resetData" :images="images" :router="$router" :showDelete="true" @deleteFunc="deleteImage" :appearAnimation="true" :isUpload="true" @addFunc="addImage" />
+      <image-container :images="images" :router="$router" :showDelete="true" @deleteFunc="deleteImage" :appearAnimation="true" :isUpload="true" @addFunc="addImage" />
     </div>
     <div class="options-box" v-if="topic || activity || circle || range">
       <edit-option :option="{leftIcon: 'topic_edit', title: '话题'}" v-if="topic">
@@ -348,12 +348,11 @@ export default {
       for (let item in _obj) {
         this[item] = _obj[item]
       }
-      this.$route.params.resetData = false
+      // this.$router.replace({name: 'EditDynamic', query: this.$route.query})
     }
   },
   beforeRouteEnter (to, from, next) {
-    if (from.name !== 'EditDynamicRange') {
-      to.params.resetData = true
+    next(vm => {
       let title = ''
       let circle = to.query.circle ? JSON.parse(to.query.circle) : null
       if (circle && circle.title) {
@@ -371,10 +370,6 @@ export default {
       }
       document.title = title
       document.body.appendChild(i)
-    } else {
-      to.params.resetData = false
-    }
-    next(vm => {
       if (from.name === 'EditDynamicRange') {
         vm.range = from.query.selected
       }
