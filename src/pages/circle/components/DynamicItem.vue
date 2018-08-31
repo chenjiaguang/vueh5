@@ -47,7 +47,7 @@
       </div>
       <div class="comment-and-like-border" :style="{transform: 'scale(1,' + $tranScale + ')'}"></div>
     </div>
-    <div class="gray-block"></div>
+    <div class="gray-block" v-if="!hideBlock"></div>
   </div>
 </template>
 
@@ -68,7 +68,7 @@
 }
 .dynamic-item{
   width: 100%;
-  padding: 0 4% 4px;
+  padding: 0 4%;
   overflow: visible;
   text-align: left;
   background-color: #fff;
@@ -245,6 +245,9 @@ export default {
       type: Object,
       required: true
     },
+    hideBlock: {
+      required: false
+    },
     router: {
       required: false
     }
@@ -279,7 +282,7 @@ export default {
       this.router.push({ name: 'DynamicDetail', query: { id: this.itemData.id, isArticle: this.itemData.type.toString() === '18' } })
     },
     goUser () {
-      this.router.push({ name: 'UserCenter', query: { user_id: this.itemData.uid } })
+      this.router.push({ name: 'UserCenter', query: { user_id: this.itemData.uid }, params: {resetData: true} })
     }
   }
 }

@@ -1,5 +1,5 @@
 <template>
-  <div class="map-page" :style="{width: winWidth + 'px', height: winHeight + 'px'}">
+  <div class="map-page" :style="{width: $winWidth + 'px', height: $winHeight + 'px'}">
     <div id="map-container"></div>
     <div id="panel"></div>
   </div>
@@ -23,8 +23,6 @@ export default {
   name: 'ActivityDetail',
   data () {
     return {
-      winWidth: window.innerWidth,
-      winHeight: window.innerHeight,
       locationText: 'sdfsdfsdf',
       map: null
     }
@@ -89,7 +87,7 @@ export default {
               clickable: true
             })
             this.map.add(marker)
-              // 创建 infoWindow 实例
+            // 创建 infoWindow 实例
             const InfoDomConstructor = Vue.extend(MapInfoWindow) // 直接将Vue组件作为Vue.extend的参数
             const Info = (text) => {
               return new InfoDomConstructor({
@@ -117,9 +115,9 @@ export default {
                         let driving = new AMap.Driving({
                           map: this.map,
                           panel: 'panel'
-                        });
+                        })
                         // 根据起终点经纬度规划驾车导航路线
-                        driving.search(startPos, endPos);
+                        driving.search(startPos, endPos)
                       } else {
                         alert('获取您的位置出错')
                       }
@@ -140,7 +138,7 @@ export default {
         })
         geocoder.getLocation('海南省海口市观澜湖新城', function (status, result) {
           if (status === 'complete' && result.info === 'OK') {
-            
+
           }
         })
       })

@@ -1,7 +1,7 @@
 <template>
-  <div :style="{height: winHeight + 'px'}">
+  <div :style="{height: $winHeight + 'px'}">
 
-    <div v-if="dynamic" :style="{height: winHeight-(100/750*winWidth) + 'px'}">
+    <div v-if="dynamic" :style="{height: $winHeight-(100/750*$winWidth) + 'px'}">
       <div id="mescroll" class="mescroll" >
         <div>
           <DownloadBox />
@@ -43,33 +43,21 @@
                 <div class="article-desc" v-if="content.type==2&&content.des">{{content.des}}</div>
                 <div class="article-content" v-if="content.type==1">{{content.content}}</div>
               </div>
-              <a class="content-activity-box row center" v-if="dynamic.actid" href="javascript:void(0)" @click="clickActivity(dynamic.actid)">
-                <div class="content-activity-img" :style="`background-image:url(${dynamic.activity.covers[0].compress})`"/>
-                <div class="content-activity-right column space-between">
-                  <div class="content-activity-title">{{dynamic.activity.title}}</div>
-                  <div class="content-activity-address">{{dynamic.activity.address}}</div>
-                  <div class="content-activity-time_text">{{dynamic.activity.time_text}}</div>
-                </div>
-              </a>
-              <div class="row foot-info-box" v-if="dynamic.location">
-                <i class="iconfont icon-location"></i>
-                <div class="location">{{dynamic.location}}</div>
-              </div>
-              <div class="row circle-box" v-if="dynamic.circle_name">
-                <span class="circle-name">{{dynamic.circle_name}}</span>
-              </div>
             </div>
 
             <div v-if="dynamic&&!dynamic.isArticle" id="content-container" class="column">
-              <div class="dynamic-content">{{dynamic.content}}</div>
+              <div class="dynamic-content" v-html="handleContentUrl(dynamic.content)"></div>
               <TopicTagBox :topicInfo="dynamic.topicInfo" />
               <DetailImageContainer class="detail-image-container"  :images="dynamic.covers"/>
               <a class="content-article-box row center" v-if="dynamic.aid" :href="dynamic.newsArticle.article_url">
-                <div class="content-article-img" :style="`background-image:url(${dynamic.newsArticle.covers[0].compress})`"/>
+                <div class="content-article-img" :style="`background-image:url(${dynamic.newsArticle.covers?dynamic.newsArticle.covers[0].compress:''})`"/>
                 <div class="content-article-content">{{dynamic.newsArticle.name}}</div>
               </a>
+            </div>
+
+            <div v-if="dynamic" id="foot-container" class="column">
               <a class="content-activity-box row center" v-if="dynamic.actid" href="javascript:void(0)" @click="clickActivity(dynamic.actid)">
-                <div class="content-activity-img" :style="`background-image:url(${dynamic.activity.covers[0].compress})`"/>
+                <div class="content-activity-img" :style="`background-image:url(${dynamic.activity.covers?dynamic.activity.covers[0].compress:''})`"/>
                 <div class="content-activity-right column space-between">
                   <div class="content-activity-title">{{dynamic.activity.title}}</div>
                   <div class="content-activity-address">{{dynamic.activity.address}}</div>
@@ -81,7 +69,7 @@
                 <div class="location">{{dynamic.location}}</div>
               </div>
               <div class="row circle-box" v-if="dynamic.circle_name">
-                <span class="circle-name">{{dynamic.circle_name}}</span>
+                <span class="circle-name" style="border-width: 1px">{{dynamic.circle_name}}</span>
               </div>
             </div>
 
@@ -109,14 +97,14 @@
                       <div class="row">
                         <div class="comment-username" @click="clickUser(comment.uid)">{{comment.username}}</div>
                       </div>
-                      <div class="comment-content" @click="()=>showReplyActionSheet(comment,comment.username)">{{comment.content}}</div>
+                      <div class="comment-content" @click="()=>showReplyActionSheet(comment,comment.username)" v-html="handleContentUrl(comment.content)"></div>
                       <div class="comment-time">{{comment.time}}</div>
 
                       <transition name="fade-slow">
                         <div v-if="comment.replys.list.length>0" class="comment-replies-box">
                           <transition-group name="fade-slow" tag="div">
                             <div class="reply-box transition-quick" v-for="(reply) in comment.replys.list" :key="'replys'+reply.id" @click.stop="()=>showReplyActionSheet(comment,reply.username,reply.id)">
-                              <span class="reply-from" v-if="reply.pusername" @click.stop="clickUser(reply.uid)">{{reply.username}}</span><span class="reply-from" v-if="!reply.pusername" @click.stop="clickUser(reply.uid)">{{reply.username}}:</span><span class="reply-reply" v-if="reply.pusername">回复</span><span class="reply-to" v-if="reply.pusername" @click.stop="clickUser(reply.puid)">{{reply.pusername}}:</span><span class="reply-content">{{reply.content}}</span>
+                              <span class="reply-from" v-if="reply.pusername" @click.stop="clickUser(reply.uid)">{{reply.username}}</span><span class="reply-from" v-if="!reply.pusername" @click.stop="clickUser(reply.uid)">{{reply.username}}:</span><span class="reply-reply" v-if="reply.pusername">回复</span><span class="reply-to" v-if="reply.pusername" @click.stop="clickUser(reply.puid)">{{reply.pusername}}:</span><span class="reply-content" v-html="handleContentUrl(reply.content)"></span>
                             </div>
                           </transition-group>
                           <div class="reply-box transition-quick" v-if="!comment.replys.paging.is_end">
@@ -165,8 +153,6 @@ export default {
         pullUpLoad: true,
         useTransition: false
       },
-      winHeight: window.innerHeight,
-      winWidth: window.innerWidth,
       pn: 1,
       scrollToTopVisible: false
     }
@@ -240,6 +226,9 @@ export default {
     }
   },
   methods: {
+    handleContentUrl (content) {
+      return utils.handleContentUrl(content)
+    },
     fetch () {
       let url = ''
       if (this.isArticle) {
@@ -322,7 +311,7 @@ export default {
         .catch()
     },
     clickUser (uid) {
-      this.$router.push({ name: 'UserCenter', query: { user_id: uid } })
+      this.$router.push({ name: 'UserCenter', query: { user_id: uid }, params: {resetData: true} })
     },
     clickFollow (uid) {
       this.$ajax('/jv/user/follow', { data: this.followData })
@@ -333,7 +322,7 @@ export default {
         .catch()
     },
     clickActivity (id) {
-      this.$router.push({ name: 'ActivityDetail', query: { id: id } })
+      this.$router.push({ name: 'ActivityDetail', query: { id: id }, params: {resetData: true} })
     },
     showReplyActionSheet (comment, replyName = '', pid = '') {
       this.$createActionSheet({
@@ -365,7 +354,7 @@ export default {
     },
     onScrollHandle (pos) {
       let y = pos.y
-      if (y > window.innerHeight) {
+      if (y > this.$winHeight) {
         this.scrollToTopVisible = true
       } else {
         this.scrollToTopVisible = false
@@ -519,16 +508,17 @@ export default {
 .circle-name {
   margin-top: 1px;
   border-radius: 6px;
-  border-width: 1.2px;
   border-color: #1eb0fd;
   border-style: solid;
   color: #1eb0fd;
   font-size: 24px;
   padding: 12px 20px 12px 20px;
 }
+#foot-container{
+  margin-bottom: 36px;
+}
 /*************************************************************************/
 #content-container {
-  margin-bottom: 36px;
 }
 .dynamic-content {
   color: #333333;
@@ -536,6 +526,7 @@ export default {
   line-height: 46px;
   margin-bottom: 17px;
   word-break: break-all;
+  white-space: pre-wrap;
 }
 .detail-image-container {
   margin-left: -30px;

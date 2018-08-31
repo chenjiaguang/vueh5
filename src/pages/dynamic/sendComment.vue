@@ -23,8 +23,7 @@ export default {
       commentId: this.$route.query.commentId,
       pid: this.$route.query.pid,
       isReply: this.$route.query.isReply,
-      replyName: this.$route.query.replyName,
-      winHeight: window.innerHeight
+      replyName: this.$route.query.replyName
     }
   },
   computed: {

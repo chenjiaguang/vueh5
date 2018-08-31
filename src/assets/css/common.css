@@ -1,0 +1,197 @@
+
+/************BASE CSS************/
+.row {
+  display: flex;
+  flex-direction: row;
+}
+.row-reverse {
+  flex-direction: row-reverse;
+}
+.column {
+  display: flex;
+  flex-direction: column;
+}
+.space-between {
+  justify-content: space-between;
+}
+.center{
+  align-items: center;
+}
+.flex-start{
+  align-items: flex-start;
+}
+.flex-end {
+  align-items: flex-end;
+}
+.stretch{
+  align-items:stretch;
+}
+.flex-wrap-wrap{
+  flex-wrap:wrap;
+}
+.hide{
+  display: none;
+}
+.relative{
+  position: relative;
+}
+.content-url{
+  font-size:inherit;
+  color: #1EB0FD;
+}
+.content-url .icon-icon_lianjie_min{
+  font-size:inherit
+}
+
+
+/************动画 CSS************/
+.fade-slow-enter-active, .fade-slow-leave-active {
+  transition: all 1s;
+}
+.fade-slow-enter, .fade-slow-leave-to /* .fade-leave-active below version 2.1.8 */ {
+  opacity: 0;
+}
+
+.fade-normal-enter-active, .fade-normal-leave-active {
+  transition: all .5s;
+}
+.fade-normal-enter, .fade-normal-leave-to /* .fade-leave-active below version 2.1.8 */ {
+  opacity: 0;
+}
+
+.fade-quick-enter-active, .fade-quick-leave-active {
+  transition: all .3s;
+}
+.fade-quick-enter, .fade-quick-leave-to /* .fade-leave-active below version 2.1.8 */ {
+  opacity: 0;
+}
+
+.transition-quick{
+  transition: all .3s;
+}
+
+
+/************主题 CSS************/
+.action-sheet-item {
+  padding: 0 !important;
+  height: 100px !important;
+  line-height: 100px !important;
+  font-size: 34px !important;
+  color: #333333 !important;
+}
+.cube-action-sheet-space{
+  height: 10px !important;
+  background-color:#E1E1E1 !important;
+}
+.cube-action-sheet-cancel span {
+  padding: 0 !important;
+  height: 100px !important;
+  line-height: 100px !important;
+  font-size: 34px !important;
+  color: #333333 !important;
+}
+
+/* 上拉加载/下拉刷新 */
+.mescroll-upwarp, .mescroll-downwarp .downwarp-content{
+  padding: 0;
+  min-height: auto;
+}
+.pull-down-wrapper{
+  position: relative;
+}
+.pull-up-wrapper{
+  font-size: 24px;
+  color: #666;
+  height: 100px;
+  position: relative;
+  background-color: #fff
+}
+.pull-down-icon{
+  display: block;
+  width: 44px;
+  height: 44px;
+  position: absolute;
+  bottom: 25px;
+  left: 50%;
+  margin-left: -22px;
+}
+.pull-down-icon.refreshing{
+  animation: refreshing 500ms infinite linear;
+}
+.loading-content{
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  padding-left: 42px;
+}
+.loading-icon{
+  display: block;
+  width: 32px;
+  height: 32px;
+  position: absolute;
+  left: 0;
+  top: 50%;
+  margin-top: -18px;
+  animation: loading 1000ms infinite cubic-bezier(0.5,0.5,0.5,0.5);
+}
+@keyframes refreshing {
+  0%{
+    transform: rotate(0deg)
+  }
+  100%{
+    transform: rotate(360deg)
+  }
+}
+@keyframes loading {
+  0%{
+    transform: rotate(0deg)
+  }
+  8.33%{
+    transform: rotate(30deg)
+  }
+  16.66%{
+    transform: rotate(60)
+  }
+  25%{
+    transform: rotate(90deg)
+  }
+  33.33%{
+    transform: rotate(120deg)
+  }
+  41.66%{
+    transform: rotate(150deg)
+  }
+  50%{
+    transform: rotate(180deg)
+  }
+  58.33%{
+    transform: rotate(210deg)
+  }
+  66.66%{
+    transform: rotate(240deg)
+  }
+  75%{
+    transform: rotate(270deg)
+  }
+  83.32%{
+    transform: rotate(300deg)
+  }
+  91.66%{
+    transform: rotate(330deg)
+  }
+  100%{
+    transform: rotate(360deg)
+  }
+}
+.first-loading-box{
+  height: 152px;
+  margin-top: 0;
+}
+.loading-scale-leave-to{
+  transform: scale(0, 0);
+  height: 0;
+}
+.loading-scale-leave-active{
+  transition: height 400ms, transform 400ms;
+}

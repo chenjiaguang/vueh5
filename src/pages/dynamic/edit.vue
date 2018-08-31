@@ -82,28 +82,32 @@ import axios from 'axios'
 import utils from '@/lib/utils'
 
 // 接受参数(params) topic: [{id: 2, title: '测试话题'}]    activity: {id: 2, title: '屯昌木色湖一日游'}    circle: {id: 2, title: '舌尖上的海口'}    range: 0||1||2
+let initialData = {
+  dynamicText: '',
+  images: [],
+  cancelRequest: {},
+  topic: [],
+  activity: {},
+  circle: {},
+  range: 0,
+  rangeMap: {
+    0: '公开',
+    1: '仅好友可见',
+    2: '仅自己可见'
+  },
+  submitting: false,
+  submitSuccess: false
+}
 export default {
   data () {
-    let topic = this.$route.params.topic ? this.$route.params.topic.concat([]) : null
-    let activity = this.$route.params.activity ? Object.assign({}, this.$route.params.activity) : null
-    let circle = this.$route.params.circle ? Object.assign({}, this.$route.params.circle) : null
-    let range = this.$route.params.range !== undefined ? this.$route.params.range.toString() : null
-    return {
-      dynamicText: '',
-      images: [],
-      cancelRequest: {},
-      topic,
-      activity,
-      circle,
-      range,
-      rangeMap: {
-        0: '公开',
-        1: '仅好友可见',
-        2: '仅自己可见'
-      },
-      submitting: false,
-      previewInstance: null
-    }
+    let topic = this.$route.query.topic ? JSON.parse(this.$route.query.topic) : null
+    let activity = this.$route.query.activity ? JSON.parse(this.$route.query.activity) : null
+    let circle = this.$route.query.circle ? JSON.parse(this.$route.query.circle) : null
+    let range = this.$route.query.range !== undefined ? this.$route.query.range.toString() : null
+    let _initialData = JSON.parse(JSON.stringify(initialData))
+    let _obj = Object.assign({}, _initialData, {topic, activity, circle, range})
+    console.log('_obj', _obj)
+    return _obj
   },
   components: {imageContainer, EditOption},
   watch: {
@@ -114,6 +118,12 @@ export default {
           window.previewImageId = null
         }
       }
+    },
+    submitSuccess: function (val, oldVal) {
+      if (val && !oldVal) {
+        this.refreshData()
+        this.$router.go(-1)
+      }
     }
   },
   methods: {
@@ -121,98 +131,116 @@ export default {
       console.log('addImage')
       let _this = this
       let currentLength = this.images.length
-      let addLength = 9 - currentLength // 最多9图
+      let addLength = 9 - currentLength
       if (addLength <= 0) { // 超过9图处理
+        console.log('超过9图处理')
         return false
       }
       for (let i = 0; i < files.length; i++) {
         if (i < addLength) {
           let sign = new Date().getTime() + i
-          let item = {
+          let imageItem = {
             id: '',
             sign: new Date().getTime() + i,
             url: '',
             width: '',
             height: '',
             localUrl: '',
-            status: 'submitting'
+            status: 'reading'
           }
-          this.images.push(item) // 在添加按钮前插入图片
-          var CancelToken = axios.CancelToken
-          let formData = new FormData()
-          formData.append('file', files[i])
-          this.$ajax('/jv/image/compressupload', {
-            token: window.localStorage.token || '',
-            contentType: 'multipart/form-data',
-            data: formData,
-            cancelToken: new CancelToken(function executor (cancel) {
-              // An executor function receives a cancel function as a parameter
-              _this.cancelRequest[sign.toString()] = cancel
-            })
-          }).then(res => { // 上传返回数据处理
-            let status = ''
-            let id = ''
-            let url = ''
-            if (res && res.msg) {
-              _this.$toast(res.msg)
-            }
-            if (!res.error && res.data) {
-              status = 'success'
-              id = res.data.id[0]
-              url = res.data.url[0]
-            } else {
-              status = 'error'
-            }
-            _this.images = _this.images.map((item, idx) => {
-              if (item.sign === sign) {
-                return Object.assign({}, item, {
-                  status: status,
-                  id: id,
-                  url: url
-                })
-              } else {
-                return item
-              }
-            })
-            this.cancelRequest[sign.toString()] = null
-          }).catch(err => {
-            if (err && err.msg) {
-              _this.$toast(err.msg)
-            }
-            _this.images = _this.images.map((item, idx) => {
-              if (item.sign === sign) {
-                return Object.assign({}, item, {
-                  status: 'error'
-                })
-              } else {
-                return item
-              }
-            })
-            this.cancelRequest[sign.toString()] = null
-          })
+          console.log('插入图片', sign)
+          // 在添加按钮前插入图片
+          this.images.push(imageItem)
           let fileReader = new FileReader()
           fileReader.readAsDataURL(files[i])
           fileReader.onload = function () {
+            console.log('读取成功', sign)
             let img = document.createElement('img')
             img.src = this.result
             img.onload = function (imageData) {
+              console.log('图片加载成功')
               if (_this.images.length > 9) { // 大于9张图时终止，为防止其他错误
+                console.log('超过最大图片数')
                 return false
               }
               let data = imageData.target ? imageData.target : (imageData.path && imageData.path[0]) ? imageData.path[0] : {}
-              _this.images = _this.images.map((item, idx) => {
+              _this.images.forEach((item, idx) => {
                 if (item.sign === sign) {
-                  return Object.assign({}, item, {
-                    width: data.width,
-                    height: data.height,
-                    localUrl: data.src
-                  })
-                } else {
-                  return item
+                  item.width = data.width
+                  item.height = data.height
+                  item.localUrl = data.src
                 }
               })
             }
+            img.onerror = function () {
+              console.log('图片加载错误')
+            }
+            _this.images.forEach((item, idx) => {
+              if (item.sign === sign) {
+                item.status = 'submitting'
+              }
+            })
+            var CancelToken = axios.CancelToken
+            let formData = new FormData()
+            formData.append('file', files[i])
+            _this.$ajax('/jv/image/compressupload', {
+              token: window.localStorage.token || '',
+              contentType: 'multipart/form-data',
+              data: formData,
+              cancelToken: new CancelToken(function executor (cancel) {
+                // An executor function receives a cancel function as a parameter
+                _this.cancelRequest[sign.toString()] = cancel
+              })
+            }).then(res => { // 上传返回数据处理
+              console.log('上传图片成功')
+              let status = ''
+              let id = ''
+              let url = ''
+              if (res && res.msg) {
+                _this.$toast(res.msg)
+              }
+              if (!res.error && res.data) {
+                status = 'success'
+                id = res.data.id[0]
+                url = res.data.url[0]
+              } else {
+                status = 'error'
+              }
+              _this.images.forEach((item, idx) => {
+                if (item.sign === sign) {
+                  item.status = status
+                  item.id = id
+                  item.url = url
+                }
+              })
+              _this.cancelRequest[sign.toString()] = null
+            }).catch(err => {
+              if (err && err.msg) {
+                _this.$toast(err.msg)
+              }
+              _this.images.forEach((item, idx) => {
+                if (item.sign === sign) {
+                  console.log('catch错误')
+                  item.status = 'error'
+                }
+              })
+              _this.cancelRequest[sign.toString()] = null
+            })
           }
+          fileReader.onerror = function () {
+            if (_this.images.length > 9) { // 大于9张图时终止，为防止其他错误
+              console.log('超过最大图片数')
+              return false
+            }
+            _this.images.forEach((item, idx) => {
+              if (item.sign === sign) {
+                console.log('读取失败')
+                item.status = 'error'
+              }
+            })
+          }
+        } else {
+          console.log('超过了')
         }
       }
     },
@@ -237,7 +265,7 @@ export default {
       let topic_ids = ''
       let uploadImages = this.images.filter(item => item.status === 'success')
       let imageIds = this.images.map((item, idx) => {
-        if (item.status === 'submitting') {
+        if (item.status === 'submitting' || item.status === 'reading') {
           flat = true
         }
         if (item.id) {
@@ -282,7 +310,8 @@ export default {
         range: this.range || '',
         actid: this.activity ? (this.activity.id || '') : '',
         circle_id: this.circle ? (this.circle.id || '') : '',
-        topicId: topic_ids
+        topicId: topic_ids,
+        showAllways: true
       }
       this.submitting = true
       this.$ajax('/jv/qz/publish/dynamic', {data: rData}).then(res => {
@@ -291,7 +320,8 @@ export default {
             this.$toast(res.msg, 2000, () => {
               this.submitting = false
               console.log('发布成功,返回')
-              this.$router.go(-1)
+              // this.$router.go(-1)
+              this.submitSuccess = true
             })
           } else {
             this.submitting = false
@@ -301,39 +331,32 @@ export default {
         if (res && !res.msg && !res.error) { // 发布成功
           this.submitting = false
           console.log('发布成功,返回')
-          this.$router.go(-1)
+          // this.$router.go(-1)
+          this.submitSuccess = true
         }
       }).catch(err => {
         this.submitting = false
       })
     },
-    resetData () {
-      let topic = this.$route.params.topic || null
-      let activity = this.$route.params.activity || null
-      let circle = this.$route.params.circle || null
-      let range = this.$route.params.range !== undefined ? this.$route.params.range.toString() : null
-      this.dynamicText = ''
-      this.topic = topic
-      this.activity = activity
-      this.circle = circle
-      this.range = range
-      this.images = []
-      this.cancelRequest = {}
-      this.rangeMap = {
-        0: '公开',
-        1: '仅好友可见',
-        2: '仅自己可见'
+    refreshData () {
+      let topic = this.$route.query.topic ? JSON.parse(this.$route.query.topic) : null
+      let activity = this.$route.query.activity ? JSON.parse(this.$route.query.activity) : null
+      let circle = this.$route.query.circle ? JSON.parse(this.$route.query.circle) : null
+      let range = this.$route.query.range !== undefined ? this.$route.query.range.toString() : null
+      let _initialData = JSON.parse(JSON.stringify(initialData))
+      let _obj = Object.assign({}, _initialData, {topic, activity, circle, range})
+      for (let item in _obj) {
+        this[item] = _obj[item]
       }
-      this.submitting = false
-      this.isPreview = false
+      // this.$router.replace({name: 'EditDynamic', query: this.$route.query})
     }
   },
   beforeRouteEnter (to, from, next) {
-    if (from.name !== 'EditDynamicRange') {
-      to.params.resetData = true
+    next(vm => {
       let title = ''
-      if (to.params.circle && to.params.circle.title) {
-        title = to.params.circle.title
+      let circle = to.query.circle ? JSON.parse(to.query.circle) : null
+      if (circle && circle.title) {
+        title = circle.title
       } else {
         title = '发动态'
       }
@@ -347,10 +370,6 @@ export default {
       }
       document.title = title
       document.body.appendChild(i)
-    } else {
-      to.params.resetData = false
-    }
-    next(vm => {
       if (from.name === 'EditDynamicRange') {
         vm.range = from.query.selected
       }
@@ -358,7 +377,7 @@ export default {
   },
   activated () {
     if (this.$route.params.resetData) {
-      this.resetData()
+      this.refreshData()
     }
   }
 }

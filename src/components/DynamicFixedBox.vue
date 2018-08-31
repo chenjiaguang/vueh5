@@ -80,7 +80,11 @@ export default {
   }
 }
 </script>
-<style scoped>
+
+<style lang="scss" type="text/scss" scoped>
+.fix-box::before{
+  @include borderTop;
+}
 .fix-box {
   position: fixed;
   height: 100px;
@@ -92,10 +96,6 @@ export default {
   right: 0;
   bottom: 0;
   background-color: #ffffff;
-
-  border-top-width: 0.5px;
-  border-color: #cbcbcb;
-  border-top-style: solid;
 
   z-index: 1;
   display: flex;

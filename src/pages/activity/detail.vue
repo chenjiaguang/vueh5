@@ -384,9 +384,9 @@ export default {
           window.previewImageId = null
         }
       }
-      if (val.query.id && val.query.id !== oldVal.query.id) { // 登录不刷新，只有id变化才刷新
+      utils.checkReloadWithKeepAliveNew(this, val, oldVal, 'ActivityDetail', ['id'], () => {
         this.refreshData()
-      }
+      })
     }
   },
   methods: {
@@ -458,53 +458,26 @@ export default {
     },
     goPublish () {
       if (utils.checkLogin()) {
-        this.$router.push({name: 'EditDynamic', params: {circle: {id: this.circle.id, title: this.circle.name}, activity: {id: this.activity.id, title: this.activity.title}}})
+        let circleJson = JSON.stringify({id: this.circle.id, title: this.circle.name})
+        let activityJson = JSON.stringify({id: this.activity.id, title: this.activity.title})
+        this.$router.push({name: 'EditDynamic', query: {circle: circleJson, activity: activityJson}, params: {resetData: true}})
       }
     },
     goDynamicList () {
-      this.$router.push({name: 'ActivityDynamic', query: {activity_id: this.activity.id}})
+      this.$router.push({name: 'ActivityDynamic', query: {activity_id: this.activity.id}, params: {resetData: true}})
     },
     goOrder () {
       if (this.activity.statusText !== '购票' || !utils.checkLogin()) { // 未登录或不可购票时终止
         return false
       }
       this.$router.push({name: 'ActivityOrder', query: {id: this.$route.query.id}})
-    },
-    changeShowContext () {
-      let currentHeight = this.$refs['contentContainer'].offsetHeight
-      if (currentHeight > this.halfScreenHeight) {
-        this.$refs['contentContainer'].style.height = this.halfScreenHeight + 'px'
-        this.showMore = false
-      } else {
-        this.$refs['contentContainer'].style.height = this.contentWrapperHeight + 'px'
-        this.showMore = true
-      }
-    },
-    layout () {
-      if (this.setted) {
-        return false
-      }
-      setTimeout(() => {
-        let btnHeight = (84 / 750) * window.innerWidth
-        if (this.$refs['contentContainer']) {
-          let wrapperHeight = this.$refs['contentContainer'].offsetHeight
-          if (wrapperHeight > this.halfScreenHeight && !this.showMore) { // 大于半屏且处于隐藏状态
-            this.contentWrapperHeight = wrapperHeight + btnHeight
-            this.$refs['contentContainer'].style.height = this.halfScreenHeight + 'px'
-          }
-          this.setted = true
-        }
-      }, 100)
     }
   },
   beforeRouteEnter (to, from, next) {
     utils.beforeRouteEnterHandleShareOpen(to, from, next, 5)
   },
-  created () {
+  mounted () {
     this.fetchActivity()
-  },
-  updated () {
-    this.layout()
   }
 }
 </script>

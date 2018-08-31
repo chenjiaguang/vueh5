@@ -8,7 +8,7 @@
 export default {
   props: ['topicInfo'],
   data () {
-    return {};
+    return {}
   },
   computed: {},
   components: {},
@@ -16,11 +16,12 @@ export default {
     click (id) {
       this.$router.push({
         name: 'TopicDetail',
-        query: { topic_id: id }
-      });
+        query: { topic_id: id },
+        params: {resetData: true}
+      })
     }
   }
-};
+}
 </script>
 <style scoped>
 .topic-box {

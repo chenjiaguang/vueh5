@@ -3,7 +3,6 @@ import Router from 'vue-router'
 import NotFoundPage from '@/pages/notFoundPage'
 import Home from '@/pages/home'
 import CircleDetail from '@/pages/circle/detail'
-import CircleDetailTest from '@/pages/circle/detailTest'
 import ActivityDetail from '@/pages/activity/detail'
 import ActivityDynamic from '@/pages/activity/dynamic'
 import ActivityOrder from '@/pages/activity/order'
@@ -17,7 +16,7 @@ import EditDynamic from '@/pages/dynamic/edit'
 import EditDynamicRange from '@/pages/dynamic/chooseRange'
 import DynamicDetail from '@/pages/dynamic/detail'
 import DynamicSendComment from '@/pages/dynamic/sendComment'
-import TopicDetal from '@/pages/topic/detail'
+import TopicDetail from '@/pages/topic/detail'
 import SMSCode from '@/pages/smsCode'
 import WeixinLoginJump from '@/pages/weixinLoginJump'
 Vue.use(Router)
@@ -114,15 +113,6 @@ const router = new Router({
       }
     },
     {
-      path: prefix + '/circle/detail/test',
-      name: 'CircleDetailTest',
-      component: CircleDetailTest,
-      meta: {
-        title: '范团圈子test',
-        keepAlive: true
-      }
-    },
-    {
       path: prefix + '/user/center',
       name: 'UserCenter',
       component: UserCenter,
@@ -180,7 +170,7 @@ const router = new Router({
     {
       path: prefix + '/topic/detail',
       name: 'TopicDetail',
-      component: TopicDetal,
+      component: TopicDetail,
       meta: {
         title: '范团话题',
         keepAlive: true

@@ -154,7 +154,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" type="text/scss" scoped>
 .container {
   margin-left: 60px;
   margin-right: 60px;
@@ -171,9 +171,10 @@ export default {
 .phone-box {
   height: 90px;
   margin-bottom: 38px;
-  border-bottom-width: 1px;
-  border-bottom-color: #bbbbbb;
-  border-bottom-style: solid;
+  position: relative;
+}
+.phone-box::after {
+  @include borderBottom;
 }
 .area-code {
   margin-left: 20px;
@@ -202,9 +203,10 @@ export default {
   flex: 1;
   height: 90px;
   margin-bottom: 80px;
-  border-bottom-width: 1px;
-  border-bottom-color: #bbbbbb;
-  border-bottom-style: solid;
+  position: relative;
+}
+.code-box::after {
+  @include borderBottom;
 }
 .code-input-box {
   flex: 1

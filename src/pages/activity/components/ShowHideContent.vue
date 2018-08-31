@@ -37,6 +37,7 @@
     margin-bottom: 21px;
   }
   .content-text{
+    word-wrap: break-word;
     white-space: pre-wrap;
   }
   .image-box{
@@ -118,7 +119,7 @@ export default {
       setted: false,
       showMore: false, // 显示更多
       contentWrapperHeight: null,
-      halfScreenHeight: parseInt(window.innerHeight * 0.5),
+      halfScreenHeight: parseInt(window.innerHeight * 0.5)
     }
   },
   methods: {
@@ -134,7 +135,10 @@ export default {
     },
     load () {
       this.$nextTick(() => {
-        let btnHeight = (84 / 750) * window.innerWidth
+        if (!this.$refs['contentContainer'] || this.contentWrapperHeight) { // 已设置过就不再设置,防止重复添加高度
+          return false
+        }
+        let btnHeight = (84 / 750) * this.$winWidth
         let wrapperHeight = this.$refs['contentContainer'].offsetHeight
         if (wrapperHeight > this.halfScreenHeight) { // 大于半屏
           this.contentWrapperHeight = wrapperHeight + btnHeight

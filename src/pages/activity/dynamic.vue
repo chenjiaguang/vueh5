@@ -1,63 +1,41 @@
 <template>
-  <div :style="{height: widHeight + 'px'}">
-    <cube-scroll :data="dynamic" class="activity-dynamic" ref="pageScroller" :scrollEvents="['scroll']" :options="options" @scroll="pageScroll" @pulling-up="onPullingUp">
-      <div ref="topBanner">
-        <download-box v-if="$route.params.isShareOpen" />
-      </div>
+  <div :style="{height: $winHeight + 'px'}">
+    <div id="mescroll" class="mescroll activity-dynamic" :style="{width: $winWidth + 'px', height: '100%', overflowY: 'auto', overflowX: 'hidden'}">
+      <download-box v-if="$route.params.isShareOpen" />
       <transition name="loading-scale">
         <div class="first-loading-box" v-if="!paging.pn">
           <loading-view />
         </div>
       </transition>
-      <dynamic-item v-for="(item, idx) in dynamic" :key="idx" :itemData="item" :router="$router" @changeLike="changeLike" />
-      <template slot="pullup" slot-scope="props">
-        <!-- 可以下拉继续加载 -->
-        <div class="cube-pullup-wrapper pullup-wrapper" :style="props.pullUpStyle" v-if="paging && paging.pn && !paging.is_end">
-          <div class="pullup-content"><img class="pull-up-icon" :src="$assetsPublicPath + '/cwebassets/image/loading_icon.png'" />正在加载...</div>
-        </div>
-        <!-- 加载完无数据 -->
-        <div v-else-if="paging && paging.is_end && dynamic && dynamic.length === 0" style="height: 0;"></div>
-        <!-- 其他情况 -->
-        <div v-else class="pullup-wrapper">
-          <div class="pullup-content">再刷也没有了</div>
-        </div>
-      </template>
-    </cube-scroll>
-    <scroll-to-top :visible="showBackTop" :position="{bottom: (winWidth / 750) * 178, right: (winWidth / 750) * 54}" :scroll="$refs['pageScroller']"/>
+      <div v-if="paging.pn && dynamic && dynamic.length !== 0" :style="{minHeight: '100%', backgroundColor: '#fff'}">
+        <dynamic-item v-for="(item, idx) in dynamic" :key="idx" :itemData="item" :hideBlock="idx === dynamic.length - 1" :router="$router" @changeLike="changeLike" />
+      </div>
+      <div v-else-if="paging.is_end && dynamic && dynamic.length === 0" class="empty-box">该活动暂无晒图</div>
+    </div>
+    <scroll-to-top v-if="mescroll[0]" :visible="showBackTop" :position="{bottom: ($winWidth / 750) * 178, right: ($winWidth / 750) * 54}" :scroll="mescroll[0]"/>
   </div>
 </template>
 
 <script type="text/ecmascript-6">
-import Vue from 'vue'
 import DynamicItem from './components/DynamicItem'
 import DownloadBox from '@/components/DownloadBox'
 import LoadingView from '@/components/LoadingView'
 import ScrollToTop from '@/components/ScrollToTop'
 import utils from '@/lib/utils'
-import {
-  /* eslint-disable no-unused-vars */
-  Style,
-  Scroll
-} from 'cube-ui'
-Vue.use(Scroll)
+import MeScroll from 'mescroll.js'
+import 'mescroll.js/mescroll.min.css'
+import MeScrollSupportArr from '@/mixin/MeScrollSupportArr'
+import mescrollOptions from '@/lib/mescrollOptions'
 
 const initialData = {
   showBackTop: false,
   dynamic: [],
   paging: {},
   fetching: false,
-  winWidth: window.innerWidth,
-  widHeight: window.innerHeight,
-  options: {
-    pullDownRefresh: false,
-    pullUpLoad: {
-      threshold: (window.innerWidth / 750) * 100
-    },
-    probType: 3,
-    stopPropagation: true
-  }
+  mescroll: []
 }
 export default {
+  mixins: [MeScrollSupportArr],
   data () {
     let _initialData = JSON.parse(JSON.stringify(initialData))
     return _initialData
@@ -79,6 +57,7 @@ export default {
   methods: {
     fetchDynamic (pn) {
       if (this.fetching) { // 正在拉取动态数据
+        this.mescroll[0].endErr()
         return false
       }
       let rData = {
@@ -92,19 +71,26 @@ export default {
         if (res && res.msg) {
           this.$toast(res.msg)
         }
+        this.fetching = false
         if (res && !res.error && res.data) { // 成功获取数据
-          this.fetching = false
           this.paging = res.data.paging
           if (pn.toString() === '1') { // 刷新
             this.dynamic = res.data.list
           } else {
             this.dynamic = this.dynamic.concat(res.data.list)
           }
+          this.$nextTick(() => {
+            this.mescroll[0].endSuccess(res.data.list.length, true)
+            if (res.data.paging.is_end) {
+              this.mescroll[0].showNoMore()
+            }
+          })
         } else {
-          this.fetching = false
+          this.mescroll[0].endErr()
         }
       }).catch(err => {
         this.fetching = false
+        this.mescroll[0].endErr()
         if (err && err.msg) {
           this.$toast(err.msg)
         } else {
@@ -113,18 +99,30 @@ export default {
       })
     },
     refreshData () {
+      if (this.mescroll) {
+        for (let i = 0; i < this.mescroll.length; i++) {
+          this.mescroll[i].setScrollTop(0)
+          this.mescroll[i].destroy()
+        }
+      }
       let _initialData = JSON.parse(JSON.stringify(initialData))
       for (let item in _initialData) {
         this[item] = _initialData[item]
       }
+      this.initMeScroll(0)
+    },
+    onPuillingDown () {
       this.fetchDynamic(1)
-      this.$refs['pageScroller'].scrollTo(0, 0, 10)
     },
     onPullingUp () {
-      if (!(this.paging && this.paging.pn && !this.paging.is_end)) { // 未生成paging，或者paging.pn不存在，或者已是最后一页     终止操作
+      if (this.paging && this.paging.pn && this.paging.is_end) { // 最后一页不允许上拉加载
+        this.mescroll[0].endErr()
         return false
       }
-      let pn = parseInt(this.paging.pn) + 1
+      let pn = parseInt(this.paging.pn || 0) + 1
+      if (pn === 1) {
+        this.mescroll[0].hideUpScroll()
+      }
       this.fetchDynamic(pn)
     },
     changeLike (item) {
@@ -171,22 +169,30 @@ export default {
         })
       })
     },
-    pageScroll ({x, y}) {
-      if (-y > window.innerHeight) { // 超过一屏显示返回顶部
+    initMeScroll () {
+      let _down = Object.assign({}, mescrollOptions.get().down, {
+        auto: true,
+        autoShowLoading: false,
+        isLock: true,
+        callback: this.onPuillingDown
+      })
+      let _up = Object.assign({}, mescrollOptions.get().up, {
+        callback: this.onPullingUp,
+        onScroll: this.onMeScroll,
+        htmlNodata: '<div style="height:0"></div>'
+      })
+      this.mescroll[0] = new MeScroll('mescroll', {down: _down, up: _up})
+    },
+    onMeScroll (mescroll, y, isUp) {
+      if (y > this.$winHeight && !this.showBackTop) {
         this.showBackTop = true
-      } else {
+      } else if (y < this.$winHeight && this.showBackTop) {
         this.showBackTop = false
       }
     }
   },
-  activated () {
-    if (!this.showBanner) {
-      let bannerHeight = this.$refs['topBanner'].getBoundingClientRect().height
-      this.$refs['pageScroller'].scrollTo(0, -bannerHeight, 0)
-    }
-  },
-  created () {
-    this.fetchDynamic(1)
+  mounted () {
+    this.initMeScroll(0)
   }
 }
 </script>
@@ -207,117 +213,6 @@ fl{
   width: 100%;
   height: 100%;
   background: #F5F5F5;
-}
-.pull-down-icon{
-  display: block;
-  width: 44px;
-  height: 44px;
-  margin-top: -44px;
-  margin-bottom: 25px;
-}
-.pull-down-icon.refreshing{
-  display: block;
-  width: 44px;
-  height: 44px;
-  margin-top: 25px;
-  margin-bottom: 25px;
-  animation: refreshing 500ms infinite linear;
-}
-.pull-up-icon{
-  display: block;
-  width: 32px;
-  height: 32px;
-  position: absolute;
-  left: 0;
-  top: 50%;
-  margin-top: -18px;
-  animation: loading 1000ms infinite cubic-bezier(0.5,0.5,0.5,0.5);
-}
-.pullup-wrapper{
-  font-size: 24px;
-  color: #666;
-  height: 100px;
-  position: relative;
-  background-color: #fff;
-}
-.pullup-content{
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  padding-left: 42px;
-}
-@keyframes refreshing {
-  0%{
-    transform: rotate(0deg)
-  }
-  100%{
-    transform: rotate(360deg)
-  }
-}
-@keyframes loading {
-  0%{
-    transform: rotate(0deg)
-  }
-  8.33%{
-    transform: rotate(30deg)
-  }
-  16.66%{
-    transform: rotate(60)
-  }
-  25%{
-    transform: rotate(90deg)
-  }
-  33.33%{
-    transform: rotate(120deg)
-  }
-  41.66%{
-    transform: rotate(150deg)
-  }
-  50%{
-    transform: rotate(180deg)
-  }
-  58.33%{
-    transform: rotate(210deg)
-  }
-  66.66%{
-    transform: rotate(240deg)
-  }
-  75%{
-    transform: rotate(270deg)
-  }
-  83.32%{
-    transform: rotate(300deg)
-  }
-  91.66%{
-    transform: rotate(330deg)
-  }
-  100%{
-    transform: rotate(360deg)
-  }
-}
-.gray-block{
-  position: relative;
-  left: -5%;
-  width: 110%;
-  height: 10px;
-  background: #F5F5F5;
-}
-.publish-icon{
-  display: block;
-  width: 88px;
-  height: 88px;
-  background-color: #FF5126;
-  background-image: linear-gradient(155deg, #FAB03C, #FF273B);
-  color: #fff;
-  font-size:46px;
-  line-height: 88px;
-  text-align: center;
-  border-radius: 8px;
-  position: fixed;
-  right: 54px;
-  bottom: 80px;
-  z-index: 2;
 }
 .first-loading-box{
   height: 152px;
