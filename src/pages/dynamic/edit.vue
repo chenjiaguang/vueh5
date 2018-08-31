@@ -166,14 +166,25 @@ export default {
                   return Object.assign({}, item, {
                     width: data.width,
                     height: data.height,
-                    localUrl: data.src,
-                    status: 'submitting'
+                    localUrl: data.src
                   })
                 } else {
                   return item
                 }
               })
             }
+            img.onerror = function () {
+              console.log('图片加载错误')
+            }
+            _this.images = _this.images.map((item, idx) => {
+              if (item.sign === sign) {
+                return Object.assign({}, item, {
+                  status: 'submitting'
+                })
+              } else {
+                return item
+              }
+            })
             var CancelToken = axios.CancelToken
             let formData = new FormData()
             formData.append('file', files[i])
