@@ -174,6 +174,58 @@ export default {
                 }
               })
             }
+            var CancelToken = axios.CancelToken
+            let formData = new FormData()
+            formData.append('file', files[i])
+            this.$ajax('/jv/image/compressupload', {
+              token: window.localStorage.token || '',
+              contentType: 'multipart/form-data',
+              data: formData,
+              cancelToken: new CancelToken(function executor (cancel) {
+                // An executor function receives a cancel function as a parameter
+                _this.cancelRequest[sign.toString()] = cancel
+              })
+            }).then(res => { // 上传返回数据处理
+              let status = ''
+              let id = ''
+              let url = ''
+              if (res && res.msg) {
+                _this.$toast(res.msg)
+              }
+              if (!res.error && res.data) {
+                status = 'success'
+                id = res.data.id[0]
+                url = res.data.url[0]
+              } else {
+                status = 'error'
+              }
+              _this.images = _this.images.map((item, idx) => {
+                if (item.sign === sign) {
+                  return Object.assign({}, item, {
+                    status: status,
+                    id: id,
+                    url: url
+                  })
+                } else {
+                  return item
+                }
+              })
+              this.cancelRequest[sign.toString()] = null
+            }).catch(err => {
+              if (err && err.msg) {
+                _this.$toast(err.msg)
+              }
+              _this.images = _this.images.map((item, idx) => {
+                if (item.sign === sign) {
+                  return Object.assign({}, item, {
+                    status: 'error'
+                  })
+                } else {
+                  return item
+                }
+              })
+              this.cancelRequest[sign.toString()] = null
+            })
           }
           fileReader.onerror = function () {
             if (_this.images.length > 9) { // 大于9张图时终止，为防止其他错误
@@ -190,58 +242,6 @@ export default {
               }
             })
           }
-          var CancelToken = axios.CancelToken
-          let formData = new FormData()
-          formData.append('file', files[i])
-          this.$ajax('/jv/image/compressupload', {
-            token: window.localStorage.token || '',
-            contentType: 'multipart/form-data',
-            data: formData,
-            cancelToken: new CancelToken(function executor (cancel) {
-              // An executor function receives a cancel function as a parameter
-              _this.cancelRequest[sign.toString()] = cancel
-            })
-          }).then(res => { // 上传返回数据处理
-            let status = ''
-            let id = ''
-            let url = ''
-            if (res && res.msg) {
-              _this.$toast(res.msg)
-            }
-            if (!res.error && res.data) {
-              status = 'success'
-              id = res.data.id[0]
-              url = res.data.url[0]
-            } else {
-              status = 'error'
-            }
-            _this.images = _this.images.map((item, idx) => {
-              if (item.sign === sign) {
-                return Object.assign({}, item, {
-                  status: status,
-                  id: id,
-                  url: url
-                })
-              } else {
-                return item
-              }
-            })
-            this.cancelRequest[sign.toString()] = null
-          }).catch(err => {
-            if (err && err.msg) {
-              _this.$toast(err.msg)
-            }
-            _this.images = _this.images.map((item, idx) => {
-              if (item.sign === sign) {
-                return Object.assign({}, item, {
-                  status: 'error'
-                })
-              } else {
-                return item
-              }
-            })
-            this.cancelRequest[sign.toString()] = null
-          })
         } else {
           console.log('超过了')
         }
@@ -268,7 +268,7 @@ export default {
       let topic_ids = ''
       let uploadImages = this.images.filter(item => item.status === 'success')
       let imageIds = this.images.map((item, idx) => {
-        if (item.status === 'submitting') {
+        if (item.status === 'submitting' || item.status === 'reading') {
           flat = true
         }
         if (item.id) {
