@@ -1,5 +1,5 @@
 <template>
-  <div class="activity-detail" :style="{width: $winWidth + 'px', height: $winHeight + 'px', position: 'relative'}">
+  <div class="activity-order">
     <div class="scroller-wrapper">
       <div class="scroller">
         <div class="activity-container" v-if="activity.id">
@@ -90,11 +90,14 @@
 </template>
 
 <style scoped>
-  .activity-detail{
+  .activity-order{
     width:100%;
+    height: 100%;
+    box-sizing: border-box;
     padding-bottom: 100px;
     overflow: hidden;
     background-color: #fff;
+    position: relative;
   }
   .scroller-wrapper{
     width: 100%;
@@ -424,7 +427,7 @@
     font-weight: 600;
     line-height: 100px;
     padding-left: 30px;
-    position: relative;
+    position: absolute;
     left: 0;
     bottom: 0;
   }
@@ -493,7 +496,8 @@ export default {
       countNum: -1,
       btnText: '获取验证码',
       counting: false,
-      submitting: false
+      submitting: false,
+      updateTimer: null
     }
   },
   methods: {
@@ -618,7 +622,7 @@ export default {
       this.form.agreement = !this.form.agreement
     },
     goAgreement () {
-      this.$router.push({path: '/agreement', query: {type: 'activity'}})
+      this.$router.push({name: 'Agreement', query: {type: 'activity'}})
     },
     // orderPay (res, successCallback) {
     //   if (this.$browserUA.isWeixin()) { // 微信内置浏览器内
@@ -738,7 +742,11 @@ export default {
     }
   },
   created () {
+    console.log('created')
     this.fetchActivity()
+  },
+  mounted () {
+    console.log('mounted')
   }
 }
 </script>

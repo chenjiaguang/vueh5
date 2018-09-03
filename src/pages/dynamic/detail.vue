@@ -4,7 +4,7 @@
     <div v-if="dynamic" :style="{height: $winHeight-(100/750*$winWidth) + 'px'}">
       <div id="mescroll" class="mescroll" >
         <div>
-          <DownloadBox />
+          <download-box v-if="$route.query.isShareOpen" />
           <div class="container">
             <div v-if="dynamic" id="title-container" class="column">
               <div v-if="dynamic.title" class="title">{{dynamic.title}}</div>
@@ -165,13 +165,13 @@ export default {
     DetailImageContainer,
     NotFoundPage
   },
-  beforeRouteEnter (to, from, next) {
-    if (to.query.isArticle && to.query.isArticle !== 'false') {
-      utils.beforeRouteEnterHandleShareOpen(to, from, next, 4)
-    } else {
-      utils.beforeRouteEnterHandleShareOpen(to, from, next, 3)
-    }
-  },
+  // beforeRouteEnter (to, from, next) {
+  //   if (to.query.isArticle && to.query.isArticle !== 'false') {
+  //     utils.beforeRouteEnterHandleShareOpen(to, from, next, 4)
+  //   } else {
+  //     utils.beforeRouteEnterHandleShareOpen(to, from, next, 3)
+  //   }
+  // },
   mounted () {
     this.fetch()
   },
@@ -192,6 +192,7 @@ export default {
     }
   },
   activated () {
+    console.log('window.history', window.history)
     if (this.isArticle) {
       document.title = '长文详情'
     } else {
@@ -658,6 +659,7 @@ export default {
   line-height: 42px;
   margin-bottom: 14px;
   word-break: break-all;
+  white-space: pre-wrap;
 }
 .comment-time {
   color: #999999;
@@ -673,6 +675,7 @@ export default {
   background-color: #f6f6f6;
   border-radius: 4px;
   word-break: break-all;
+  white-space: pre-wrap;
 }
 .reply-box {
   background-color: transparent;

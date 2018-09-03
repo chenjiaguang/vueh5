@@ -1,7 +1,7 @@
 <template>
   <div :style="{height: $winHeight + 'px'}">
     <div id="mescroll" class="mescroll activity-dynamic" :style="{width: $winWidth + 'px', height: '100%', overflowY: 'auto', overflowX: 'hidden'}">
-      <download-box v-if="$route.params.isShareOpen" />
+      <download-box v-if="$route.query.isShareOpen" />
       <transition name="loading-scale">
         <div class="first-loading-box" v-if="!paging.pn">
           <loading-view />

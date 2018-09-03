@@ -2,7 +2,7 @@
   <div :style="{height: $winHeight + 'px'}" class="circle-page">
     <div ref="pageContainer" style="transition: all 300ms" :style="{transform: 'translateY(' + pageTop + 'px)'}">
       <div ref="topBanner" @touchmove="bannerTouchMove" @touchstart="bannerTouchStart" @touchend="bannerTouchEnd">
-        <download-box v-if="$route.params.isShareOpen" />
+        <download-box v-if="$route.query.isShareOpen" />
         <header class="top-header">
           <div class="top-header-bg" :style="{backgroundImage: 'url(' + circle.cover.compress + ')'}"></div>
           <div class="top-header-content">
@@ -516,9 +516,9 @@ export default {
       this.wrapperTouchY = 0
     }
   },
-  beforeRouteEnter (to, from, next) {
-    utils.beforeRouteEnterHandleShareOpen(to, from, next, 1)
-  },
+  // beforeRouteEnter (to, from, next) {
+  //   utils.beforeRouteEnterHandleShareOpen(to, from, next, 1)
+  // },
   mounted () {
     this.fetchCircle()
     this.initSlideBlock()

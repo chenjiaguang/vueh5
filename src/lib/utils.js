@@ -1,7 +1,7 @@
 import browserUA from './browserUA'
 
 import router from '../router'
-import ajax from './ajax'
+// import ajax from './ajax'
 
 export default {
   isPoneAvailable: function (phone) {
@@ -134,9 +134,9 @@ export default {
    */
   beforeRouteEnterHandleShareOpenDontNext: function (to, from, next, type) {
     if (to.query.isShareOpen && to.query.isShareOpen !== 'false') {
-      ajax('/jv/share/anonymous/open', { data: { type: type } })
-      delete to.query.isShareOpen
-      to.params.isShareOpen = true
+      // ajax('/jv/share/anonymous/open', { data: { type: type } })
+      // delete to.query.isShareOpen
+      // to.params.isShareOpen = true
       return true
     } else {
       return false

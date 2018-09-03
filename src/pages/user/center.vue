@@ -2,7 +2,7 @@
   <div :style="{height: $winHeight + 'px'}" class="user-center-page">
     <div ref="pageContainer" style="transition: all 300ms" :style="{transform: 'translateY(' + pageTop + 'px)'}">
       <div ref="topBanner" @touchmove="bannerTouchMove" @touchstart="bannerTouchStart" @touchend="bannerTouchEnd">
-        <download-box v-if="$route.params.isShareOpen" />
+        <download-box v-if="$route.query.isShareOpen" />
         <header ref="topHeader" class="top-header">
           <div class="top-header-bg" :style="{backgroundImage: 'url(' + user.cover + ')'}">
             <div class="top-header-avatar" :style="{backgroundImage: 'url(' + user.avatar_url + ')', opacity: user.avatar_url ? 1 : 0}"></div>

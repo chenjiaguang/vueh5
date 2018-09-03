@@ -473,9 +473,9 @@ export default {
       this.$router.push({name: 'ActivityOrder', query: {id: this.$route.query.id}})
     }
   },
-  beforeRouteEnter (to, from, next) {
-    utils.beforeRouteEnterHandleShareOpen(to, from, next, 5)
-  },
+  // beforeRouteEnter (to, from, next) {
+  //   utils.beforeRouteEnterHandleShareOpen(to, from, next, 5)
+  // },
   mounted () {
     this.fetchActivity()
   }
