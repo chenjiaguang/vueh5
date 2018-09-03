@@ -34,7 +34,7 @@
                     </div>
                   </transition>
                   <div v-if="tabs[index].paging.pn && tabs[index].data && tabs[index].data.length !== 0" :style="{minHeight: ($winHeight - ((tabs && tabs.length) > 1 ? tabBarHeight : 0)) + 0.5 + 'px', backgroundColor: '#fff'}">
-                    <topic-item v-for="(item, idx) in tabs[index].data" :key="idx" :itemData="item" :router="$router" :hideBlock="idx === tabs[index].data.length - 1" @changeLike="(data) => changeLike(data, index)" />
+                    <topic-item v-for="(item, idx) in tabs[index].data" :key="item.id" :itemData="item" :router="$router" :hideBlock="idx === tabs[index].data.length - 1" @changeLike="(data) => changeLike(data, index)" />
                   </div>
                   <div v-else-if="tabs[index].paging.is_end && tabs[index].data && tabs[index].data.length === 0" class="empty-box">该话题暂无{{index === 0 ? '最新动态' : '最热动态'}}</div>
                 </div>

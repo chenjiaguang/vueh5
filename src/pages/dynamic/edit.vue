@@ -141,7 +141,7 @@ export default {
           let sign = new Date().getTime() + i
           let imageItem = {
             id: '',
-            sign: new Date().getTime() + i,
+            sign: sign,
             url: '',
             width: '',
             height: '',
