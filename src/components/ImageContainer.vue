@@ -4,13 +4,14 @@
       <div :key="item.sign || item.id || idx" v-if="isAndroid()">
         <div v-if="isUpload" :key="item.sign || item.id || idx" @click.stop="previewImage(idx)" :style="{marginTop: idx < 3 ? 0 : '1.055%', backgroundImage: 'url(' + (item.localUrl ||  item.url) + ')'}" class="item-container two-and-more fl" :class="{left: idx % 3 === 0}">
           <!-- <img :src="item.localUrl || item.url" class="image-item" :class="{horizontal: images.length === 1 && (Number(item.width) / Number(item.height) >= 1.44) || images.length > 1 && Number(item.width) >= Number(item.height), vertical: images.length === 1 && (Number(item.width) / Number(item.height) < 1.44) || images.length > 1 && Number(item.width) < Number(item.height)}" /> -->
-          <div class="long-tag" v-if="Number(item.height) / Number(item.width) > 4">长图</div>
+          <div class="long-tag" v-if="item.longCover && !item.gif">长图</div>
           <div class="delete-btn iconfont icon-guanbi" v-if="showDelete" @click.stop="deleteImage(item, idx)"></div>
           <div class="status-box" v-if="item.status === 'submitting' || item.status === 'error' || item.status === 'reading'"><span class="status-text">{{statusText[item.status]}}</span></div>
         </div>
-        <div v-else v-lazy:background-image="item.compress || item.url" :key="item.sign || item.id || idx" @click.stop="previewImage(idx)" :style="{marginTop: idx < 3 ? 0 : '1.055%'}" class="item-container fl" :class="{one: images.length === 1 && !isUpload, 'two-and-more': images.length > 1 || isUpload, left: idx % 3 === 0, horizontal: Number(item.width) >= Number(item.height), vertical: Number(item.width) < Number(item.height)}">
+        <div v-else v-lazy:background-image="(item.gif && item.staticImage) ? item.staticImage : (item.compress || item.url)" :key="item.sign || item.id || idx" @click.stop="previewImage(idx)" :style="{marginTop: idx < 3 ? 0 : '1.055%'}" class="item-container fl" :class="{one: images.length === 1 && !isUpload, 'two-and-more': images.length > 1 || isUpload, left: idx % 3 === 0, horizontal: Number(item.width) >= Number(item.height), vertical: Number(item.width) < Number(item.height)}">
           <!-- <img :data-src="item.localUrl || item.url" class="image-item" :class="{horizontal: images.length === 1 && (Number(item.width) / Number(item.height) >= 1.44) || images.length > 1 && Number(item.width) >= Number(item.height), vertical: images.length === 1 && (Number(item.width) / Number(item.height) < 1.44) || images.length > 1 && Number(item.width) < Number(item.height)}" /> -->
-          <div class="long-tag" v-if="Number(item.height) / Number(item.width) > 4">长图</div>
+          <div class="long-tag" v-if="item.longCover && !item.gif">长图</div>
+          <div class="gif-tag" v-if="item.gif"></div>
           <div class="delete-btn iconfont icon-guanbi" v-if="showDelete" @click.stop="deleteImage(item, idx)"></div>
           <div class="status-box" v-if="item.status === 'submitting' || item.status === 'error' || item.status === 'reading'"><span class="status-text">{{statusText[item.status]}}</span></div>
         </div>
@@ -18,13 +19,14 @@
       <transition :key="item.sign || item.id || idx" :appear="appearAnimation" appear-class="before-appear" v-else>
         <div v-if="isUpload" :key="item.sign || item.id || idx" @click.stop="previewImage(idx)" :style="{marginTop: idx < 3 ? 0 : '1.055%', backgroundImage: 'url(' + (item.localUrl || item.url) + ')'}" class="item-container two-and-more fl" :class="{left: idx % 3 === 0}">
           <!-- <img :src="item.localUrl || item.url" class="image-item" :class="{horizontal: images.length === 1 && (Number(item.width) / Number(item.height) >= 1.44) || images.length > 1 && Number(item.width) >= Number(item.height), vertical: images.length === 1 && (Number(item.width) / Number(item.height) < 1.44) || images.length > 1 && Number(item.width) < Number(item.height)}" /> -->
-          <div class="long-tag" v-if="Number(item.height) / Number(item.width) > 4">长图</div>
+          <div class="long-tag" v-if="item.longCover && !item.gif">长图</div>
           <div class="delete-btn iconfont icon-guanbi" v-if="showDelete" @click.stop="deleteImage(item, idx)"></div>
           <div class="status-box" v-if="item.status === 'submitting' || item.status === 'error' || item.status === 'reading'"><span class="status-text">{{statusText[item.status]}}</span></div>
         </div>
-        <div v-else v-lazy:background-image="item.compress || item.url" :key="item.sign || item.id || idx" @click.stop="previewImage(idx)" :style="{marginTop: idx < 3 ? 0 : '1.055%'}" class="item-container fl" :class="{one: images.length === 1 && !isUpload, 'two-and-more': images.length > 1 || isUpload, left: idx % 3 === 0, horizontal: Number(item.width) >= Number(item.height), vertical: Number(item.width) < Number(item.height)}">
+        <div v-else v-lazy:background-image="(item.gif && item.staticImage) ? item.staticImage : (item.compress || item.url)" :key="item.sign || item.id || idx" @click.stop="previewImage(idx)" :style="{marginTop: idx < 3 ? 0 : '1.055%'}" class="item-container fl" :class="{one: images.length === 1 && !isUpload, 'two-and-more': images.length > 1 || isUpload, left: idx % 3 === 0, horizontal: Number(item.width) >= Number(item.height), vertical: Number(item.width) < Number(item.height)}">
           <!-- <img :data-src="item.localUrl || item.url" class="image-item" :class="{horizontal: images.length === 1 && (Number(item.width) / Number(item.height) >= 1.44) || images.length > 1 && Number(item.width) >= Number(item.height), vertical: images.length === 1 && (Number(item.width) / Number(item.height) < 1.44) || images.length > 1 && Number(item.width) < Number(item.height)}" /> -->
-          <div class="long-tag" v-if="Number(item.height) / Number(item.width) > 4">长图</div>
+          <div class="long-tag" v-if="item.longCover && !item.gif">长图</div>
+          <div class="gif-tag" v-if="item.gif"></div>
           <div class="delete-btn iconfont icon-guanbi" v-if="showDelete" @click.stop="deleteImage(item, idx)"></div>
           <div class="status-box" v-if="item.status === 'submitting' || item.status === 'error' || item.status === 'reading'"><span class="status-text">{{statusText[item.status]}}</span></div>
         </div>
@@ -193,6 +195,17 @@ export default {
   transform: scale(0.5, 0.5);
   transform-origin: 100% 100%;
   z-index: 1;
+}
+.gif-tag{
+  width: 54px;
+  height: 26px;
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  background-image: url('/h5/cwebassets/image/is_gif.png');
+  background-position: center;
+  background-size: contain;
+  background-repeat: no-repeat;
 }
 .status-box{
   position: absolute;
