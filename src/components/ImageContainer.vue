@@ -4,7 +4,7 @@
       <div :key="item.sign || item.id || idx" v-if="isAndroid()">
         <div v-if="isUpload" :key="item.sign || item.id || idx" @click.stop="previewImage(idx)" :style="{marginTop: idx < 3 ? 0 : '1.055%', backgroundImage: 'url(' + (item.localUrl ||  item.url) + ')'}" class="item-container two-and-more fl" :class="{left: idx % 3 === 0}">
           <!-- <img :src="item.localUrl || item.url" class="image-item" :class="{horizontal: images.length === 1 && (Number(item.width) / Number(item.height) >= 1.44) || images.length > 1 && Number(item.width) >= Number(item.height), vertical: images.length === 1 && (Number(item.width) / Number(item.height) < 1.44) || images.length > 1 && Number(item.width) < Number(item.height)}" /> -->
-          <div class="long-tag" v-if="item.longCover && !item.gif">长图</div>
+          <div class="long-tag" v-if="Number(item.height) / Number(item.width) > 2 && !item.gif">长图</div>
           <div class="delete-btn iconfont icon-guanbi" v-if="showDelete" @click.stop="deleteImage(item, idx)"></div>
           <div class="status-box" v-if="item.status === 'submitting' || item.status === 'error' || item.status === 'reading'"><span class="status-text">{{statusText[item.status]}}</span></div>
         </div>
@@ -19,7 +19,7 @@
       <transition :key="item.sign || item.id || idx" :appear="appearAnimation" appear-class="before-appear" v-else>
         <div v-if="isUpload" :key="item.sign || item.id || idx" @click.stop="previewImage(idx)" :style="{marginTop: idx < 3 ? 0 : '1.055%', backgroundImage: 'url(' + (item.localUrl || item.url) + ')'}" class="item-container two-and-more fl" :class="{left: idx % 3 === 0}">
           <!-- <img :src="item.localUrl || item.url" class="image-item" :class="{horizontal: images.length === 1 && (Number(item.width) / Number(item.height) >= 1.44) || images.length > 1 && Number(item.width) >= Number(item.height), vertical: images.length === 1 && (Number(item.width) / Number(item.height) < 1.44) || images.length > 1 && Number(item.width) < Number(item.height)}" /> -->
-          <div class="long-tag" v-if="item.longCover && !item.gif">长图</div>
+          <div class="long-tag" v-if="Number(item.height) / Number(item.width) > 2 && !item.gif">长图</div>
           <div class="delete-btn iconfont icon-guanbi" v-if="showDelete" @click.stop="deleteImage(item, idx)"></div>
           <div class="status-box" v-if="item.status === 'submitting' || item.status === 'error' || item.status === 'reading'"><span class="status-text">{{statusText[item.status]}}</span></div>
         </div>
