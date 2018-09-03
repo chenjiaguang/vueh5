@@ -12,7 +12,7 @@
 
 <script>
 export default {
-  props: ['images'],
+  props: ['images', 'router'],
   data () {
     return {}
   },
@@ -30,7 +30,7 @@ export default {
   methods: {
     previewImage (idx) {
       let _images = this.images.map(item => item.url || item.localUrl)
-      this.$previewImage.show({ images: _images, idx }, this.previewCallBack)
+      this.$previewImage.show({ images: _images, idx }, this.router)
     }
   }
 }
