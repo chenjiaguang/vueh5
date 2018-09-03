@@ -41,15 +41,15 @@
         <img class="join-avatar fl" v-if="activity.joinTotal && parseInt(activity.joinTotal) > 40"  :src="$assetsPublicPath + '/cwebassets/image/more_avatar2.png'" style="border-radius:0" />
       </div>
     </div>
-    <div @click.stop="goDynamicList" class="dynamic-wrapper" v-if="activity.activityHasDynamic">
+    <div class="dynamic-wrapper" v-if="activity.activityHasDynamic">
       <div class="dynamic-header clearfix">
         <div class="fl">大家都在晒</div>
-        <div class="more-dynamic-text fr">更多<i class="iconfont icon-next more-dynamic-icon"></i></div>
+        <div @click.stop="goDynamicList" class="more-dynamic-text fr">更多<i class="iconfont icon-next more-dynamic-icon"></i></div>
       </div>
       <div class="dynamic-images clearfix">
         <div class="top-border"></div>
         <div class="bottom-border"></div>
-        <div class="dynamic-image-item fl" v-for="(item, idx) in activity.activityDynamic" :key="idx" :style="{backgroundImage: 'url(' + (item.compress || item.url) + ')'}"></div>
+        <div @click.stop="goDynamicList" class="dynamic-image-item fl" v-for="(item, idx) in activity.activityDynamic" :key="idx" :style="{backgroundImage: 'url(' + (item.compress || item.url) + ')'}"></div>
         <div @click.stop="goPublish" class="dynamic-image-item fl">
           <div class="dynamic-btn">
             <i class="iconfont icon-camera1 dynamic-btn-icon"></i>
