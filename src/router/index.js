@@ -97,7 +97,7 @@ const router = new Router({
     },
     {
       path: prefix + '/agreement',
-      name: 'agreement',
+      name: 'Agreement',
       component: Agreement,
       meta: {
         title: ''
@@ -185,18 +185,19 @@ const router = new Router({
 router.beforeEach((to, from, next) => {
   /* 路由发生变化修改页面title */
   if (to.meta.title) {
-    let i = document.createElement('iframe')
-    i.src = 'https://www.baidu.com/favicon.ico'
-    i.style.display = 'none'
-    i.onload = () => {
-      setTimeout(() => {
-        i.remove()
-      }, 9)
-    }
+    // let i = document.createElement('iframe')
+    // i.src = 'https://www.baidu.com/favicon.ico'
+    // i.style.display = 'none'
+    // i.onload = () => {
+    //   i.remove()
+    // }
     document.title = to.meta.title
-    document.body.appendChild(i)
+    // document.body.appendChild(i)
+    next()
+  } else {
+    document.title = '\u200E'
+    next()
   }
-  next()
 })
 
 export default router

@@ -42,14 +42,17 @@
       </div>
     </div>
     <div class="dynamic-wrapper" v-if="activity.activityHasDynamic">
-      <div @click.stop="goDynamicList" class="dynamic-header clearfix">
+      <div class="dynamic-header clearfix">
         <div class="fl">大家都在晒</div>
-        <div class="more-dynamic-text fr">更多<i class="iconfont icon-next more-dynamic-icon"></i></div>
+        <div @click.stop="goDynamicList" class="more-dynamic-text fr">更多<i class="iconfont icon-next more-dynamic-icon"></i></div>
       </div>
       <div class="dynamic-images clearfix">
         <div class="top-border"></div>
         <div class="bottom-border"></div>
-        <div class="dynamic-image-item fl" v-for="(item, idx) in activity.activityDynamic" :key="idx" :style="{backgroundImage: 'url(' + item.compress + ')'}"></div>
+        <div @click.stop="goDynamicList" class="dynamic-image-item fl" v-for="(item, idx) in activity.activityDynamic" :key="idx" :style="{backgroundImage: 'url(' + ((item.gif && item.staticImage) ? item.staticImage : (item.compress || item.url)) + ')'}">
+          <div class="long-tag" v-if="item.longCover && !item.gif">长图</div>
+          <div class="gif-tag" v-if="item.gif"></div>
+        </div>
         <div @click.stop="goPublish" class="dynamic-image-item fl">
           <div class="dynamic-btn">
             <i class="iconfont icon-camera1 dynamic-btn-icon"></i>
@@ -233,6 +236,33 @@
     text-align: center;
     color: #999;
     position: relative;
+  }
+  .long-tag{
+    width: 128px;
+    height: 64px;
+    font-size: 42px;
+    line-height: 64px;
+    color: #fff;
+    border-top-left-radius: 16px;
+    background-color: rgba(0,0,0,0.5);
+    text-align: center;
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    transform: scale(0.5, 0.5);
+    transform-origin: 100% 100%;
+    z-index: 1;
+  }
+  .gif-tag{
+    width: 54px;
+    height: 26px;
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    background-image: url('/h5/cwebassets/image/is_gif.png');
+    background-position: center;
+    background-size: contain;
+    background-repeat: no-repeat;
   }
   .dynamic-btn{
     position: absolute;
@@ -473,9 +503,9 @@ export default {
       this.$router.push({name: 'ActivityOrder', query: {id: this.$route.query.id}})
     }
   },
-  beforeRouteEnter (to, from, next) {
-    utils.beforeRouteEnterHandleShareOpen(to, from, next, 5)
-  },
+  // beforeRouteEnter (to, from, next) {
+  //   utils.beforeRouteEnterHandleShareOpen(to, from, next, 5)
+  // },
   mounted () {
     this.fetchActivity()
   }

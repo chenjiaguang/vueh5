@@ -12,6 +12,13 @@ export default {
   name: 'App',
   data () {
     return {
+      shareType: {
+        circleDetail: 1,
+        topicDetail: 2,
+        shortDynamicl: 3,
+        longDynamic: 4,
+        activutyDetail: 5
+      },
       transitionName: 'none',
       mounted () {
         if (window.localStorage.token) {
@@ -21,16 +28,44 @@ export default {
         }
       }
     }
+  },
+  mounted () {
+    /**
+     * 分享打开计数功能 不带next 返回bool表示是否有路由更新
+     * type: 1：圈子 2：话题 3：短动态 4：长文 5：活动
+     */
+    if (this.$route.query.isShareOpen && this.$route.query.isShareOpen !== 'false') {
+      let _type = ''
+      if (this.$route.name === 'dynamicDetail') { // 动态详情页分为短动态和长文、其他的按路由来确定type
+        if (this.$route.query.isArticle && this.$route.query.isArticle !== 'false') {
+          _type = 4
+        } else {
+          _type = 3
+        }
+      } else {
+        _type = this.shareType[this.$route.name]
+      }
+      if (_type) {
+        this.$ajax('/jv/share/anonymous/open', { data: { type: _type } })
+      }
+    }
   }
 }
 </script>
 
 <style src='./assets/css/common.css' />
 <style>
+html{
+  height: 100%;
+}
+#app{
+  height: 100%;
+}
 body {
   margin: 0;
   color: #333;
   background-color: #fff;
+  height: 100%;
 }
 *,
 ::before,

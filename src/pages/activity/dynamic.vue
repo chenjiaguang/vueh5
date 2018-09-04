@@ -1,14 +1,14 @@
 <template>
   <div :style="{height: $winHeight + 'px'}">
     <div id="mescroll" class="mescroll activity-dynamic" :style="{width: $winWidth + 'px', height: '100%', overflowY: 'auto', overflowX: 'hidden'}">
-      <download-box v-if="$route.params.isShareOpen" />
+      <download-box v-if="$route.query.isShareOpen" />
       <transition name="loading-scale">
         <div class="first-loading-box" v-if="!paging.pn">
           <loading-view />
         </div>
       </transition>
       <div v-if="paging.pn && dynamic && dynamic.length !== 0" :style="{minHeight: '100%', backgroundColor: '#fff'}">
-        <dynamic-item v-for="(item, idx) in dynamic" :key="idx" :itemData="item" :hideBlock="idx === dynamic.length - 1" :router="$router" @changeLike="changeLike" />
+        <dynamic-item v-for="(item, idx) in dynamic" :key="item.id" :itemData="item" :hideBlock="idx === dynamic.length - 1" :router="$router" @changeLike="changeLike" />
       </div>
       <div v-else-if="paging.is_end && dynamic && dynamic.length === 0" class="empty-box">该活动暂无晒图</div>
     </div>

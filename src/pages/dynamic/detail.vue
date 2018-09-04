@@ -4,7 +4,7 @@
     <div v-if="dynamic" :style="{height: $winHeight-(100/750*$winWidth) + 'px'}">
       <div id="mescroll" class="mescroll" >
         <div>
-          <DownloadBox />
+          <download-box v-if="$route.query.isShareOpen" />
           <div class="container">
             <div v-if="dynamic" id="title-container" class="column">
               <div v-if="dynamic.title" class="title">{{dynamic.title}}</div>
@@ -37,7 +37,9 @@
             <div v-if="dynamic&&dynamic.isArticle" id="article-content-container" class="column">
               <div v-for="(content,index) in dynamic.contents" :key="index">
                 <div class="article-image-container">
-                  <img class="article-image" v-if="content.type==2" :src="content.imageUrl" @click="previewImagesInArticle(content.imageIndex)"/>
+                  <img class="article-image" v-if="content.type==2" :src="(covers[content.imageIndex].gif && covers[content.imageIndex].staticImage) ? covers[content.imageIndex].staticImage : (covers[content.imageIndex].compress || covers[content.imageIndex].url)" @click="previewImagesInArticle(content.imageIndex)"/>
+                  <div class="long-tag" v-if="covers[content.imageIndex].longCover && !covers[content.imageIndex].gif">长图</div>
+                  <div class="gif-tag" v-if="covers[content.imageIndex].gif"></div>
                 </div>
 
                 <div class="article-desc" v-if="content.type==2&&content.des">{{content.des}}</div>
@@ -48,7 +50,7 @@
             <div v-if="dynamic&&!dynamic.isArticle" id="content-container" class="column">
               <div class="dynamic-content" v-html="handleContentUrl(dynamic.content)"></div>
               <TopicTagBox :topicInfo="dynamic.topicInfo" />
-              <DetailImageContainer class="detail-image-container"  :images="dynamic.covers"/>
+              <DetailImageContainer class="detail-image-container"  :images="dynamic.covers" :router="$router" />
               <a class="content-article-box row center" v-if="dynamic.aid" :href="dynamic.newsArticle.article_url">
                 <div class="content-article-img" :style="`background-image:url(${dynamic.newsArticle.covers?dynamic.newsArticle.covers[0].compress:''})`"/>
                 <div class="content-article-content">{{dynamic.newsArticle.name}}</div>
@@ -147,6 +149,7 @@ export default {
       mescroll: null, // mescroll实例对象
       dynamic: null,
       isLoad: false,
+      covers: [],
       imageList: [],
       options: {
         pullDownRefresh: false,
@@ -165,18 +168,24 @@ export default {
     DetailImageContainer,
     NotFoundPage
   },
-  beforeRouteEnter (to, from, next) {
-    if (to.query.isArticle && to.query.isArticle !== 'false') {
-      utils.beforeRouteEnterHandleShareOpen(to, from, next, 4)
-    } else {
-      utils.beforeRouteEnterHandleShareOpen(to, from, next, 3)
-    }
-  },
+  // beforeRouteEnter (to, from, next) {
+  //   if (to.query.isArticle && to.query.isArticle !== 'false') {
+  //     utils.beforeRouteEnterHandleShareOpen(to, from, next, 4)
+  //   } else {
+  //     utils.beforeRouteEnterHandleShareOpen(to, from, next, 3)
+  //   }
+  // },
   mounted () {
     this.fetch()
   },
   watch: {
     $route: function (val, oldVal) {
+      if (!val.query.previewImage && oldVal.query.previewImage) { // 点击大图后返回
+        if (window.previewImageId) {
+          this.$previewImage.hide(window.previewImageId)
+          window.previewImageId = null
+        }
+      }
       utils.checkReloadWithKeepAliveNew(
         this,
         val,
@@ -243,6 +252,7 @@ export default {
           this.dynamic.isArticle = this.isArticle
 
           if (this.isArticle) {
+            this.covers = res.data.covers
             this.imageList = this.dynamic.contents
               .filter(content => {
                 return content.type === '2'
@@ -364,7 +374,7 @@ export default {
       this.$previewImage.show({
         images: this.imageList,
         idx: index
-      })
+      }, this.$router)
     }
   }
 }
@@ -455,11 +465,41 @@ export default {
 .article-image-container {
   margin-left: -30px;
   margin-right: -30px;
+  position: relative;
+  overflow: hidden;
 }
 .article-image {
+  display: block;
   width: 100%;
   flex: 1;
-  margin-bottom: 13px;
+  margin-bottom: 15px;
+}
+.long-tag{
+  width: 128px;
+  height: 64px;
+  font-size: 42px;
+  line-height: 64px;
+  color: #fff;
+  border-top-left-radius: 16px;
+  background-color: rgba(0,0,0,0.5);
+  text-align: center;
+  position: absolute;
+  right: 0;
+  bottom: 15px;
+  transform: scale(0.5, 0.5);
+  transform-origin: 100% 100%;
+  z-index: 1;
+}
+.gif-tag{
+  width: 54px;
+  height: 26px;
+  position: absolute;
+  bottom: 25px;
+  right: 10px;
+  background-image: url('/h5/cwebassets/image/is_gif.png');
+  background-position: center;
+  background-size: contain;
+  background-repeat: no-repeat;
 }
 .foot-info-box {
   margin-bottom: 24px;
@@ -659,6 +699,7 @@ export default {
   line-height: 42px;
   margin-bottom: 14px;
   word-break: break-all;
+  white-space: pre-wrap;
 }
 .comment-time {
   color: #999999;
@@ -674,6 +715,7 @@ export default {
   background-color: #f6f6f6;
   border-radius: 4px;
   word-break: break-all;
+  white-space: pre-wrap;
 }
 .reply-box {
   background-color: transparent;

@@ -2,7 +2,7 @@
   <div :style="{height: $winHeight + 'px'}" class="topic-page">
     <div ref="pageContainer" style="transition: all 300ms" :style="{transform: 'translateY(' + pageTop + 'px)'}">
       <div ref="topBanner" @touchmove="bannerTouchMove" @touchstart="bannerTouchStart" @touchend="bannerTouchEnd">
-        <download-box v-if="isShareOpen" />
+        <download-box v-if="$route.query.isShareOpen" />
         <header ref="topHeader" class="top-header">
           <div class="top-header-bg" :style="{backgroundImage: 'linear-gradient(60deg,#' + topicInfo.beginColor + ',#' + topicInfo.endColor + ')'}"></div>
           <div class="top-header-content-wrapper">
@@ -34,7 +34,7 @@
                     </div>
                   </transition>
                   <div v-if="tabs[index].paging.pn && tabs[index].data && tabs[index].data.length !== 0" :style="{minHeight: ($winHeight - ((tabs && tabs.length) > 1 ? tabBarHeight : 0)) + 0.5 + 'px', backgroundColor: '#fff'}">
-                    <topic-item v-for="(item, idx) in tabs[index].data" :key="idx" :itemData="item" :router="$router" :hideBlock="idx === tabs[index].data.length - 1" @changeLike="(data) => changeLike(data, index)" />
+                    <topic-item v-for="(item, idx) in tabs[index].data" :key="item.id" :itemData="item" :router="$router" :hideBlock="idx === tabs[index].data.length - 1" @changeLike="(data) => changeLike(data, index)" />
                   </div>
                   <div v-else-if="tabs[index].paging.is_end && tabs[index].data && tabs[index].data.length === 0" class="empty-box">该话题暂无{{index === 0 ? '最新动态' : '最热动态'}}</div>
                 </div>
@@ -116,15 +116,13 @@ const initialData = {
   tabSlideX: -window.innerWidth + 'px',
   showBanner: true,
   pageTop: 0,
-  mescroll: [],
-  isShareOpen: false
+  mescroll: []
 }
 export default {
   mixins: [MeScrollSupportArr],
   data () {
     let selectedIdx = parseInt(this.$route.query.jump_tab || 0)
     let selectedLabel = (this.$route.query.jump_tab && this.$route.query.jump_tab.toString() === '1') ? '最热' : '最新'
-    let isShareOpen = this.$route.params.isShareOpen
     let _this = this
     let swiperOption = {
       initialSlide: selectedIdx,
@@ -144,7 +142,7 @@ export default {
       }
     }
     let _initialData = JSON.parse(JSON.stringify(initialData))
-    let _obj = Object.assign({}, _initialData, {selectedIdx, selectedLabel, isShareOpen, swiperOption})
+    let _obj = Object.assign({}, _initialData, {selectedIdx, selectedLabel, swiperOption})
     return _obj
   },
   components: {TopicItem, DownloadBox, LoadingView, ScrollToTop, swiper, swiperSlide},
@@ -425,9 +423,9 @@ export default {
       this.wrapperTouchY = 0
     }
   },
-  beforeRouteEnter (to, from, next) {
-    utils.beforeRouteEnterHandleShareOpen(to, from, next, 2)
-  },
+  // beforeRouteEnter (to, from, next) {
+  //   utils.beforeRouteEnterHandleShareOpen(to, from, next, 2)
+  // },
   mounted () {
     if (this.$route.query.jump_tab && this.$route.query.jump_tab.toString() === '1') { // 初始tab为1
       this.initMeScroll(1)
