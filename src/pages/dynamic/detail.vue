@@ -38,8 +38,8 @@
               <div v-for="(content,index) in dynamic.contents" :key="index">
                 <div class="article-image-container">
                   <img class="article-image" v-if="content.type==2" :src="(covers[content.imageIndex].gif && covers[content.imageIndex].staticImage) ? covers[content.imageIndex].staticImage : (covers[content.imageIndex].compress || covers[content.imageIndex].url)" @click="previewImagesInArticle(content.imageIndex)"/>
-                  <div class="long-tag" v-if="content.imageIndex && covers[content.imageIndex].longCover && !covers[content.imageIndex].gif">长图</div>
-                  <div class="gif-tag" v-if="content.imageIndex && covers[content.imageIndex].gif"></div>
+                  <div class="long-tag" v-if="(content.imageIndex || content.imageIndex === 0) && covers[content.imageIndex].longCover && !covers[content.imageIndex].gif">长图</div>
+                  <div class="gif-tag" v-if="(content.imageIndex || content.imageIndex === 0) && covers[content.imageIndex].gif"></div>
                 </div>
 
                 <div class="article-desc" v-if="content.type==2&&content.des">{{content.des}}</div>
