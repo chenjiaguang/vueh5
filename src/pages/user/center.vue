@@ -42,10 +42,10 @@
                       <loading-view />
                     </div>
                   </transition> -->
-                  <div v-if="tabs[index].paging.pn && tabs[index].data && tabs[index].data.length !== 0" :style="{minHeight: ($winHeight - ((tabs && tabs.length) > 1 ? tabBarHeight : 0)) + 0.5 + 'px', backgroundColor: '#fff'}">
+                  <div v-if="tabs[index].paging.pn && tabs[index].data && tabs[index].data.length !== 0" :style="{minHeight: ($winHeight - ((tabs && tabs.length) > 1 ? tabBarHeight : 0)) + 1 + 'px', backgroundColor: '#fff'}">
                     <dynamic-item v-for="(item, idx) in tabs[index].data" :key="item.id" :itemData="item" :hideBlock="idx === tabs[index].data.length - 1" :router="$router" @changeLike="(data) => changeLike(data, index)" />
                   </div>
-                  <div v-else-if="tabs[index].paging.is_end && tabs[index].data && tabs[index].data.length === 0" class="empty-box">
+                  <div v-else-if="tabs[index].paging.is_end && tabs[index].data && tabs[index].data.length === 0" class="empty-box" :style="{minHeight: ($winHeight - ((tabs && tabs.length) > 1 ? tabBarHeight : 0)) + 1 + 'px'}">
                     <img :src="$assetsPublicPath + '/cwebassets/image/empty_dynamic.png'" class="empty-image" />
                     暂无{{index === 0 ? '动态' : '文章'}}
                   </div>
@@ -92,7 +92,6 @@ import MeScroll from 'mescroll.js'
 import 'mescroll.js/mescroll.min.css'
 import MeScrollSupportArr from '@/mixin/MeScrollSupportArr'
 import mescrollOptions from '@/lib/mescrollOptions'
-import Fingerprint2 from 'fingerprintjs2'
 import {
   /* eslint-disable no-unused-vars */
   Style,
@@ -512,10 +511,6 @@ export default {
     this.initSlideBlock()
   },
   activated () {
-    new Fingerprint2().get(function (result, components) {
-      console.log(result) // a hash, representing your device fingerprint
-      console.log(components) // an array of FP components
-    })
     this.$forceUpdate()
   }
 }

@@ -1,7 +1,7 @@
 <template>
   <div :style="{height: $winHeight + 'px'}">
 
-    <div v-if="dynamic" :style="{height: $winHeight-(100/750*$winWidth) + 'px'}">
+    <div v-if="dynamic" :style="{height: $winHeight-(80/750*$winWidth) + 'px'}">
       <div id="mescroll" class="mescroll" >
         <div>
           <download-box v-if="$route.query.isShareOpen" />
@@ -38,8 +38,8 @@
               <div v-for="(content,index) in dynamic.contents" :key="index">
                 <div class="article-image-container">
                   <img class="article-image" v-if="content.type==2" :src="(covers[content.imageIndex].gif && covers[content.imageIndex].staticImage) ? covers[content.imageIndex].staticImage : (covers[content.imageIndex].compress || covers[content.imageIndex].url)" @click="previewImagesInArticle(content.imageIndex)"/>
-                  <div class="long-tag" v-if="content.imageIndex && covers[content.imageIndex].longCover && !covers[content.imageIndex].gif">长图</div>
-                  <div class="gif-tag" v-if="content.imageIndex && covers[content.imageIndex].gif"></div>
+                  <div class="long-tag" v-if="(content.imageIndex || content.imageIndex === 0) && covers[content.imageIndex].longCover && !covers[content.imageIndex].gif">长图</div>
+                  <div class="gif-tag" v-if="(content.imageIndex || content.imageIndex === 0) && covers[content.imageIndex].gif"></div>
                 </div>
 
                 <div class="article-desc" v-if="content.type==2&&content.des">{{content.des}}</div>
@@ -60,7 +60,7 @@
               </a>
             </div>
 
-            <div v-if="dynamic" id="foot-container" class="column">
+            <div v-if="dynamic && (dynamic.actid || dynamic.location || dynamic.circle_name)" id="foot-container" class="column">
               <a class="content-activity-box row center" v-if="dynamic.actid" href="javascript:void(0)" @click="clickActivity(dynamic.actid)">
                 <div class="content-activity-img" :style="`background-image:url(${dynamic.activity.covers?dynamic.activity.covers[0].compress:''})`"/>
                 <div class="content-activity-right column space-between">
@@ -77,8 +77,52 @@
                 <span class="circle-name" style="border-width: 1px">{{dynamic.circle_name}}</span>
               </div>
             </div>
+            <div class="comment-and-like">
+              <div class="gray-block"></div>
+              <div class="comment-and-like-header">
+                <div class="comment-header">{{parseInt(dynamic.comment_num) ? (dynamic.comment_num + '条') : ''}}评论</div>
+                <div class="like-header" v-if="dynamic&&dynamic.like_num>0">
+                  <span>{{dynamic.like_num}}人点了赞</span>
+                  <transition-group class="like-avatar-list" name="avatar-animate" tag="div">
+                    <div v-for="image in dynamic.like_list.filter((item, index) => index < 3)" :key="image.uid" class="like-avatar-item" :style="{backgroundImage: 'url(' + image.avatar + ')'}"></div>
+                  </transition-group>
+                </div>
+              </div>
+              <div class="comment-list" v-if="dynamic && dynamic.comment_list && dynamic.comment_list.length > 0">
+                <transition-group name="fade-slow" tag="div">
+                  <div v-for="(comment) in dynamic.comment_list" class="transition-quick" :key="'comments'+comment.id">
+                    <div class="comment-box row space-between">
+                      <div class="column">
+                        <img class="user-avatar" :src="comment.avatar" @click="clickUser(comment.uid)" />
+                      </div>
+                      <div class="comment-right-box column" >
+                        <div class="row">
+                          <div class="comment-username" @click="clickUser(comment.uid)">{{comment.username}}</div>
+                        </div>
+                        <div class="comment-content" @click="()=>showReplyActionSheet(comment,comment.username)" v-html="handleContentUrl(comment.content)"></div>
+                        <div class="comment-time">{{comment.time}}</div>
 
-            <div v-if="dynamic&&dynamic.like_num>0" class="like-box" id="like-container">
+                        <transition name="fade-slow">
+                          <div v-if="comment.replys.list.length>0" class="comment-replies-box">
+                            <transition-group name="fade-slow" tag="div">
+                              <div class="reply-box transition-quick" v-for="(reply) in comment.replys.list" :key="'replys'+reply.id" @click.stop="()=>showReplyActionSheet(comment,reply.username,reply.id)">
+                                <span class="reply-from" v-if="reply.pusername" @click.stop="clickUser(reply.uid)">{{reply.username}}</span><span class="reply-from" v-if="!reply.pusername" @click.stop="clickUser(reply.uid)">{{reply.username}}:</span><span class="reply-reply" v-if="reply.pusername">回复</span><span class="reply-to" v-if="reply.pusername" @click.stop="clickUser(reply.puid)">{{reply.pusername}}:</span><span class="reply-content" v-html="handleContentUrl(reply.content)"></span>
+                              </div>
+                            </transition-group>
+                            <div class="reply-box transition-quick" v-if="!comment.replys.paging.is_end">
+                              <span class="reply-more" v-if="!comment.replys.paging.is_end" @click.stop="()=>fetchMoreReplies(comment)">查看更多回复></span>
+                            </div>
+                          </div>
+                        </transition>
+                      </div>
+                    </div>
+                  </div>
+                </transition-group>
+              </div>
+              <div class="comment-empty-list" v-else>暂时没有评论</div>
+            </div>
+
+            <!-- <div v-if="dynamic&&dynamic.like_num>0" class="like-box" id="like-container">
               <div class="like-text">{{dynamic.like_num}}个人点了赞</div>
               <div class="row space-between">
                 <div class="row center">
@@ -121,13 +165,13 @@
                   </div>
                 </div>
               </transition-group>
-            </div>
+            </div> -->
           </div>
         </div>
       </div>
     </div>
     <ScrollToTop v-if="dynamic" :visible="scrollToTopVisible" :scroll="this.mescroll" :isMeScroll="true"/>
-    <DynamicFixedBox v-if="dynamic" :dynamic="dynamic"/>
+    <DynamicFixedBox v-if="dynamic" :dynamic="dynamic" @changeLike="changeLike"/>
     <NotFoundPage v-if="isLoad&&!dynamic"/>
   </div>
 </template>
@@ -159,8 +203,9 @@ export default {
         pullUpLoad: true,
         useTransition: false
       },
-      pn: 1,
-      scrollToTopVisible: false
+      paging: {},
+      scrollToTopVisible: false,
+      likeSubmitting: false
     }
   },
   components: {
@@ -237,6 +282,49 @@ export default {
     }
   },
   methods: {
+    changeLike () {
+      if (!utils.checkLogin()) {
+        return false
+      }
+      const isLike = this.dynamic.has_like
+      const likeNum = parseInt(this.dynamic.like_num)
+      let rData = {
+        id: this.dynamic.id,
+        like: !isLike,
+        type: 0
+      }
+      this.dynamic.has_like = !isLike
+      this.dynamic.like_num = likeNum + (isLike ? -1 : 1)
+      this.dynamic.submitting = true
+      this.$ajax('/jv/qz/like', {data: rData}).then(res => {
+        if (!res || (res && Boolean(res.error))) { // 出错时重置点赞
+          this.dynamic.has_like = isLike
+          this.dynamic.like_num = likeNum
+          this.dynamic.submitting = false
+        } else {
+          if (this.dynamic.has_like) { // 增加
+            let i = this.dynamic.like_list.length + 1
+            this.dynamic.like_list.splice(i, 0, res.data)
+          } else { // 减少
+            let i = null
+            this.dynamic.like_list.forEach((ele, idx) => {
+              if (ele.uid === res.data.uid) {
+                i = idx
+                return false
+              }
+            })
+            if (i || i === 0) {
+              this.dynamic.like_list.splice(i, 1)
+            }
+          }
+          this.dynamic.submitting = false
+        }
+      }).catch(err => {
+        this.dynamic.has_like = isLike
+        this.dynamic.like_num = likeNum
+        this.dynamic.submitting = false
+      })
+    },
     handleContentUrl (content) {
       return utils.handleContentUrl(content)
     },
@@ -252,6 +340,7 @@ export default {
           this.dynamic = res.data
           let i = 0
           this.dynamic.isArticle = this.isArticle
+          this.paging = res.data.paging
 
           if (this.isArticle) {
             this.covers = res.data.covers
@@ -273,6 +362,7 @@ export default {
                 use: false
               },
               up: {
+                auto: false,
                 callback: this.fetchMoreComments,
                 htmlLoading: '<p class="">正在加载...</p>',
                 htmlNodata: '<p class="">再刷也没有了</p>',
@@ -304,8 +394,12 @@ export default {
         .catch()
     },
     fetchMoreComments () {
-      this.pn++
-      this.dynamicData.pn = this.pn
+      console.log('this.paging', this.paging)
+      if (this.paging && this.paging.is_end) {
+        this.mescroll.endSuccess(0, false)
+        return false
+      }
+      this.dynamicData.pn = parseInt(this.paging.pn) ? parseInt(this.paging.pn) + 1 : 1
       let url = ''
       if (this.isArticle) {
         url = '/jv/anonymous/qz/dynamicarticle'
@@ -317,7 +411,7 @@ export default {
           res.data.comment_list.forEach(element => {
             this.dynamic.comment_list.push(element)
           })
-          this.dynamic.paging.is_end = res.data.paging.is_end
+          this.paging = res.data.paging
 
           this.mescroll.endSuccess(res.data.comment_list.length, !res.data.paging.is_end)
         })
@@ -385,13 +479,16 @@ export default {
 
 <style scoped>
 .container {
-  margin-left: 30px;
-  margin-right: 30px;
+  width: 100%;
   /* margin-bottom: 100px; */
 }
 #title-container {
   padding-top: 30px;
   margin-bottom: 43px;
+}
+#title-container, #article-content-container, #content-container, #foot-container, #like-container, #comment-container{
+  margin-left: 4%;
+  margin-right: 4%;
 }
 .title {
   margin-bottom: 40px;
@@ -761,6 +858,96 @@ export default {
   font-size: 26px;
   line-height: 38px;
 }
+.comment-and-like{
+  width: 100%;
+}
+.gray-block{
+  width: 100%;
+  height: 12px;
+  background-color: #F0F0F0;
+}
+.comment-and-like-header{
+  height: 96px;
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+.comment-and-like-header:before{
+  content: "";
+  display: block;
+  width: 100%;
+  height: 3px;
+  background-color: #E5E5E5;
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  transform: scale(1, 0.5);
+  transform-origin: 0 100%;
+}
+.comment-header{
+  margin-left: 4%;
+  font-size: 28px;
+  line-height: 40px;
+  font-weight: 700;
+}
+.like-header{
+  flex: 1;
+  height: 100%;
+  margin-right: 4%;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  font-size: 24px;
+  line-height: 40px;
+  color: #666;
+}
+.like-avatar-list{
+  display: flex;
+  flex-direction: row-reverse;
+  height: 100%;
+  flex-wrap: nowrap;
+  position: relative;
+  align-items: center;
+  margin-left: 8px;
+  margin-right: 15px;
+}
+.like-avatar-item{
+  width: 40px;
+  height: 40px;
+  box-sizing: content-box;
+  border: 2px solid #fff;
+  margin-right: -15px;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  border-radius: 50%;
+  position: relative;
+  /* box-shadow: 0 0 6px rgba(0,0,0,0.57); */
+}
+.comment-list{
+  padding-top: 40px;
+  margin: 0 4%;
+}
+.comment-empty-list{
+  height: 380px;
+  box-sizing: border-box;
+  padding-top: 60px;
+  font-size: 28px;
+  line-height: 48px;
+  color: #666;
+  text-align: center;
+}
+
+  .avatar-animate-enter-active, .avatar-animate-leave-active {
+    transition: all 300ms;
+  }
+  .avatar-animate-enter, .avatar-animate-leave-to /* .fade-leave-active below version 2.1.8 */ {
+    width: 0;
+    height: 0;
+    border-width: 0;
+    opacity: 0;
+    margin-right: 0;
+  }
 /*************************************************************/
 .cube-pullup-wrapper {
   height: 50px;

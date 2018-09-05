@@ -1,30 +1,25 @@
 //动态固底交互
 <template>
   <div class="fix-box">
-    <div class="comment-input" @click="clickComment(dynamic.id)">
-      来说点什么吧~
-    </div>
-    <div class="comment-box">
-      <i class="iconfont icon-comment_icon"></i>
-      <div class="badge-container" v-if="dynamic.comment_num&&dynamic.comment_num>0">
-        <div class="badge">{{dynamic.comment_num}}</div>
-      </div>
-
-    </div>
-
-    <div class="like-box" @click="clickLike(dynamic.id)">
+    <div class="like-box" @click="clickLike(dynamic.id)" :style="{color: dynamic.has_like ? '#fe5273' : '#666'}">
       <transition
         enter-active-class="animated wobble"
         leave-active-class="hide"
       >
-        <div v-if="dynamic.has_like" style="height:100%;width:100%;">
+        <div v-if="dynamic.has_like" class="like-icon-box">
           <i class='iconfont icon-like'></i>
+          <span class="like-comment-box-text">{{likeNumber || '赞'}}</span>
         </div>
       </transition>
 
-      <div v-if="!dynamic.has_like" style="height:100%;width:100%;">
+      <div v-if="!dynamic.has_like" class="like-icon-box">
         <i class='iconfont icon-dislike'></i>
+        <span class="like-comment-box-text">{{likeNumber || '赞'}}</span>
       </div>
+    </div>
+    <div class="comment-box" @click="clickComment(dynamic.id)">
+      <i class="iconfont icon-comment_icon2"></i>
+      <span class="like-comment-box-text">{{commentNumber || '评论'}}</span>
     </div>
   </div>
 </template>
@@ -36,35 +31,23 @@ export default {
     return {}
   },
   computed: {
-    likeData: function () {
-      return {
-        type: '0',
-        id: this.dynamic.id
-      }
+    likeNumber () {
+      let num = parseInt(this.dynamic.like_num)
+      console.log('num', num)
+      return num > 999 ? '999+' : num
+    },
+    commentNumber () {
+      let num = parseInt(this.dynamic.comment_num)
+      return num > 999 ? '999+' : num
     }
   },
   components: {},
   methods: {
-    clickLike (id) {
-      let nowHasLike = this.likeData.like = this.dynamic.has_like = !this.dynamic.has_like
-      this.$ajax('/jv/qz/like', { data: this.likeData, checkLogin: true })
-        .then(res => {
-          if (nowHasLike) {
-            // 增加
-            this.dynamic.like_list.splice(0, 0, res.data)
-            this.dynamic.like_num++
-          } else {
-            // 减少
-            let i = this.dynamic.like_list.findIndex((value, index, arr) => {
-              return value.uid === res.data.uid
-            })
-            this.dynamic.like_list.splice(i, 1)
-            this.dynamic.like_num--
-          }
-        })
-        .catch(() => {
-          this.dynamic.has_like = !nowHasLike
-        })
+    clickLike () {
+      if (this.dynamic.submitting) {
+        return false
+      }
+      this.$emit('changeLike')
     },
     clickComment (id) {
       if (utils.checkLogin()) {
@@ -77,6 +60,9 @@ export default {
         })
       }
     }
+  },
+  mounted () {
+    console.log('dynamic', this.dynamic)
   }
 }
 </script>
@@ -87,48 +73,60 @@ export default {
 }
 .fix-box {
   position: fixed;
-  height: 100px;
-  padding-top: 20px;
-  padding-bottom: 20px;
-  padding-left: 30px;
-  padding-right: 30px;
-  left: 0;
-  right: 0;
+  width: 100%;
+  height: 80px;
   bottom: 0;
-  background-color: #ffffff;
-
+  background-color: #FAFAFA;
   z-index: 1;
   display: flex;
   flex-direction: row;
   align-items: center;
 }
-.comment-input {
-  background-color: #f1f1f1;
-  border-radius: 16px;
-  width: 496px;
-  height: 60px;
-  font-size: 30px;
-  padding-left: 20px;
-  padding-right: 20px;
-  padding-top: 15px;
-  padding-bottom: 15px;
-  color: #c5c5c5;
-}
 .comment-box {
-  height: 55px;
-  width: 55px;
-  padding: 10px;
-  margin-left: 47px;
+  width: 50%;
+  height: 100%;
   position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  color: #666;
 }
-.icon-comment_icon {
+.comment-box:before{
+  content: "";
+  display: block;
+  width: 2px;
+  height: 36px;
+  background-color: #BBBBBB;
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: scale(0.5, 1) translateY(-50%);
+  transform-origin: 0 0;
+}
+.icon-comment_icon2 {
   font-size: 35px;
+  color: #666;
 }
 .like-box {
-  height: 55px;
-  width: 55px;
-  padding: 10px;
-  margin-left: 37px;
+  width: 50%;
+  height: 100%;
+  display: block;
+  position: relative;
+}
+.like-icon-box{
+  width: 34%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  left: 33%;
+  top: 0;
+}
+.like-comment-box-text{
+  font-size: 24px;
+  margin-left: 16px;
 }
 .icon-like {
   font-size: 35px;
@@ -136,20 +134,6 @@ export default {
 }
 .icon-dislike {
   font-size: 35px;
-}
-.badge-container {
-  position: absolute;
-  top: -10px;
-  width: 70px;
-  text-align: center;
-}
-.badge {
-  background-color: #fe5273;
-  border-radius: 12px;
-  font-size: 24px;
-  padding: 4px;
-  color: #fff;
-  display: inline-block;
-  min-width: 30px;
+  color: #666;
 }
 </style>

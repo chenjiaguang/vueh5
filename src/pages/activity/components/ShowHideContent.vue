@@ -10,7 +10,7 @@
                   <div v-if="item.content.description" class="description" @load="load">{{item.content.description}}</div>
                 </div>
               </template>
-              <img src="" @error="load" style="width:0;height:0;display:none;" />
+              <img src="" @error="bottomErr" style="width:0;height:0;display:none;" />
           </div>
         </div>
         <div v-if="contentWrapperHeight && contentWrapperHeight > halfScreenHeight" ref="contentBtn" class="show-hide-btn" @click.stop="changeShowContext"><span class="show-hide-text">{{showMore ? '收起' : '查看更多图文详情'}}<i class="pull-sign iconfont icon-pull_down" :style="{transform: showMore ? 'scale(0.25) rotate(180deg)' : 'scale(0.25) rotate(0)'}"></i></span></div>
@@ -119,7 +119,8 @@ export default {
       setted: false,
       showMore: false, // 显示更多
       contentWrapperHeight: null,
-      halfScreenHeight: parseInt(window.innerHeight * 0.5)
+      halfScreenHeight: parseInt(window.innerHeight * 0.5),
+      loadError: false
     }
   },
   methods: {
@@ -135,7 +136,7 @@ export default {
     },
     load () {
       this.$nextTick(() => {
-        if (!this.$refs['contentContainer'] || this.contentWrapperHeight) { // 已设置过就不再设置,防止重复添加高度
+        if (!this.$refs['contentContainer']) { // 已设置过就不再设置,防止重复添加高度
           return false
         }
         let btnHeight = (84 / 750) * this.$winWidth
@@ -144,6 +145,13 @@ export default {
           this.contentWrapperHeight = wrapperHeight + btnHeight
         }
       })
+    },
+    bottomErr () {
+      if (this.loadError) {
+        return false
+      }
+      this.loadError = true
+      this.load()
     },
     preview (index) {
       let idx = this.contentImages.idxArr.indexOf(index)
