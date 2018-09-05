@@ -38,8 +38,8 @@
               <div v-for="(content,index) in dynamic.contents" :key="index">
                 <div class="article-image-container">
                   <img class="article-image" v-if="content.type==2" :src="(covers[content.imageIndex].gif && covers[content.imageIndex].staticImage) ? covers[content.imageIndex].staticImage : (covers[content.imageIndex].compress || covers[content.imageIndex].url)" @click="previewImagesInArticle(content.imageIndex)"/>
-                  <div class="long-tag" v-if="covers[content.imageIndex].longCover && !covers[content.imageIndex].gif">长图</div>
-                  <div class="gif-tag" v-if="covers[content.imageIndex].gif"></div>
+                  <div class="long-tag" v-if="content.imageIndex && covers[content.imageIndex].longCover && !covers[content.imageIndex].gif">长图</div>
+                  <div class="gif-tag" v-if="content.imageIndex && covers[content.imageIndex].gif"></div>
                 </div>
 
                 <div class="article-desc" v-if="content.type==2&&content.des">{{content.des}}</div>
@@ -52,8 +52,11 @@
               <TopicTagBox :topicInfo="dynamic.topicInfo" />
               <DetailImageContainer class="detail-image-container"  :images="dynamic.covers" :router="$router" />
               <a class="content-article-box row center" v-if="dynamic.aid" :href="dynamic.newsArticle.article_url">
-                <div class="content-article-img" :style="`background-image:url(${dynamic.newsArticle.covers?dynamic.newsArticle.covers[0].compress:''})`"/>
-                <div class="content-article-content">{{dynamic.newsArticle.name}}</div>
+                <div v-if="dynamic.newsArticle.covers && dynamic.newsArticle.covers[0]" class="content-article-img" :style="`background-image:url(${dynamic.newsArticle.covers[0].compress || dynamic.newsArticle.covers[0].url})`"/>
+                <div v-else class="content-article-img">
+                  <i class="iconfont link-image icon-link_icon"></i>
+                </div>
+                <div class="content-article-content">{{dynamic.newsArticle.name || dynamic.newsArticle.article_url}}</div>
               </a>
             </div>
 
@@ -261,6 +264,7 @@ export default {
                 return content.imageUrl
               })
           }
+          console.log('dynamic.contents', this.dynamic.contents, this.covers)
 
           this.isLoad = true
           this.$nextTick(() => {
@@ -583,6 +587,14 @@ export default {
   margin-left: 14px;
   background-size: cover;
   background-position: center;
+  background-color: #D8D8D8;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.link-image{
+  font-size: 38px;
+  color: #4B4B4B;
 }
 .content-article-content {
   flex: 1;
@@ -596,6 +608,7 @@ export default {
   line-height: 36px;
   margin-left: 20px;
   margin-right: 14px;
+  word-break: break-all;
 }
 .content-activity-box {
   background-color: #f5f5f5;

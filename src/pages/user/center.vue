@@ -92,6 +92,7 @@ import MeScroll from 'mescroll.js'
 import 'mescroll.js/mescroll.min.css'
 import MeScrollSupportArr from '@/mixin/MeScrollSupportArr'
 import mescrollOptions from '@/lib/mescrollOptions'
+import Fingerprint2 from 'fingerprintjs2'
 import {
   /* eslint-disable no-unused-vars */
   Style,
@@ -511,6 +512,10 @@ export default {
     this.initSlideBlock()
   },
   activated () {
+    new Fingerprint2().get(function (result, components) {
+      console.log(result) // a hash, representing your device fingerprint
+      console.log(components) // an array of FP components
+    })
     this.$forceUpdate()
   }
 }

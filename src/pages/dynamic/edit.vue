@@ -15,7 +15,13 @@
         </div>
       </edit-option>
       <edit-option :option="{leftIcon: 'activity_edit', title: activity.title}" v-if="activity"></edit-option>
-      <edit-option :option="{leftIcon: 'circle', title: '发布于圈子', rightText: circle.title}" v-if="circle"></edit-option>
+      <edit-option :option="{leftIcon: 'circle', title: '发布于圈子', rightText: circle.title}" v-if="circle">
+        <div class="topic-box clearfix" slot="extra">
+          <div @click.stop="showAllwaysChecked = !showAllwaysChecked" class="check-sync fr">
+            <i class="iconfont check-icon" :class="{'icon-checked': showAllwaysChecked, 'icon-uncheck': !showAllwaysChecked}"></i><span>同步到动态</span>
+          </div>
+        </div>
+      </edit-option>
       <edit-option :option="{leftIcon: 'range_' + range, title: rangeMap[range.toString()], rightIcon: 'next'}" @tapFunc="changeRange" v-if="range || range === 0"></edit-option>
     </div>
     <div class="submit-btn" @click.stop="submitDynamic">发布</div>
@@ -45,6 +51,19 @@
 }
 .options-box{
   padding-top: 88px;
+  position: relative;
+}
+.options-box:before{
+  content: "";
+  display: block;
+  width: 300%;
+  height: 3px;
+  background: #E1E1E1;
+  position: absolute;
+  left: 0;
+  top: 88px;
+  transform: scale(0.3333, 0.3333);
+  transform-origin: 0 0;
 }
 .topic-box{
   padding-top: 16px;
@@ -63,6 +82,26 @@
   color: #FF611A;
   margin-right: 8px;
 }
+.check-sync{
+  display: flex;
+  height: 34px;
+  line-height: 30px;
+  font-size: 24px;
+  color: #999;
+  justify-content: flex-end;
+  align-items: center;
+}
+.check-icon{
+  font-size: 30px;
+  margin-right: 16px;
+  transition: color 300ms;
+}
+.check-icon.icon-uncheck{
+  color: #C1C1C1;
+}
+.check-icon.icon-checked{
+  color: #1EB0FD;
+}
 .submit-btn{
   margin-top: 80px;
   height: 90px;
@@ -80,6 +119,7 @@ import imageContainer from '@/components/ImageContainer'
 import EditOption from './components/EditOption'
 import axios from 'axios'
 import utils from '@/lib/utils'
+import 'lrz/dist/lrz.bundle.js'
 
 // 接受参数(params) topic: [{id: 2, title: '测试话题'}]    activity: {id: 2, title: '屯昌木色湖一日游'}    circle: {id: 2, title: '舌尖上的海口'}    range: 0||1||2
 let initialData = {
@@ -96,7 +136,8 @@ let initialData = {
     2: '仅自己可见'
   },
   submitting: false,
-  submitSuccess: false
+  submitSuccess: false,
+  showAllwaysChecked: false
 }
 export default {
   data () {
@@ -106,7 +147,6 @@ export default {
     let range = this.$route.query.range !== undefined ? this.$route.query.range.toString() : null
     let _initialData = JSON.parse(JSON.stringify(initialData))
     let _obj = Object.assign({}, _initialData, {topic, activity, circle, range})
-    console.log('_obj', _obj)
     return _obj
   },
   components: {imageContainer, EditOption},
@@ -127,118 +167,264 @@ export default {
     }
   },
   methods: {
-    addImage (files) {
-      console.log('addImage')
+    convertBase64UrlToBlob (urlData) {
+      let arr = urlData.split(',')
+      let mime = arr[0].match(/:(.*?);/)[1]
+      let bstr = atob(arr[1])
+      let n = bstr.length
+      let u8arr = new Uint8Array(n)
+      while (n--) {
+        u8arr[n] = bstr.charCodeAt(n)
+      }
+      return new Blob([u8arr], {type: mime})
+    },
+    readFile (files, idx, success) {
+      let sign = new Date().getTime() + idx
+      let imageItem = {
+        id: '',
+        sign: sign,
+        url: '',
+        width: '',
+        height: '',
+        localUrl: '',
+        status: 'reading'
+      }
+      // 在添加按钮前插入图片
+      this.images.push(imageItem)
       let _this = this
+      let fileReader = new FileReader()
+      fileReader.readAsDataURL(files[idx])
+      fileReader.onload = function () {
+        console.log('读取成功')
+        let img = document.createElement('img')
+        img.src = this.result
+        img.onload = function (imageData) {
+          success(imageData, sign)
+        }
+        _this.uploadImage(files[idx], sign)
+      }
+      fileReader.onerror = function () {
+        if (_this.images.length > 9) { // 大于9张图时终止，为防止其他错误
+          console.log('超过最大图片数')
+          return false
+        }
+        _this.images.forEach((item, idx) => {
+          if (item.sign === sign) {
+            console.log('读取失败')
+            item.status = 'error'
+          }
+        })
+      }
+    },
+    showLocalImage (imageData, sign, type) { // type：1表示imageData 是base64，可以直接显示，否则是img元素，需读取src
+      let _this = this
+      if (_this.images.length > 9) { // 大于9张图时终止，为防止其他错误
+        console.log('超过最大图片数')
+        return false
+      }
+      let data = imageData.target ? imageData.target : (imageData.path && imageData.path[0]) ? imageData.path[0] : {}
+      _this.images.forEach((item, idx) => {
+        if (item.sign === sign) {
+          item.localUrl = data.src
+        }
+      })
+    },
+    uploadImage (file, sign) {
+      let _this = this
+      _this.images.forEach((item, idx) => {
+        if (item.sign === sign) {
+          item.status = 'submitting'
+        }
+      })
+      var CancelToken = axios.CancelToken
+      let formData = new FormData()
+      formData.append('file', file)
+      _this.$ajax('/jv/image/compressupload', {
+        token: window.localStorage.token || '',
+        contentType: 'multipart/form-data',
+        data: formData,
+        cancelToken: new CancelToken(function executor (cancel) {
+          // An executor function receives a cancel function as a parameter
+          _this.cancelRequest[sign.toString()] = cancel
+        })
+      }).then(res => { // 上传返回数据处理
+        console.log('上传图片成功')
+        let status = ''
+        let id = ''
+        let url = ''
+        if (res && res.msg) {
+          _this.$toast(res.msg)
+        }
+        if (!res.error && res.data) {
+          status = 'success'
+          id = res.data.id[0]
+          url = res.data.url[0]
+        } else {
+          status = 'error'
+        }
+        _this.images.forEach((item, idx) => {
+          if (item.sign === sign) {
+            item.status = status
+            item.id = id
+            item.url = url
+          }
+        })
+        _this.cancelRequest[sign.toString()] = null
+      }).catch(err => {
+        if (err && err.msg) {
+          _this.$toast(err.msg)
+        }
+        _this.images.forEach((item, idx) => {
+          if (item.sign === sign) {
+            console.log('catch错误')
+            item.status = 'error'
+          }
+        })
+        _this.cancelRequest[sign.toString()] = null
+      })
+    },
+    addImage (files) {
+      // let _this = this
       let currentLength = this.images.length
       let addLength = 9 - currentLength
       if (addLength <= 0) { // 超过9图处理
-        console.log('超过9图处理')
         return false
       }
       for (let i = 0; i < files.length; i++) {
         if (i < addLength) {
-          let sign = new Date().getTime() + i
-          let imageItem = {
-            id: '',
-            sign: sign,
-            url: '',
-            width: '',
-            height: '',
-            localUrl: '',
-            status: 'reading'
-          }
-          console.log('插入图片', sign)
-          // 在添加按钮前插入图片
-          this.images.push(imageItem)
-          let fileReader = new FileReader()
-          fileReader.readAsDataURL(files[i])
-          fileReader.onload = function () {
-            console.log('读取成功', sign)
-            let img = document.createElement('img')
-            img.src = this.result
-            img.onload = function (imageData) {
-              console.log('图片加载成功')
-              if (_this.images.length > 9) { // 大于9张图时终止，为防止其他错误
-                console.log('超过最大图片数')
-                return false
+          let reg = /(jpeg|jpg)/i
+          let isJpg = reg.test(files[i].type)
+          if (isJpg) { // jpg图片才压缩, 默认压缩质量0.7
+            window.lrz(files[i]).then(res => {
+              console.log('压缩图片成功')
+              let sign = new Date().getTime() + i
+              let imageItem = {
+                id: '',
+                sign: sign,
+                url: '',
+                width: '',
+                height: '',
+                localUrl: '',
+                status: 'reading'
               }
-              let data = imageData.target ? imageData.target : (imageData.path && imageData.path[0]) ? imageData.path[0] : {}
-              _this.images.forEach((item, idx) => {
-                if (item.sign === sign) {
-                  item.width = data.width
-                  item.height = data.height
-                  item.localUrl = data.src
-                }
-              })
-            }
-            img.onerror = function () {
-              console.log('图片加载错误')
-            }
-            _this.images.forEach((item, idx) => {
-              if (item.sign === sign) {
-                item.status = 'submitting'
-              }
-            })
-            var CancelToken = axios.CancelToken
-            let formData = new FormData()
-            formData.append('file', files[i])
-            _this.$ajax('/jv/image/compressupload', {
-              token: window.localStorage.token || '',
-              contentType: 'multipart/form-data',
-              data: formData,
-              cancelToken: new CancelToken(function executor (cancel) {
-                // An executor function receives a cancel function as a parameter
-                _this.cancelRequest[sign.toString()] = cancel
-              })
-            }).then(res => { // 上传返回数据处理
-              console.log('上传图片成功')
-              let status = ''
-              let id = ''
-              let url = ''
-              if (res && res.msg) {
-                _this.$toast(res.msg)
-              }
-              if (!res.error && res.data) {
-                status = 'success'
-                id = res.data.id[0]
-                url = res.data.url[0]
-              } else {
-                status = 'error'
-              }
-              _this.images.forEach((item, idx) => {
-                if (item.sign === sign) {
-                  item.status = status
-                  item.id = id
-                  item.url = url
-                }
-              })
-              _this.cancelRequest[sign.toString()] = null
+              // 在添加按钮前插入图片
+              this.images.push(imageItem)
+              this.showLocalImage(res.base64, sign, 1)
+              this.uploadImage(res.file, sign)
             }).catch(err => {
-              if (err && err.msg) {
-                _this.$toast(err.msg)
-              }
-              _this.images.forEach((item, idx) => {
-                if (item.sign === sign) {
-                  console.log('catch错误')
-                  item.status = 'error'
-                }
+              console.log('压缩图片失败')
+              this.readFile(files, i, (_imageData, _sign) => {
+                this.showLocalImage(_imageData, _sign, 2)
               })
-              _this.cancelRequest[sign.toString()] = null
+            })
+            return false
+          } else {
+            this.readFile(files, i, (_imageData, _sign) => {
+              this.showLocalImage(_imageData, _sign, 2)
             })
           }
-          fileReader.onerror = function () {
-            if (_this.images.length > 9) { // 大于9张图时终止，为防止其他错误
-              console.log('超过最大图片数')
-              return false
-            }
-            _this.images.forEach((item, idx) => {
-              if (item.sign === sign) {
-                console.log('读取失败')
-                item.status = 'error'
-              }
-            })
-          }
+          // return false
+          // let sign = new Date().getTime() + i
+          // let imageItem = {
+          //   id: '',
+          //   sign: sign,
+          //   url: '',
+          //   width: '',
+          //   height: '',
+          //   localUrl: '',
+          //   status: 'reading'
+          // }
+          // console.log('插入图片', sign)
+          // // 在添加按钮前插入图片
+          // this.images.push(imageItem)
+          // let fileReader = new FileReader()
+          // fileReader.readAsDataURL(files[i])
+          // fileReader.onload = function () {
+          //   console.log('读取成功', sign)
+          //   let img = document.createElement('img')
+          //   img.src = this.result
+          //   img.onload = function (imageData) {
+          //     console.log('图片加载成功')
+          //     if (_this.images.length > 9) { // 大于9张图时终止，为防止其他错误
+          //       console.log('超过最大图片数')
+          //       return false
+          //     }
+          //     let data = imageData.target ? imageData.target : (imageData.path && imageData.path[0]) ? imageData.path[0] : {}
+          //     _this.images.forEach((item, idx) => {
+          //       if (item.sign === sign) {
+          //         item.width = data.width
+          //         item.height = data.height
+          //         item.localUrl = data.src
+          //       }
+          //     })
+          //   }
+          //   img.onerror = function () {
+          //     console.log('图片加载错误')
+          //   }
+          //   _this.images.forEach((item, idx) => {
+          //     if (item.sign === sign) {
+          //       item.status = 'submitting'
+          //     }
+          //   })
+          //   var CancelToken = axios.CancelToken
+          //   let formData = new FormData()
+          //   formData.append('file', files[i])
+          //   _this.$ajax('/jv/image/compressupload', {
+          //     token: window.localStorage.token || '',
+          //     contentType: 'multipart/form-data',
+          //     data: formData,
+          //     cancelToken: new CancelToken(function executor (cancel) {
+          //       // An executor function receives a cancel function as a parameter
+          //       _this.cancelRequest[sign.toString()] = cancel
+          //     })
+          //   }).then(res => { // 上传返回数据处理
+          //     console.log('上传图片成功')
+          //     let status = ''
+          //     let id = ''
+          //     let url = ''
+          //     if (res && res.msg) {
+          //       _this.$toast(res.msg)
+          //     }
+          //     if (!res.error && res.data) {
+          //       status = 'success'
+          //       id = res.data.id[0]
+          //       url = res.data.url[0]
+          //     } else {
+          //       status = 'error'
+          //     }
+          //     _this.images.forEach((item, idx) => {
+          //       if (item.sign === sign) {
+          //         item.status = status
+          //         item.id = id
+          //         item.url = url
+          //       }
+          //     })
+          //     _this.cancelRequest[sign.toString()] = null
+          //   }).catch(err => {
+          //     if (err && err.msg) {
+          //       _this.$toast(err.msg)
+          //     }
+          //     _this.images.forEach((item, idx) => {
+          //       if (item.sign === sign) {
+          //         console.log('catch错误')
+          //         item.status = 'error'
+          //       }
+          //     })
+          //     _this.cancelRequest[sign.toString()] = null
+          //   })
+          // }
+          // fileReader.onerror = function () {
+          //   if (_this.images.length > 9) { // 大于9张图时终止，为防止其他错误
+          //     console.log('超过最大图片数')
+          //     return false
+          //   }
+          //   _this.images.forEach((item, idx) => {
+          //     if (item.sign === sign) {
+          //       console.log('读取失败')
+          //       item.status = 'error'
+          //     }
+          //   })
+          // }
         } else {
           console.log('超过了')
         }
@@ -311,7 +497,7 @@ export default {
         actid: this.activity ? (this.activity.id || '') : '',
         circle_id: this.circle ? (this.circle.id || '') : '',
         topicId: topic_ids,
-        showAllways: true
+        showAllways: this.showAllways
       }
       this.submitting = true
       this.$ajax('/jv/qz/publish/dynamic', {data: rData}).then(res => {
@@ -349,6 +535,11 @@ export default {
         this[item] = _obj[item]
       }
       // this.$router.replace({name: 'EditDynamic', query: this.$route.query})
+    }
+  },
+  computed: {
+    showAllways () {
+      return (this.circle && this.circle.id) ? this.showAllwaysChecked : true
     }
   },
   beforeRouteEnter (to, from, next) {

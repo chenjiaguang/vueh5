@@ -19,10 +19,13 @@
     </div>
     <div v-if="itemData.location" class="publish-address">{{itemData.location}}</div>
     <div v-if="itemData.activity" class="at-activity"><i class="iconfont icon-activity activity-sign"></i>{{itemData.activity.title}}</div>
-    <a @click.stop :href="itemData.newsArticle.article_url" v-if="itemData.newsArticle && itemData.newsArticle.name" class="with-article">
-      <div class="with-article-cover" :style="{backgroundImage: 'url(' + ((itemData.newsArticle.covers && itemData.newsArticle.covers[0]) ? itemData.newsArticle.covers[0].compress : '') + ')'}"></div>
+    <a @click.stop :href="itemData.newsArticle.article_url" v-if="itemData.newsArticle && itemData.newsArticle.id" class="with-article">
+      <div class="with-article-cover" v-if="itemData.newsArticle.covers && itemData.newsArticle.covers[0]" :style="{backgroundImage: 'url(' + (itemData.newsArticle.covers[0].compress || itemData.newsArticle.covers[0].url) + ')'}"></div>
+      <div class="with-article-cover" v-else>
+        <i class="iconfont link-image icon-link_icon"></i>
+      </div>
       <div class="with-article-title">
-        <div class="with-article-title-text">{{itemData.newsArticle.name}}</div>
+        <div class="with-article-title-text">{{itemData.newsArticle.name || itemData.newsArticle.article_url}}</div>
       </div>
     </a>
     <div class="comment-and-like clearfix">
@@ -170,11 +173,19 @@
   width: 100px;
   height: 100px;
   position: absolute;
-  left: 14px;
-  top: 14px;
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;
+  background-color: #D8D8D8;
+  left: 14px;
+  top: 14px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.link-image{
+  font-size: 38px;
+  color: #4B4B4B;
 }
 .with-article-title{
   margin-left: 134px;
@@ -198,6 +209,7 @@
   top: 50%;
   transform: translateY(-50%);
   white-space: normal;
+  word-break: break-all;
 }
 .comment-and-like{
   width: 100%;
