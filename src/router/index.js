@@ -19,6 +19,7 @@ import DynamicSendComment from '@/pages/dynamic/sendComment'
 import TopicDetail from '@/pages/topic/detail'
 import SMSCode from '@/pages/smsCode'
 import WeixinLoginJump from '@/pages/weixinLoginJump'
+import PromotionIndex from '@/pages/promotion/index'
 Vue.use(Router)
 let prefix = '/h5'
 
@@ -174,6 +175,14 @@ const router = new Router({
       meta: {
         title: '范团话题',
         keepAlive: true
+      }
+    },
+    {
+      path: prefix + '/promotion/index',
+      name: 'PromotionIndex',
+      component: PromotionIndex,
+      meta: {
+        title: '范团'
       }
     }
   ],
