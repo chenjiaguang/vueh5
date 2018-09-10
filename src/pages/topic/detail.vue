@@ -286,6 +286,13 @@ export default {
                 this.mescroll[idx].showNoMore()
               }
             })
+            this.$store.commit('weixinShare/set', {
+              type: '2',
+              title: res.data.shareInfo.shareTitle,
+              desc: res.data.shareInfo.shareContent,
+              url: res.data.shareInfo.shareUrl,
+              imgUrl: res.data.shareInfo.shareImage
+            })
           } else {
             this.tabs[idx].data = this.tabs[idx].data.concat(res.data.list)
             this.$nextTick(() => {

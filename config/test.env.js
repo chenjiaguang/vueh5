@@ -7,5 +7,6 @@ module.exports = merge(prodEnv, {
   API_DOMAIN: '"http://fanttest.fantuanlife.com"',
   WEIXINLOGINJUMP_HTTPS: '"https://fanttest.fantuanlife.com/h5/weixinLoginJump"',
   WEIXINLOGINJUMP_HTTP: '"http://fanttest.fantuanlife.com/h5/weixinLoginJump"',
-  LOCATION_DOMAIN: '"https://fanttest.fantuanlife.com/cweb/index.html#"'
+  LOCATION_DOMAIN: '"https://fanttest.fantuanlife.com/cweb/index.html#"',
+  LOGO_URL:'"http://fanttest.fantuanlife.com/h5/cwebassets/image/van_logo.png"'
 })

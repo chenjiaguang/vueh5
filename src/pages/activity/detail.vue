@@ -463,6 +463,14 @@ export default {
           tagsArr.push('限购' + res.data.max_ticket + '张')
         }
         this.activity.tags = tagsArr
+
+        this.$store.commit('weixinShare/set', {
+          type: '5',
+          title: res.data.shareInfo.shareTitle,
+          desc: res.data.shareInfo.shareContent,
+          url: res.data.shareInfo.shareUrl,
+          imgUrl: res.data.shareInfo.shareImage
+        })
       }).catch(err => {
         console.log('获取数据失败')
       })

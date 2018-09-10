@@ -8,6 +8,7 @@
 </template>
 
 <script>
+//
 export default {
   name: 'App',
   data () {
@@ -30,14 +31,39 @@ export default {
     }
   },
   mounted () {
+    this.$ajax('/jv/anonymous/ticket/get', {
+      data: 'url=' + encodeURIComponent(window.location.href),
+      contentType: 'application/x-www-form-urlencoded'
+    })
+      .then(res => {
+        global.wx.config({
+          debug: false, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
+          appId: res.data.appid, // 必填，公众号的唯一标识
+          timestamp: res.data.timestamp, // 必填，生成签名的时间戳
+          nonceStr: res.data.nonceStr, // 必填，生成签名的随机串
+          signature: res.data.signature, // 必填，签名
+          jsApiList: ['onMenuShareTimeline', 'onMenuShareAppMessage'] // 必填，需要使用的JS接口列表
+        })
+      })
+      .catch(e => {
+        console.log(e)
+      })
+
     /**
      * 分享打开计数功能 不带next 返回bool表示是否有路由更新
      * type: 1：圈子 2：话题 3：短动态 4：长文 5：活动
      */
-    if (this.$route.query.isShareOpen && this.$route.query.isShareOpen !== 'false') {
+    if (
+      this.$route.query.isShareOpen &&
+      this.$route.query.isShareOpen !== 'false'
+    ) {
       let _type = ''
-      if (this.$route.name === 'dynamicDetail') { // 动态详情页分为短动态和长文、其他的按路由来确定type
-        if (this.$route.query.isArticle && this.$route.query.isArticle !== 'false') {
+      if (this.$route.name === 'dynamicDetail') {
+        // 动态详情页分为短动态和长文、其他的按路由来确定type
+        if (
+          this.$route.query.isArticle &&
+          this.$route.query.isArticle !== 'false'
+        ) {
           _type = 4
         } else {
           _type = 3
@@ -55,10 +81,10 @@ export default {
 
 <style src='./assets/css/common.css' />
 <style>
-html{
+html {
   height: 100%;
 }
-#app{
+#app {
   height: 100%;
 }
 body {
