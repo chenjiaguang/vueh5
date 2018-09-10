@@ -287,6 +287,7 @@ export default {
             }
           }
           this.$store.commit('weixinShare/set', {
+            type: '1',
             title: res.data.shareInfo.shareTitle,
             desc: res.data.shareInfo.shareContent,
             url: res.data.shareInfo.shareUrl,

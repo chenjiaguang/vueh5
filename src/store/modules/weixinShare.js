@@ -1,9 +1,12 @@
+import ajax from '@/lib/ajax'
 export default {
   namespaced: true,
   state: {
+    type: ''
   },
   mutations: {
     set (state, payload = {}) {
+      state.type = payload.type || ''
       global.wx.ready(function () {
         // 需在用户可能点击分享按钮前就先调用
         global.wx.updateAppMessageShareData(
@@ -14,7 +17,10 @@ export default {
             imgUrl: payload.imgUrl // 分享图标
           },
           function (res) {
-            // 这里是回调函数
+            console.log('type', state.type)
+            if (state.type) {
+              ajax('/jv/share/article/addPoint', { data: { type: state.type } })
+            }
           }
         )
         global.wx.onMenuShareAppMessage({
@@ -25,7 +31,10 @@ export default {
           type: '', // 分享类型,music、video或link，不填默认为link
           dataUrl: '', // 如果type是music或video，则要提供数据链接，默认为空
           success: function () {
-            // 用户点击了分享后执行的回调函数
+            console.log('type', state.type)
+            if (state.type) {
+              ajax('/jv/share/article/addPoint', { data: { type: state.type } })
+            }
           }
         })
       })

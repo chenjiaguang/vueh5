@@ -471,6 +471,7 @@ export default {
         this.activity.tags = tagsArr
 
         this.$store.commit('weixinShare/set', {
+          type: '5',
           title: res.data.shareInfo.shareTitle,
           desc: res.data.shareInfo.shareContent,
           url: res.data.shareInfo.shareUrl,
