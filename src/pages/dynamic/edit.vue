@@ -151,14 +151,6 @@ export default {
   },
   components: {imageContainer, EditOption},
   watch: {
-    '$route.query.previewImage': function (val, oldVal) {
-      if (!val && oldVal) {
-        if (window.previewImageId) {
-          this.$previewImage.hide(window.previewImageId)
-          window.previewImageId = null
-        }
-      }
-    },
     submitSuccess: function (val, oldVal) {
       if (val && !oldVal) {
         this.refreshData()
@@ -199,7 +191,7 @@ export default {
         let img = document.createElement('img')
         img.src = this.result
         img.onload = function (imageData) {
-          success(imageData, sign)
+          success(imageData, sign, {width: img.width, height: img.height})
         }
         _this.uploadImage(files[idx], sign)
       }
@@ -216,16 +208,31 @@ export default {
         })
       }
     },
-    showLocalImage (imageData, sign, type) { // type：1表示imageData 是base64，可以直接显示，否则是img元素，需读取src
+    showLocalImage (imageData, sign, type, imageSize) { // type：1表示imageData 是base64，可以直接显示，否则是img元素，需读取src
       let _this = this
       if (_this.images.length > 9) { // 大于9张图时终止，为防止其他错误
         console.log('超过最大图片数')
         return false
       }
-      let data = imageData.target ? imageData.target : (imageData.path && imageData.path[0]) ? imageData.path[0] : {}
+      let url = ''
+      if (type.toString() === '1') {
+        url = imageData
+      } else if (type.toString() === '2') {
+        url = imageData.target ? imageData.target.src : ((imageData.path && imageData.path[0]) ? imageData.path[0].src : '')
+      }
       _this.images.forEach((item, idx) => {
-        if (item.sign === sign) {
-          item.localUrl = data.src
+        if (item.sign === sign && type.toString() === '1') { // 尚未获得图片的宽高
+          let _img = document.createElement('img')
+          item.localUrl = url
+          _img.src = url
+          _img.onload = function () {
+            item.width = _img.width
+            item.height = _img.height
+          }
+        } else if (item.sign === sign && type.toString() === '2' && imageSize) { // 已获得图片的宽高
+          item.width = imageSize.width
+          item.height = imageSize.height
+          item.localUrl = url
         }
       })
     },
@@ -313,14 +320,14 @@ export default {
               this.uploadImage(res.file, sign)
             }).catch(err => {
               console.log('压缩图片失败')
-              this.readFile(files, i, (_imageData, _sign) => {
-                this.showLocalImage(_imageData, _sign, 2)
+              this.readFile(files, i, (_imageData, _sign, sizeObj) => {
+                this.showLocalImage(_imageData, _sign, 2, sizeObj)
               })
             })
             return false
           } else {
-            this.readFile(files, i, (_imageData, _sign) => {
-              this.showLocalImage(_imageData, _sign, 2)
+            this.readFile(files, i, (_imageData, _sign, sizeObj) => {
+              this.showLocalImage(_imageData, _sign, 2, sizeObj)
             })
           }
           // return false

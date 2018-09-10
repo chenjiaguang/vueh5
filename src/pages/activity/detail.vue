@@ -408,12 +408,6 @@ export default {
   components: { ShowHideContent },
   watch: {
     '$route': function (val, oldVal) {
-      if (!val.query.previewImage && oldVal.query.previewImage) { // 点击大图后返回
-        if (window.previewImageId) {
-          this.$previewImage.hide(window.previewImageId)
-          window.previewImageId = null
-        }
-      }
       utils.checkReloadWithKeepAliveNew(this, val, oldVal, 'ActivityDetail', ['id'], () => {
         this.refreshData()
       })
