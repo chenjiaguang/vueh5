@@ -85,6 +85,7 @@ import utils from '@/lib/utils'
 import MeScroll from 'mescroll.js'
 import 'mescroll.js/mescroll.min.css'
 import MeScrollSupportArr from '@/mixin/MeScrollSupportArr'
+import CloseImagePreviewer from '@/mixin/CloseImagePreviewer'
 import mescrollOptions from '@/lib/mescrollOptions'
 import {
   /* eslint-disable no-unused-vars */
@@ -126,7 +127,7 @@ const initialData = {
   mescroll: []
 }
 export default {
-  mixins: [MeScrollSupportArr],
+  mixins: [MeScrollSupportArr, CloseImagePreviewer],
   data () {
     let selectedIdx = parseInt(this.$route.query.jump_tab || 0)
     let selectedLabel = (this.$route.query.jump_tab && this.$route.query.jump_tab.toString() === '1') ? '活动' : '动态'
@@ -156,12 +157,6 @@ export default {
   components: {DynamicItem, ActivityItem, DownloadBox, LoadingView, ScrollToTop, swiper, swiperSlide},
   watch: {
     '$route': function (val, oldVal) {
-      if (!val.query.previewImage && oldVal.query.previewImage) { // 点击大图后返回
-        if (window.previewImageId) {
-          this.$previewImage.hide(window.previewImageId)
-          window.previewImageId = null
-        }
-      }
       utils.checkReloadWithKeepAliveNew(this, val, oldVal, 'CircleDetail', ['circle_id', 'jump_tab'], () => {
         this.refreshData()
       })
@@ -531,6 +526,9 @@ export default {
   },
   activated () {
     this.$forceUpdate()
+  },
+  beforeDestroy () {
+    alert(1111)
   }
 }
 </script>

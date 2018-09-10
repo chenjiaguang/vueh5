@@ -1,19 +1,14 @@
 <template>
     <transition appear appear-class="before-appear">
-        <div class="container" :id="id" ref="mySwiper" :style="{width: swiperOption.width + 'px', height: swiperOption.height + 'px', zIndex: timestap}" @click="close">
+        <div class="container" :id="id" ref="mySwiper" :style="{width: swiperOption.width + 'px', height: swiperOption.height + 'px', zIndex: timestap}" @click.stop="close" @touchmove.prevent>
             <swiper class="swiper-wrapper" :options="swiperOption">
                 <!-- slides -->
                 <swiper-slide class="swiper-item" v-for="(item, idx) in images" :key="idx">
-                    <div class="swiper-item-content">
+                    <div class="swiper-item-content swiper-zoom-container">
                         <img class="image" :src="item" />
                     </div>
                 </swiper-slide>
             </swiper>
-            <!-- Optional controls -->
-            <div class="swiper-pagination"></div>
-            <!-- <div class="swiper-button-prev" slot="button-prev"></div> -->
-            <!-- <div class="swiper-button-next" slot="button-next"></div> -->
-            <!-- <div class="swiper-scrollbar"   slot="scrollbar"></div> -->
         </div>
     </transition>
 </template>
@@ -30,8 +25,7 @@ export default {
       swiperOption: {
         initialSlide: 0,
         setWrapperSize: true,
-        width: window.innerWidth,
-        height: window.innerHeight,
+        zoom: true,
         pagination: {
           el: '.swiper-pagination',
           type: 'fraction'
@@ -74,32 +68,23 @@ export default {
     .swiper-item{
         width: 100%;
         height: 100%;
-        overflow: hidden;
+        overflow-x: hidden;
+        overflow-y: hidden;
         position: relative;
     }
     .swiper-item-content{
         width: 100%;
-        max-height:100%;
-        position: absolute;
-        left: 0;
-        top: 50%;
-        transform: translateY(-50%);
-        overflow-x: hidden;
-        overflow-y: auto;
+        height: 100%;
+        // max-height:100%;
+        // position: absolute;
+        // left: 0;
+        // top: 50%;
+        // transform: translateY(-50%);
+        // overflow-x: hidden;
+        // overflow-y: auto;
     }
     .image{
         display: block;
         width: 100%;
-    }
-    .swiper-pagination{
-        position: absolute;
-        color: #fff;
-        width: 100%;
-        text-align: center;
-        height: 40px;
-        line-height: 40px;
-        font-size: 34px;
-        left: 0;
-        top: 64px;
     }
 </style>
