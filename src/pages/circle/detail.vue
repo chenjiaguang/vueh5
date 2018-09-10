@@ -291,6 +291,12 @@ export default {
               this.initMeScroll(0)
             }
           }
+          this.$store.commit('weixinShare/set', {
+            title: res.data.shareInfo.shareTitle,
+            desc: res.data.shareInfo.shareContent,
+            url: res.data.shareInfo.shareUrl,
+            imgUrl: res.data.shareInfo.shareImage
+          })
         }
       }).catch(err => {
         if (err.msg) {

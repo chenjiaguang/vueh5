@@ -261,20 +261,14 @@ export default {
                 content.imageIndex = i++
                 return content.imageUrl
               })
-            this.$store.commit('weixinShare/set', {
-              title: res.data.title,
-              desc: res.data.content ? res.data.content : `分享${res.data.username}在范团的长文`,
-              url: window.location.href,
-              imgUrl: res.data.covers.length > 0 ? ((res.data.covers[0].gif && res.data.covers[0].staticImage) ? res.data.covers[0].staticImage : res.data.covers[0].compress) : process.env.LOGO_URL
-            })
-          } else {
-            this.$store.commit('weixinShare/set', {
-              title: `分享${res.data.username}在范团的动态`,
-              desc: res.data.content ? res.data.content : '范团-有范又有趣的海南生活圈',
-              url: window.location.href,
-              imgUrl: res.data.covers.length > 0 ? ((res.data.covers[0].gif && res.data.covers[0].staticImage) ? res.data.covers[0].staticImage : res.data.covers[0].compress) : process.env.LOGO_URL
-            })
           }
+
+          this.$store.commit('weixinShare/set', {
+            title: res.data.shareInfo.shareTitle,
+            desc: res.data.shareInfo.shareContent,
+            url: res.data.shareInfo.shareUrl,
+            imgUrl: res.data.shareInfo.shareImage
+          })
 
           this.isLoad = true
           this.$nextTick(() => {
