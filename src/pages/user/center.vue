@@ -267,6 +267,12 @@ export default {
           this.tabs[tabIdx].fetching = false
           if (pn === 1) { // 第一页
             this.tabs[tabIdx].data = res.data.list
+            this.$store.commit('weixinShare/set', {
+              title: res.data.shareInfo.shareTitle,
+              desc: res.data.shareInfo.shareContent,
+              url: res.data.shareInfo.shareUrl,
+              imgUrl: res.data.shareInfo.shareImage
+            })
           } else { // 非第一页
             this.tabs[tabIdx].data = this.tabs[tabIdx].data.concat(res.data.list)
           }

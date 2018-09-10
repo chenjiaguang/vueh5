@@ -249,6 +249,7 @@ export default {
     }
   },
   activated () {
+    console.log('window.history', window.history)
     if (this.isArticle) {
       document.title = '长文详情'
     } else {
@@ -354,6 +355,13 @@ export default {
               })
           }
           console.log('dynamic.contents', this.dynamic.contents, this.covers)
+
+          this.$store.commit('weixinShare/set', {
+            title: res.data.shareInfo.shareTitle,
+            desc: res.data.shareInfo.shareContent,
+            url: res.data.shareInfo.shareUrl,
+            imgUrl: res.data.shareInfo.shareImage
+          })
 
           this.isLoad = true
           this.$nextTick(() => {

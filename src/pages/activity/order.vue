@@ -680,7 +680,7 @@ export default {
         phone: phone
       }
       this.submitting = true
-      this.$ajax('/jv/anonymous/qz/v21/apply', {data: rData}).then(res => { // 请求后端下单接口,接受返回参数,如果有error,则提示，无error，则判断是否应调起支付
+      this.$ajax('/jv/qz/v21/apply', {data: rData}).then(res => { // 请求后端下单接口,接受返回参数,如果有error,则提示，无error，则判断是否应调起支付
         this.submitting = false
         if (res && res.msg) {
           if (res.error) { // 出错时仅提示
@@ -701,7 +701,7 @@ export default {
                 payType: '1',
                 tradeType: 'MWEB'
               }
-              this.$ajax('/jv/anonymous/qz/v21/activity/pay', {data: _rData}).then(res => {
+              this.$ajax('/jv/qz/v21/activity/pay', {data: _rData}).then(res => {
                 if (res && Boolean(res.error) && res.msg) {
                   this.$toast(res.msg)
                 } else if (res && !res.error) {
