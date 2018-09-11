@@ -114,6 +114,7 @@ export default {
         .then(res => {
           this.article = res.data
           this.paging = res.data.paging
+          document.title = this.article.name
 
           if (this.article.content_type === '0') {
             // 如果是微信则读url
