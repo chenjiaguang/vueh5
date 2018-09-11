@@ -310,9 +310,6 @@ export default {
     commentNumber () {
       let num = parseInt(this.itemData.comment_num)
       return num > 999 ? '999+' : num
-    },
-    linkCanNav () {
-
     }
   },
   methods: {

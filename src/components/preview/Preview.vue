@@ -1,6 +1,6 @@
 <template>
   <!-- Root element of PhotoSwipe. Must have class pswp. -->
-<div class="pswp" ref="previewer" tabindex="-1" role="dialog" aria-hidden="true" :style="{zIndex: zIndex}" @touchmove.prevent @touchcancel="cancel">
+<div class="pswp" ref="previewer" tabindex="-1" role="dialog" aria-hidden="true" :style="{zIndex: zIndex}" @touchmove.prevent>
     <!-- Background of PhotoSwipe.
          It's a separate element as animating opacity is faster than rgba(). -->
     <div class="pswp__bg"></div>
@@ -97,16 +97,10 @@ export default {
       gallery: null
     }
   },
-  methods: {
-    cancel () {
-      console.log('dsdf')
-    }
-  },
   mounted () {
     this.gallery = new PhotoSwipe(this.$refs['previewer'], PhotoSwipeUI_Default, this.images, this.options)
     this.gallery.init()
     this.gallery.listen('destroy', () => {
-      console.log('destroy')
       let _body = document.getElementsByTagName('body')[0]
       _body.removeChild(this.$refs['previewer'])
     })
