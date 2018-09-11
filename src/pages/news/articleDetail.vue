@@ -72,7 +72,7 @@ export default {
         'NewsDetail',
         ['id'],
         () => {
-          this.dynamic = null
+          this.article = null
           this.isLoad = false
           this.fetch()
         }
