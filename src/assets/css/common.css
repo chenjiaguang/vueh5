@@ -195,3 +195,8 @@
 .loading-scale-leave-active{
   transition: height 400ms, transform 400ms;
 }
+
+.pswp__img{
+  user-select: all !important;
+  -webkit-touch-callout: default !important;
+}

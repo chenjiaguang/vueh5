@@ -1,6 +1,6 @@
 <template>
   <!-- Root element of PhotoSwipe. Must have class pswp. -->
-<div class="pswp" ref="previewer" tabindex="-1" role="dialog" aria-hidden="true" :style="{zIndex: zIndex}">
+<div class="pswp" ref="previewer" tabindex="-1" role="dialog" aria-hidden="true" :style="{zIndex: zIndex}" @touchmove.prevent="touchmove" @touchstart="touchstart" @touchend="touchend" @touchcancel="touchcancel">
     <!-- Background of PhotoSwipe.
          It's a separate element as animating opacity is faster than rgba(). -->
     <div class="pswp__bg"></div>
@@ -63,7 +63,7 @@ export default {
         // hideAnimationDuration: 0,
         showHideOpacity: true,
         pinchToClose: false,
-        tapToClose: true,
+        // tapToClose: true,
         tapToToggleControls: false,
         closeEl: false,
         captionEl: false,
@@ -74,6 +74,10 @@ export default {
         arrowEl: false,
         preloaderEl: true,
         loop: false,
+        // isClickableElement: function (el) {
+        //   console.log('isClickableElement', el.tagName)
+        //   return el.tagName === 'IMG'
+        // },
         getThumbBoundsFn: (index) => {
           // find thumbnail element
           var thumbnail = this.clickedEl
@@ -89,17 +93,69 @@ export default {
         }
       },
       zIndex: 999,
-      clickedEl: null
+      clickedEl: null,
+      gallery: null,
+      start: null
+    }
+  },
+  methods: {
+    touchmove () {
+      console.log('move')
+      this.start = null
+    },
+    touchstart () {
+      console.log('start')
+      this.start = new Date().getTime()
+    },
+    touchend () {
+      console.log('end')
+      if (this.start) {
+        this.gallery.close()
+      }
+    },
+    touchcancel () {
+      console.log('cancel')
+      this.start = null
     }
   },
   mounted () {
-    PhotoSwipeUI_Default.tapToClose = true
-    PhotoSwipeUI_Default.tapToToggleControls = false
-    let gallery = new PhotoSwipe(this.$refs['previewer'], PhotoSwipeUI_Default, this.images, this.options)
-    gallery.init()
-    gallery.listen('destroy', () => {
+    this.gallery = new PhotoSwipe(this.$refs['previewer'], PhotoSwipeUI_Default, this.images, this.options)
+    this.gallery.init()
+    this.gallery.listen('destroy', () => {
+      console.log('destroy')
       let _body = document.getElementsByTagName('body')[0]
       _body.removeChild(this.$refs['previewer'])
+    })
+    // let _this = this
+    // this.gallery.framework.bind(this.gallery.scrollWrap /* bind on any element of gallery */, 'pswpTap', function (e) {
+    // //   console.log('tap', e, e.detail.target)
+    //   // e.detail.origEvent  // original event that finished tap (e.g. mouseup or touchend)
+    //   // e.detail.target // e.target of original event
+    //   // e.detail.releasePoint // object with x/y coordinates of tap
+    //   // e.detail.pointerType // mouse, touch, or pen
+    // //   _this.gallery.close()
+    // //   if (e.detail.target.className === 'pswp__img') {
+    // //     e.stopPropagation()
+    // //     // e.preventDefault()
+    // //     return true
+    // //   }
+    // })
+    this.gallery.listen('preventDragEvent', function (e, isDown, preventObj) {
+      // e - original event
+      // isDown - true = drag start, false = drag release
+
+      // Line below will force e.preventDefault() on:
+      // touchstart/mousedown/pointerdown events
+      // as well as on:
+      // touchend/mouseup/pointerup events
+      if (isDown && e.target.className === 'pswp__img') {
+        preventObj.prevent = false
+      } else {
+        preventObj.prevent = true
+      }
+    })
+    this.gallery.listen('initialZoomIn', function () {
+      console.log('initialZoomIn')
     })
   }
 }
