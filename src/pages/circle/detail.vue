@@ -160,6 +160,9 @@ export default {
       utils.checkReloadWithKeepAliveNew(this, val, oldVal, 'CircleDetail', ['circle_id', 'jump_tab'], () => {
         this.refreshData()
       })
+    },
+    'circle.name': function (val, oldVal) {
+      document.title = val || '范团圈子'
     }
   },
   methods: {

@@ -5,7 +5,7 @@
          It's a separate element as animating opacity is faster than rgba(). -->
     <div class="pswp__bg"></div>
     <!-- Slides wrapper with overflow:hidden. -->
-    <div class="pswp__scroll-wrap">
+    <div class="pswp__scroll-wrap" @click.stop="close">
         <!-- Container that holds slides.
             PhotoSwipe keeps only 3 of them in the DOM to save memory.
             Don't modify these 3 pswp__item elements, data is added later on. -->
@@ -74,10 +74,10 @@ export default {
         arrowEl: false,
         preloaderEl: true,
         loop: false,
-        // isClickableElement: function (el) {
-        //   console.log('isClickableElement', el.tagName)
-        //   return el.tagName === 'IMG'
-        // },
+        isClickableElement: function (el) {
+          console.log('isClickableElement', el.tagName)
+          return el.tagName === 'A'
+        },
         getThumbBoundsFn: (index) => {
           // find thumbnail element
           var thumbnail = this.clickedEl
@@ -95,6 +95,14 @@ export default {
       zIndex: 999,
       clickedEl: null,
       gallery: null
+    }
+  },
+  methods: {
+    close () {
+      console.log('close')
+      if (this.gallery) {
+        this.gallery.close()
+      }
     }
   },
   mounted () {

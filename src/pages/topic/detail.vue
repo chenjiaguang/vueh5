@@ -151,6 +151,9 @@ export default {
       utils.checkReloadWithKeepAliveNew(this, val, oldVal, 'TopicDetail', ['topic_id', 'jump_tab'], () => {
         this.refreshData()
       })
+    },
+    'topicInfo.title': function (val, oldVal) {
+      document.title = val || '范团话题'
     }
   },
   methods: {

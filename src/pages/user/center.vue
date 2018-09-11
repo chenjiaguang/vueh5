@@ -168,6 +168,9 @@ export default {
       utils.checkReloadWithKeepAliveNew(this, val, oldVal, 'UserCenter', ['user_id', 'jump_tab'], () => {
         this.refreshData()
       })
+    },
+    'user.username': function (val, oldval) {
+      document.title = val || '范团名片'
     }
   },
   methods: {

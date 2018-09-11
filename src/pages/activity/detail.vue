@@ -411,6 +411,9 @@ export default {
       utils.checkReloadWithKeepAliveNew(this, val, oldVal, 'ActivityDetail', ['id'], () => {
         this.refreshData()
       })
+    },
+    'activity.title': function (val, oldVal) {
+      document.title = val || ''
     }
   },
   methods: {
