@@ -58,14 +58,12 @@
                 </div>
                 <div class="content-article-content">{{dynamic.newsArticle.name || dynamic.newsArticle.article_url}}</div>
               </a>
-              <a @click.stop :href="dynamic.linkInfo.url" v-if="dynamic.linkInfo && dynamic.linkInfo.id" class="with-article">
-                <div class="with-article-cover" v-if="dynamic.linkInfo.cover" :style="{backgroundImage: 'url(' + dynamic.linkInfo.cover + ')'}"></div>
-                <div class="with-article-cover" v-else>
+              <a class="content-article-box row center" v-if="dynamic.linkInfo && dynamic.linkInfo.id" :href="dynamic.linkInfo.url">
+                <div v-if="dynamic.linkInfo.cover" class="content-article-img" :style="`background-image:url(${dynamic.linkInfo.cover})`"/>
+                <div v-else class="content-article-img">
                   <i class="iconfont link-image icon-link_icon"></i>
                 </div>
-                <div class="with-article-title">
-                  <div class="with-article-title-text">{{dynamic.linkInfo.title || dynamic.linkInfo.url}}</div>
-                </div>
+                <div class="content-article-content">{{dynamic.linkInfo.title || dynamic.linkInfo.url}}</div>
               </a>
             </div>
 
