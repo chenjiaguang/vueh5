@@ -37,9 +37,9 @@
             <div v-if="dynamic&&dynamic.isArticle" id="article-content-container" class="column">
               <div v-for="(content,index) in dynamic.contents" :key="index">
                 <div class="article-image-container">
-                  <img class="article-image" v-if="content.type==2" :src="(covers[content.imageIndex].gif && covers[content.imageIndex].staticImage) ? covers[content.imageIndex].staticImage : (covers[content.imageIndex].compress || covers[content.imageIndex].url)" @click="previewImagesInArticle(content.imageIndex)"/>
-                  <div class="long-tag" v-if="(content.imageIndex || content.imageIndex === 0) && covers[content.imageIndex].longCover && !covers[content.imageIndex].gif">长图</div>
-                  <div class="gif-tag" v-if="(content.imageIndex || content.imageIndex === 0) && covers[content.imageIndex].gif"></div>
+                  <img class="article-image" v-if="content.type == 2" :src="(content.cover.gif && content.cover.staticImage) ? content.cover.staticImage : (content.cover.compress || content.cover.url)" @click="previewImagesInArticle(content.imageIndex)"/>
+                  <div class="long-tag" v-if="content.type == 2 && content.cover.longCover && !content.cover.gif">长图</div>
+                  <div class="gif-tag" v-if="content.type == 2 && content.cover.gif"></div>
                 </div>
 
                 <div class="article-desc" v-if="content.type==2&&content.des">{{content.des}}</div>

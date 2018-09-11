@@ -20,6 +20,7 @@ import TopicDetail from '@/pages/topic/detail'
 import SMSCode from '@/pages/smsCode'
 import WeixinLoginJump from '@/pages/weixinLoginJump'
 import PromotionIndex from '@/pages/promotion/index'
+import NewsDetail from '@/pages/news/articleDetail'
 Vue.use(Router)
 let prefix = '/h5'
 
@@ -181,6 +182,14 @@ const router = new Router({
       path: prefix + '/promotion/index',
       name: 'PromotionIndex',
       component: PromotionIndex,
+      meta: {
+        title: '范团'
+      }
+    },
+    {
+      path: prefix + '/news/detail',
+      name: 'NewsDetail',
+      component: NewsDetail,
       meta: {
         title: '范团'
       }
