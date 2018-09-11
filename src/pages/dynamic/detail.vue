@@ -343,6 +343,11 @@ export default {
           let i = 0
           this.dynamic.isArticle = this.isArticle
           this.paging = res.data.paging
+          if (this.isArticle) { // 长文
+            document.title = res.data.title
+          } else {
+            document.title = '范团-海南生活圈'
+          }
 
           if (this.isArticle) {
             this.covers = res.data.covers
