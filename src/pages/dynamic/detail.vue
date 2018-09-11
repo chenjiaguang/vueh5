@@ -37,7 +37,11 @@
             <div v-if="dynamic&&dynamic.isArticle" id="article-content-container" class="column">
               <div v-for="(content,index) in dynamic.contents" :key="index">
                 <div class="article-image-container">
+<<<<<<< HEAD
                   <img class="article-image" v-if="content.type == 2" :src="(content.cover.gif && content.cover.staticImage) ? content.cover.staticImage : (content.cover.compress || content.cover.url)" @click="previewImagesInArticle(content.imageIndex)"/>
+=======
+                  <img ref="articleImage" class="article-image" v-if="content.type == 2" :src="(content.cover.gif && content.cover.staticImage) ? content.cover.staticImage : (content.cover.compress || content.cover.url)" @click="previewImagesInArticle(content.imageIndex, $refs['articleImage'][content.imageIndex], (content.cover.gif && content.cover.staticImage) ? content.cover.staticImage : (content.cover.compress || content.cover.url))" />
+>>>>>>> 2683a76844eda980645963c5cfdd0d044525c52e
                   <div class="long-tag" v-if="content.type == 2 && content.cover.longCover && !content.cover.gif">长图</div>
                   <div class="gif-tag" v-if="content.type == 2 && content.cover.gif"></div>
                 </div>
@@ -228,12 +232,6 @@ export default {
   },
   watch: {
     $route: function (val, oldVal) {
-      if (!val.query.previewImage && oldVal.query.previewImage) { // 点击大图后返回
-        if (window.previewImageId) {
-          this.$previewImage.hide(window.previewImageId)
-          window.previewImageId = null
-        }
-      }
       utils.checkReloadWithKeepAliveNew(
         this,
         val,
@@ -351,7 +349,11 @@ export default {
               })
               .map(content => {
                 content.imageIndex = i++
-                return content.imageUrl
+                return {
+                  width: content.width,
+                  height: content.height,
+                  url: content.imageUrl
+                }
               })
           }
           console.log('dynamic.contents', this.dynamic.contents, this.covers)
@@ -476,11 +478,13 @@ export default {
         this.scrollToTopVisible = false
       }
     },
-    previewImagesInArticle (index) {
+    previewImagesInArticle (idx, el, placeholder) {
       this.$previewImage.show({
         images: this.imageList,
-        idx: index
-      }, this.$router)
+        idx,
+        clickedEl: el,
+        placeholder
+      })
     }
   }
 }

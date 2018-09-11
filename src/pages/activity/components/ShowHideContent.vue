@@ -6,7 +6,7 @@
               <template v-for="(item, idx) in content">
                 <p :key="idx" v-if="item.type === '1'" class="content-text" @load="load">{{item.content}}</p>
                 <div :key="idx" v-else-if="item.type === '2' && item.content" class="image-box">
-                  <img :src="item.content.image" class="image" @load="load" @click.stop="() => preview(idx)" />
+                  <img ref="contentImage" :src="item.content.image" class="image" @load="load" @click.stop="() => preview(contentImages.idxArr.indexOf(idx), $refs['contentImage'][contentImages.idxArr.indexOf(idx)], item.content.image)" />
                   <div v-if="item.content.description" class="description" @load="load">{{item.content.description}}</div>
                 </div>
               </template>
@@ -153,9 +153,8 @@ export default {
       this.loadError = true
       this.load()
     },
-    preview (index) {
-      let idx = this.contentImages.idxArr.indexOf(index)
-      this.$previewImage.show({images: this.contentImages.imageArr, idx: idx}, this.router)
+    preview (idx, el, placeholder) {
+      this.$previewImage.show({images: this.contentImages.imageArr, idx, clickedEl: el, placeholder})
     }
   },
   computed: {
@@ -164,7 +163,11 @@ export default {
       let idxArr = []
       this.content.forEach((item, idx) => {
         if (item.type.toString() === '2') {
-          imageArr.push(item.content.image)
+          imageArr.push({
+            width: item.width,
+            height: item.height,
+            url: item.content.image
+          })
           idxArr.push(idx)
         }
       })

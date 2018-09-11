@@ -5,7 +5,7 @@ import ajax from './lib/ajax'
 import browserUA from './lib/browserUA'
 import toast from './components/toast'
 import modal from './components/modal'
-import ImagePreview from './components/imagePreview'
+import Preview from './components/preview'
 
 import VConsole from 'vconsole/dist/vconsole.min.js' // import vconsole
 import {
@@ -27,7 +27,7 @@ Vue.prototype.$ajax = ajax
 Vue.prototype.$browserUA = browserUA
 Vue.prototype.$toast = toast
 Vue.prototype.$modal = modal
-Vue.prototype.$previewImage = ImagePreview
+Vue.prototype.$previewImage = Preview
 Vue.use(VueLazyload, {
   preLoad: 1.3,
   error: '/h5/cwebassets/image/img_error.png',
