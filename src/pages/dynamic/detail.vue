@@ -37,7 +37,11 @@
             <div v-if="dynamic&&dynamic.isArticle" id="article-content-container" class="column">
               <div v-for="(content,index) in dynamic.contents" :key="index">
                 <div class="article-image-container">
+<<<<<<< HEAD
                   <img class="article-image" v-if="content.type == 2" :src="(content.cover.gif && content.cover.staticImage) ? content.cover.staticImage : content.cover.url" @click="previewImagesInArticle(content.imageIndex)"/>
+=======
+                  <img class="article-image" v-if="content.type == 2" :src="(content.cover.gif && content.cover.staticImage) ? content.cover.staticImage : (content.cover.compress || content.cover.url)" @click="previewImagesInArticle(content.imageIndex)"/>
+>>>>>>> addFunction
                   <div class="long-tag" v-if="content.type == 2 && content.cover.longCover && !content.cover.gif">长图</div>
                   <div class="gif-tag" v-if="content.type == 2 && content.cover.gif"></div>
                 </div>
@@ -262,6 +266,13 @@ export default {
                 return content.imageUrl
               })
           }
+
+          this.$store.commit('weixinShare/set', {
+            title: res.data.shareInfo.shareTitle,
+            desc: res.data.shareInfo.shareContent,
+            url: res.data.shareInfo.shareUrl,
+            imgUrl: res.data.shareInfo.shareImage
+          })
 
           this.isLoad = true
           this.$nextTick(() => {

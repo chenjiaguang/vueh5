@@ -18,6 +18,8 @@ axios.interceptors.request.use(function (config) {
   // window.localStorage.token = 'c46bb5b5d0f54013bcdf75a6ebf967b1'
   if (config.data instanceof FormData) {
     config.data.append('token', config.data.token || window.localStorage.token || '')
+  } else if (typeof (config.data) == 'string') {
+    config.data += '&token=' + (config.data.token || window.localStorage.token || '')
   } else {
     config.data = JSON.parse(JSON.stringify(config.data))
     config.data.token = config.data.token || window.localStorage.token || ''

@@ -5,12 +5,12 @@
         <img class="image fr" src='@/../cwebassets/image/throw_arrow.png' />
       </div>
       <div class="text-box">
-        <div class="clearfix">
-          <div class="text fl">1.点击右上角</div>
-          <div id="menu-dot" class="fl"><div></div><div></div><div></div></div>
+        <div class="tip-line">
+          <div class="text">1.点击右上角</div>
+          <div id="menu-dot"><div></div><div></div><div></div></div>
         </div>
-        <div class="clearfix">
-          <span class="text fl">2.选择在</span><span class="text fl" style="color:#ff3f53;padding-left:5px;padding-right:5px">浏览器</span><span class="text fl">中打开</span>
+        <div class="tip-line">
+          <span class="text">2.选择在</span><span class="text" style="color:#ff3f53;padding-left:5px;padding-right:5px">浏览器</span><span class="text">中打开</span>
         </div>
       </div>
     </div>
@@ -32,28 +32,27 @@ export default {
 </script>
 <style scoped>
 #menu-dot{
-  display:inline-block;
-  width:40px;
-  height:30px;
+  display:flex;
+  justify-content: center;
+  align-items: center;
+  width:64px;
+  height:44px;
   background:#323233;
-  border-radius:6px;
-  box-sizing:border-box;
-  padding-top:12px;
-  font-size:0;
-  line-height:0;
-  text-align:center;
-  transform:scale(0.5, 0.5);
-  transform-origin:50% 50%;
-  margin-top:9px;
+  border-radius:10px;
+  transform: scale(0.5, 0.5);
 }
 
 #menu-dot div{
-  width:5px;
-  height:5px;
+  width:8px;
+  height:8px;
   border-radius:50%;
   background:#fff;
-  display:inline-block;
-  margin:0 2px;
+  margin:0 4px;
+}
+.tip-line{
+  display: flex;
+  align-items: center;
+  height: 48px;
 }
 .clearfix:after{
   content: "";
@@ -88,7 +87,7 @@ export default {
 }
 .text{
   font-size: 32px;
-  line-height: 48px;
+  line-height: 40px;
 }
 .image{
   width: 80px;
