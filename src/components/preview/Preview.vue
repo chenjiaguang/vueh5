@@ -1,6 +1,6 @@
 <template>
   <!-- Root element of PhotoSwipe. Must have class pswp. -->
-<div class="pswp" ref="previewer" tabindex="-1" role="dialog" aria-hidden="true" :style="{zIndex: zIndex}" @touchmove.prevent="touchmove" @touchstart="touchstart" @touchend="touchend" @touchcancel="touchcancel">
+<div class="pswp" ref="previewer" tabindex="-1" role="dialog" aria-hidden="true" :style="{zIndex: zIndex}" @touchmove.prevent @touchcancel="cancel">
     <!-- Background of PhotoSwipe.
          It's a separate element as animating opacity is faster than rgba(). -->
     <div class="pswp__bg"></div>
@@ -63,7 +63,7 @@ export default {
         // hideAnimationDuration: 0,
         showHideOpacity: true,
         pinchToClose: false,
-        // tapToClose: true,
+        tapToClose: true,
         tapToToggleControls: false,
         closeEl: false,
         captionEl: false,
@@ -94,28 +94,12 @@ export default {
       },
       zIndex: 999,
       clickedEl: null,
-      gallery: null,
-      start: null
+      gallery: null
     }
   },
   methods: {
-    touchmove () {
-      console.log('move')
-      this.start = null
-    },
-    touchstart () {
-      console.log('start')
-      this.start = new Date().getTime()
-    },
-    touchend () {
-      console.log('end')
-      if (this.start) {
-        this.gallery.close()
-      }
-    },
-    touchcancel () {
-      console.log('cancel')
-      this.start = null
+    cancel () {
+      console.log('dsdf')
     }
   },
   mounted () {
@@ -153,9 +137,6 @@ export default {
       } else {
         preventObj.prevent = true
       }
-    })
-    this.gallery.listen('initialZoomIn', function () {
-      console.log('initialZoomIn')
     })
   }
 }
