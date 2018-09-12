@@ -210,6 +210,8 @@ export default {
       }
     },
     setContent (data) {
+      data = data.replace(/(staticcdntest.fantuanlife.com\/uimage.*?\.jpg)/g, '$1?x-oss-process=image/interlace,1/format,jpg')
+
       document.getElementById('article-frame-weixin').remove()
       let div = document.getElementById('article-frame')
       div.innerHTML = data
