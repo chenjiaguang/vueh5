@@ -63,7 +63,7 @@ export default {
         // hideAnimationDuration: 0,
         showHideOpacity: true,
         pinchToClose: false,
-        tapToClose: true,
+        // tapToClose: true,
         tapToToggleControls: false,
         closeEl: false,
         captionEl: false,
@@ -74,10 +74,6 @@ export default {
         arrowEl: false,
         preloaderEl: true,
         loop: false,
-        isClickableElement: function (el) {
-          console.log('isClickableElement', el.tagName)
-          return el.tagName === 'A'
-        },
         getThumbBoundsFn: (index) => {
           // find thumbnail element
           var thumbnail = this.clickedEl
@@ -94,7 +90,12 @@ export default {
       },
       zIndex: 999,
       clickedEl: null,
-      gallery: null
+      gallery: null,
+      startPos: {
+        x: null,
+        y: null
+      },
+      endTimeStamp: null
     }
   },
   methods: {
@@ -111,14 +112,15 @@ export default {
     this.gallery.listen('destroy', () => {
       let _body = document.getElementsByTagName('body')[0]
       _body.removeChild(this.$refs['previewer'])
+      this.gallery = null
     })
     // let _this = this
     // this.gallery.framework.bind(this.gallery.scrollWrap /* bind on any element of gallery */, 'pswpTap', function (e) {
-    // //   console.log('tap', e, e.detail.target)
-    //   // e.detail.origEvent  // original event that finished tap (e.g. mouseup or touchend)
-    //   // e.detail.target // e.target of original event
-    //   // e.detail.releasePoint // object with x/y coordinates of tap
-    //   // e.detail.pointerType // mouse, touch, or pen
+    //   console.log('tap', e, e.detail.releasePoint)
+    // //   e.detail.origEvent  // original event that finished tap (e.g. mouseup or touchend)
+    // //   e.detail.target // e.target of original event
+    // //   e.detail.releasePoint // object with x/y coordinates of tap
+    // //   e.detail.pointerType // mouse, touch, or pen
     // //   _this.gallery.close()
     // //   if (e.detail.target.className === 'pswp__img') {
     // //     e.stopPropagation()
@@ -126,6 +128,7 @@ export default {
     // //     return true
     // //   }
     // })
+    let _this = this
     this.gallery.listen('preventDragEvent', function (e, isDown, preventObj) {
       // e - original event
       // isDown - true = drag start, false = drag release
@@ -134,10 +137,25 @@ export default {
       // touchstart/mousedown/pointerdown events
       // as well as on:
       // touchend/mouseup/pointerup events
+    //   console.log('isDown', e)
+      console.log('preventDragEvent', e)
+      if (isDown) {
+        if (_this.gallery.timer) {
+          clearTimeout(_this.gallery.timer)
+        }
+        _this.startPos.x = parseInt(e.changedTouches[0].pageX)
+        _this.startPos.y = parseInt(e.changedTouches[0].pageY)
+        _this.startPos.timestamp = e.timeStamp
+      } else if (!isDown && parseInt(e.changedTouches[0].pageX) === _this.startPos.x && parseInt(e.changedTouches[0].pageY) === _this.startPos.y && e.timeStamp - _this.startPos.timestamp < 300 && (!_this.endTimeStamp || e.timeStamp - _this.endTimeStamp > 300)) {
+        _this.gallery.timer = setTimeout(() => {
+          _this.gallery && _this.gallery.close()
+        }, 300)
+      }
       if (isDown && e.target.className === 'pswp__img') {
         preventObj.prevent = false
       } else {
         preventObj.prevent = true
+        _this.endTimeStamp = e.timeStamp
       }
     })
   }
