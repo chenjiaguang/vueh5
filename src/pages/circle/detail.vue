@@ -2,7 +2,7 @@
   <div :style="{height: $winHeight + 'px'}" class="circle-page">
     <div ref="pageContainer" style="transition: all 300ms" :style="{transform: 'translateY(' + pageTop + 'px)'}">
       <div ref="topBanner" @touchmove="bannerTouchMove" @touchstart="bannerTouchStart" @touchend="bannerTouchEnd">
-        <download-box v-if="$route.query.isShareOpen" />
+        <download-box v-if="$route.query.isShareOpen && !$isApp" />
         <header class="top-header">
           <div class="top-header-bg" :style="{backgroundImage: 'url(' + circle.cover.compress + ')'}"></div>
           <div class="top-header-content">

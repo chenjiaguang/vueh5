@@ -6,6 +6,7 @@ import browserUA from './lib/browserUA'
 import toast from './components/toast'
 import modal from './components/modal'
 import Preview from './components/preview'
+import appCall from './lib/appCall'
 
 import VConsole from 'vconsole/dist/vconsole.min.js' // import vconsole
 import {
@@ -17,6 +18,7 @@ import {
 if (process.env.NODE_ENV !== 'production') { // 非正式环境包，就实例化vconsole
   new VConsole() // 初始化
 }
+appCall('isFanTuan')
 Vue.prototype.$assetsPublicPath = '/h5'
 Vue.prototype.$winWidth = window.innerWidth
 Vue.prototype.$winHeight = window.innerHeight
@@ -28,6 +30,7 @@ Vue.prototype.$browserUA = browserUA
 Vue.prototype.$toast = toast
 Vue.prototype.$modal = modal
 Vue.prototype.$previewImage = Preview
+Vue.prototype.$isApp = window._is_app
 Vue.use(VueLazyload, {
   preLoad: 1.3,
   error: '/h5/cwebassets/image/img_error.png',
@@ -35,7 +38,6 @@ Vue.use(VueLazyload, {
   attempt: 1
 })
 Vue.use(Vuex)
-
 window.addEventListener('resize', function () {
   Vue.prototype.$winWidth = window.innerWidth
   Vue.prototype.$winHeight = window.innerHeight

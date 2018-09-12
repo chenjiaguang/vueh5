@@ -4,7 +4,7 @@
     <div v-if="dynamic" :style="{height: $winHeight-(80/750*$winWidth) + 'px'}">
       <div id="mescroll" class="mescroll" >
         <div>
-          <download-box v-if="$route.query.isShareOpen" />
+          <download-box v-if="$route.query.isShareOpen && !$isApp" />
           <div class="container">
             <div v-if="dynamic" id="title-container" class="column">
               <div v-if="dynamic.title" class="title">{{dynamic.title}}</div>
@@ -504,7 +504,7 @@ export default {
   /* margin-bottom: 100px; */
 }
 #title-container {
-  padding-top: 30px;
+  padding-top: 26px;
   margin-bottom: 43px;
 }
 #title-container, #article-content-container, #content-container, #foot-container, #like-container, #comment-container{
@@ -512,10 +512,10 @@ export default {
   margin-right: 4%;
 }
 .title {
-  margin-bottom: 40px;
+  margin-bottom: 36px;
   color: #333333;
   font-size: 56px;
-  line-height: 60px;
+  line-height: 68px;
   font-weight: bold;
 }
 .avatar {

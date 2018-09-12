@@ -209,6 +209,7 @@ export default {
       }
     },
     showLocalImage (imageData, sign, type, imageSize) { // type：1表示imageData 是base64，可以直接显示，否则是img元素，需读取src
+      console.log('showLocalImage')
       let _this = this
       if (_this.images.length > 9) { // 大于9张图时终止，为防止其他错误
         console.log('超过最大图片数')
@@ -237,6 +238,7 @@ export default {
       })
     },
     uploadImage (file, sign) {
+      console.log('')
       let _this = this
       _this.images.forEach((item, idx) => {
         if (item.sign === sign) {
@@ -291,45 +293,49 @@ export default {
       })
     },
     addImage (files) {
+      console.log(112)
       // let _this = this
       let currentLength = this.images.length
       let addLength = 9 - currentLength
       if (addLength <= 0) { // 超过9图处理
         return false
       }
+      console.log(444)
       for (let i = 0; i < files.length; i++) {
         if (i < addLength) {
-          let reg = /(jpeg|jpg)/i
-          let isJpg = reg.test(files[i].type)
-          if (isJpg) { // jpg图片才压缩, 默认压缩质量0.7
-            window.lrz(files[i]).then(res => {
-              console.log('压缩图片成功')
-              let sign = new Date().getTime() + i
-              let imageItem = {
-                id: '',
-                sign: sign,
-                url: '',
-                width: '',
-                height: '',
-                localUrl: '',
-                status: 'reading'
-              }
-              // 在添加按钮前插入图片
-              this.images.push(imageItem)
-              this.showLocalImage(res.base64, sign, 1)
-              this.uploadImage(res.file, sign)
-            }).catch(err => {
-              console.log('压缩图片失败')
-              this.readFile(files, i, (_imageData, _sign, sizeObj) => {
-                this.showLocalImage(_imageData, _sign, 2, sizeObj)
-              })
-            })
-            return false
-          } else {
-            this.readFile(files, i, (_imageData, _sign, sizeObj) => {
-              this.showLocalImage(_imageData, _sign, 2, sizeObj)
-            })
-          }
+          // let reg = /(jpeg|jpg)/i
+          // let isJpg = reg.test(files[i].type)
+          // if (isJpg) { // jpg图片才压缩, 默认压缩质量0.7
+          //   console.log(666)
+          //   window.lrz(files[i]).then(res => {
+          //     console.log('res', res)
+          //     console.log('压缩图片成功')
+          //     let sign = new Date().getTime() + i
+          //     let imageItem = {
+          //       id: '',
+          //       sign: sign,
+          //       url: '',
+          //       width: '',
+          //       height: '',
+          //       localUrl: '',
+          //       status: 'reading'
+          //     }
+          //     // 在添加按钮前插入图片
+          //     this.images.push(imageItem)
+          //     this.showLocalImage(res.base64, sign, 1)
+          //     this.uploadImage(res.file, sign)
+          //   }).catch(err => {
+          //     console.log('压缩图片失败')
+          //     this.readFile(files, i, (_imageData, _sign, sizeObj) => {
+          //       this.showLocalImage(_imageData, _sign, 2, sizeObj)
+          //     })
+          //   })
+          //   return false
+          // } else {
+          this.readFile(files, i, (_imageData, _sign, sizeObj) => {
+            this.showLocalImage(_imageData, _sign, 2, sizeObj)
+          })
+          // }
           // return false
           // let sign = new Date().getTime() + i
           // let imageItem = {
