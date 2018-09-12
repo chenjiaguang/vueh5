@@ -63,7 +63,7 @@ export default {
         // hideAnimationDuration: 0,
         showHideOpacity: true,
         pinchToClose: false,
-        // tapToClose: true,
+        tapToClose: true,
         tapToToggleControls: false,
         closeEl: false,
         captionEl: false,
@@ -76,7 +76,7 @@ export default {
         loop: false,
         getThumbBoundsFn: (index) => {
           // find thumbnail element
-          var thumbnail = this.clickedEl
+          var thumbnail = this.clickedEls[index]
           // get window scroll Y
           var pageYScroll = window.pageYOffset || document.documentElement.scrollTop
           // optionally get horizontal scroll
@@ -128,36 +128,36 @@ export default {
     // //     return true
     // //   }
     // })
-    let _this = this
-    this.gallery.listen('preventDragEvent', function (e, isDown, preventObj) {
-      // e - original event
-      // isDown - true = drag start, false = drag release
+    // let _this = this
+    // this.gallery.listen('preventDragEvent', function (e, isDown, preventObj) {
+    //   // e - original event
+    //   // isDown - true = drag start, false = drag release
 
-      // Line below will force e.preventDefault() on:
-      // touchstart/mousedown/pointerdown events
-      // as well as on:
-      // touchend/mouseup/pointerup events
-    //   console.log('isDown', e)
-      console.log('preventDragEvent', e)
-      if (isDown) {
-        if (_this.gallery.timer) {
-          clearTimeout(_this.gallery.timer)
-        }
-        _this.startPos.x = parseInt(e.changedTouches[0].pageX)
-        _this.startPos.y = parseInt(e.changedTouches[0].pageY)
-        _this.startPos.timestamp = e.timeStamp
-      } else if (!isDown && parseInt(e.changedTouches[0].pageX) === _this.startPos.x && parseInt(e.changedTouches[0].pageY) === _this.startPos.y && e.timeStamp - _this.startPos.timestamp < 300 && (!_this.endTimeStamp || e.timeStamp - _this.endTimeStamp > 300)) {
-        _this.gallery.timer = setTimeout(() => {
-          _this.gallery && _this.gallery.close()
-        }, 300)
-      }
-      if (isDown && e.target.className === 'pswp__img') {
-        preventObj.prevent = false
-      } else {
-        preventObj.prevent = true
-        _this.endTimeStamp = e.timeStamp
-      }
-    })
+    //   // Line below will force e.preventDefault() on:
+    //   // touchstart/mousedown/pointerdown events
+    //   // as well as on:
+    //   // touchend/mouseup/pointerup events
+    // //   console.log('isDown', e)
+    //   console.log('preventDragEvent', e)
+    //   if (isDown) {
+    //     if (_this.gallery.timer) {
+    //       clearTimeout(_this.gallery.timer)
+    //     }
+    //     _this.startPos.x = parseInt(e.changedTouches[0].pageX)
+    //     _this.startPos.y = parseInt(e.changedTouches[0].pageY)
+    //     _this.startPos.timestamp = e.timeStamp
+    //   } else if (!isDown && parseInt(e.changedTouches[0].pageX) === _this.startPos.x && parseInt(e.changedTouches[0].pageY) === _this.startPos.y && e.timeStamp - _this.startPos.timestamp < 300 && (!_this.endTimeStamp || e.timeStamp - _this.endTimeStamp > 300)) {
+    //     _this.gallery.timer = setTimeout(() => {
+    //       _this.gallery && _this.gallery.close()
+    //     }, 300)
+    //   }
+    //   if (isDown && e.target.className === 'pswp__img') {
+    //     preventObj.prevent = false
+    //   } else {
+    //     preventObj.prevent = true
+    //     _this.endTimeStamp = e.timeStamp
+    //   }
+    // })
   }
 }
 </script>
