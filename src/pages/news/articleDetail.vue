@@ -280,7 +280,8 @@ export default {
   margin-top: 68px;
   margin-bottom: 68px;
 }
-/*******************************************头条样式*****************************************/
+</style>
+<style>
 xmteditor{
   max-width: 100%;
 }
@@ -298,6 +299,10 @@ xmteditor{
   min-height: 667px;
   max-height: 100vh;
   background-color: #ffffff;
+}
+#article-frame{
+  padding-left:30px;
+  padding-right:30px;
 }
 #article-frame *{
   font-size: 32px;
