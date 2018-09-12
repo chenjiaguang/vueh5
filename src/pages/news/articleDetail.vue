@@ -210,7 +210,8 @@ export default {
       }
     },
     setContent (data) {
-      data = data.replace(/(staticcdntest.fantuanlife.com\/uimage.*?\.jpg)/g, '$1?x-oss-process=image/interlace,1/format,jpg')
+      // 匹配一个不带?参数的图片url (?!\?)为负向零宽断言
+      data = data.replace(/(staticcdntest.fantuanlife.com\/uimage[^"]*?\.jpg)(?!\?)/g, '$1?x-oss-process=image/interlace,1/format,jpg')
 
       document.getElementById('article-frame-weixin').remove()
       let div = document.getElementById('article-frame')
@@ -232,7 +233,7 @@ export default {
 </script>
 
 <style scoped>
-/******************************基本央视*******************************/
+/******************************基本样式*******************************/
 .container {
   width: 100%;
   overflow: hidden;
