@@ -1,18 +1,18 @@
 <template>
   <div>
     <div v-if="article">
-      <download-box v-if="!isInApp&&$route.query.isShareOpen" />
+      <download-box v-if="$route.query.isShareOpen && !$isApp" />
       <div class="container">
         <div v-if="article" id="title-container" class="column">
           <div v-if="article.name" class="title">{{article.name}}</div>
           <div class="row space-between center">
             <!-- 左 -->
             <div class="row">
-              <img class="avatar" :src="article.avatar" @click="!isInApp&&clickUser(article.uid)"/>
+              <img class="avatar" :src="article.avatar" @click="!$isApp&&clickUser(article.uid)"/>
               <div class="flex column space-between">
                 <!-- 上 -->
                 <div class="row">
-                  <div class="username" @click="!isInApp&&clickUser(article.uid)">{{article.username}}</div>
+                  <div class="username" @click="!$isApp&&clickUser(article.uid)">{{article.username}}</div>
                 </div>
                 <!-- 下 -->
                 <div class="row">
@@ -24,7 +24,7 @@
         </div>
         <div style="align-items: flex-start;" class="article-content toutiaohao" id="article-frame"></div>
         <iframe style="width:100%" height="1000" frameborder="0" src="about:blank" scrolling="no" id="article-frame-weixin"></iframe>
-        <div class="comment" @click="openFantTuanC" v-if="!isInApp">打开范团APP，查看全部精彩评论</div>
+        <div class="comment" @click="openFantTuanC" v-if="!$isApp">打开范团APP，查看全部精彩评论</div>
       </div>
     </div>
     <NotFoundPage v-if="isLoad&&!article"/>
@@ -82,11 +82,6 @@ export default {
     isShowAll: function () {
       return (
         this.$route.query.showAll && this.$route.query.showAll !== 'false'
-      )
-    },
-    isInApp: function () {
-      return (
-        this.$route.query.inApp && this.$route.query.inApp !== 'false'
       )
     },
     fetchData: function () {
