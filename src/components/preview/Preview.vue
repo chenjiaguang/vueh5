@@ -217,6 +217,7 @@ export default {
     .close-btn{
         width: 54px;
         height: 54px;
+        line-height: 58px;
         border-radius: 8px;
         background: rgba(0,0,0,0.3) !important;
         opacity: 1 !important;

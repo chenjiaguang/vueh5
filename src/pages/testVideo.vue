@@ -22,7 +22,8 @@ export default {
       loop: false,
       fluid: true,
       inactivityTimeout: 5000,
-      nativeControlsForTouch: false
+      nativeControlsForTouch: false,
+      playbackRates: [0.5, 1, 1.5, 2]
     })
   }
 }
