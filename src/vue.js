@@ -29,7 +29,6 @@ Vue.prototype.$browserUA = browserUA
 Vue.prototype.$toast = toast
 Vue.prototype.$modal = modal
 Vue.prototype.$previewImage = Preview
-Vue.prototype.$isApp = window._is_app
 Vue.use(VueLazyload, {
   preLoad: 1.3,
   error: '/h5/cwebassets/image/img_error.png',
@@ -42,6 +41,7 @@ window.receiveIsFantuan = function (string) {
   Vue.prototype.$isApp = window._is_app
 }
 appCall('isFanTuan')
+Vue.prototype.$isApp = window._is_app
 window.addEventListener('resize', function () {
   Vue.prototype.$winWidth = window.innerWidth
   Vue.prototype.$winHeight = window.innerHeight

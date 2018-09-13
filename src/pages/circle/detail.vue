@@ -11,7 +11,7 @@
               <div class="top-header-name">{{circle.name}}</div>
               <div class="top-header-intro">{{circle.intro}}</div>
               <div class="top-header-overview">
-                <span>{{circle.followed_num || 0}}人关注</span>
+                <span>{{circle.followed_num || 0}}人加入</span>
                 <span>{{circle.dynamic_num || 0}}条动态</span>
               </div>
             </div>

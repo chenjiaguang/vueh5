@@ -1,7 +1,6 @@
 <template>
   <div class="video-page" @touchmove.prevent>
     <video id="fantuan_video" class="my-video video-js vjs-default-skin" controls preload="none" poster="http://vjs.zencdn.net/v/oceans.png">
-      <source src="https://ugcydzd.qq.com/uwMRJfz-r5jAYaQXGdGnC2_ppdhgmrDlPaRvaV7F2Ic/q0784gucsx3.mp4?sdtfrom=v3010&guid=c014f13a7b7bd9b15a8637c72e27b4fb&vkey=1A8C053C8376538F1A1FAA25756FBD992E6541E80579A11B74967F05C4CDC655B243985736064FF9AE0FAA3B18296D99873304B1E713BBE9BE3B7414555ACEEA0E1B52587B1E0C805EC28CA989FC236EEB000C5FD8DEB68FD7719BC23A771F1146634F6386B07B36990C2451FDB2528A1DBAFA1DEC8FC3A1&platform=2" type="video/mp4">
     </video>
   </div>
 </template>
@@ -23,7 +22,13 @@ export default {
       fluid: true,
       inactivityTimeout: 5000,
       nativeControlsForTouch: false,
-      playbackRates: [0.5, 1, 1.5, 2]
+      playbackRates: [0.5, 1, 1.5, 2],
+      sources: [
+        {
+          src: 'http://112.67.251.144/vlive.qqvideo.tc.qq.com/Al-mliryp26QIXa5n_cfFfHJYrQMtkXzz28U7TGEw-GA/v0200dgqnj9.p201.1.mp4?sdtfrom=&vkey=53E2B62CE8824FB447645589D0CC2E6162C549F0F7AD1A30C58EB7DBEBB9ED056F86065F21337FBC37943A52166BF957D74970C52C1A2E4FC693C2569F27DF18016F5CC4C541A3B245A6A50F5C03CA6C4B51FBBB6D7222721D13E31C8074213F443B712F69B43182F93134C0D9069B25BC6F59AA067180E1&platform=10901&level=0&fmt=shd',
+          type: 'video/mp4'
+        }
+      ]
     })
   }
 }
