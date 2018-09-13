@@ -23,7 +23,7 @@
           </div>
         </div>
         <div style="align-items: flex-start;" class="article-content toutiaohao" id="article-frame"></div>
-        <iframe style="width:100%" height="1000" frameborder="0" src="about:blank" scrolling="no" id="article-frame-weixin"></iframe>
+        <iframe class="iframe" height="1000" frameborder="0" src="about:blank" scrolling="no" id="article-frame-weixin"></iframe>
         <div class="comment" @click="openFantTuanC" v-if="!$isApp">打开范团APP，查看全部精彩评论</div>
       </div>
     </div>
@@ -370,5 +370,8 @@ xmteditor{
   line-height: 44px;
   margin: 20px !important;
   color: #505050;
+}
+#article-frame-weixin{
+  width:750px;
 }
 </style>

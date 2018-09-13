@@ -1,14 +1,14 @@
 <template>
   <div class="container column">
     <div class="title">申请加入圈子</div>
-    <div class="userInfo row center">
-      <img class="avatar" :src="user.avatar" @click="clickUser(user.uid)"/>
-      <div class="username" @click="clickUser(user.uid)">{{user.username}}</div>
+    <div class="circleInfo row center">
+      <img class="avatar" :src="circle.cover.compress"/>
+      <div class="circlename">{{circle.name}}</div>
     </div>
     <textarea  ref="input" class="input" placeholder="写下你的申请理由（50字以内），用心写更容易通过哦~" v-model="content" :maxlength="50"/>
     <div class="btnGroup row space-between">
-      <div class="btnCancel">取消</div>
-      <div class="btnSubmit">提交</div>
+      <div :class="['btnCancel',isSended?'disable':null]" @click="back">取消</div>
+      <div :class="['btnSubmit',isSended?'disable':null]" @click="submit">提交</div>
     </div>
   </div>
 </template>
@@ -17,31 +17,52 @@
 export default {
   data () {
     return {
-      user: {
-        uid: '111',
-        avatar: 'https://ss0.baidu.com/6ONWsjip0QIZ8tyhnq/it/u=2075076846,2339167561&fm=58',
-        username: '小清新美图壁纸控'
-      },
-      content: ''
+      circle: null,
+      content: '',
+      isSended: false
     }
   },
   computed: {
-    sendCommentData: function () {
+    sendData: function () {
       return {
-        content: this.content,
-        dy_id: this.dy_id,
-        commentId: this.commentId,
-        pid: this.pid
+        cid: this.circle.id,
+        reason: this.content
       }
     }
   },
   components: {},
+  mounted () {
+    this.fetch()
+  },
   methods: {
+    fetch () {
+      let rData = {
+        cid: this.$route.query.circle_id
+      }
+      this.$ajax('/jv/anonymous/qz/v21/circleinfo', {data: rData}).then(res => {
+        this.circle = res.data
+      }).catch(err => {
+      })
+    },
     back () {
       this.$router.back()
     },
-    focus () {
-      this.$refs.input.focus()
+    submit () {
+      if (!this.isSended) {
+        if (!this.content) {
+          this.content = '申请加入' + this.circle.name
+        }
+        this.isSended = true
+        this.$ajax('/jv/qz/joincircle/apply', { data: this.sendData })
+          .then(res => {
+            this.$toast(res.msg ? res.msg : '提交成功', 1500, () => {
+            })
+            this.$router.back()
+          })
+          .catch(e => {
+            this.isSended = false
+          })
+      }
     }
   }
 }
@@ -59,7 +80,7 @@ export default {
   margin-bottom: 40px;
   font-weight: bold
 }
-.userInfo{
+.circleInfo{
   margin-bottom: 30px;
 }
 .avatar{
@@ -68,7 +89,7 @@ export default {
   margin-right: 20px;
   border-radius:8px;
 }
-.username{
+.circlename{
   color: #333333;
   font-size:28px;
 }
@@ -79,13 +100,14 @@ export default {
   padding: 24px 20px 24px 20px;
   border: none;
   resize: none;
+  outline: 0;
   border-width: 1px;
   border-color: #E5E5E5;
   border-style: solid;
   border-radius: 4px;
 }
 .btnCancel{
-  border-width: 2px;
+  border-width: 1px;
   border-color: #c0c0c0;
   border-style: solid;
   border-radius: 6px;
@@ -105,5 +127,8 @@ export default {
   font-size: 34px;
   text-align: center;
   line-height: 90px;
+}
+.disable{
+  opacity: 0.5;
 }
 </style>
