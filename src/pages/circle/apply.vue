@@ -56,8 +56,8 @@ export default {
         this.$ajax('/jv/qz/joincircle/apply', { data: this.sendData })
           .then(res => {
             this.$toast(res.msg ? res.msg : '提交成功', 1500, () => {
-              this.$router.back()
             })
+            this.$router.back()
           })
           .catch(e => {
             this.isSended = false
@@ -107,7 +107,7 @@ export default {
   border-radius: 4px;
 }
 .btnCancel{
-  border-width: 2px;
+  border-width: 1px;
   border-color: #c0c0c0;
   border-style: solid;
   border-radius: 6px;
