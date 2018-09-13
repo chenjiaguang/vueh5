@@ -37,7 +37,7 @@
             <div v-if="dynamic&&dynamic.isArticle" id="article-content-container" class="column">
               <div v-for="(content,index) in dynamic.contents" :key="index">
                 <div class="article-image-container">
-                  <img ref="articleImage" class="article-image" v-if="content.type == 2" :src="(content.cover.gif && content.cover.staticImage) ? content.cover.staticImage : (content.cover.compress || content.cover.url)" @click="previewImagesInArticle(content.imageIndex, $refs['articleImage'][content.imageIndex], (content.cover.gif && content.cover.staticImage) ? content.cover.staticImage : (content.cover.compress || content.cover.url))" />
+                  <img ref="articleImage" class="article-image" v-if="content.type == 2" :src="(content.cover.gif && content.cover.staticImage) ? content.cover.staticImage : (content.cover.url)" @click="previewImagesInArticle(content.imageIndex, $refs['articleImage'], (content.cover.gif && content.cover.staticImage) ? content.cover.staticImage : content.cover.url)" />
                   <div class="long-tag" v-if="content.type == 2 && content.cover.longCover && !content.cover.gif">长图</div>
                   <div class="gif-tag" v-if="content.type == 2 && content.cover.gif"></div>
                 </div>
@@ -126,7 +126,7 @@
                   </div>
                 </transition-group>
               </div>
-              <div class="comment-empty-list" v-else>暂时没有评论</div>
+              <div class="comment-empty-list" v-else>暂无评论</div>
             </div>
 
             <!-- <div v-if="dynamic&&dynamic.like_num>0" class="like-box" id="like-container">
