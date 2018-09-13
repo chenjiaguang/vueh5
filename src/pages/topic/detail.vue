@@ -2,7 +2,7 @@
   <div :style="{height: $winHeight + 'px'}" class="topic-page">
     <div ref="pageContainer" style="transition: all 300ms" :style="{transform: 'translateY(' + pageTop + 'px)'}">
       <div ref="topBanner" @touchmove="bannerTouchMove" @touchstart="bannerTouchStart" @touchend="bannerTouchEnd">
-        <download-box v-if="$route.query.isShareOpen" />
+        <download-box v-if="$route.query.isShareOpen && !$isApp" />
         <header ref="topHeader" class="top-header">
           <div class="top-header-bg" :style="{backgroundImage: 'linear-gradient(60deg,#' + topicInfo.beginColor + ',#' + topicInfo.endColor + ')'}"></div>
           <div class="top-header-content-wrapper">

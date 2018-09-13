@@ -21,6 +21,7 @@ import SMSCode from '@/pages/smsCode'
 import WeixinLoginJump from '@/pages/weixinLoginJump'
 import PromotionIndex from '@/pages/promotion/index'
 import NewsDetail from '@/pages/news/articleDetail'
+import TestVideo from '@/pages/testVideo'
 Vue.use(Router)
 let prefix = '/h5'
 
@@ -192,6 +193,14 @@ const router = new Router({
       component: NewsDetail,
       meta: {
         title: '范团'
+      }
+    },
+    {
+      path: prefix + '/test/video',
+      name: 'TestVideo',
+      component: TestVideo,
+      meta: {
+        title: '视频播放'
       }
     }
   ],

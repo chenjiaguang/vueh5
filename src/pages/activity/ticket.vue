@@ -1,5 +1,6 @@
 <template>
   <div class="ticket-wrapper">
+    <download-box />
     <div class="ticket-body">
       <div class="ticket-code-image-box">
         <img class="ticket-code-image1" :src="codeImage" />
@@ -37,95 +38,96 @@
       <div class="attention-item">2.下载范团APP，在我的-活动中查看电子票，云端保存 不丢失</div>
       <div class="attention-item">3.暂不支持退票，有需要请联系主办方</div>
     </div>
-    <div class="fixed-button">
+    <!-- <div class="fixed-button">
       <img :src="$assetsPublicPath + '/cwebassets/image/van_logo.png'" class="van-logo" />
       有范又有趣的海南生活圈
       <div class="open-btn" @click="openFantTuanC">立即打开</div>
-    </div>
+    </div> -->
     <weixin :show="showWeixinTip" @changeShow="showHideTip" />
   </div>
 </template>
 
 <script>
+import DownloadBox from '../../components/DownloadBox'
 import download from '@/lib/download.js'
 import Weixin from '@/components/Weixin.vue'
-import Vue from 'vue';
-  export default {
-    data () {
-      return {
-        showWeixinTip: false,
-        canDownload: false,
-        codeImage: '',
-        ticket: {
-          price: 0,
-          time: '',
-          statusText: '',
-          downloadImage: '',
-          feeName: ''
-        },
-        activity: {
-          title: '',
-          address: '',
-          time: ''
-        }
+import Vue from 'vue'
+export default {
+  data () {
+    return {
+      showWeixinTip: false,
+      canDownload: false,
+      codeImage: '',
+      ticket: {
+        price: 0,
+        time: '',
+        statusText: '',
+        downloadImage: '',
+        feeName: ''
+      },
+      activity: {
+        title: '',
+        address: '',
+        time: ''
+      }
+    }
+  },
+  components: { Weixin, DownloadBox },
+  methods: {
+    enAbleDownload () {
+      this.canDownload = true
+    },
+    openFantTuanC () { // 打开范团app或下载
+      console.log('打开范团app或下载')
+      let browserInfo = download.browserInfo()
+      if (browserInfo.isWeixin) { // 微信内置浏览器
+        this.showWeixinTip = true
+      } else {
+        download.click()
       }
     },
-    components: { Weixin },
-    methods: {
-      enAbleDownload () {
-        this.canDownload = true
-      },
-      openFantTuanC () { // 打开范团app或下载
-        console.log('打开范团app或下载')
-        let browserInfo = download.browserInfo()
-        if (browserInfo.isWeixin) { // 微信内置浏览器
-          this.showWeixinTip = true
-        } else {
-          download.click()
-        }
-      },
-      showHideTip () {
-        this.showWeixinTip = !this.showWeixinTip
-      },
-      downloadIamge (name) {
-        let image = new Image()
-        // 解决跨域 Canvas 污染问题
-        image.setAttribute('crossOrigin', 'anonymous')
-        image.onload = function () {
-          let canvas = document.createElement('canvas')
-          canvas.width = image.width
-          canvas.height = image.height
-
-          let context = canvas.getContext('2d')
-          context.drawImage(image, 0, 0, image.width, image.height)
-          let url = canvas.toDataURL('image/png')
-
-          // 生成一个a元素
-          let a = document.createElement('a')
-          // 创建一个单击事件
-          let event = new MouseEvent('click')
-
-          // 将a的download属性设置为我们想要下载的图片名称，若name不存在则使用‘下载图片名称’作为默认名称
-          a.download = name || '范团活动电子票'
-          // 将生成的URL设置为a.href属性
-          a.href = url
-          // 触发a的单击事件
-          a.dispatchEvent(event)
-        }
-
-        image.src = this.ticket.downloadImage
-      }
+    showHideTip () {
+      this.showWeixinTip = !this.showWeixinTip
     },
-    created () {
-      let checkcode = this.$route.query.checkcode
-      if (checkcode) { // 存在checkcode时，把它存到缓存中, 并且拉取信息
+    downloadIamge (name) {
+      let image = new Image()
+      // 解决跨域 Canvas 污染问题
+      image.setAttribute('crossOrigin', 'anonymous')
+      image.onload = function () {
+        let canvas = document.createElement('canvas')
+        canvas.width = image.width
+        canvas.height = image.height
+
+        let context = canvas.getContext('2d')
+        context.drawImage(image, 0, 0, image.width, image.height)
+        let url = canvas.toDataURL('image/png')
+
+        // 生成一个a元素
+        let a = document.createElement('a')
+        // 创建一个单击事件
+        let event = new MouseEvent('click')
+
+        // 将a的download属性设置为我们想要下载的图片名称，若name不存在则使用‘下载图片名称’作为默认名称
+        a.download = name || '范团活动电子票'
+        // 将生成的URL设置为a.href属性
+        a.href = url
+        // 触发a的单击事件
+        a.dispatchEvent(event)
+      }
+
+      image.src = this.ticket.downloadImage
+    }
+  },
+  created () {
+    let checkcode = this.$route.query.checkcode
+    if (checkcode) { // 存在checkcode时，把它存到缓存中, 并且拉取信息
       let rData = {
         checkcode: checkcode
       }
-       this.$ajax('/jv/anonymous/qz/v21/activityapplyinfo', {data: rData}).then(res => {
+      this.$ajax('/jv/anonymous/qz/v21/activityapplyinfo', {data: rData}).then(res => {
         if (res && Boolean(res.error) && res.msg) {
           this.$toast(res.msg)
-        } else if (res && !Boolean(res.error)) {
+        } else if (res && !res.error) {
           this.codeImage = res.data.QRCode
           this.ticket.downloadImage = res.data.ticket_image
           this.ticket.statusText = res.data.state_text
@@ -136,22 +138,21 @@ import Vue from 'vue';
           this.activity.address = res.data.activity.address_text
           this.activity.time = res.data.activity.time_text
         }
-       }).catch(err => {
+      }).catch(err => {
         console.log('获取失败', err)
-       })
-      }
+      })
     }
   }
+}
 </script>
 
 <style lang="scss" type="text/scss" scoped>
   .ticket-wrapper{
     background-color: #F3F3F3;
-    padding-top: 30px;
     overflow: hidden;
   }
   .ticket-body{
-    margin: 0 4%;
+    margin: 30px 4% 0;
     background-color: #fff;
     border-radius:10px;
     overflow: hidden;
@@ -266,13 +267,13 @@ import Vue from 'vue';
     }
   }
   .activity-address{
-    display: -webkit-box;    
-    -webkit-box-orient: vertical;    
-    -webkit-line-clamp: 2;    
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
     overflow: hidden;
   }
   .ticket-attention{
-    padding: 40px 4% 176px;
+    padding: 40px 4% 48px;
     background-color: #fff;
   }
   .save-ticket{

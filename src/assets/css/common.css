@@ -196,6 +196,7 @@
   transition: height 400ms, transform 400ms;
 }
 
+/* 浏览大图修改样式 */
 .pswp__img{
   user-select: all !important;
   -webkit-touch-callout: default !important;

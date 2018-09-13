@@ -30,8 +30,10 @@ let preview = {
             }
           }),
           options: _options,
+          optionsIos: _options,
+          optionsAndroid: _options,
           zIndex: new Date().getTime(),
-          clickedEl: clickedEl
+          clickedEls: clickedEl
         }
       }
     })
