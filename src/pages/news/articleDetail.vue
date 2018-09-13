@@ -40,8 +40,10 @@ import NotFoundPage from '../notFoundPage'
 import DownloadBox from '../../components/DownloadBox'
 import download from '@/lib/download.js'
 import Weixin from '@/components/Weixin.vue'
+import WeixinShareInKeepAlive from '../../mixin/WeixinShareInKeepAlive'
 Vue.use(ActionSheet)
 export default {
+  mixins: [WeixinShareInKeepAlive],
   data () {
     return {
       article: null,
@@ -69,6 +71,9 @@ export default {
           this.article = null
           this.isLoad = false
           this.fetch()
+        },
+        () => {
+          this.runShareBindfunction()
         }
       )
     }
@@ -143,15 +148,13 @@ export default {
               })
             }
           }
-
-          this.$store.commit('weixinShare/set', {
+          this.setShareData({
             type: '0',
             title: res.data.shareInfo.shareTitle,
             desc: res.data.shareInfo.shareContent,
             url: res.data.shareInfo.shareUrl,
             imgUrl: res.data.shareInfo.shareImage
           })
-
           this.isLoad = true
         })
         .catch(e => {

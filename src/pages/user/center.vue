@@ -92,6 +92,7 @@ import MeScroll from 'mescroll.js'
 import 'mescroll.js/mescroll.min.css'
 import MeScrollSupportArr from '@/mixin/MeScrollSupportArr'
 import mescrollOptions from '@/lib/mescrollOptions'
+import WeixinShareInKeepAlive from '../../mixin/WeixinShareInKeepAlive'
 import {
   /* eslint-disable no-unused-vars */
   Style,
@@ -135,7 +136,7 @@ const initialData = {
   mescroll: []
 }
 export default {
-  mixins: [MeScrollSupportArr],
+  mixins: [MeScrollSupportArr, WeixinShareInKeepAlive],
   data () {
     let selectedIdx = parseInt(this.$route.query.jump_tab || 0)
     let selectedLabel = (this.$route.query.jump_tab && this.$route.query.jump_tab.toString() === '1') ? '文章' : '动态'
@@ -167,6 +168,9 @@ export default {
     '$route': function (val, oldVal) {
       utils.checkReloadWithKeepAliveNew(this, val, oldVal, 'UserCenter', ['user_id', 'jump_tab'], () => {
         this.refreshData()
+      },
+      () => {
+        this.runShareBindfunction()
       })
     },
     'user.username': function (val, oldval) {
@@ -264,7 +268,8 @@ export default {
           this.tabs[tabIdx].fetching = false
           if (pn === 1) { // 第一页
             this.tabs[tabIdx].data = res.data.list
-            this.$store.commit('weixinShare/set', {
+
+            this.setShareData({
               type: '',
               title: res.data.shareInfo.shareTitle,
               desc: res.data.shareInfo.shareContent,

@@ -187,6 +187,7 @@
 import Vue from 'vue'
 import DownloadBox from '../../components/DownloadBox'
 import MeScrollSupport from '../../mixin/MeScrollSupport'
+import WeixinShareInKeepAlive from '../../mixin/WeixinShareInKeepAlive'
 import DynamicFixedBox from '../../components/DynamicFixedBox'
 import ScrollToTop from '../../components/ScrollToTop'
 import TopicTagBox from '../../components/TopicTagBox'
@@ -197,7 +198,7 @@ import MeScroll from 'mescroll.js'
 import { ActionSheet } from 'cube-ui'
 Vue.use(ActionSheet)
 export default {
-  mixins: [MeScrollSupport],
+  mixins: [MeScrollSupport, WeixinShareInKeepAlive],
   data () {
     return {
       mescroll: null, // mescroll实例对象
@@ -245,6 +246,9 @@ export default {
           this.dynamic = null
           this.isLoad = false
           this.fetch()
+        },
+        () => {
+          this.runShareBindfunction()
         }
       )
     }
@@ -366,7 +370,7 @@ export default {
           }
           console.log('dynamic.contents', this.dynamic.contents, this.covers)
 
-          this.$store.commit('weixinShare/set', {
+          this.setShareData({
             type: this.isArticle ? '4' : '3',
             title: res.data.shareInfo.shareTitle,
             desc: res.data.shareInfo.shareContent,
