@@ -364,6 +364,7 @@
 import '@/iconfont/iconfont.css'
 import ShowHideContent from './components/ShowHideContent'
 import utils from '@/lib/utils'
+import WeixinShareInKeepAlive from '../../mixin/WeixinShareInKeepAlive'
 
 const initialData = {
   setted: false,
@@ -400,6 +401,7 @@ const initialData = {
   halfScreenHeight: parseInt(window.innerHeight * 0.5)
 }
 export default {
+  mixins: [WeixinShareInKeepAlive],
   name: 'ActivityDetail',
   data () {
     let _initialData = JSON.parse(JSON.stringify(initialData))
@@ -410,6 +412,9 @@ export default {
     '$route': function (val, oldVal) {
       utils.checkReloadWithKeepAliveNew(this, val, oldVal, 'ActivityDetail', ['id'], () => {
         this.refreshData()
+      },
+      () => {
+        this.runShareBindfunction()
       })
     },
     'activity.title': function (val, oldVal) {
@@ -467,7 +472,7 @@ export default {
         }
         this.activity.tags = tagsArr
 
-        this.$store.commit('weixinShare/set', {
+        this.setShareData({
           type: '5',
           title: res.data.shareInfo.shareTitle,
           desc: res.data.shareInfo.shareContent,

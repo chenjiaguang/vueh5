@@ -87,6 +87,7 @@ import 'mescroll.js/mescroll.min.css'
 import MeScrollSupportArr from '@/mixin/MeScrollSupportArr'
 import CloseImagePreviewer from '@/mixin/CloseImagePreviewer'
 import mescrollOptions from '@/lib/mescrollOptions'
+import WeixinShareInKeepAlive from '../../mixin/WeixinShareInKeepAlive'
 import {
   /* eslint-disable no-unused-vars */
   Style,
@@ -127,7 +128,7 @@ const initialData = {
   mescroll: []
 }
 export default {
-  mixins: [MeScrollSupportArr, CloseImagePreviewer],
+  mixins: [MeScrollSupportArr, CloseImagePreviewer, WeixinShareInKeepAlive],
   data () {
     let selectedIdx = parseInt(this.$route.query.jump_tab || 0)
     let selectedLabel = (this.$route.query.jump_tab && this.$route.query.jump_tab.toString() === '1') ? '活动' : '动态'
@@ -159,6 +160,9 @@ export default {
     '$route': function (val, oldVal) {
       utils.checkReloadWithKeepAliveNew(this, val, oldVal, 'CircleDetail', ['circle_id', 'jump_tab'], () => {
         this.refreshData()
+      },
+      () => {
+        this.runShareBindfunction()
       })
     },
     'circle.name': function (val, oldVal) {
@@ -289,7 +293,7 @@ export default {
               this.initMeScroll(0)
             }
           }
-          this.$store.commit('weixinShare/set', {
+          this.setShareData({
             type: '1',
             title: res.data.shareInfo.shareTitle,
             desc: res.data.shareInfo.shareContent,
