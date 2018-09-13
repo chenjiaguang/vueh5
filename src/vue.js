@@ -39,6 +39,7 @@ Vue.use(VueLazyload, {
 Vue.use(Vuex)
 window.receiveIsFantuan = function (string) {
   window._is_app = parseInt(string)
+  Vue.prototype.$isApp = window._is_app
 }
 appCall('isFanTuan')
 window.addEventListener('resize', function () {
