@@ -38,6 +38,9 @@ Vue.use(VueLazyload, {
   attempt: 1
 })
 Vue.use(Vuex)
+window.receiveIsFantuan = function (string) {
+  window._is_app = parseInt(string)
+}
 window.addEventListener('resize', function () {
   Vue.prototype.$winWidth = window.innerWidth
   Vue.prototype.$winHeight = window.innerHeight
