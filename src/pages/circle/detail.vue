@@ -42,7 +42,7 @@
                     <dynamic-item v-if="index === 0" v-for="(item, idx) in tabs[index].data" :key="item.id" :itemData="item" :hideBlock="idx === tabs[index].data.length - 1" :router="$router" @changeLike="changeLike" />
                     <activity-item v-if="index === 1" v-for="(item, idx) in tabs[index].data" :key="item.id" :itemData="item" :hideBlock="idx === tabs[index].data.length - 1" />
                   </div>
-                  <div v-else-if="tabs[index].paging.is_end && tabs[index].data && tabs[index].data.length === 0" class="empty-box" :style="{minHeight: ($winHeight - ((tabs && tabs.length) > 1 ? tabBarHeight : 0)) + 1 + 'px'}">该圈子暂无{{index === 0 ? '动态' : '活动'}}</div>
+                  <div v-else-if="tabs[index].paging.is_end && tabs[index].data && tabs[index].data.length === 0" class="empty-box" :style="{minHeight: ($winHeight - ((tabs && tabs.length) > 1 ? tabBarHeight : 0)) + 1 + 'px'}">{{circle.followed ? ('该圈子暂无' + index === 0 ? '动态' : '活动') : '加入圈子才能进行更多操作哦~'}}</div>
                 </div>
               </swiper-slide>
           </swiper>
@@ -68,7 +68,7 @@
       </div>
     </div>
     <scroll-to-top v-if="mescroll && mescroll.length > 0" :visible="showBackTop" :position="{bottom: ($winWidth / 750) * 178, right: ($winWidth / 750) * 54}" :scroll="mescroll[selectedIdx]"/>
-    <i class="iconfont icon-camera publish-icon" @click="goPublish"></i>
+    <i class="iconfont icon-camera publish-icon" v-if="circle.followed" @click="goPublish"></i>
   </div>
 </template>
 
