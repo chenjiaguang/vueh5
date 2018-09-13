@@ -5,6 +5,7 @@ import ajax from './lib/ajax'
 import browserUA from './lib/browserUA'
 import toast from './components/toast'
 import modal from './components/modal'
+import prompt from './components/prompt'
 import Preview from './components/preview'
 import appCall from './lib/appCall'
 
@@ -28,6 +29,7 @@ Vue.prototype.$ajax = ajax
 Vue.prototype.$browserUA = browserUA
 Vue.prototype.$toast = toast
 Vue.prototype.$modal = modal
+Vue.prototype.$prompt = prompt
 Vue.prototype.$previewImage = Preview
 Vue.use(VueLazyload, {
   preLoad: 1.3,

@@ -29,7 +29,7 @@
           </div>
           <div class="tab-border" :style="{transform: 'scale(1,' + $tranScale + ')'}"></div>
         </div>
-        <div class="tabs-wrapper" :style="{height: ($winHeight - ((tabs && tabs.length) > 1 ? tabBarHeight : 0)) + 'px'}">
+        <div class="tabs-wrapper" :style="{height: ($winHeight - ((tabs && tabs.length) > 1 ? tabBarHeight : 0)) - (circle.followed ? 0 : followBoxHeight) + 'px'}">
           <swiper class="swiper-wrapper swiper-no-swiping" ref="swiper" :style="{width: '100%', height: '100%'}" :options="swiperOption">
               <swiper-slide v-for="(item, index) in tabs" :key="item.title" :style="{width: '100%', height: '100%'}">
                 <div :id="'mescroll' + index" class="mescroll content-scroll-wrapper" :style="{width: $winWidth + 'px', height: '100%', overflowY: 'auto', overflowX: 'hidden'}">
@@ -38,11 +38,11 @@
                       <loading-view />
                     </div>
                   </transition>
-                  <div v-if="tabs[index].paging.pn && tabs[index].data && tabs[index].data.length !== 0" :style="{minHeight: ($winHeight - ((tabs && tabs.length) > 1 ? tabBarHeight : 0)) + 1 + 'px', backgroundColor: '#fff'}">
+                  <div v-if="tabs[index].paging.pn && tabs[index].data && tabs[index].data.length !== 0" :style="{minHeight: ($winHeight - ((tabs && tabs.length) > 1 ? tabBarHeight : 0)) - (circle.followed ? 0 : followBoxHeight) + 1 + 'px', backgroundColor: '#fff'}">
                     <dynamic-item v-if="index === 0" v-for="(item, idx) in tabs[index].data" :key="item.id" :itemData="item" :hideBlock="idx === tabs[index].data.length - 1" :router="$router" @changeLike="changeLike" />
                     <activity-item v-if="index === 1" v-for="(item, idx) in tabs[index].data" :key="item.id" :itemData="item" :hideBlock="idx === tabs[index].data.length - 1" />
                   </div>
-                  <div v-else-if="tabs[index].paging.is_end && tabs[index].data && tabs[index].data.length === 0" class="empty-box" :style="{minHeight: ($winHeight - ((tabs && tabs.length) > 1 ? tabBarHeight : 0)) + 1 + 'px'}">{{circle.followed ? ('该圈子暂无' + index === 0 ? '动态' : '活动') : '加入圈子才能进行更多操作哦~'}}</div>
+                  <div v-else-if="tabs[index].paging.is_end && tabs[index].data && tabs[index].data.length === 0" class="empty-box" :style="{minHeight: ($winHeight - ((tabs && tabs.length) > 1 ? tabBarHeight : 0)) - (circle.followed ? 0 : followBoxHeight) + 1 + 'px'}">{{circle.followed ? ('该圈子暂无' + index === 0 ? '动态' : '活动') : '加入圈子才能进行更多操作哦~'}}</div>
                 </div>
               </swiper-slide>
           </swiper>
@@ -69,6 +69,10 @@
     </div>
     <scroll-to-top v-if="mescroll && mescroll.length > 0" :visible="showBackTop" :position="{bottom: ($winWidth / 750) * 178, right: ($winWidth / 750) * 54}" :scroll="mescroll[selectedIdx]"/>
     <i class="iconfont icon-camera publish-icon" v-if="circle.followed" @click="goPublish"></i>
+    <div v-if="!circle.followed && circle.followed !== null" class="follow-box" :style="{height: followBoxHeight + 'px'}" @click="joinCircle">
+      <div class="follow-icon" :style="{backgroundImage: 'url(' + $assetsPublicPath + '/cwebassets/image/add_circle_icon.png)'}"></div>
+      <div class="follow-text">申请加入圈子</div>
+    </div>
   </div>
 </template>
 
@@ -102,7 +106,8 @@ const initialData = {
   circle: {
     cover: {
       compress: ''
-    }
+    },
+    followed: null
   },
   tabs: [
     {
@@ -120,6 +125,7 @@ const initialData = {
   ],
   swiperOption: {},
   tabBarHeight: parseInt((window.innerWidth / 750) * 88),
+  followBoxHeight: parseInt((window.innerWidth / 750) * 100),
   selectedLabel: '动态',
   selectedIdx: 0,
   tabSlideX: -window.innerWidth + 'px',
@@ -170,6 +176,13 @@ export default {
     }
   },
   methods: {
+    joinCircle () {
+      // this.$prompt.showAlert({contentText: '加入圈子才能进行更多操作哦~', leftText: '我再想想', rightText: '立即加入'}, () => {
+      //   console.log('confirm')
+      // }, () => {
+      //   console.log('cancel')
+      // })
+    },
     changeTabBar (tabTitle) { // 点击tab切换
       this.tabs.forEach((item, index) => {
         if (item.title === tabTitle) {
@@ -698,5 +711,27 @@ fl{
   line-height: 48px;
   padding: 50px 0;
   text-align: center;
+}
+.follow-box{
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  background: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.follow-icon{
+  width: 32px;
+  height: 32px;
+  background-position: center;
+  background-size: contain;
+  background-repeat: no-repeat;
+  margin-right: 16px;
+}
+.follow-text{
+  font-size: 32px;
+  line-height: 50px;
 }
 </style>
