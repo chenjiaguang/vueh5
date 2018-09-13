@@ -6,6 +6,7 @@ export default {
   },
   mutations: {
     set (state, payload = {}) {
+      console.log('payload', payload)
       state.type = payload.type || ''
       global.wx.ready(function () {
         // 需在用户可能点击分享按钮前就先调用
