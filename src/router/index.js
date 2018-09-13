@@ -3,6 +3,7 @@ import Router from 'vue-router'
 import NotFoundPage from '@/pages/notFoundPage'
 import Home from '@/pages/home'
 import CircleDetail from '@/pages/circle/detail'
+import CircleApply from '@/pages/circle/apply'
 import ActivityDetail from '@/pages/activity/detail'
 import ActivityDynamic from '@/pages/activity/dynamic'
 import ActivityOrder from '@/pages/activity/order'
@@ -201,6 +202,14 @@ const router = new Router({
       component: TestVideo,
       meta: {
         title: '视频播放'
+      }
+    },
+    {
+      path: prefix + '/circle/apply',
+      name: 'CircleApply',
+      component: CircleApply,
+      meta: {
+        title: '入圈申请'
       }
     }
   ],
