@@ -18,7 +18,6 @@ import {
 if (process.env.NODE_ENV !== 'production') { // 非正式环境包，就实例化vconsole
   new VConsole() // 初始化
 }
-appCall('isFanTuan')
 Vue.prototype.$assetsPublicPath = '/h5'
 Vue.prototype.$winWidth = window.innerWidth
 Vue.prototype.$winHeight = window.innerHeight
@@ -41,6 +40,7 @@ Vue.use(Vuex)
 window.receiveIsFantuan = function (string) {
   window._is_app = parseInt(string)
 }
+appCall('isFanTuan')
 window.addEventListener('resize', function () {
   Vue.prototype.$winWidth = window.innerWidth
   Vue.prototype.$winHeight = window.innerHeight
