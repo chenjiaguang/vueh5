@@ -103,7 +103,7 @@ export default {
         this.$toast('正在申请...')
         return false
       }
-      if (!this.dynamic.circleInfo.visible) { // 不可见
+      if (!this.dynamic.show_allways.toString() !== '1') { // 不可见
         this.joinCircle()
         return false
       }
