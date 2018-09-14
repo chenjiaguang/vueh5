@@ -87,7 +87,7 @@
             <div class="comment-and-like">
               <div class="gray-block"></div>
               <div class="comment-and-like-header">
-                <div class="comment-header">{{parseInt(dynamic.comment_num) ? (dynamic.comment_num + '条') : ''}}评论</div>
+                <div class="comment-header">评论{{parseInt(dynamic.comment_num) ? (' ' + dynamic.comment_num) : ''}}</div>
                 <div class="like-header" v-if="dynamic&&dynamic.like_num>0">
                   <span>{{dynamic.like_num}}人点了赞</span>
                   <transition-group class="like-avatar-list" name="avatar-animate" tag="div">

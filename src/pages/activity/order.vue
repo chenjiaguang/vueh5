@@ -59,7 +59,7 @@
             </div>
             <div class="user-info-item clearfix" v-if="form.userInfo.needIdCard">
               <div class="user-left fl"><i class="require-icon iconfont icon-xinghao"></i>身份证</div>
-              <input class="user-full-input fl" type="number" v-model="form.userInfo.idCard" placeholder="请输入身份证号" />
+              <input class="user-full-input fl" v-model="form.userInfo.idCard" placeholder="请输入身份证号" />
             </div>
             <div class="user-info-item clearfix" v-if="form.userInfo.needSex">
               <div class="user-left fl"><i class="require-icon iconfont icon-xinghao"></i>性<span style="visibility:hidden">别</span>别</div>

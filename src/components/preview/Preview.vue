@@ -77,6 +77,7 @@ export default {
         loop: false,
         getThumbBoundsFn: (index) => {
           // find thumbnail element
+          console.log('clickedEls', this.clickedEls)
           var thumbnail = this.clickedEls[index]
           // get window scroll Y
           var pageYScroll = window.pageYOffset || document.documentElement.scrollTop
@@ -90,7 +91,7 @@ export default {
         }
       },
       zIndex: 999,
-      clickedEl: null,
+      clickedEls: null,
       gallery: null,
       startPos: {
         x: null,

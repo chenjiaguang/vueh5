@@ -457,11 +457,12 @@ export default {
     joinCircle () {
       let {need_audit, followed} = this.circle
       let _rightText = need_audit ? '申请加入' : '立即加入'
-      if (followed) {
+      if (followed || !utils.checkLogin()) { // 已加入或未登录均返回
         return false
       }
       if (this.following) { // 正在申请
         this.$toast('正在申请...')
+        return false
       }
       this.$prompt.showAlert({contentText: '加入圈子才能进行更多操作哦~', leftText: '我再想想', rightText: _rightText}, () => {
         this.applyJoinCircle()

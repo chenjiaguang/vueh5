@@ -28,7 +28,9 @@ import utils from '../lib/utils'
 export default {
   props: ['dynamic'],
   data () {
-    return {}
+    return {
+      following: false
+    }
   },
   computed: {
     likeNumber () {
@@ -43,6 +45,46 @@ export default {
   },
   components: {},
   methods: {
+    applyJoinCircle () {
+      let {need_audit, id} = this.dynamic.circleInfo
+      if (need_audit) { // 跳转申请加入
+        this.$router.push({name: 'CircleApply', query: {circle_id: id}})
+      } else { // 直接申请
+        if (this.following) { // 正在申请
+          this.$toast('正在申请...')
+          return false
+        }
+        let rData = {
+          id: id,
+          follow: 1
+        }
+        this.following = true
+        this.$ajax('/jv/qz/following', {data: rData}).then(res => {
+          if (res && !res.error) { // 申请成功
+            this.dynamic.circleInfo.followed = true
+            this.following = false
+            this.$toast('加入成功')
+          } else if (res.error && res.msg) {
+            this.following = false
+            this.$toast(res.msg)
+          } else {
+            this.following = false
+          }
+        }).catch(err => {
+          console.log('加入圈子出错', err)
+          this.following = false
+        })
+      }
+    },
+    joinCircle () {
+      let {need_audit} = this.dynamic.circleInfo
+      let _rightText = need_audit ? '申请加入' : '立即加入'
+      this.$prompt.showAlert({contentText: '加入圈子才能进行更多操作哦~', leftText: '我再想想', rightText: _rightText}, () => {
+        this.applyJoinCircle()
+      }, () => {
+        console.log('cancel')
+      })
+    },
     clickLike () {
       if (this.dynamic.submitting) {
         return false
@@ -50,15 +92,27 @@ export default {
       this.$emit('changeLike')
     },
     clickComment (id) {
-      if (utils.checkLogin()) {
-        this.$router.push({
-          name: 'DynamicSendComment',
-          query: { dy_id: this.dynamic.id },
-          params: {
-            dynamic: this.dynamic
-          }
-        })
+      console.log('clickComment', this.dynamic)
+      if (this.dynamic.circleInfo.followed || !utils.checkLogin()) { // 未登陆或已加入均返回
+        return false
       }
+
+      if (this.following) { // 正在申请
+        this.$toast('正在申请...')
+        return false
+      }
+      if (!this.dynamic.circleInfo.visible) { // 不可见
+        this.joinCircle()
+        return false
+      }
+
+      this.$router.push({
+        name: 'DynamicSendComment',
+        query: { dy_id: this.dynamic.id },
+        params: {
+          dynamic: this.dynamic
+        }
+      })
     }
   },
   mounted () {
