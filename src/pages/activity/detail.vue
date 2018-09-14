@@ -393,7 +393,8 @@ const initialData = {
     activityHasDynamic: false,
     activityDynamic: [],
     statusText: '',
-    ticket: []
+    ticket: [],
+    following: false
   },
   circle: {},
   showMore: false, // 显示更多
@@ -422,6 +423,52 @@ export default {
     }
   },
   methods: {
+    applyJoinCircle () {
+      let {need_audit, id} = this.circle
+      if (need_audit) { // 跳转申请加入
+        this.$router.push({name: 'CircleApply', query: {circle_id: id}})
+      } else { // 直接申请
+        if (this.following) { // 正在申请
+          this.$toast('正在申请...')
+          return false
+        }
+        let rData = {
+          id: id,
+          follow: 1
+        }
+        this.following = true
+        this.$ajax('/jv/qz/following', {data: rData}).then(res => {
+          if (res && !res.error) { // 申请成功
+            this.circle.followed = true
+            this.following = false
+            this.$toast('加入成功')
+          } else if (res.error && res.msg) {
+            this.following = false
+            this.$toast(res.msg)
+          } else {
+            this.following = false
+          }
+        }).catch(err => {
+          console.log('加入圈子出错', err)
+          this.following = false
+        })
+      }
+    },
+    joinCircle () {
+      let {need_audit, followed} = this.circle
+      let _rightText = need_audit ? '申请加入' : '立即加入'
+      if (followed) {
+        return false
+      }
+      if (this.following) { // 正在申请
+        this.$toast('正在申请...')
+      }
+      this.$prompt.showAlert({contentText: '加入圈子才能进行更多操作哦~', leftText: '我再想想', rightText: _rightText}, () => {
+        this.applyJoinCircle()
+      }, () => {
+        console.log('cancel')
+      })
+    },
     fetchActivity () {
       let rData = {
         id: this.$route.query.id
@@ -497,6 +544,11 @@ export default {
       this.$router.push({name: 'mapPage', query: { lng: option.lng, lat: option.lat, title: option.title || '' }})
     },
     goPublish () {
+      let {followed} = this.circle
+      if (!followed) {
+        this.joinCircle()
+        return false
+      }
       if (utils.checkLogin()) {
         let circleJson = JSON.stringify({id: this.circle.id, title: this.circle.name})
         let activityJson = JSON.stringify({id: this.activity.id, title: this.activity.title})
@@ -508,6 +560,11 @@ export default {
     },
     goOrder () {
       if (this.activity.statusText !== '购票' || !utils.checkLogin()) { // 未登录或不可购票时终止
+        return false
+      }
+      let {followed} = this.circle
+      if (!followed) {
+        this.joinCircle()
         return false
       }
       this.$router.push({name: 'ActivityOrder', query: {id: this.$route.query.id}})

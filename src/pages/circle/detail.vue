@@ -131,7 +131,8 @@ const initialData = {
   tabSlideX: -window.innerWidth + 'px',
   showTabbar: false,
   pageTop: 0,
-  mescroll: []
+  mescroll: [],
+  following: false
 }
 export default {
   mixins: [MeScrollSupportArr, CloseImagePreviewer, WeixinShareInKeepAlive],
@@ -176,12 +177,51 @@ export default {
     }
   },
   methods: {
+    applyJoinCircle () {
+      let {need_audit, id} = this.circle
+      if (need_audit) { // 跳转申请加入
+        this.$router.push({name: 'CircleApply', query: {circle_id: id}})
+      } else { // 直接申请
+        if (this.following) { // 正在申请
+          this.$toast('正在申请...')
+          return false
+        }
+        let rData = {
+          id: id,
+          follow: 1
+        }
+        this.following = true
+        this.$ajax('/jv/qz/following', {data: rData}).then(res => {
+          if (res && !res.error) { // 申请成功
+            this.circle.followed = true
+            this.following = false
+            this.$toast('加入成功')
+          } else if (res.error && res.msg) {
+            this.following = false
+            this.$toast(res.msg)
+          } else {
+            this.following = false
+          }
+        }).catch(err => {
+          console.log('加入圈子出错', err)
+          this.following = false
+        })
+      }
+    },
     joinCircle () {
-      // this.$prompt.showAlert({contentText: '加入圈子才能进行更多操作哦~', leftText: '我再想想', rightText: '立即加入'}, () => {
-      //   console.log('confirm')
-      // }, () => {
-      //   console.log('cancel')
-      // })
+      let {need_audit, followed} = this.circle
+      let _rightText = need_audit ? '申请加入' : '立即加入'
+      if (followed) {
+        return false
+      }
+      if (this.following) { // 正在申请
+        this.$toast('正在申请...')
+      }
+      this.$prompt.showAlert({contentText: '加入圈子才能进行更多操作哦~', leftText: '我再想想', rightText: _rightText}, () => {
+        this.applyJoinCircle()
+      }, () => {
+        console.log('cancel')
+      })
     },
     changeTabBar (tabTitle) { // 点击tab切换
       this.tabs.forEach((item, index) => {
@@ -721,6 +761,18 @@ fl{
   display: flex;
   justify-content: center;
   align-items: center;
+}
+.follow-box:before{
+  content: "";
+  display: block;
+  width: 100%;
+  height: 2px;
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform: scale(1, 0.5);
+  transform-origin: 0 0;
+  background: #e5e5e5;
 }
 .follow-icon{
   width: 32px;
