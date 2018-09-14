@@ -23,7 +23,7 @@ export default {
       rightText: '',
       cancel: function () {},
       confirm: function () {},
-      os: !browserUA.isAndroid() ? 'android' : 'ios'
+      os: browserUA.isAndroid() ? 'android' : 'ios'
     }
   },
   methods: {
