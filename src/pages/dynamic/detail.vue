@@ -213,7 +213,8 @@ export default {
       },
       paging: {},
       scrollToTopVisible: false,
-      likeSubmitting: false
+      likeSubmitting: false,
+      following: false
     }
   },
   components: {
@@ -454,6 +455,53 @@ export default {
     clickActivity (id) {
       this.$router.push({ name: 'ActivityDetail', query: { id: id }, params: {resetData: true} })
     },
+    applyJoinCircle () {
+      let {need_audit, id} = this.dynamic.circleInfo
+      if (need_audit) { // 跳转申请加入
+        this.$router.push({name: 'CircleApply', query: {circle_id: id}})
+      } else { // 直接申请
+        if (this.following) { // 正在申请
+          this.$toast('正在申请...')
+          return false
+        }
+        let rData = {
+          id: id,
+          follow: 1
+        }
+        this.following = true
+        this.$ajax('/jv/qz/following', {data: rData}).then(res => {
+          if (res && !res.error) { // 申请成功
+            this.dynamic.circleInfo.followed = true
+            this.following = false
+            this.$toast('加入成功')
+          } else if (res.error && res.msg) {
+            this.following = false
+            this.$toast(res.msg)
+          } else {
+            this.following = false
+          }
+        }).catch(err => {
+          console.log('加入圈子出错', err)
+          this.following = false
+        })
+      }
+    },
+    joinCircle () {
+      let {need_audit, followed} = this.dynamic.circleInfo
+      let _rightText = need_audit ? '申请加入' : '立即加入'
+      if (followed || !utils.checkLogin()) { // 已加入或未登录均返回
+        return false
+      }
+      if (this.following) { // 正在申请
+        this.$toast('正在申请...')
+        return false
+      }
+      this.$prompt.showAlert({contentText: '加入圈子才能进行更多操作哦~', leftText: '我再想想', rightText: _rightText}, () => {
+        this.applyJoinCircle()
+      }, () => {
+        console.log('cancel')
+      })
+    },
     showReplyActionSheet (comment, replyName = '', pid = '') {
       this.$createActionSheet({
         data: [
@@ -464,20 +512,25 @@ export default {
         ],
         onSelect: (item, index) => {
           if (index === 0) {
-            if (utils.checkLogin()) {
-              this.$router.push({
-                name: 'DynamicSendComment',
-                query: {
-                  commentId: comment.id,
-                  pid: pid,
-                  isReply: true,
-                  replyName: replyName
-                },
-                params: {
-                  comment: comment
-                }
-              })
+            if (!utils.checkLogin()) { // 未登陆返回
+              return false
             }
+            if ((this.dynamic.show_allways.toString() !== '1') && !this.dynamic.circleInfo.followed) { // 不可见且不加入
+              this.joinCircle()
+              return false
+            }
+            this.$router.push({
+              name: 'DynamicSendComment',
+              query: {
+                commentId: comment.id,
+                pid: pid,
+                isReply: true,
+                replyName: replyName
+              },
+              params: {
+                comment: comment
+              }
+            })
           }
         }
       }).show()
