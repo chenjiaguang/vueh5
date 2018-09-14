@@ -77,7 +77,10 @@ export default {
       }
     },
     joinCircle () {
-      let {need_audit} = this.dynamic.circleInfo
+      let {need_audit, followed} = this.dynamic.circleInfo
+      if (followed) {
+        return false
+      }
       let _rightText = need_audit ? '申请加入' : '立即加入'
       this.$prompt.showAlert({contentText: '加入圈子才能进行更多操作哦~', leftText: '我再想想', rightText: _rightText}, () => {
         this.applyJoinCircle()
@@ -92,8 +95,7 @@ export default {
       this.$emit('changeLike')
     },
     clickComment (id) {
-      console.log('clickComment', this.dynamic)
-      if (this.dynamic.circleInfo.followed || !utils.checkLogin()) { // 未登陆或已加入均返回
+      if (!utils.checkLogin()) { // 未登陆或已加入均返回
         return false
       }
 
