@@ -14,11 +14,11 @@ export default {
   data () {
     return {
       shareType: {
-        circleDetail: 1,
-        topicDetail: 2,
-        shortDynamicl: 3,
-        longDynamic: 4,
-        activutyDetail: 5
+        CircleDetail: 1,
+        TopicDetail: 2,
+        ShortDynamicl: 3,
+        LongDynamic: 4,
+        ActivutyDetail: 5
       },
       transitionName: 'none',
       mounted () {

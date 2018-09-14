@@ -587,9 +587,6 @@ export default {
   },
   activated () {
     this.$forceUpdate()
-  },
-  beforeDestroy () {
-    alert(1111)
   }
 }
 </script>
