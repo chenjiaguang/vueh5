@@ -17,14 +17,14 @@ class download {
       weixinCallback && weixinCallback()
     } else if (browser.isIphone) {
       window.location.href = 'fantuanc://'
-      // setTimeout(() => {
-      // window.location.href = 'https://itunes.apple.com/cn/app/%E8%8C%83%E5%9B%A2/id1278226297?mt=8'
-      // }, 500)
+      setTimeout(() => {
+        window.location.href = 'https://itunes.apple.com/cn/app/%E8%8C%83%E5%9B%A2/id1278226297?mt=8'
+      }, 500)
     } else if (browser.isAndroid) {
       window.location.href = 'launchapp://myhost/open'
-      // setTimeout(() => {
-      // window.location.href = 'http://a.app.qq.com/o/simple.jsp?pkgname=com.wetime.fanc'
-      // }, 500)
+      setTimeout(() => {
+        window.location.href = 'http://a.app.qq.com/o/simple.jsp?pkgname=com.wetime.fanc'
+      }, 500)
     }
   }
 }
