@@ -196,6 +196,7 @@ export default {
             this.circle.followed = true
             this.following = false
             this.$toast('加入成功')
+            this.refreshData()
           } else if (res.error && res.msg) {
             this.following = false
             this.$toast(res.msg)
