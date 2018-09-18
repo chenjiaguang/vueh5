@@ -554,7 +554,6 @@ export default {
         let bannerHeight = bannerPos.height
         this.pageTop = -bannerHeight
       }
-      console.log('sdf')
       if (y > this.$winHeight && !this.showBackTop) {
         this.showBackTop = true
       } else if (y < this.$winHeight && this.showBackTop) {

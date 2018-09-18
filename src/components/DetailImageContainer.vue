@@ -1,8 +1,8 @@
 // 动态详情页的图片展示
 <template>
   <div v-if="images&&images.length" class="row flex-wrap-wrap space-between">
-    <div ref="detailImage" v-for="(item, idx) in images" :key="idx" @click="previewImage(idx, $refs['detailImage'], (item.gif && item.staticImage) ? item.staticImage : (item.compress || item.url))" :class="[imageClassName]">
-      <div :style="`background-image:url(${(item.gif && item.staticImage) ? item.staticImage : item.url});height:${images.length==1?((images[0].height/images[0].width*$winWidth)+'px'):null}`" :class="['image-item']" />
+    <div v-for="(item, idx) in images" :key="idx" @click="previewImage(idx, $refs['detailImage'], (item.gif && item.staticImage) ? item.staticImage : (item.compress || item.url))" :class="[imageClassName]">
+      <div ref="detailImage" :style="`background-image:url(${(item.gif && item.staticImage) ? item.staticImage : item.url});height:${images.length==1?((images[0].height/images[0].width*$winWidth)+'px'):null}`" :class="['image-item']" />
       <div class="long-tag" v-if="item.longCover && !item.gif">长图</div>
       <div class="gif-tag" v-if="item.gif"></div>
     </div>
@@ -29,7 +29,6 @@ export default {
   },
   methods: {
     previewImage (idx, els, placeholder) {
-      console.log('images', this.images)
       this.$previewImage.show({images: this.images, idx, clickedEl: els, placeholder: placeholder || null})
     }
   }

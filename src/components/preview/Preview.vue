@@ -77,7 +77,6 @@ export default {
         loop: false,
         getThumbBoundsFn: (index) => {
           // find thumbnail element
-          console.log('clickedEls', this.clickedEls)
           var thumbnail = this.clickedEls[index]
           // get window scroll Y
           var pageYScroll = window.pageYOffset || document.documentElement.scrollTop
@@ -102,7 +101,6 @@ export default {
   },
   methods: {
     close () {
-      console.log('close')
       if (this.gallery) {
         this.gallery.close()
       }
@@ -139,7 +137,6 @@ export default {
       // as well as on:
       // touchend/mouseup/pointerup events
         //   console.log('isDown', e)
-        console.log('preventDragEvent', e)
         if (isDown) {
           if (_this.gallery.timer) {
             clearTimeout(_this.gallery.timer)

@@ -23,7 +23,7 @@ export default {
   name: 'ActivityDetail',
   data () {
     return {
-      locationText: 'sdfsdfsdf',
+      locationText: '',
       map: null
     }
   },

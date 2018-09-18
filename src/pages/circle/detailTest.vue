@@ -420,7 +420,7 @@ export default {
 
     },
     upCallback () {
-      console.log('sdfs')
+      console.log('upCallback')
     },
     initPageScroll () {
       this.pagescroll = new MeScroll('page-scroll', { // 在vue的mounted生命周期初始化mescroll,确保此处配置的id能够被找到
