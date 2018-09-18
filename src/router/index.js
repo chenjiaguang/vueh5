@@ -7,6 +7,7 @@ import CircleApply from '@/pages/circle/apply'
 import ActivityDetail from '@/pages/activity/detail'
 import ActivityDynamic from '@/pages/activity/dynamic'
 import ActivityOrder from '@/pages/activity/order'
+import ConfirmOrder from '@/pages/activity/confirmOrder'
 import WebPay from '@/pages/activity/webPay'
 import ActivitySuccess from '@/pages/activity/success'
 import ActivityTicket from '@/pages/activity/ticket'
@@ -65,6 +66,14 @@ const router = new Router({
       component: ActivityOrder,
       meta: {
         title: '提交订单'
+      }
+    },
+    {
+      path: prefix + '/activity/order/confirm',
+      name: 'ConfirmOrder',
+      component: ConfirmOrder,
+      meta: {
+        title: '确认订单'
       }
     },
     {
