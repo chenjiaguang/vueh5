@@ -515,7 +515,7 @@ export default {
             if (!utils.checkLogin()) { // 未登陆返回
               return false
             }
-            if ((this.dynamic.show_allways.toString() !== '1') && !this.dynamic.circleInfo.followed) { // 不可见且不加入
+            if ((this.dynamic.show_allways.toString() !== '1') && this.dynamic.circleInfo && !this.dynamic.circleInfo.followed) { // 不可见且不加入
               this.joinCircle()
               return false
             }
@@ -736,8 +736,6 @@ export default {
   margin-bottom: 36px;
 }
 /*************************************************************************/
-#content-container {
-}
 .dynamic-content {
   color: #333333;
   font-size: 32px;

@@ -585,7 +585,7 @@ export default {
     },
     sendCode () {
       let {phone} = this.form.userInfo
-      if (!/^1[34578][0-9]\d{8}$/.test(phone)) { // 输入的不是手机号
+      if (!/^1\d{10}$/.test(phone)) { // 输入的不是手机号
         this.$toast('请输入正确手机号')
         return false
       }
@@ -688,12 +688,12 @@ export default {
           } else {
             if (res.data && res.data.needToPlay) { // 无错且需支付时仅提示
               this.$toast(res.msg)
-            } else if (res.data && !res.data.needToPlay) { // 无措且不需支付时提示后跳转
+            } else if (res.data && !res.data.needToPlay) { // 无错且不需支付时提示后跳转
               this.$toast(res.msg, 2000, () => this.goSuccess(res))
             }
           }
         }
-        if (res && !res.error) {
+        if (res && !res.msg && !res.error) {
           if (res.data && res.data.needToPlay) { // 需要支付
             if (typeof WeixinJSBridge == 'undefined') { // 不允许调用微信公众号支付,其他浏览器
               let _rData = {
@@ -716,10 +716,14 @@ export default {
               window.location.href = _href
             }
           } else if (res.data && !res.data.needToPlay) {
-            if (res.msg) { // 如果无msg则直接跳转
+            if (!res.msg) { // 如果无msg则直接跳转
               this.goSuccess(res)
+            } else if (res.msg) {
+              this.$toast(res.msg, 2000, () => this.goSuccess(res))
             }
           }
+        } else if (res && !res.msg && res.error) {
+          console.log('报名出错')
         }
       }).catch(() => {
         this.submitting = false
@@ -738,7 +742,7 @@ export default {
       return (selected && Number((Number(selected.putAmount) * Number(selected.price)).toFixed(2))) || 0
     },
     disabledSend () {
-      return !/^1[34578][0-9]\d{8}$/.test(this.form.userInfo.phone) || this.counting
+      return !/^1\d{10}$/.test(this.form.userInfo.phone) || this.counting
     }
   },
   created () {
