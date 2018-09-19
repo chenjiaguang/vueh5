@@ -39,7 +39,7 @@
               <span class="fr" v-if="selectedTicket.max && selectedTicket.max.toString() !== '0'">剩余{{selectedTicket.amount}}张</span>
             </div>
           </div>
-          <div class="header info-header">报名人信息</div>
+          <div class="header info-header">取票人信息</div>
           <div class="user-info">
             <div class="user-info-item clearfix" v-if="form.userInfo.needName">
               <div class="user-left fl"><i class="require-icon iconfont icon-xinghao"></i>姓<span style="visibility:hidden">名</span>名</div>
@@ -67,13 +67,13 @@
               <div @click="form.userInfo.sex = 2" class="sexual-option fl clearfix"><i class="iconfont fl" :class="{'icon-quanzi': form.userInfo.sex.toString() === '2', 'icon-quan': form.userInfo.sex.toString() !== '2'}"></i>女</div>
             </div>
           </div>
-          <div class="pay-way-box" v-if="shouldPay && shouldPay.toString() !== '0'">
+          <!-- <div class="pay-way-box" v-if="shouldPay && shouldPay.toString() !== '0'">
             <div class="header pay-header">选择支付方式</div>
             <div class="pay-way">
               <div class="pay-way-item clearfix" @click="changePayWay(1)" v-if="form.payWay.toString() === '1'"><i class="iconfont icon-weixinzhifu fl" style="color: #09bb07;"></i>微信支付<i class="iconfont fr" :class="{'icon-gou': form.payWay.toString() === '1', 'icon-quan': form.payWay.toString() === '2'}"></i></div>
               <div class="pay-way-item clearfix" @click="changePayWay(2)" v-if="form.payWay.toString() === '2'"><i class="iconfont icon-zhifubaozhifu fl" style="color: #00a0e8;"></i>支付宝支付<i class="iconfont fr" :class="{'icon-gou': form.payWay.toString() === '2', 'icon-quan': form.payWay.toString() === '1'}"></i></div>
             </div>
-          </div>
+          </div> -->
           <div class="agreement-box clearfix" @click.stop="changeAgreement">
             <i class="iconfont fl" style="width: 4.95%" :class="{'icon-gou': form.agreement, 'icon-quan': !form.agreement}"></i>
             <div class="fl" style="width: 95.05%">我同意<span @click.stop="goAgreement" style="color: #1EB0FD">《范团活动参与协议》</span>并已确认活动真实性，同意支付 报名费用。</div>
@@ -84,7 +84,7 @@
     <div class="fixed-button">
       <span style="vertical-align: middle">合计</span>
       <span class="should-pay-amount">&yen;{{shouldPay}}</span>
-      <div @click="orderSubmit" class="btn-submit" :style="{backgroundColor: (!selectedTicket || !form.agreement || submitting) ? '#bbbbbb' : '#ff3f53'}">{{submitting ? '正在提交' : '确认报名'}}</div>
+      <div @click="clickSubmit" class="btn-submit" :style="{backgroundColor: (!selectedTicket || !form.agreement || submitting) ? '#bbbbbb' : '#ff3f53'}">{{submitting ? '正在提交' : '确认报名'}}</div>
     </div>
   </div>
 </template>
@@ -406,7 +406,7 @@
   .agreement-box{
     font-size: 24px;
     line-height: 38px;
-    margin-top: 17px;
+    margin-top: 33px;
   }
   .agreement-box .icon-quan{
     font-size: 24px;
@@ -467,6 +467,8 @@ import utils from '@/lib/utils'
 export default {
   name: 'ActivityDetail',
   data () {
+    let _orderOwnerInfo = window.localStorage.orderOwnerInfo ? JSON.parse(window.localStorage.orderOwnerInfo) : {}
+    let {name, phone, idCard, weChat, sex} = _orderOwnerInfo
     return {
       activity: {
         id: '',
@@ -482,12 +484,12 @@ export default {
           needIdCard: false,
           needSex: false,
           needWeChat: false,
-          name: '',
-          phone: '',
+          name: name || '',
+          phone: phone || '',
           code: '',
-          idCard: '',
-          weChat: '',
-          sex: 0 // 0表示未选，1表示男，2表示女
+          idCard: idCard || '',
+          weChat: weChat || '',
+          sex: sex || 0 // 0表示未选，1表示男，2表示女
         },
         payWay: 1, // 1表示微信支付，2表示支付宝支付     如果微信内则微信支付，否则支付宝支付:this.$browserUA.isWeixin() ? 1 : 2
         agreement: true
@@ -640,35 +642,84 @@ export default {
     // completeOrder () { // 完成订单
     //   console.log('完成订单')
     // },
-    orderSubmit () { // 验证并提交订单
-      if (!utils.checkLogin()) { // 未登录终止
-        return false
+    checkOrder () {
+      let rData = {
+        aid: this.activity.id
       }
-      let {selectedTicket} = this
-      let {agreement} = this.form
-      let {id, buyNum, maxTicket} = this.activity
-      let {name, needName, phone, idCard, needIdCard, weChat, needWeChat, sex, needSex} = this.form.userInfo
-      let toastObject = {
-        selectedTicket: !selectedTicket && '请选择购买的票',
-        name: !name && needName && '请输入正确的姓名',
-        phone: !phone && '请输入正确的手机号码',
-        weChat: !weChat && needWeChat && '请输入正确的微信号',
-        idCard: !idCard && needIdCard && '请输入正确的身份证号',
-        sex: (!sex || sex.toString() === '0') && needSex && '请选择你的性别',
-        buynum: maxTicket && parseInt(maxTicket) && selectedTicket && ((selectedTicket.putAmount + parseInt(buyNum)) > parseInt(maxTicket)) && '您已超过限购数量'
-      }
-      if (!(id.toString() && agreement)) { // 活动id必须存在,需同意范团活动参与协议
-        return false
-      }
-      for (let item in toastObject) {
-        if (toastObject[item]) { // 有一项出错，停止提交并提示
-          this.$toast(toastObject[item])
-          return false
+      this.submitting = true
+      this.$ajax('/jv/qz/v25/order/unpaid', {data: rData, dontToast: true}).then(res => {
+        console.log('获取未支付订单成功', res)
+        if (res && res.data && res.data.checkcode && !res.error) { // 有未支付订单
+          if (res.data.leftTime && parseInt(res.data.leftTime) > 0) { // 剩余时间大于0
+            console.log(45)
+            this.submitting = false
+            this.$router.push({name: 'ConfirmOrder', query: {aid: this.activity.id}, params: {data: res.data, refreshData: true}})
+          } else { // 剩余时间不足
+            this.orderSubmit()
+          }
+        } else { // 无未支付订单
+          this.orderSubmit()
         }
-      }
-      if (this.submitting) {
+      }).catch(err => {
+        console.log('获取未支付订单失败', err)
+        if (err.status.toString() === '200') {
+          this.orderSubmit()
+        } else {
+          this.submitting = false
+        }
+      })
+    },
+    clickSubmit () {
+      if (!utils.checkLogin() || this.submitting) { // 未登录终止
         return false
       }
+      // let {selectedTicket} = this
+      // let {agreement} = this.form
+      // let {id, buyNum, maxTicket} = this.activity
+      // let {name, needName, phone, idCard, needIdCard, weChat, needWeChat, sex, needSex} = this.form.userInfo
+      // let toastObject = {
+      //   selectedTicket: !selectedTicket && '请选择购买的票',
+      //   name: !name && needName && '请输入正确的姓名',
+      //   phone: !phone && '请输入正确的手机号码',
+      //   weChat: !weChat && needWeChat && '请输入正确的微信号',
+      //   idCard: !idCard && needIdCard && '请输入正确的身份证号',
+      //   sex: (!sex || sex.toString() === '0') && needSex && '请选择你的性别',
+      //   buynum: maxTicket && parseInt(maxTicket) && selectedTicket && ((selectedTicket.putAmount + parseInt(buyNum)) > parseInt(maxTicket)) && '您已超过限购数量'
+      // }
+      // if (!(id.toString() && agreement)) { // 活动id必须存在,需同意范团活动参与协议
+      //   return false
+      // }
+      // for (let item in toastObject) {
+      //   if (toastObject[item]) { // 有一项出错，停止提交并提示
+      //     this.$toast(toastObject[item])
+      //     return false
+      //   }
+      // }
+      this.checkOrder()
+    },
+    orderSubmit () { // 验证并提交订单
+      let {selectedTicket} = this
+      let {name, phone, idCard, weChat, sex} = this.form.userInfo
+      // let toastObject = {
+      //   selectedTicket: !selectedTicket && '请选择购买的票',
+      //   name: !name && needName && '请输入正确的姓名',
+      //   phone: !phone && '请输入正确的手机号码',
+      //   weChat: !weChat && needWeChat && '请输入正确的微信号',
+      //   idCard: !idCard && needIdCard && '请输入正确的身份证号',
+      //   sex: (!sex || sex.toString() === '0') && needSex && '请选择你的性别',
+      //   buynum: maxTicket && parseInt(maxTicket) && selectedTicket && ((selectedTicket.putAmount + parseInt(buyNum)) > parseInt(maxTicket)) && '您已超过限购数量'
+      // }
+      // if (!(id.toString() && agreement)) { // 活动id必须存在,需同意范团活动参与协议
+      //   this.submitting = false
+      //   return false
+      // }
+      // for (let item in toastObject) {
+      //   if (toastObject[item]) { // 有一项出错，停止提交并提示
+      //     this.$toast(toastObject[item])
+      //     this.submitting = false
+      //     return false
+      //   }
+      // }
       let rData = {
         aid: this.$route.query.id,
         feeId: selectedTicket.id,
@@ -679,52 +730,65 @@ export default {
         wechat: weChat,
         phone: phone
       }
-      this.submitting = true
       this.$ajax('/jv/qz/v21/apply', {data: rData}).then(res => { // 请求后端下单接口,接受返回参数,如果有error,则提示，无error，则判断是否应调起支付
         this.submitting = false
-        if (res && res.msg) {
-          if (res.error) { // 出错时仅提示
-            this.$toast(res.msg)
-          } else {
-            if (res.data && res.data.needToPlay) { // 无错且需支付时仅提示
-              this.$toast(res.msg)
-            } else if (res.data && !res.data.needToPlay) { // 无错且不需支付时提示后跳转
+        // if (res && res.msg) {
+        //   if (res.error) { // 出错时仅提示
+        //     this.$toast(res.msg)
+        //   } else {
+        //     if (res.data && res.data.needToPlay) { // 无错且需支付时仅提示
+        //       this.$toast(res.msg)
+        //     } else if (res.data && !res.data.needToPlay) { // 无错且不需支付时提示后跳转
+        //       this.$toast(res.msg, 2000, () => this.goSuccess(res))
+        //     }
+        //   }
+        // }
+        if (res && res.data && res.data.needToPlay) { // 需要支付
+          this.$router.push({name: 'ConfirmOrder', query: {aid: this.$route.query.id}, params: {data: res.data, refreshData: true}})
+        } else if (res && res.data && !res.data.needToPlay) { // 不需要支付
+          if (res.error) { // 出错时
+            res.msg && this.$toast(res.msg)
+          } else { // 无错误时
+            if (res.msg) { // 有提示
               this.$toast(res.msg, 2000, () => this.goSuccess(res))
-            }
-          }
-        }
-        if (res && !res.msg && !res.error) {
-          if (res.data && res.data.needToPlay) { // 需要支付
-            if (typeof WeixinJSBridge == 'undefined') { // 不允许调用微信公众号支付,其他浏览器
-              let _rData = {
-                checkcode: res.data.checkcode,
-                payType: '1',
-                tradeType: 'MWEB'
-              }
-              this.$ajax('/jv/qz/v21/activity/pay', {data: _rData}).then(res => {
-                if (res && Boolean(res.error) && res.msg) {
-                  this.$toast(res.msg)
-                } else if (res && !res.error) {
-                  let _href = res.data.mweb_url
-                  window.location.href = _href
-                }
-              }).catch(() => {
-                console.log('微信外h5 err')
-              })
-            } else { // 允许调用微信公众号支付,微信浏览器
-              let _href = this.$apiDomain + '/jv/qz/v21/activity/weixin/JSAPI/pay/' + res.data.checkcode
-              window.location.href = _href
-            }
-          } else if (res.data && !res.data.needToPlay) {
-            if (!res.msg) { // 如果无msg则直接跳转
+            } else { // 无提示
               this.goSuccess(res)
-            } else if (res.msg) {
-              this.$toast(res.msg, 2000, () => this.goSuccess(res))
             }
           }
-        } else if (res && !res.msg && res.error) {
-          console.log('报名出错')
         }
+        console.log('apply_res', res)
+        // if (res && !res.msg && !res.error) {
+        //   if (res.data && res.data.needToPlay) { // 需要支付
+        //     if (typeof WeixinJSBridge == 'undefined') { // 不允许调用微信公众号支付,其他浏览器
+        //       let _rData = {
+        //         checkcode: res.data.checkcode,
+        //         payType: '1',
+        //         tradeType: 'MWEB'
+        //       }
+        //       this.$ajax('/jv/qz/v21/activity/pay', {data: _rData}).then(res => {
+        //         if (res && Boolean(res.error) && res.msg) {
+        //           this.$toast(res.msg)
+        //         } else if (res && !res.error) {
+        //           let _href = res.data.mweb_url
+        //           window.location.href = _href
+        //         }
+        //       }).catch(() => {
+        //         console.log('微信外h5 err')
+        //       })
+        //     } else { // 允许调用微信公众号支付,微信浏览器
+        //       let _href = this.$apiDomain + '/jv/qz/v21/activity/weixin/JSAPI/pay/' + res.data.checkcode
+        //       window.location.href = _href
+        //     }
+        //   } else if (res.data && !res.data.needToPlay) {
+        //     if (!res.msg) { // 如果无msg则直接跳转
+        //       this.goSuccess(res)
+        //     } else if (res.msg) {
+        //       this.$toast(res.msg, 2000, () => this.goSuccess(res))
+        //     }
+        //   }
+        // } else if (res && !res.msg && res.error) {
+        //   console.log('报名出错')
+        // }
       }).catch(() => {
         this.submitting = false
       })
@@ -751,6 +815,15 @@ export default {
   },
   mounted () {
     console.log('mounted')
+  },
+  beforeRouteLeave (to, from, next) {
+    // 导航离开该组件的对应路由时调用
+    // 可以访问组件实例 `this`
+    let {name, phone, idCard, weChat, sex} = this.form.userInfo
+    let _info = {name, phone, idCard, weChat, sex}
+    let _infoJson = JSON.stringify(_info)
+    window.localStorage.orderOwnerInfo = _infoJson
+    next()
   }
 }
 </script>

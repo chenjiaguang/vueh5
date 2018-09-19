@@ -74,7 +74,7 @@
           <div>晒图</div>
         </div>
       </div>
-      <div @click="goOrder" class="order-btn fl" :style="{backgroundColor: activity.statusText === '购票' ? '#ff3f53' : '#bbbbbb', width: activity.sponsor.tel ? '46.68%' : '73.34%'}">{{activity.statusText}}</div>
+      <div @click="goOrder" class="order-btn fl" :style="{backgroundColor: (activity.statusText === '购票' && !submitting) ? '#ff3f53' : '#bbbbbb', width: activity.sponsor.tel ? '46.68%' : '73.34%'}">{{activity.statusText}}</div>
     </div>
   </div>
 </template>
@@ -399,7 +399,8 @@ const initialData = {
   circle: {},
   showMore: false, // 显示更多
   contentWrapperHeight: null,
-  halfScreenHeight: parseInt(window.innerHeight * 0.5)
+  halfScreenHeight: parseInt(window.innerHeight * 0.5),
+  submitting: false
 }
 export default {
   mixins: [WeixinShareInKeepAlive],
@@ -464,7 +465,7 @@ export default {
         this.$toast('正在申请...')
         return false
       }
-      this.$prompt.showAlert({contentText: '加入圈子才能进行更多操作哦~', leftText: '我再想想', rightText: _rightText}, () => {
+      this.$prompt.showPrompt({contentText: '加入圈子才能进行更多操作哦~', leftText: '我再想想', rightText: _rightText}, () => {
         this.applyJoinCircle()
       }, () => {
         console.log('cancel')
@@ -559,8 +560,33 @@ export default {
     goDynamicList () {
       this.$router.push({name: 'ActivityDynamic', query: {activity_id: this.activity.id}, params: {resetData: true}})
     },
+    checkOrder () {
+      let rData = {
+        aid: this.$route.query.id
+      }
+      this.submitting = true
+      this.$ajax('/jv/qz/v25/order/unpaid', {data: rData, dontToast: true}).then(res => {
+        console.log('获取未支付订单成功', res)
+        this.submitting = false
+        if (res && res.data && res.data.checkcode && !res.error) { // 有未支付订单
+          if (res.data.leftTime && parseInt(res.data.leftTime) > 0) { // 剩余时间大于0
+            this.$router.push({name: 'ConfirmOrder', query: {aid: this.$route.query.id}, params: {data: res.data, refreshData: true}})
+          } else { // 剩余时间不足
+            this.$router.push({name: 'ActivityOrder', query: {id: this.$route.query.id}})
+          }
+        } else { // 无未支付订单
+          this.$router.push({name: 'ActivityOrder', query: {id: this.$route.query.id}})
+        }
+      }).catch(err => {
+        console.log('获取未支付订单失败', err)
+        this.submitting = false
+        if (err.status.toString() === '200') {
+          this.$router.push({name: 'ActivityOrder', query: {id: this.$route.query.id}})
+        }
+      })
+    },
     goOrder () {
-      if (this.activity.statusText !== '购票' || !utils.checkLogin()) { // 未登录或不可购票时终止
+      if (this.activity.statusText !== '购票' || !utils.checkLogin() || this.submitting) { // 未登录或不可购票时终止
         return false
       }
       let {followed} = this.circle
@@ -568,7 +594,7 @@ export default {
         this.joinCircle()
         return false
       }
-      this.$router.push({name: 'ActivityOrder', query: {id: this.$route.query.id}})
+      this.checkOrder()
     }
   },
   // beforeRouteEnter (to, from, next) {

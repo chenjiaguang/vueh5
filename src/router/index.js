@@ -73,7 +73,8 @@ const router = new Router({
       name: 'ConfirmOrder',
       component: ConfirmOrder,
       meta: {
-        title: '确认订单'
+        title: '确认订单',
+        keepAlive: true
       }
     },
     {

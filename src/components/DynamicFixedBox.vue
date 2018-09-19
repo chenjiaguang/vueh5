@@ -82,7 +82,7 @@ export default {
         return false
       }
       let _rightText = need_audit ? '申请加入' : '立即加入'
-      this.$prompt.showAlert({contentText: '加入圈子才能进行更多操作哦~', leftText: '我再想想', rightText: _rightText}, () => {
+      this.$prompt.showPrompt({contentText: '加入圈子才能进行更多操作哦~', leftText: '我再想想', rightText: _rightText}, () => {
         this.applyJoinCircle()
       }, () => {
         console.log('cancel')
