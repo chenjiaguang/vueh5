@@ -37,7 +37,9 @@
       <div class="color-block"></div>
       <div class="join-header">已经报名的小伙伴({{activity.joinTotal}})</div>
       <div class="join-partner clearfix">
-        <div class="join-avatar fl" v-for="(item, idx) in activity.join" :key="idx" :style="{backgroundImage: 'url(' + item.avatar + ')'}"></div>
+        <div class="join-avatar fl" v-for="(item, idx) in activity.join" :key="idx" :style="{backgroundImage: 'url(' + item.avatar + ')'}">
+          <div v-if="item.num && parseInt(item.num) > 1" class="join-num">x{{item.num}}</div>
+        </div>
         <img class="join-avatar fl" v-if="activity.joinTotal && parseInt(activity.joinTotal) > 40"  :src="$assetsPublicPath + '/cwebassets/image/more_avatar2.png'" style="border-radius:0" />
       </div>
     </div>
@@ -190,6 +192,22 @@
     background-repeat: no-repeat;
     margin: 10px 1.4286%;
     border-radius: 50%;
+    position: relative;
+  }
+  .join-num{
+    height: 44px;
+    padding: 0 6px;
+    border: 2px solid #FE5F5F;
+    color: #FE5F5F;
+    font-size: 28px;
+    line-height: 44px;
+    border-radius: 22px;
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    transform: scale(0.5, 0.5) translateY(50%);
+    transform-origin: 100% 100%;
+    background: #fff;
   }
   .color-block{
     height: 16px;
@@ -580,7 +598,7 @@ export default {
       }).catch(err => {
         console.log('获取未支付订单失败', err)
         this.submitting = false
-        if (err.status.toString() === '200') {
+        if (err && err.status && err.status.toString() === '200') {
           this.$router.push({name: 'ActivityOrder', query: {id: this.$route.query.id}})
         }
       })
