@@ -41,7 +41,7 @@
     <div class="fixed-button">
       <span style="vertical-align: middle">合计</span>
       <span class="should-pay-amount">&yen;{{totalPrices || 0}}</span>
-      <div @click.stop="orderSubmit" class="btn-submit" :style="{backgroundColor: (!agreement || submitting || exceed || !checkcode) ? '#bbbbbb' : '#ff3f53'}">继续支付</div>
+      <div @click.stop="orderSubmit" class="btn-submit" :style="{backgroundColor: (!agreement || submitting || !checkcode) ? '#bbbbbb' : '#ff3f53'}">继续支付</div>
     </div>
   </div>
   <!-- 加载完成并且无订单 -->
@@ -314,13 +314,6 @@ export default {
     let _obj = Object.assign({}, _initialData, _initObj)
     return _obj
   },
-  watch: {
-    exceed: function (val, oldVal) {
-      if (!oldVal && val && this.applyId && this.checkcode) { // 由未超时变为超时,并且之前是有数据是
-        this.$modal.showAlert('订单已超时失效，请返回上一级页面重新购票', () => {}, '知道了')
-      }
-    }
-  },
   methods: {
     startCounting (callback) {
       if (this.timer) {
@@ -433,8 +426,14 @@ export default {
       }
     },
     orderSubmit () { // 验证并提交订单
-      console.log('orderSubmit', this.agreement, this.exceed, this.submitting, this.checkcode)
-      if (!utils.checkLogin() || !this.agreement || this.exceed || this.submitting || !this.checkcode) { // 未登录终止
+      if (!utils.checkLogin() || !this.agreement || this.submitting || !this.checkcode) { // 未登录终止
+        return false
+      }
+      if (this.exceed && this.applyId && this.checkcode) { // 有数据并且过期
+        this.$modal.showAlert('订单已超时失效，请返回上一级页面重新购票', () => {
+          this.pass = true
+          this.$router.go(-1)
+        }, '知道了')
         return false
       }
       this.submitting = true
@@ -496,6 +495,9 @@ export default {
     console.log('showPrompt', this.showPrompt)
     if (to.name === 'Agreement' || to.name === 'SMSCode' || this.pass || this.exceed || !this.feeId) {
       this.pass = false
+      if (window._alert_id) { // 如果有alert弹窗，则关闭弹窗
+        this.$modal.hideAlert(window._alert_id)
+      }
       next()
     } else {
       if (!this.showPrompt) {

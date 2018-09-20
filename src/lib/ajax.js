@@ -60,7 +60,7 @@ axios.interceptors.response.use(function (res) {
 }, function (error) {
   // 对响应错误做点什么
   if (error.message) {
-    toast('网络异常', 2000, () => { })
+    toast('网络异常，请检查网络设置', 2000, () => { })
   }
   return Promise.reject(error)
 })

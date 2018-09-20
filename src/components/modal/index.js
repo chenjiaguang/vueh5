@@ -19,10 +19,12 @@ let Modal = {
     _main.id = id
     window.document.body.appendChild(div)
     _main.$mount(div)
+    window._alert_id = id
   },
   hideAlert: (id, onClose) => {
     let modal = window.document.getElementById(id)
     window.document.body.removeChild(modal)
+    window._alert_id = null
     console.log('onClose', onClose)
     if (onClose) {
       onClose()
