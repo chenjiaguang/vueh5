@@ -69,6 +69,8 @@ export default function (func, overlay) {
       request_str = `_goUploadPic`
     } else if (arguments[0] === 'goGallery') {
       request_str = `_${arguments[0]}={"id":${JSON.stringify(arguments[1])}}`
+    } else if (arguments[0] === 'h5GoShortDynamic') { // 跳转短动态
+      request_str = `_${arguments[0]}={"id":${JSON.stringify(arguments[1])}}`
     }
     url += request_str
     console.log('ios请求url', url)

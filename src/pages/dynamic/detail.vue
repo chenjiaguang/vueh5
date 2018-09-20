@@ -196,10 +196,18 @@ import utils from '../../lib/utils'
 import NotFoundPage from '../notFoundPage'
 import MeScroll from 'mescroll.js'
 import { ActionSheet } from 'cube-ui'
+import appCall from '@/lib/appCall'
 Vue.use(ActionSheet)
 export default {
   mixins: [MeScrollSupport, WeixinShareInKeepAlive],
   data () {
+    if (this.$isApp && !this.$route.query.isArticle) { // 范团app内打开,跳转原生短动态页面
+      // appCall('finishWebView')
+      appCall('h5GoShortDynamic', this.$route.query.id)
+    } else if (this.$isApp && !this.$route.query.isArticle) { // 范团app内打开,跳转原生长文页面
+      // appCall('finishWebView')
+      appCall('h5GoLongDynamic', this.$route.query.id)
+    }
     return {
       mescroll: null, // mescroll实例对象
       dynamic: null,
