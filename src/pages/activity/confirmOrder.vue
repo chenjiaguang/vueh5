@@ -16,11 +16,11 @@
         <div class="color-block"></div>
         <div class="owner-box">
           <div class="header">取票人信息</div>
-          <div class="owner-item"><span>姓<span style="visibility:hidden">名</span>名：</span><span class="flex-1">{{name}}</span></div>
+          <div v-if="name" class="owner-item"><span>姓<span style="visibility:hidden">名</span>名：</span><span class="flex-1">{{name}}</span></div>
           <div v-if="sex && sex.toString() !== '0'" class="owner-item"><span>性<span style="visibility:hidden">别</span>别：</span><span class="flex-1">{{sexText[sex.toString()]}}</span></div>
-          <div class="owner-item"><span>手<span style="visibility:hidden">机</span>机：</span><span class="flex-1">{{phone}}</span></div>
-          <div class="owner-item"><span>微信号：</span><span class="flex-1">{{wechat}}</span></div>
-          <div class="owner-item"><span>身份证：</span><span class="flex-1">{{idCard}}</span></div>
+          <div v-if="phone" class="owner-item"><span>手<span style="visibility:hidden">机</span>机：</span><span class="flex-1">{{phone}}</span></div>
+          <div v-if="wechat" class="owner-item"><span>微信号：</span><span class="flex-1">{{wechat}}</span></div>
+          <div v-if="idCard" class="owner-item"><span>身份证：</span><span class="flex-1">{{idCard}}</span></div>
         </div>
         <div class="color-block"></div>
         <div class="form-wrapper">

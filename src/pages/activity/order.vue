@@ -699,7 +699,7 @@ export default {
     },
     orderSubmit () { // 验证并提交订单
       let {selectedTicket} = this
-      let {name, phone, idCard, weChat, sex} = this.form.userInfo
+      let {name, needName, phone, idCard, needIdCard, weChat, needWeChat, sex, needSex} = this.form.userInfo
       // let toastObject = {
       //   selectedTicket: !selectedTicket && '请选择购买的票',
       //   name: !name && needName && '请输入正确的姓名',
@@ -724,10 +724,10 @@ export default {
         aid: this.$route.query.id,
         feeId: selectedTicket.id,
         num: selectedTicket.putAmount,
-        name: name,
-        sex: sex,
-        idCard: idCard,
-        wechat: weChat,
+        name: needName ? name : '',
+        sex: needSex ? sex : '',
+        idCard: needIdCard ? idCard : '',
+        wechat: needWeChat ? weChat : '',
         phone: phone
       }
       this.$ajax('/jv/qz/v21/apply', {data: rData}).then(res => { // 请求后端下单接口,接受返回参数,如果有error,则提示，无error，则判断是否应调起支付
