@@ -29,7 +29,7 @@ export default {
         this.$ajax('/jv/anonymous/qz/v21/activity/pay', {data: _rData}).then(res => {
           if (res && Boolean(res.error) && res.msg) {
             this.$toast(res.msg)
-          } else if (res && res.error) {
+          } else if (res && !res.error) {
             let _href = res.data.mweb_url
             window.location.href = _href
           }
