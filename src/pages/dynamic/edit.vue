@@ -141,6 +141,9 @@ let initialData = {
 }
 export default {
   data () {
+    if (this.$isApp) {
+      this.$appCall('h5GoPublishShortDynamic')
+    }
     let topic = this.$route.query.topic ? JSON.parse(this.$route.query.topic) : null
     let activity = this.$route.query.activity ? JSON.parse(this.$route.query.activity) : null
     let circle = this.$route.query.circle ? JSON.parse(this.$route.query.circle) : null

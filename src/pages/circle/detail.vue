@@ -338,7 +338,11 @@ export default {
             this.tabs.splice(1, 1)
             // this.initPageScroll()
             this.initMeScroll(0)
-          } else {
+          } else { // 有活动tab
+            if (this.$isApp) {
+              let {id, name, circle_has_activity} = res.data
+              this.$appCall('h5GoCircleDetail', id, name, circle_has_activity)
+            }
             this.showTabbar = true
             const len = this.tabs.length.toString()
             // this.initPageScroll()

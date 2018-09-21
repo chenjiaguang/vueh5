@@ -281,6 +281,10 @@ export default {
           this.$toast(res.msg)
         }
         if (res && !res.error && res.data) { // 成功获取数据
+          if (this.$isApp) {
+            let {id, title, content, beginColor, endColor} = res.data
+            this.$appCall('h5GoTopicDetail', id, title, content, beginColor, endColor)
+          }
           this.tabs[idx].fetching = false
           this.tabs[idx].paging = res.data.paging
           if (pn.toString() === '1') { // 刷新

@@ -31,6 +31,7 @@ Vue.prototype.$toast = toast
 Vue.prototype.$modal = modal
 Vue.prototype.$prompt = prompt
 Vue.prototype.$previewImage = Preview
+Vue.prototype.$appCall = appCall
 Vue.use(VueLazyload, {
   preLoad: 1.3,
   error: '/h5/cwebassets/image/img_error.png',

@@ -14,19 +14,21 @@ export default function (func, overlay) {
     } else if (arguments[0] === 'getLatitude') { // 获取纬度
       window._lat = window.android[arguments[0]]()
     } else if (arguments[0] === 'goShopDetail') {
-      window.android[arguments[0]](arguments[1])
+      window.android[arguments[0]] && window.android[arguments[0]](arguments[1])
     } else if (arguments[0] === 'isFanTuan') {
       window._is_app = parseInt(window.android[arguments[0]]())
     } else if (arguments[0] === 'goUserCard') {
-      window.android[arguments[0]](arguments[2], arguments[3], arguments[4])
+      window.android[arguments[0]] && window.android[arguments[0]](arguments[2], arguments[3], arguments[4])
     } else if (arguments[0] === 'goDynamicDetail') {
-      window.android['goActDetail'](arguments[1])
+      window.android['goActDetail'] && window.android['goActDetail'](arguments[1])
     } else if (arguments[0] === 'goLongDynamic') {
-      window.android['goLongDetail'](arguments[1])
+      window.android['goLongDetail'] && window.android['goLongDetail'](arguments[1])
+    } else if (arguments[0] === 'h5GoUserCenter') { // 跳转用户名片
+      window.android[arguments[0]] && window.android[arguments[0]](arguments[1])
     } else if (new_arguments.length) { // 有参数时
-      window.android[arguments[0]](...new_arguments)
+      window.android[arguments[0]] && window.android[arguments[0]](...new_arguments)
     } else { // 无参数时
-      window.android[arguments[0]]()
+      window.android[arguments[0]] && window.android[arguments[0]]()
     }
   }
 
@@ -71,6 +73,30 @@ export default function (func, overlay) {
       request_str = `_${arguments[0]}={"id":${JSON.stringify(arguments[1])}}`
     } else if (arguments[0] === 'h5GoShortDynamic') { // 跳转短动态
       request_str = `_${arguments[0]}={"id":${JSON.stringify(arguments[1])}}`
+    } else if (arguments[0] === 'h5GoLongDynamic') { // 跳转长文
+      request_str = `_${arguments[0]}={"id":${JSON.stringify(arguments[1])}}`
+    } else if (arguments[0] === 'h5GoPublishShortDynamic') { // 跳转发布短动态
+      request_str = `_h5GoPublishShortDynamic`
+    } else if (arguments[0] === 'h5GoActivityDetail') { // 跳转活动详情页
+      request_str = `_${arguments[0]}={"id":${JSON.stringify(arguments[1])}}`
+    } else if (arguments[0] === 'h5GoActivityDynamic') { // 跳转活动晒图页
+      request_str = `_${arguments[0]}={"id":${JSON.stringify(arguments[1])},"circleName":${JSON.stringify(arguments[2])},"actId":${JSON.stringify(arguments[3])},"actName":${JSON.stringify(arguments[4])}}`
+    } else if (arguments[0] === 'h5GoOrder') { // 跳转活动购票页面
+      request_str = `_${arguments[0]}={"id":${JSON.stringify(arguments[1])}}`
+    } else if (arguments[0] === 'h5GoConfirmOrder') { // 跳转确认订单页
+      request_str = `_${arguments[0]}={"id":${JSON.stringify(arguments[1])}}`
+    } else if (arguments[0] === 'h5GoTicket') {
+      request_str = `_${arguments[0]}={"checkcode":${JSON.stringify(arguments[1])}}`
+    } else if (arguments[0] === 'h5GoArticleDetail') {
+      request_str = `_${arguments[0]}={"id":${JSON.stringify(arguments[1])}}`
+    } else if (arguments[0] === 'h5GoApplyCircle') { // 跳转申请加入圈子
+      request_str = `_${arguments[0]}={"circleid":${JSON.stringify(arguments[1])},"name":${JSON.stringify(arguments[2])},"cover":${JSON.stringify(arguments[3])}}`
+    } else if (arguments[0] === 'h5GoCircleDetail') { // 跳转圈子详情
+      request_str = `_${arguments[0]}={"id":${JSON.stringify(arguments[1])},"name":${JSON.stringify(arguments[2])},"hasAct":${JSON.stringify(arguments[3])}}`
+    } else if (arguments[0] === 'h5GoTopicDetail') { // 跳转话题详情
+      request_str = `_${arguments[0]}={"id":${JSON.stringify(arguments[1])},"title":${JSON.stringify(arguments[2])},"content":${JSON.stringify(arguments[3])},"beginColor":${JSON.stringify(arguments[4])},"endColor":${JSON.stringify(arguments[5])}}`
+    } else if (arguments[0] === 'h5GoUserCenter') { // 跳转用户名片
+      request_str = `_${arguments[0]}={"id":${JSON.stringify(arguments[1])},"is_news":${JSON.stringify(arguments[2])},"type":${JSON.stringify(arguments[3])}}`
     }
     url += request_str
     console.log('ios请求url', url)

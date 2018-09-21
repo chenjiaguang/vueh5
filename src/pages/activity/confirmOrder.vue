@@ -302,7 +302,9 @@ const initialData = {
 }
 export default {
   data () {
-    console.log(54)
+    if (this.$isApp && this.$route.query.aid) { // 再app内打开，跳转活动购票页面
+      this.$appCall('h5GoConfirmOrder', this.$route.query.aid)
+    }
     let _initObj = JSON.parse(JSON.stringify(initialData))
     if (this.$route.params.data) { // 如果上个页面传数据进来,取传进来的数据
       let {aid, checkcode, feeId, applyId, feeTitle, idCard, leftTime, name, num, phone, sex, title, totalPrices, wechat} = this.$route.params.data

@@ -467,6 +467,9 @@ import utils from '@/lib/utils'
 export default {
   name: 'ActivityDetail',
   data () {
+    if (this.$isApp && this.$route.query.id) { // 再app内打开，跳转活动购票页面
+      this.$appCall('h5GoOrder', this.$route.query.id)
+    }
     let _orderOwnerInfo = window.localStorage.orderOwnerInfo ? JSON.parse(window.localStorage.orderOwnerInfo) : {}
     let {name, phone, idCard, weChat, sex} = _orderOwnerInfo
     return {

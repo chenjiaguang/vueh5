@@ -45,6 +45,9 @@ Vue.use(ActionSheet)
 export default {
   mixins: [WeixinShareInKeepAlive],
   data () {
+    if (this.$isApp && this.$route.query.id) { // 在范团app内打开，跳转原生文章详情页面
+      this.$appCall('h5GoArticleDetail', this.$route.query.id)
+    }
     return {
       article: null,
       isLoad: false,

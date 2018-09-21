@@ -51,9 +51,11 @@
 import DownloadBox from '../../components/DownloadBox'
 import download from '@/lib/download.js'
 import Weixin from '@/components/Weixin.vue'
-import Vue from 'vue'
 export default {
   data () {
+    if (this.$isApp && this.$route.query.checkcode) {
+      this.$appCall('h5GoTicket', this.$route.query.checkcode)
+    }
     return {
       showWeixinTip: false,
       canDownload: false,

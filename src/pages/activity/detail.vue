@@ -424,6 +424,10 @@ export default {
   mixins: [WeixinShareInKeepAlive],
   name: 'ActivityDetail',
   data () {
+    if (this.$isApp && this.$route.query.id) { // 范团app内打开,跳转原生活动详情页面
+      // appCall('finishWebView')
+      this.$appCall('h5GoActivityDetail', this.$route.query.id)
+    }
     let _initialData = JSON.parse(JSON.stringify(initialData))
     return _initialData
   },

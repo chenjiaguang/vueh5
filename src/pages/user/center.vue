@@ -247,6 +247,10 @@ export default {
           this.$toast(res.msg)
         }
         if (res && !res.error && res.data) { // 成功获取数据
+          if (this.$isApp) {
+            let {id, is_news} = res.data.user
+            this.$appCall('h5GoUserCenter', id, is_news, '1') // type传1
+          }
           this.lastYear = res.data.lastYear
           if (res.data.user) {
             this.user = res.data.user
