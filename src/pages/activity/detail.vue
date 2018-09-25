@@ -317,6 +317,7 @@
   .fixed-button{
     height: 100px;
     width: 100%;
+    max-width: 800PX;
     background-color: #fff;
     font-size: 30px;
     color: #fff;
@@ -324,8 +325,9 @@
     line-height: 100px;
     text-align: center;
     position: fixed;
-    left: 0;
+    left: 50%;
     bottom: 0;
+    transform: translateX(-50%);
   }
   .fixed-button:before{
     content: "";

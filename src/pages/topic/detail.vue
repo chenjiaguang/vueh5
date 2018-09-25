@@ -60,7 +60,7 @@
         </div> -->
       </div>
     </div>
-    <scroll-to-top v-if="mescroll && mescroll.length > 0" :visible="showBackTop" :position="{bottom: ($winWidth / 750) * 278, right: ($winWidth / 750) * 54}" :scroll="mescroll[selectedIdx]"/>
+    <scroll-to-top v-if="mescroll && mescroll.length > 0" :visible="showBackTop" :position="{bottom: (($winWidth > (54 * 10) ? (54 * 10) : $winWidth) / 750) * 278, right: (($winWidth > (54 * 10) ? (54 * 10) : $winWidth) / 750) * 54}" :scroll="mescroll[selectedIdx]"/>
     <div class="discuss-box" @click.stop="goPublish">
       <i class="iconfont icon-discuss discuss-icon"></i><span>参与讨论</span>
     </div>
@@ -90,6 +90,7 @@ import {
 Vue.use(TabBar)
 Vue.use(Slide)
 
+let maxWidth = window.innerWidth > (54 * 10) ? (54 * 10) : window.innerWidth // 最大宽度，flexible中html font-size都最大值的10倍
 const initialData = {
   showBackTop: false,
   topicInfo: {
@@ -111,7 +112,7 @@ const initialData = {
     }
   ],
   swiperOption: {},
-  tabBarHeight: parseInt((window.innerWidth / 750) * 96),
+  tabBarHeight: parseInt((maxWidth / 750) * 96),
   selectedLabel: '最新',
   selectedIdx: 0,
   tabSlideX: -window.innerWidth + 'px',
@@ -134,8 +135,9 @@ export default {
       },
       on: {
         slideChangeTransitionStart: function () {
+          let appPos = document.getElementById('app').getBoundingClientRect()
           let pos = _this.$refs['tabItem'][this.activeIndex].$el.getBoundingClientRect()
-          let slideX = pos.left + pos.width / 2
+          let slideX = pos.left + pos.width / 2 - appPos.left
           _this.selectedLabel = _this.tabs[this.activeIndex].title
           _this.tabSlideX = slideX + 'px'
           _this.$refs['swiper'].swiper.slideTo(this.activeIndex, 300)
@@ -217,8 +219,9 @@ export default {
       this.timer = setInterval(() => {
         const initialTab = parseInt(this.$route.query.jump_tab || 0)
         if (this.$refs['tabItem']) {
+          let appPos = document.getElementById('app').getBoundingClientRect()
           let pos = this.$refs['tabItem'][initialTab].$el.getBoundingClientRect()
-          let slideX = pos.left + pos.width / 2
+          let slideX = pos.left + pos.width / 2 - appPos.left
           this.tabSlideX = slideX + 'px'
           clearInterval(this.timer)
         }
@@ -398,7 +401,7 @@ export default {
       let _up = Object.assign({}, mescrollOptions.get(94, 198).up, {
         callback: () => this.onPullingUp(idx),
         onScroll: this.onMeScroll,
-        htmlNodata: '<div style="height:' + (this.$winWidth / 750) * 98 + 'px"></div>'
+        htmlNodata: '<div style="height:' + ((this.$winWidth > (54 * 10) ? (54 * 10) : this.$winWidth) / 750) * 98 + 'px"></div>'
       })
       this.mescroll[idx] = new MeScroll('mescroll' + idx, {down: _down, up: _up})
     },
@@ -612,6 +615,7 @@ div.cube-tab_active div{
 }
 .discuss-box{
   width: 100%;
+  max-width: 800PX;
   height: 98px;
   line-height: 98px;
   font-size: 30px;
@@ -619,9 +623,10 @@ div.cube-tab_active div{
   text-align: center;
   background: #FAFAFA;
   position: fixed;
-  left: 0;
+  left: 50%;
   bottom: 0;
   z-index: 3;
+  transform: translateX(-50%);
 }
 .discuss-box:before{
   content: "";

@@ -73,6 +73,7 @@ export default {
   position: fixed;
   width: 100%;
   height: 100%;
+  max-width: 800PX;
   left: 0;
   top: 0;
   background-color: rgba(0,0,0,0.6);

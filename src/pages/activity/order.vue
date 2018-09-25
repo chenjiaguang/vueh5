@@ -421,6 +421,7 @@
   .fixed-button{
     height: 100px;
     width: 100%;
+    max-width: 800PX;
     box-sizing: border-box;
     background-color: #ffffff;
     font-size: 24px;
@@ -428,7 +429,8 @@
     line-height: 100px;
     padding-left: 30px;
     position: absolute;
-    left: 0;
+    left: 50%;
+    transform: translateX(-50%);
     bottom: 0;
   }
   .fixed-button:before{

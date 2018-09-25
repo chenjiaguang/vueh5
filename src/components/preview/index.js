@@ -11,8 +11,9 @@ let preview = {
     } else if (!images[idx].width || !images[idx].height) { // 未获取到图片的宽高
       return false
     }
+    let maxWidth = window.innerWidth > 800 ? 800 : window.innerWidth
     let _initialOptions = {
-      width: window.innerWidth,
+      width: maxWidth,
       height: window.innerHeight,
       index: idx
     }

@@ -93,11 +93,11 @@
 
 /* 上拉加载/下拉刷新 */
 .mescroll-upwarp, .mescroll-downwarp .downwarp-content{
-  padding: 0;
-  min-height: auto;
+  padding: 0 !important;
+  min-height: auto !important;
 }
 .pull-down-wrapper{
-  position: relative;
+  position: relative  !important;
 }
 .pull-up-wrapper{
   font-size: 24px;

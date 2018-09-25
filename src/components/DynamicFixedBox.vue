@@ -130,8 +130,11 @@ export default {
 .fix-box {
   position: fixed;
   width: 100%;
+  max-width: 800PX;
   height: 80px;
   bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
   background-color: #FAFAFA;
   z-index: 1;
   display: flex;

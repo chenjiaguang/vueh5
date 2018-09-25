@@ -30,6 +30,9 @@
 
 <style lang="scss" type="text/scss" scoped>
 .edit-page{
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
   padding: 0 4%;
 }
 .text-box{
@@ -104,6 +107,7 @@
 }
 .submit-btn{
   margin-top: 80px;
+  margin-bottom: 50px;
   height: 90px;
   font-size: 34px;
   line-height: 90px;

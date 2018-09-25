@@ -12,7 +12,7 @@
       </div>
       <div v-else-if="paging.is_end && dynamic && dynamic.length === 0" class="empty-box">该活动暂无晒图</div>
     </div>
-    <scroll-to-top v-if="mescroll[0]" :visible="showBackTop" :position="{bottom: ($winWidth / 750) * 178, right: ($winWidth / 750) * 54}" :scroll="mescroll[0]"/>
+    <scroll-to-top v-if="mescroll[0]" :visible="showBackTop" :position="{bottom: (($winWidth > (54 * 10) ? (54 * 10) : $winWidth) / 750) * 178, right: (($winWidth > (54 * 10) ? (54 * 10) : $winWidth) / 750) * 54}" :scroll="mescroll[0]"/>
   </div>
 </template>
 

@@ -1,7 +1,7 @@
 <template>
   <div :style="{height: $winHeight + 'px'}">
 
-    <div v-if="dynamic" :style="{height: $winHeight-(80/750*$winWidth) + 'px'}">
+    <div v-if="dynamic" :style="{height: $winHeight-(80/750*($winWidth > (54 * 10) ? (54 * 10) : $winWidth)) + 'px'}">
       <div id="mescroll" class="mescroll" >
         <div>
           <download-box v-if="$route.query.isShareOpen && !$isApp" />
@@ -203,7 +203,7 @@ export default {
     if (this.$isApp && !this.$route.query.isArticle) { // 范团app内打开,跳转原生短动态页面
       // appCall('finishWebView')
       this.$appCall('h5GoShortDynamic', this.$route.query.id)
-    } else if (this.$isApp && !this.$route.query.isArticle) { // 范团app内打开,跳转原生长文页面
+    } else if (this.$isApp && this.$route.query.isArticle) { // 范团app内打开,跳转原生长文页面
       // appCall('finishWebView')
       this.$appCall('h5GoLongDynamic', this.$route.query.id)
     }
