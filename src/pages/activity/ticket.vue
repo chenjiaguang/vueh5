@@ -38,11 +38,6 @@
       <div class="attention-item">2.下载范团APP，在我的-活动中查看电子票，云端保存 不丢失</div>
       <div class="attention-item">3.暂不支持退票，有需要请联系主办方</div>
     </div>
-    <!-- <div class="fixed-button">
-      <img :src="$assetsPublicPath + '/cwebassets/image/van_logo.png'" class="van-logo" />
-      有范又有趣的海南生活圈
-      <div class="open-btn" @click="openFantTuanC">立即打开</div>
-    </div> -->
     <weixin :show="showWeixinTip" @changeShow="showHideTip" />
   </div>
 </template>
@@ -51,9 +46,11 @@
 import DownloadBox from '../../components/DownloadBox'
 import download from '@/lib/download.js'
 import Weixin from '@/components/Weixin.vue'
-import Vue from 'vue'
 export default {
   data () {
+    if (this.$isApp && this.$route.query.checkcode) {
+      this.$appCall('h5GoTicket', this.$route.query.checkcode)
+    }
     return {
       showWeixinTip: false,
       canDownload: false,
@@ -328,39 +325,5 @@ export default {
   .attention-item{
     font-size: 28px;
     line-height: 52px;
-  }
-  .fixed-button{
-    position: fixed;
-    left: 0;
-    bottom: 0;
-    width: 100%;
-    height: 128px;
-    box-sizing: border-box;
-    padding-left: 138px;
-    line-height: 128px;
-    font-size: 32px;
-    color: #fff;
-    background-color: rgba(38,38,38,0.75);
-    .van-logo{
-      display: block;
-      width: 88px;
-      height: 88px;
-      position:absolute;
-      left: 30px;
-      top: 50%;
-      margin-top: -44px;
-    }
-    .open-btn{
-      width: 180px;
-      height: 60px;
-      line-height: 60px;
-      text-align: center;
-      background-image: linear-gradient(135deg, #2ED5DF, #4E73EB);
-      position: absolute;
-      top: 34px;
-      right: 30px;
-      font-size: 28px;
-      border-radius: 8px;
-    }
   }
 </style>

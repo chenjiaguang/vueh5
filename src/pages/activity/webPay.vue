@@ -29,7 +29,7 @@ export default {
         this.$ajax('/jv/anonymous/qz/v21/activity/pay', {data: _rData}).then(res => {
           if (res && Boolean(res.error) && res.msg) {
             this.$toast(res.msg)
-          } else if (res && res.error) {
+          } else if (res && !res.error) {
             let _href = res.data.mweb_url
             window.location.href = _href
           }
@@ -152,10 +152,12 @@ export default {
   .contact{
     font-size: 28px;
     position: fixed;
+    max-width: 800PX;
     width: 100%;
-    left: 0;
+    left: 50%;
     bottom: 100px;
     text-align: center;
+    transform: translateX(-50%);
   }
   .tel-btn{
     color: #1EB0FD;

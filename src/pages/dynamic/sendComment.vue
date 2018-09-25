@@ -79,6 +79,9 @@ export default {
 </script>
 
 <style scoped>
+#app{
+  position: relative;
+}
 .container {
   position: absolute;
   top: 0;
@@ -115,9 +118,9 @@ export default {
 .fix-box {
   position: fixed;
   height: 88px;
-  left: 0;
-  right: 0;
-  top: 0;
+  left: 50%;
+  width: 100%;
+  max-width: 800PX;
   background-color: #fafafa;
 
   border-bottom-width: 0.5px;
@@ -129,6 +132,7 @@ export default {
   align-items: center;
   justify-content: space-between;
   z-index: 99999;
+  transform: translateX(-50%);
 }
 .icon-goback {
   font-size: 41px;

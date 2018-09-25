@@ -11,8 +11,9 @@ let Main = Vue.extend(main)
 let preview = {
   show: (obj) => {
     let {images, id, idx, options} = obj
+    let maxWidth = window.innerWidth > 800 ? 800 : window.innerWidth
     let _initialOptions = {
-      width: window.innerWidth,
+      width: maxWidth,
       height: window.innerHeight,
       initialSlide: idx
     }

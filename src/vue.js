@@ -8,6 +8,7 @@ import modal from './components/modal'
 import prompt from './components/prompt'
 import Preview from './components/preview'
 import appCall from './lib/appCall'
+import '@/iconfont/iconfont.css'
 
 import VConsole from 'vconsole/dist/vconsole.min.js' // import vconsole
 import {
@@ -20,7 +21,7 @@ if (process.env.NODE_ENV !== 'production') { // 非正式环境包，就实例�
   new VConsole() // 初始化
 }
 Vue.prototype.$assetsPublicPath = '/h5'
-Vue.prototype.$winWidth = window.innerWidth
+Vue.prototype.$winWidth = window.innerWidth > 800 ? 800 : window.innerWidth
 Vue.prototype.$winHeight = window.innerHeight
 Vue.prototype.$tranScale = 1 / window.devicePixelRatio
 Vue.prototype.$apiDomain = process.env.API_DOMAIN
@@ -31,12 +32,14 @@ Vue.prototype.$toast = toast
 Vue.prototype.$modal = modal
 Vue.prototype.$prompt = prompt
 Vue.prototype.$previewImage = Preview
+Vue.prototype.$appCall = appCall
 Vue.use(VueLazyload, {
   preLoad: 1.3,
   error: '/h5/cwebassets/image/img_error.png',
   loading: '/h5/cwebassets/image/img_loading.png',
   attempt: 1
 })
+window._max_width = 800
 Vue.use(Vuex)
 window.receiveIsFantuan = function (string) {
   window._is_app = parseInt(string)
@@ -45,7 +48,7 @@ window.receiveIsFantuan = function (string) {
 appCall('isFanTuan')
 Vue.prototype.$isApp = window._is_app
 window.addEventListener('resize', function () {
-  Vue.prototype.$winWidth = window.innerWidth
+  Vue.prototype.$winWidth = window.innerWidth > 800 ? 800 : window.innerWidth
   Vue.prototype.$winHeight = window.innerHeight
 }, false)
 

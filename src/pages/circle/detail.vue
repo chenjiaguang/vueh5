@@ -67,8 +67,8 @@
         </div> -->
       </div>
     </div>
-    <scroll-to-top v-if="mescroll && mescroll.length > 0" :visible="showBackTop" :position="{bottom: ($winWidth / 750) * 178, right: ($winWidth / 750) * 54}" :scroll="mescroll[selectedIdx]"/>
-    <i class="iconfont icon-camera publish-icon" v-if="circle.followed" @click="goPublish"></i>
+    <scroll-to-top v-if="mescroll && mescroll.length > 0" :visible="showBackTop" :position="{bottom: (maxWidth / 750) * 178, right: (maxWidth / 750) * 54}" :scroll="mescroll[selectedIdx]"/>
+    <i class="iconfont icon-camera publish-icon" :style="{marginRight: marginRight + 'px'}" v-if="circle.followed" @click="goPublish"></i>
     <div v-if="!circle.followed && circle.followed !== null" class="follow-box" :style="{height: followBoxHeight + 'px'}" @click="joinCircle">
       <div class="follow-icon" :style="{backgroundImage: 'url(' + $assetsPublicPath + '/cwebassets/image/add_circle_icon.png)'}"></div>
       <div class="follow-text">申请加入圈子</div>
@@ -101,6 +101,8 @@ import {
 Vue.use(TabBar)
 Vue.use(Slide)
 
+let _maxWidth = window.innerWidth > (54 * 10) ? (54 * 10) : window.innerWidth // 最大宽度，flexible中html font-size都最大值的10倍
+let _marginRight = (window.innerWidth - (window.innerWidth > 800 ? 800 : window.innerWidth)) / 2
 const initialData = {
   showBackTop: false,
   circle: {
@@ -124,15 +126,17 @@ const initialData = {
     }
   ],
   swiperOption: {},
-  tabBarHeight: parseInt((window.innerWidth / 750) * 88),
-  followBoxHeight: parseInt((window.innerWidth / 750) * 100),
+  tabBarHeight: parseInt((_maxWidth / 750) * 88),
+  followBoxHeight: parseInt((_maxWidth / 750) * 100),
   selectedLabel: '动态',
   selectedIdx: 0,
   tabSlideX: -window.innerWidth + 'px',
   showTabbar: false,
   pageTop: 0,
   mescroll: [],
-  following: false
+  following: false,
+  maxWidth: _maxWidth,
+  marginRight: _marginRight
 }
 export default {
   mixins: [MeScrollSupportArr, CloseImagePreviewer, WeixinShareInKeepAlive],
@@ -150,8 +154,9 @@ export default {
       },
       on: {
         slideChangeTransitionStart: function () {
+          let appPos = document.getElementById('app').getBoundingClientRect()
           let pos = _this.$refs['tabItem'][this.activeIndex].$el.getBoundingClientRect()
-          let slideX = pos.left + pos.width / 2
+          let slideX = pos.left + pos.width / 2 - appPos.left
           _this.selectedLabel = _this.tabs[this.activeIndex].title
           _this.tabSlideX = slideX + 'px'
           _this.$refs['swiper'].swiper.slideTo(this.activeIndex, 300)
@@ -219,7 +224,7 @@ export default {
         this.$toast('正在申请...')
         return false
       }
-      this.$prompt.showAlert({contentText: '加入圈子才能进行更多操作哦~', leftText: '我再想想', rightText: _rightText}, () => {
+      this.$prompt.showPrompt({contentText: '加入圈子才能进行更多操作哦~', leftText: '我再想想', rightText: _rightText}, () => {
         this.applyJoinCircle()
       }, () => {
         console.log('cancel')
@@ -282,8 +287,9 @@ export default {
         const initialTab = parseInt(this.$route.query.jump_tab || 0)
         if (this.$refs['tabItem'] && this.$refs['tabItem'].length > 0) {
           let slideBlock = this.$refs['tabItem'][initialTab] || this.$refs['tabItem']
+          let appPos = document.getElementById('app').getBoundingClientRect()
           let pos = this.$refs['tabItem'][initialTab].$el.getBoundingClientRect()
-          let slideX = pos.left + pos.width / 2
+          let slideX = pos.left + pos.width / 2 - appPos.left
           this.tabSlideX = slideX + 'px'
           clearInterval(this.timer)
         }
@@ -338,7 +344,11 @@ export default {
             this.tabs.splice(1, 1)
             // this.initPageScroll()
             this.initMeScroll(0)
-          } else {
+          } else { // 有活动tab
+            if (this.$isApp) {
+              let {id, name, circle_has_activity} = res.data
+              this.$appCall('h5GoCircleDetail', id, name, circle_has_activity)
+            }
             this.showTabbar = true
             const len = this.tabs.length.toString()
             // this.initPageScroll()
@@ -554,7 +564,6 @@ export default {
         let bannerHeight = bannerPos.height
         this.pageTop = -bannerHeight
       }
-      console.log('sdf')
       if (y > this.$winHeight && !this.showBackTop) {
         this.showBackTop = true
       } else if (y < this.$winHeight && this.showBackTop) {
@@ -754,9 +763,11 @@ fl{
 }
 .follow-box{
   position: fixed;
-  left: 0;
+  left: 50%;
   bottom: 0;
   width: 100%;
+  max-width: 800PX;
+  transform: translateX(-50%);
   background: #fff;
   display: flex;
   justify-content: center;

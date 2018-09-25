@@ -12,7 +12,7 @@
       </div>
       <div v-else-if="paging.is_end && dynamic && dynamic.length === 0" class="empty-box">该活动暂无晒图</div>
     </div>
-    <scroll-to-top v-if="mescroll[0]" :visible="showBackTop" :position="{bottom: ($winWidth / 750) * 178, right: ($winWidth / 750) * 54}" :scroll="mescroll[0]"/>
+    <scroll-to-top v-if="mescroll[0]" :visible="showBackTop" :position="{bottom: (($winWidth > (54 * 10) ? (54 * 10) : $winWidth) / 750) * 178, right: (($winWidth > (54 * 10) ? (54 * 10) : $winWidth) / 750) * 54}" :scroll="mescroll[0]"/>
   </div>
 </template>
 
@@ -68,6 +68,12 @@ export default {
         this.fetching = false
         if (res && !res.error && res.data) { // 成功获取数据
           this.paging = res.data.paging
+          if (this.$isApp && res.data.list && res.data.list[0]) { // 范团app内打开,跳转原生活动晒图页面
+            // appCall('finishWebView')
+            let {circle_id, circle_name, actid} = res.data.list[0]
+            let actname = res.data.list[0].activity.title
+            this.$appCall('h5GoActivityDynamic', circle_id, circle_name, actid, actname)
+          }
           if (pn.toString() === '1') { // 刷新
             this.dynamic = res.data.list
           } else {

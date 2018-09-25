@@ -1,7 +1,7 @@
 <template>
   <div :style="{height: $winHeight + 'px'}">
 
-    <div v-if="dynamic" :style="{height: $winHeight-(80/750*$winWidth) + 'px'}">
+    <div v-if="dynamic" :style="{height: $winHeight-(80/750*($winWidth > (54 * 10) ? (54 * 10) : $winWidth)) + 'px'}">
       <div id="mescroll" class="mescroll" >
         <div>
           <download-box v-if="$route.query.isShareOpen && !$isApp" />
@@ -200,6 +200,13 @@ Vue.use(ActionSheet)
 export default {
   mixins: [MeScrollSupport, WeixinShareInKeepAlive],
   data () {
+    if (this.$isApp && !this.$route.query.isArticle) { // 范团app内打开,跳转原生短动态页面
+      // appCall('finishWebView')
+      this.$appCall('h5GoShortDynamic', this.$route.query.id)
+    } else if (this.$isApp && this.$route.query.isArticle) { // 范团app内打开,跳转原生长文页面
+      // appCall('finishWebView')
+      this.$appCall('h5GoLongDynamic', this.$route.query.id)
+    }
     return {
       mescroll: null, // mescroll实例对象
       dynamic: null,
@@ -496,7 +503,7 @@ export default {
         this.$toast('正在申请...')
         return false
       }
-      this.$prompt.showAlert({contentText: '加入圈子才能进行更多操作哦~', leftText: '我再想想', rightText: _rightText}, () => {
+      this.$prompt.showPrompt({contentText: '加入圈子才能进行更多操作哦~', leftText: '我再想想', rightText: _rightText}, () => {
         this.applyJoinCircle()
       }, () => {
         console.log('cancel')
@@ -515,7 +522,7 @@ export default {
             if (!utils.checkLogin()) { // 未登陆返回
               return false
             }
-            if ((this.dynamic.show_allways.toString() !== '1') && !this.dynamic.circleInfo.followed) { // 不可见且不加入
+            if ((this.dynamic.show_allways.toString() !== '1') && this.dynamic.circleInfo && !this.dynamic.circleInfo.followed) { // 不可见且不加入
               this.joinCircle()
               return false
             }
@@ -736,8 +743,6 @@ export default {
   margin-bottom: 36px;
 }
 /*************************************************************************/
-#content-container {
-}
 .dynamic-content {
   color: #333333;
   font-size: 32px;

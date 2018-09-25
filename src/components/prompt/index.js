@@ -4,7 +4,7 @@ import main from './Prompt.vue'
 let Main = Vue.extend(main)
 
 let Prompt = {
-  showAlert: (options, onConfirm, onCancel) => {
+  showPrompt: (options, onConfirm, onCancel) => {
     let {contentText, leftText, rightText} = options
     let div = window.document.createElement('div')
     let _main = new Main({

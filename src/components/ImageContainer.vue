@@ -54,7 +54,6 @@ export default {
   },
   methods: {
     addImage () {
-      console.log('change')
       let files = this.$refs['upload'].files
       this.$emit('addFunc', files)
     },
@@ -62,7 +61,6 @@ export default {
       this.$emit('deleteFunc', item, idx)
     },
     previewImage (idx, els, placeholder) {
-      console.log('images', this.images)
       this.$previewImage.show({images: this.images, idx, clickedEl: els, placeholder: placeholder || null})
     },
     isAndroid () {

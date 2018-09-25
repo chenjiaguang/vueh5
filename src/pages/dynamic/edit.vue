@@ -30,6 +30,9 @@
 
 <style lang="scss" type="text/scss" scoped>
 .edit-page{
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
   padding: 0 4%;
 }
 .text-box{
@@ -104,6 +107,7 @@
 }
 .submit-btn{
   margin-top: 80px;
+  margin-bottom: 50px;
   height: 90px;
   font-size: 34px;
   line-height: 90px;
@@ -141,6 +145,9 @@ let initialData = {
 }
 export default {
   data () {
+    if (this.$isApp) {
+      this.$appCall('h5GoPublishShortDynamic')
+    }
     let topic = this.$route.query.topic ? JSON.parse(this.$route.query.topic) : null
     let activity = this.$route.query.activity ? JSON.parse(this.$route.query.activity) : null
     let circle = this.$route.query.circle ? JSON.parse(this.$route.query.circle) : null

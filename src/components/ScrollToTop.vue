@@ -1,14 +1,17 @@
 //滑动到顶部点击框
 <template>
   <transition name="fade-normal">
-    <i v-if="visible" class="fix-box iconfont icon-back_top" :style="position ? {bottom: position.bottom + 'px', right: position.right + 'px'} : null" @click="handleClick"></i>
+    <i v-if="visible" class="fix-box iconfont icon-back_top" :style="position ? {bottom: position.bottom + 'px', right: position.right + 'px', marginRight: marginRight + 'px'} : null" @click="handleClick"></i>
   </transition>
 </template>
 <script>
 export default {
   props: ['visible', 'position', 'scroll', 'isMeScroll'],
   data () {
-    return {}
+    let _marginRight = (window.innerWidth - (window.innerWidth > 800 ? 800 : window.innerWidth)) / 2
+    return {
+      marginRight: _marginRight
+    }
   },
   methods: {
     handleClick (event) {

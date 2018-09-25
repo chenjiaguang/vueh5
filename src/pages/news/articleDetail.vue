@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="article-page">
     <div v-if="article">
       <download-box v-if="$route.query.isShareOpen && !$isApp" />
       <div class="container">
@@ -114,7 +114,11 @@ export default {
           this.article = res.data
           this.paging = res.data.paging
           document.title = this.article.name
-
+          if (res && res.data && !res.error) {
+            if (this.$isApp) { // 在范团app内打开，跳转原生文章详情页面
+              this.$appCall('h5GoArticleDetail', this.$route.query.id, res.data.article_url)
+            }
+          }
           if (this.article.content_type === '0') {
             // 如果是微信则读url
             let isWeixin = this.article.news_type === '2'
@@ -236,6 +240,11 @@ export default {
 </script>
 
 <style scoped>
+.article-page{
+  height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
 /******************************基本样式*******************************/
 .container {
   width: 100%;

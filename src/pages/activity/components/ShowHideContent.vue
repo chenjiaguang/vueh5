@@ -139,7 +139,7 @@ export default {
         if (!this.$refs['contentContainer']) { // 已设置过就不再设置,防止重复添加高度
           return false
         }
-        let btnHeight = (84 / 750) * this.$winWidth
+        let btnHeight = (84 / 750) * (window.innerWidth > (54 * 10) ? (54 * 10) : window.innerWidth)
         let wrapperHeight = this.$refs['contentContainer'].offsetHeight
         if (wrapperHeight > this.halfScreenHeight) { // 大于半屏
           this.contentWrapperHeight = wrapperHeight + btnHeight

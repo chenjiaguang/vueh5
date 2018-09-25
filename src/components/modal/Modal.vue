@@ -1,10 +1,10 @@
 <template>
   <transition appear appear-class="before-appear">
       <div :id="id" :style="'z-index:' + new Date().getTime()" class="modal-wrapper" @touchmove.prevent>
-          <div class="modal-box">
-            <div class="content-box" v-html="text"></div>
-            <div @click="hideAlert" class="button-box">
-                <div class="main-btn">确定</div>
+          <div class="modal-box" :class="os">
+            <div class="content-box" :class="os" v-html="text"></div>
+            <div @click="hideAlert" class="button-box" :class="os">
+                <div class="main-btn" :class="os">{{btnText}}</div>
             </div>
           </div>
       </div>
@@ -12,12 +12,15 @@
 </template>
 
 <script>
+import browserUA from '@/lib/browserUA'
 export default {
   data () {
     return {
-        id: '',
-        text: '',
-        onClose: function () {}
+      id: '',
+      text: '',
+      onClose: function () {},
+      btnText: '确定',
+      os: browserUA.isAndroid() ? 'android' : 'ios'
     }
   },
   methods: {
@@ -33,8 +36,10 @@ export default {
         position: fixed;
         width: 100%;
         height: 100%;
+        max-width: 800PX;
         top: 0;
-        left: 0;
+        left: 50%;
+        transform: translateX(-50%);
         background-color: rgba(0,0,0,0.5);
         transition: background-color 300ms;
         &.before-appear {
@@ -56,13 +61,29 @@ export default {
             opacity: 0;
         }
     }
+    .modal-box.ios{
+        width: 540px;
+        border-radius: 24px;
+        margin-left: -270px;
+    }
+    .modal-box.android{
+        width: 650px;
+        border-radius: 4px;
+        margin-left: -325px;
+    }
     .content-box{
         font-size: 34px;
         line-height: 48px;
         font-weight: 600;
         color: #030303;
+    }
+    .content-box.ios{
         text-align: center;
-        padding: 36px 50px;
+        padding: 20px 36px;
+    }
+    .content-box.android{
+      text-align: left;
+      padding: 23px 30px;
     }
     .button-box{
         position:relative;
@@ -71,20 +92,33 @@ export default {
         height: 88px;
         line-height: 88px;
         font-size: 34px;
+        display: flex;
     }
-    .button-box:before{
+    .button-box.ios{
+        justify-content: center;
+        align-items: center;
+    }
+    .button-box.android{
+        justify-content: flex-end;
+        align-items: center;
+    }
+    .button-box.ios:before{
         content: "";
         display: block;
-        width: 300%;
-        height: 3px;
+        width: 200%;
+        height: 2px;
         position: absolute;
         left: 0;
         top: 0;
-        transform: scale(0.3333, 0.3333);
+        transform: scale(0.5, 0.5);
         transform-origin: 0 0;
         background-color: #4D4D4D;
+        opacity: 0.78;
+    }
+    .button-box.android:before{
+        display: none;
     }
     .main-btn{
-        font-weight: 600;
+        padding: 0 30px;
     }
 </style>

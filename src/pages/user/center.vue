@@ -75,7 +75,7 @@
         </div> -->
       </div>
     </div>
-    <scroll-to-top v-if="mescroll && mescroll.length > 0" :visible="showBackTop" :position="{bottom: ($winWidth / 750) * 178, right: ($winWidth / 750) * 54}" :scroll="mescroll[selectedIdx]"/>
+    <scroll-to-top v-if="mescroll && mescroll.length > 0" :visible="showBackTop" :position="{bottom: (($winWidth > (54 * 10) ? (54 * 10) : $winWidth) / 750) * 178, right: (($winWidth > (54 * 10) ? (54 * 10) : $winWidth) / 750) * 54}" :scroll="mescroll[selectedIdx]"/>
   </div>
 </template>
 
@@ -102,6 +102,7 @@ import {
 Vue.use(TabBar)
 Vue.use(Slide)
 
+let maxWidth = window.innerWidth > (54 * 10) ? (54 * 10) : window.innerWidth // 最大宽度，flexible中html font-size都最大值的10倍
 const initialData = {
   showBackTop: false,
   lastYear: '',
@@ -124,7 +125,7 @@ const initialData = {
     // 目前只显示动态
   ],
   swiperOption: {},
-  tabBarHeight: parseInt((window.innerWidth / 750) * 88),
+  tabBarHeight: parseInt((maxWidth / 750) * 88),
   selectedLabel: '动态',
   selectedIdx: 0,
   tabSlideX: -window.innerWidth + 'px',
@@ -151,8 +152,9 @@ export default {
       },
       on: {
         slideChangeTransitionStart: function () {
+          let appPos = document.getElementById('app').getBoundingClientRect()
           let pos = _this.$refs['tabItem'][this.activeIndex].$el.getBoundingClientRect()
-          let slideX = pos.left + pos.width / 2
+          let slideX = pos.left + pos.width / 2 - appPos.left
           _this.selectedLabel = _this.tabs[this.activeIndex].title
           _this.tabSlideX = slideX + 'px'
           _this.$refs['swiper'].swiper.slideTo(this.activeIndex, 300)
@@ -247,6 +249,10 @@ export default {
           this.$toast(res.msg)
         }
         if (res && !res.error && res.data) { // 成功获取数据
+          if (this.$isApp) {
+            let {id, is_news} = res.data.user
+            this.$appCall('h5GoUserCenter', id, is_news, '1') // type传1
+          }
           this.lastYear = res.data.lastYear
           if (res.data.user) {
             this.user = res.data.user
@@ -306,8 +312,9 @@ export default {
       this.timer = setInterval(() => {
         const initialTab = parseInt(this.$route.query.jump_tab || 0)
         if (this.$refs['tabItem']) {
+          let appPos = document.getElementById('app').getBoundingClientRect()
           let pos = this.$refs['tabItem'][initialTab].$el.getBoundingClientRect()
-          let slideX = pos.left + pos.width / 2
+          let slideX = pos.left + pos.width / 2 - appPos.left
           this.tabSlideX = slideX + 'px'
           clearInterval(this.timer)
         }

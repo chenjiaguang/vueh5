@@ -1,28 +1,53 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import NotFoundPage from '@/pages/notFoundPage'
-import Home from '@/pages/home'
-import CircleDetail from '@/pages/circle/detail'
-import CircleApply from '@/pages/circle/apply'
-import ActivityDetail from '@/pages/activity/detail'
-import ActivityDynamic from '@/pages/activity/dynamic'
-import ActivityOrder from '@/pages/activity/order'
-import WebPay from '@/pages/activity/webPay'
-import ActivitySuccess from '@/pages/activity/success'
-import ActivityTicket from '@/pages/activity/ticket'
-import MapPage from '@/pages/mapPage'
-import Agreement from '@/pages/agreement'
-import UserCenter from '@/pages/user/center'
-import EditDynamic from '@/pages/dynamic/edit'
-import EditDynamicRange from '@/pages/dynamic/chooseRange'
-import DynamicDetail from '@/pages/dynamic/detail'
-import DynamicSendComment from '@/pages/dynamic/sendComment'
-import TopicDetail from '@/pages/topic/detail'
-import SMSCode from '@/pages/smsCode'
-import WeixinLoginJump from '@/pages/weixinLoginJump'
-import PromotionIndex from '@/pages/promotion/index'
-import NewsDetail from '@/pages/news/articleDetail'
-import TestVideo from '@/pages/testVideo'
+const NotFoundPage = resolve => require(['@/pages/notFoundPage'], resolve)
+const Home = resolve => require(['@/pages/home'], resolve)
+const CircleDetail = resolve => require(['@/pages/circle/detail'], resolve)
+const CircleApply = resolve => require(['@/pages/circle/apply'], resolve)
+const ActivityDetail = resolve => require(['@/pages/activity/detail'], resolve)
+const ActivityDynamic = resolve => require(['@/pages/activity/dynamic'], resolve)
+const ActivityOrder = resolve => require(['@/pages/activity/order'], resolve)
+const ConfirmOrder = resolve => require(['@/pages/activity/confirmOrder'], resolve)
+const WebPay = resolve => require(['@/pages/activity/webPay'], resolve)
+const ActivitySuccess = resolve => require(['@/pages/activity/success'], resolve)
+const ActivityTicket = resolve => require(['@/pages/activity/ticket'], resolve)
+const MapPage = resolve => require(['@/pages/mapPage'], resolve)
+const Agreement = resolve => require(['@/pages/agreement'], resolve)
+const UserCenter = resolve => require(['@/pages/user/center'], resolve)
+const EditDynamic = resolve => require(['@/pages/dynamic/edit'], resolve)
+const EditDynamicRange = resolve => require(['@/pages/dynamic/chooseRange'], resolve)
+const DynamicDetail = resolve => require(['@/pages/dynamic/detail'], resolve)
+const DynamicSendComment = resolve => require(['@/pages/dynamic/sendComment'], resolve)
+const TopicDetail = resolve => require(['@/pages/topic/detail'], resolve)
+const SMSCode = resolve => require(['@/pages/smsCode'], resolve)
+const WeixinLoginJump = resolve => require(['@/pages/weixinLoginJump'], resolve)
+const PromotionIndex = resolve => require(['@/pages/notFoundPage'], resolve)
+const NewsDetail = resolve => require(['@/pages/news/articleDetail'], resolve)
+const TestVideo = resolve => require(['@/pages/testVideo'], resolve)
+// import NotFoundPage from '@/pages/notFoundPage'
+// import Home from '@/pages/home'
+// import CircleDetail from '@/pages/circle/detail'
+// import CircleApply from '@/pages/circle/apply'
+// import ActivityDetail from '@/pages/activity/detail'
+// import ActivityDynamic from '@/pages/activity/dynamic'
+// import ActivityOrder from '@/pages/activity/order'
+// import ConfirmOrder from '@/pages/activity/confirmOrder'
+// import WebPay from '@/pages/activity/webPay'
+// import ActivitySuccess from '@/pages/activity/success'
+// import ActivityTicket from '@/pages/activity/ticket'
+// import MapPage from '@/pages/mapPage'
+// import Agreement from '@/pages/agreement'
+// import UserCenter from '@/pages/user/center'
+// import EditDynamic from '@/pages/dynamic/edit'
+// import EditDynamicRange from '@/pages/dynamic/chooseRange'
+// import DynamicDetail from '@/pages/dynamic/detail'
+// import DynamicSendComment from '@/pages/dynamic/sendComment'
+// import TopicDetail from '@/pages/topic/detail'
+// import SMSCode from '@/pages/smsCode'
+// import WeixinLoginJump from '@/pages/weixinLoginJump'
+// import PromotionIndex from '@/pages/promotion/index'
+// import NewsDetail from '@/pages/news/articleDetail'
+// import TestVideo from '@/pages/testVideo'
 Vue.use(Router)
 let prefix = '/h5'
 
@@ -65,6 +90,15 @@ const router = new Router({
       component: ActivityOrder,
       meta: {
         title: '提交订单'
+      }
+    },
+    {
+      path: prefix + '/activity/order/confirm',
+      name: 'ConfirmOrder',
+      component: ConfirmOrder,
+      meta: {
+        title: '确认订单',
+        keepAlive: true
       }
     },
     {

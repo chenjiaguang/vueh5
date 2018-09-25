@@ -82,7 +82,7 @@ export default {
         return false
       }
       let _rightText = need_audit ? '申请加入' : '立即加入'
-      this.$prompt.showAlert({contentText: '加入圈子才能进行更多操作哦~', leftText: '我再想想', rightText: _rightText}, () => {
+      this.$prompt.showPrompt({contentText: '加入圈子才能进行更多操作哦~', leftText: '我再想想', rightText: _rightText}, () => {
         this.applyJoinCircle()
       }, () => {
         console.log('cancel')
@@ -103,8 +103,7 @@ export default {
         this.$toast('正在申请...')
         return false
       }
-      console.log('this.dynamic', this.dynamic)
-      if ((this.dynamic.show_allways.toString() !== '1') && !this.dynamic.circleInfo.followed) { // 不可见
+      if ((this.dynamic.show_allways.toString() !== '1') && this.dynamic.circleInfo && !this.dynamic.circleInfo.followed) { // 不可见
         this.joinCircle()
         return false
       }
@@ -131,8 +130,11 @@ export default {
 .fix-box {
   position: fixed;
   width: 100%;
+  max-width: 800PX;
   height: 80px;
   bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
   background-color: #FAFAFA;
   z-index: 1;
   display: flex;
