@@ -45,9 +45,6 @@ Vue.use(ActionSheet)
 export default {
   mixins: [WeixinShareInKeepAlive],
   data () {
-    if (this.$isApp && this.$route.query.id) { // 在范团app内打开，跳转原生文章详情页面
-      this.$appCall('h5GoArticleDetail', this.$route.query.id, window.location.href)
-    }
     return {
       article: null,
       isLoad: false,
@@ -117,7 +114,11 @@ export default {
           this.article = res.data
           this.paging = res.data.paging
           document.title = this.article.name
-
+          if (res && res.data && !res.error) {
+            if (this.$isApp) { // 在范团app内打开，跳转原生文章详情页面
+              this.$appCall('h5GoArticleDetail', this.$route.query.id, res.data.article_url)
+            }
+          }
           if (this.article.content_type === '0') {
             // 如果是微信则读url
             let isWeixin = this.article.news_type === '2'
