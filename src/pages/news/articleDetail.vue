@@ -241,9 +241,7 @@ export default {
 
 <style scoped>
 .article-page{
-  height: 100%;
-  overflow-x: hidden;
-  overflow-y: auto;
+  background: #fff;
 }
 /******************************基本样式*******************************/
 .container {

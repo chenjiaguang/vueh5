@@ -28,12 +28,14 @@
   </div>
 </template>
 
+<style scoped :src="$assetsPublicPath + '/cwebassets/css/webuploader.css'" />
 <style lang="scss" type="text/scss" scoped>
 .edit-page{
   height: 100%;
   overflow-y: auto;
   overflow-x: hidden;
   padding: 0 4%;
+  -webkit-overflow-scrolling: touch;
 }
 .text-box{
   height: 298px;

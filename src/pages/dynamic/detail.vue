@@ -1,8 +1,7 @@
 <template>
-  <div :style="{height: $winHeight + 'px'}">
-
+  <div class="dynamic-detail-page" :style="{height: $winHeight + 'px'}">
     <div v-if="dynamic" :style="{height: $winHeight-(80/750*($winWidth > (54 * 10) ? (54 * 10) : $winWidth)) + 'px'}">
-      <div id="mescroll" class="mescroll" >
+      <div id="mescroll" class="mescroll">
         <div>
           <download-box v-if="$route.query.isShareOpen && !$isApp" />
           <div class="container">
@@ -395,8 +394,8 @@ export default {
               up: {
                 auto: false,
                 callback: this.fetchMoreComments,
-                htmlLoading: '<p class="">正在加载...</p>',
-                htmlNodata: '<p class="">再刷也没有了</p>',
+                htmlLoading: '<p class="dynamic-commnet-bottom-tip">正在加载...</p>',
+                htmlNodata: '<p class="dynamic-commnet-bottom-tip">再刷也没有了</p>',
                 onScroll: (mescroll, y, isUp) => {
                   this.onScrollHandle({y: y})
                 }
@@ -563,6 +562,14 @@ export default {
 </script>
 
 <style scoped>
+.dynamic-detail-page{
+  background-color: #fff;
+}
+.mescroll{
+  height: 100%;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
 .container {
   width: 100%;
   /* margin-bottom: 100px; */
@@ -906,8 +913,6 @@ export default {
   padding-right: 24px;
   background-color: #f6f6f6;
   border-radius: 4px;
-  word-break: break-all;
-  white-space: pre-wrap;
 }
 .reply-box {
   background-color: transparent;
@@ -935,6 +940,8 @@ export default {
   color: #333333;
   font-size: 26px;
   line-height: 38px;
+  word-break: break-all;
+  white-space: pre-wrap;
 }
 .reply-more {
   color: #255a96;
@@ -1035,5 +1042,16 @@ export default {
 .cube-pullup-wrapper {
   height: 50px;
   align-items: start;
+}
+</style>
+<style>
+.dynamic-commnet-bottom-tip{
+  font-size: 24px;
+  color: #666;
+  height: 100px;
+  line-height: 100px;
+  position: relative;
+  background-color: #fff;
+  text-align: center;
 }
 </style>
