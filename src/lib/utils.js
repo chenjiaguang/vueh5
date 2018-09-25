@@ -161,43 +161,40 @@ export default {
       timestamp: config.timestamp, // 必填，生成签名的时间戳
       nonceStr: config.nonceStr, // 必填，生成签名的随机串
       signature: config.signature, // 必填，签名
-      jsApiList: ['updateAppMessageShareData', 'updateTimelineShareData', 'onMenuShareTimeline', 'onMenuShareAppMessage', 'onMenuShareQQ'] // 必填，需要使用的JS接口列表
+      jsApiList: ['updateAppMessageShareData', 'updateTimelineShareData', 'onMenuShareTimeline', 'onMenuShareAppMessage', 'onMenuShareQQ', 'onMenuShareQZone'] // 必填，需要使用的JS接口列表
     })
 
     global.wx.ready(function () {
-      global.wx.updateAppMessageShareData(
-        {
-          title: payload.title,
-          desc: payload.desc,
-          link: payload.url,
-          imgUrl: payload.imgUrl
-        },
-        function (res) {
-          console.log('type', type)
-          if (type) {
-            ajax('/jv/share/article/addPoint', { data: { type: type } })
-          }
-        }
-      )
-      global.wx.updateTimelineShareData(
-        {
-          title: payload.title,
-          link: payload.url,
-          imgUrl: payload.imgUrl
-        },
-        function (res) {
-          console.log('type', type)
-          if (type) {
-            ajax('/jv/share/article/addPoint', { data: { type: type } })
-          }
-        }
-      )
+      // global.wx.updateAppMessageShareData(
+      //   {
+      //     title: payload.title,
+      //     desc: payload.desc,
+      //     link: payload.url,
+      //     imgUrl: payload.imgUrl
+      //   },
+      //   function (res) {
+      //     if (type) {
+      //       ajax('/jv/share/article/addPoint', { data: { type: type } })
+      //     }
+      //   }
+      // )
+      // global.wx.updateTimelineShareData(
+      //   {
+      //     title: payload.title,
+      //     link: payload.url,
+      //     imgUrl: payload.imgUrl
+      //   },
+      //   function (res) {
+      //     if (type) {
+      //       ajax('/jv/share/article/addPoint', { data: { type: type } })
+      //     }
+      //   }
+      // )
       global.wx.onMenuShareTimeline({
         title: payload.title,
         link: payload.url,
         imgUrl: payload.imgUrl,
         success: function () {
-          console.log('type', type)
           if (type) {
             ajax('/jv/share/article/addPoint', { data: { type: type } })
           }
@@ -211,7 +208,6 @@ export default {
         type: '', // 分享类型,music、video或link，不填默认为link
         dataUrl: '', // 如果type是music或video，则要提供数据链接，默认为空
         success: function () {
-          console.log('type', type)
           if (type) {
             ajax('/jv/share/article/addPoint', { data: { type: type } })
           }
@@ -223,13 +219,26 @@ export default {
         link: payload.url, // 分享链接，该链接域名或路径必须与当前页面对应的公众号JS安全域名一致
         imgUrl: payload.imgUrl, // 分享图标
         success: function () {
-          console.log('type', type)
           if (type) {
             ajax('/jv/share/article/addPoint', { data: { type: type } })
           }
         },
         cancel: function () {
           // 用户取消分享后执行的回调函数
+        }
+      })
+      global.wx.onMenuShareQZone({
+        title: payload.title, // 分享标题
+        desc: payload.desc, // 分享描述
+        link: payload.url, // 分享链接
+        imgUrl: payload.imgUrl, // 分享图标
+        success: function () {
+          if (type) {
+            ajax('/jv/share/article/addPoint', { data: { type: type } })
+          }
+        },
+        cancel: function () {
+        // 用户取消分享后执行的回调函数
         }
       })
     })
