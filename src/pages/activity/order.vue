@@ -813,11 +813,7 @@ export default {
     }
   },
   created () {
-    console.log('created')
     this.fetchActivity()
-  },
-  mounted () {
-    console.log('mounted')
   },
   beforeRouteLeave (to, from, next) {
     // 导航离开该组件的对应路由时调用

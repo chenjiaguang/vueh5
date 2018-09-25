@@ -384,26 +384,26 @@ export default {
       this.exceed = true
       this.loaded = true
     },
-    refreshData () {
-      clearInterval(this.timer)
-      console.log('refreshData2')
-      if (this.$route.params.data) { // 有传入的数据，使用传入的数据
-        let {aid, checkcode, feeId, applyId, feeTitle, idCard, leftTime, name, num, phone, sex, title, totalPrices, wechat} = this.$route.params.data
+    refreshData (vm) {
+      let _this = vm || this
+      clearInterval(_this.timer)
+      if (_this.$route.params.data) { // 有传入的数据，使用传入的数据
+        let {aid, checkcode, feeId, applyId, feeTitle, idCard, leftTime, name, num, phone, sex, title, totalPrices, wechat} = _this.$route.params.data
         let _initialData = JSON.parse(JSON.stringify(initialData))
         let _obj = Object.assign({}, _initialData, {aid, checkcode, feeId, applyId, feeTitle, idCard, leftTime, name, num, phone, sex, title, totalPrices, wechat})
         _obj.loaded = true
         for (let item in _obj) {
-          this[item] = _obj[item]
+          _this[item] = _obj[item]
         }
-        this.startCounting()
+        _this.startCounting()
       } else { // 没有则调用接口获取
         let rData = {
-          aid: this.$route.query.aid
+          aid: _this.$route.query.aid
         }
-        this.submitting = true
-        this.$ajax('/jv/qz/v25/order/unpaid', {data: rData, dontToast: true}).then(res => {
+        _this.submitting = true
+        _this.$ajax('/jv/qz/v25/order/unpaid', {data: rData, dontToast: true}).then(res => {
           console.log('获取未支付订单成功', res)
-          this.submitting = false
+          _this.submitting = false
           if (res && res.data && res.data.checkcode && !res.error) { // 有未支付订单
             if (res.data.leftTime && parseInt(res.data.leftTime) > 0) { // 剩余时间大于0
               let {aid, checkcode, feeId, applyId, feeTitle, idCard, leftTime, name, num, phone, sex, title, totalPrices, wechat} = res.data
@@ -411,19 +411,19 @@ export default {
               let _obj = Object.assign({}, _initialData, {aid, checkcode, feeId, applyId, feeTitle, idCard, leftTime, name, num, phone, sex, title, totalPrices, wechat})
               _obj.loaded = true
               for (let item in _obj) {
-                this[item] = _obj[item]
+                _this[item] = _obj[item]
               }
-              this.startCounting()
+              _this.startCounting()
             } else { // 剩余时间不足
-              this.showEmptyPage()
+              _this.showEmptyPage()
             }
           } else { // 无未支付订单
-            this.showEmptyPage()
+            _this.showEmptyPage()
           }
         }).catch(err => {
-          this.submitting = false
+          _this.submitting = false
           console.log('获取未支付订单失败', err)
-          this.showEmptyPage()
+          _this.showEmptyPage()
         })
       }
     },
@@ -482,19 +482,17 @@ export default {
       })
     }
   },
-  created () {
-    if (this.$route.params.refreshData) { // 刷新数据
-      this.refreshData()
-    }
-  },
-  activated () {
-    console.log('activated', this.loaded, this.aid, this.$route.query.aid)
-    if (this.$route.query.refreshData || this.$route.params.refreshData || (this.$route.query.aid && (this.$route.query.aid !== this.aid || !this.loaded))) { // 刷新数据（手动刷新或活动id不一致或未加载过）
-      this.refreshData()
-    }
-  },
+  // created () {
+  //   if (this.$route.params.refreshData) { // 刷新数据
+  //     this.refreshData()
+  //   }
+  // },
+  // activated () {
+  //   if (this.$route.query.refreshData || this.$route.params.refreshData || (this.$route.query.aid && (this.$route.query.aid !== this.aid || !this.loaded))) { // 刷新数据（手动刷新或活动id不一致或未加载过）
+  //     this.refreshData()
+  //   }
+  // },
   beforeRouteLeave (to, from, next) {
-    console.log('showPrompt', this.showPrompt)
     if (to.name === 'Agreement' || to.name === 'SMSCode' || this.pass || this.exceed || !this.feeId) {
       this.pass = false
       if (window._alert_id) { // 如果有alert弹窗，则关闭弹窗
@@ -518,6 +516,13 @@ export default {
         next(false)
       }
     }
+  },
+  beforeRouteEnter (to, from, next) {
+    next(vm => {
+      if (from.name !== 'Agreement' && from.name !== 'SMSCode' && (vm.$route.query.refreshData || vm.$route.params.refreshData || (vm.$route.query.aid && (vm.$route.query.aid !== vm.aid || !vm.loaded)))) {
+        vm.refreshData(vm)
+      }
+    })
   }
 }
 </script>
