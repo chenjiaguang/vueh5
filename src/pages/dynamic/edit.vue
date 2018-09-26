@@ -3,9 +3,10 @@
     <div class="text-box">
       <textarea class="text-content" placeholder="此刻，我想说..." v-model="dynamicText"></textarea>
     </div>
-    <div class="pic-box">
+    <div ref="picBox" class="pic-box">
       <image-container :images="images" :router="$router" :showDelete="true" @deleteFunc="deleteImage" :appearAnimation="true" :isUpload="true" @addFunc="addImage" />
     </div>
+    <upload-image ref="uploader" />
     <div class="options-box" v-if="topic || activity || circle || range">
       <edit-option :option="{leftIcon: 'topic_edit', title: '话题'}" v-if="topic">
         <div class="topic-box clearfix" slot="extra">
@@ -28,7 +29,7 @@
   </div>
 </template>
 
-<style scoped :src="$assetsPublicPath + '/cwebassets/css/webuploader.css'" />
+<style src="../../../cwebassets/css/webuploader.css"></style>
 <style lang="scss" type="text/scss" scoped>
 .edit-page{
   height: 100%;
@@ -121,6 +122,7 @@
 </style>
 
 <script>
+import UploadImage from '@/components/UploadImage'
 import imageContainer from '@/components/ImageContainer'
 import EditOption from './components/EditOption'
 import axios from 'axios'
@@ -143,7 +145,8 @@ let initialData = {
   },
   submitting: false,
   submitSuccess: false,
-  showAllwaysChecked: false
+  showAllwaysChecked: false,
+  uploader: null
 }
 export default {
   data () {
@@ -158,7 +161,7 @@ export default {
     let _obj = Object.assign({}, _initialData, {topic, activity, circle, range})
     return _obj
   },
-  components: {imageContainer, EditOption},
+  components: {imageContainer, EditOption, UploadImage},
   watch: {
     submitSuccess: function (val, oldVal) {
       if (val && !oldVal) {
@@ -557,6 +560,9 @@ export default {
         this[item] = _obj[item]
       }
       // this.$router.replace({name: 'EditDynamic', query: this.$route.query})
+    },
+    getUploader (uploader) {
+      console.log('getUploader', uploader)
     }
   },
   computed: {
