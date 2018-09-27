@@ -675,7 +675,7 @@ export default {
       })
     },
     clickSubmit () {
-      if (!utils.checkLogin() || this.submitting) { // 未登录终止
+      if (!utils.checkLogin() || this.submitting || !this.selectedTicket || !this.selectedTicket[0]) { // 未登录终止
         return false
       }
       // let {selectedTicket} = this

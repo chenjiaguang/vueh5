@@ -1,18 +1,42 @@
 <template>
   <div ref="uploader" id="uploader" class="uploader">
-    <div class="images-wrapper">
-      <img class="uploader-image-item" v-for="i in images" :style="{backgroundImage: 'url(' + i.url + ')'}" :key="i.hash" />
-      <div id="picker" class="add-btn uploader-image-item"></div>
-    </div>
+    <transition-group name="list" tag="div" class="images-wrapper">
+      <div class="uploader-image-item" v-for="(val, key, idx) in images" :style="{backgroundImage: 'url(' + val.url + ')', marginLeft: idx % 3 === 0 ? 0 : '1.055%', marginTop: idx < 3 ? 0 : '1.055%'}" :key="val.hash">
+        <div v-if="val.uploadText" class="uploader-image-item-percentage">
+          <span>{{val.uploadText}}</span>
+        </div>
+        <div class="iconfont icon-guanbi delete-btn" @click.stop="deleteImage(val.uploadId)"></div>
+      </div>
+      <div class="add-btn uploader-image-item" key="add-btn" :style="{marginLeft: Object.keys(images).length % 3 === 0 ? 0 : '1.055%', marginTop: Object.keys(images).length < 3 ? 0 : '1.055%'}">
+        <div id="picker" class="picker"></div>
+      </div>
+    </transition-group>
   </div>
 </template>
 
 <style lang="scss" scoped>
+.list-enter-active{
+  transition: all 500ms;
+}
+.list-leave-active{
+  transition: all 0s;
+}
+.list-enter, .list-leave-to
+/* .list-leave-active for below version 2.1.8 */ {
+  opacity: 0;
+  transform: scale(.5,.5) translate(-20%, -20%);
+  transform-origin: 0 100%;
+}
 .select{
   user-select: auto;
 }
 .uploader{
   margin-top: 100px;
+}
+.images-wrapper{
+  display: flex;
+  justify-content: flex-start;
+  flex-wrap: wrap;
 }
 .uploader-image-item{
   width: 32.63%;
@@ -21,6 +45,40 @@
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;
+  flex-shrink: 0;
+  flex-grow: 0;
+  height: 0;
+}
+.uploader-image-item-percentage{
+  display: flex;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  color: #fff;
+  font-size: 28px;
+  justify-content: center;
+  align-items: center;
+  left: 0;
+  top: 0;
+}
+.delete-btn{
+    width: 0.96rem;
+    height: 0.96rem;
+    line-height: 0.96rem;
+    font-size: 0.48rem;
+    color: #fff;
+    border-radius: 50%;
+    text-align: center;
+    background: rgba(0, 0, 0, 0.5);
+    position: absolute;
+    top: 0.106667rem;
+    right: 0.106667rem;
+    -webkit-transform: scale(0.5, 0.5);
+    transform: scale(0.5, 0.5);
+    -webkit-transform-origin: 100% 0;
+    transform-origin: 100% 0;
+    z-index: 3;
 }
 .add-btn{
   background: #F4F4F4;
@@ -49,7 +107,16 @@
     z-index: 1;
   }
 }
-.add-btn /deep/ .webuploader-pick{
+.picker{
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  left: 0;
+  top: 0;
+  z-index: 2;
+  overflow: hidden;
+}
+.picker /deep/ .webuploader-pick{
   position: absolute;
   width: 100%;
   height: 100%;
@@ -66,8 +133,16 @@
 export default {
   data () {
     return {
-      images: [],
+      images: {},
       uploader: null
+    }
+  },
+  methods: {
+    deleteImage (id) {
+      let _images = this.images
+      delete _images[id]
+      this.images = Object.assign({}, _images)
+      this.uploader.removeFile(id, true)
     }
   },
   mounted () {
@@ -86,7 +161,7 @@ export default {
         id: '#picker',
         multiple: true
       },
-
+      fileNumLimit: 9,
       // 不压缩image, 默认如果是jpeg，文件上传前会压缩一把再上传！
       // resize: false,
       thumb: {
@@ -94,27 +169,37 @@ export default {
       }
     })
     this.uploader.on('uploadProgress', (res_file, percentage) => {
+      console.log('uploadProgress', percentage)
       let w = res_file._info.width
       let h = res_file._info.height
       let wh = (w > h ? h : w)
-      let has_add = false
-      this.images.forEach(item => {
-        if (item.hash === res_file.__hash) {
-          has_add = true
-        }
-      })
-      if (!has_add) { // 没添加过则生成缩略图
+      if (!this.images[res_file.id]) { // 没添加过缩略图则生成缩略图
         this.uploader.makeThumb(res_file, (err, data_url) => {
           if (err) {
             console.log('该图片不支持预览')
           } else {
-            this.images.push({hash: res_file.__hash, url: data_url})
+            if (!this.images[res_file.id]) {
+              this.images[res_file.id] = {uploadId: res_file.id, hash: res_file.__hash, url: data_url, uploadText: percentage.toFixed(2) * 100 + '%'}
+              this.images = Object.assign({}, this.images)
+            }
           }
         }, wh, wh)
+      } else {
+        this.images[res_file.id].uploadText = percentage.toFixed(2) * 100 + '%'
       }
     })
     this.uploader.on('uploadSuccess', (res_file, res) => {
+      console.log('this.iamges', this.images)
       console.log('uploadSuccess', res_file, res)
+      this.images[res_file.id].uploadText = ''
+    })
+    this.uploader.on('uploadError', (res_file, reason) => {
+      console.log('uploadError', res_file, reason)
+    })
+    this.uploader.on('error', type => {
+      if (type === 'Q_EXCEED_NUM_LIMI') {
+        console.log('超出9张图片,不能再上传了')
+      }
     })
   }
 }
