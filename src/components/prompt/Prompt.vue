@@ -42,8 +42,10 @@ export default {
         position: fixed;
         width: 100%;
         height: 100%;
+        max-width: 800PX;
         top: 0;
-        left: 0;
+        left: 50%;
+        transform: translateX(-50%);
         background-color: rgba(0,0,0,0.5);
         transition: background-color 300ms;
         &.before-appear {
@@ -80,7 +82,7 @@ export default {
     }
     .content-box.ios{
         text-align: center;
-        padding: 55px 36px;
+        padding: 20px 36px;
     }
     .content-box.android{
       text-align: left;
@@ -154,15 +156,20 @@ export default {
       display: none;
     }
     .left-btn{
-      font-size: 34px;
-      line-height: 40px;
+        font-size: 34px;
+        line-height: 40px;
         font-weight: normal;
+        color: #0076FF;
+    }
+    .left-btn.android{
         color: #999;
     }
     .right-btn{
-      font-size: 34px;
-      line-height: 40px;
-        font-weight: 600;
+        font-size: 34px;
+        line-height: 40px;
         color: #0076FF;
+    }
+    .right-btn.ios span{
+        font-weight: 600;
     }
 </style>

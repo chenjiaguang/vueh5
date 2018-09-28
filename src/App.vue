@@ -68,12 +68,16 @@ html {
 }
 #app {
   height: 100%;
+  max-width: 800PX;
+  margin: 0 auto;
+  background-color: #fff;
 }
 body {
   margin: 0;
   color: #333;
   background-color: #fff;
   height: 100%;
+  background-color: #000;
 }
 *,
 ::before,

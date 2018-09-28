@@ -3,9 +3,10 @@
     <div class="text-box">
       <textarea class="text-content" placeholder="此刻，我想说..." v-model="dynamicText"></textarea>
     </div>
-    <div class="pic-box">
+    <!-- <div ref="picBox" class="pic-box">
       <image-container :images="images" :router="$router" :showDelete="true" @deleteFunc="deleteImage" :appearAnimation="true" :isUpload="true" @addFunc="addImage" />
-    </div>
+    </div> -->
+    <upload-image v-if="!refreshing" ref="uploader" />
     <div class="options-box" v-if="topic || activity || circle || range">
       <edit-option :option="{leftIcon: 'topic_edit', title: '话题'}" v-if="topic">
         <div class="topic-box clearfix" slot="extra">
@@ -28,9 +29,14 @@
   </div>
 </template>
 
+<style src="../../../cwebassets/css/webuploader.css"></style>
 <style lang="scss" type="text/scss" scoped>
 .edit-page{
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
   padding: 0 4%;
+  -webkit-overflow-scrolling: touch;
 }
 .text-box{
   height: 298px;
@@ -104,6 +110,7 @@
 }
 .submit-btn{
   margin-top: 80px;
+  margin-bottom: 50px;
   height: 90px;
   font-size: 34px;
   line-height: 90px;
@@ -115,6 +122,7 @@
 </style>
 
 <script>
+import UploadImage from '@/components/UploadImage'
 import imageContainer from '@/components/ImageContainer'
 import EditOption from './components/EditOption'
 import axios from 'axios'
@@ -137,10 +145,14 @@ let initialData = {
   },
   submitting: false,
   submitSuccess: false,
-  showAllwaysChecked: false
+  showAllwaysChecked: false,
+  refreshing: false
 }
 export default {
   data () {
+    if (this.$isApp) {
+      this.$appCall('h5GoPublishShortDynamic')
+    }
     let topic = this.$route.query.topic ? JSON.parse(this.$route.query.topic) : null
     let activity = this.$route.query.activity ? JSON.parse(this.$route.query.activity) : null
     let circle = this.$route.query.circle ? JSON.parse(this.$route.query.circle) : null
@@ -149,7 +161,7 @@ export default {
     let _obj = Object.assign({}, _initialData, {topic, activity, circle, range})
     return _obj
   },
-  components: {imageContainer, EditOption},
+  components: {imageContainer, EditOption, UploadImage},
   watch: {
     submitSuccess: function (val, oldVal) {
       if (val && !oldVal) {
@@ -455,27 +467,23 @@ export default {
       this.$router.push({name: 'EditDynamicRange', query: {selected: this.range}})
     },
     submitDynamic () {
+      console.log('uploader_stats', this.$refs['uploader'].uploader.getStats(), Object.keys(this.$refs['uploader'].images).length)
       if (!utils.checkLogin()) {
         return false
       }
       let flat = false // 标记是否可提交,false可提交
+      let uploader_stats = this.$refs['uploader'].uploader.getStats() // 上传图片中或者有失败的
+      if (uploader_stats.successNum !== Object.keys(this.$refs['uploader'].images).length) {
+        flat = true
+      }
       let content = ''
       let image_ids = ''
       let topic_ids = ''
-      let uploadImages = this.images.filter(item => item.status === 'success')
-      let imageIds = this.images.map((item, idx) => {
-        if (item.status === 'submitting' || item.status === 'reading') {
-          flat = true
-        }
-        if (item.id) {
-          return item.id
-        }
-      })
       if (flat) {
-        this.$toast('图片正在上传中，请稍候发布')
+        this.$toast('有未成功上传的图片...')
         return false
       }
-      if ((!this.dynamicText || (this.dynamicText && this.dynamicText.length < 10)) && uploadImages.length === 0) {
+      if ((!this.dynamicText || (this.dynamicText && this.dynamicText.length < 10)) && uploader_stats.successNum === 0) {
         this.$toast('内容还不够10个字~')
         flat = true
       } else if (this.dynamicText && this.dynamicText.length > 2000) {
@@ -494,8 +502,8 @@ export default {
           topic_ids = topicIds.join(',')
         }
       }
-      if (imageIds && imageIds.length > 0) {
-        image_ids = imageIds.join(',')
+      for (let i in this.$refs['uploader'].images) {
+        image_ids += image_ids ? (',' + this.$refs['uploader'].images[i].id) : this.$refs['uploader'].images[i].id
       }
       if (this.submitting) {
         return false
@@ -538,15 +546,18 @@ export default {
       })
     },
     refreshData () {
-      let topic = this.$route.query.topic ? JSON.parse(this.$route.query.topic) : null
-      let activity = this.$route.query.activity ? JSON.parse(this.$route.query.activity) : null
-      let circle = this.$route.query.circle ? JSON.parse(this.$route.query.circle) : null
-      let range = this.$route.query.range !== undefined ? this.$route.query.range.toString() : null
-      let _initialData = JSON.parse(JSON.stringify(initialData))
-      let _obj = Object.assign({}, _initialData, {topic, activity, circle, range})
-      for (let item in _obj) {
-        this[item] = _obj[item]
-      }
+      this.refreshing = true
+      this.$nextTick(() => {
+        let topic = this.$route.query.topic ? JSON.parse(this.$route.query.topic) : null
+        let activity = this.$route.query.activity ? JSON.parse(this.$route.query.activity) : null
+        let circle = this.$route.query.circle ? JSON.parse(this.$route.query.circle) : null
+        let range = this.$route.query.range !== undefined ? this.$route.query.range.toString() : null
+        let _initialData = JSON.parse(JSON.stringify(initialData))
+        let _obj = Object.assign({}, _initialData, {topic, activity, circle, range})
+        for (let item in _obj) {
+          this[item] = _obj[item]
+        }
+      })
       // this.$router.replace({name: 'EditDynamic', query: this.$route.query})
     }
   },

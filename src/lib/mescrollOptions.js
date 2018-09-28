@@ -1,7 +1,8 @@
 export default {
   get: function ($downOffset, $upOffset) {
-    let downOffset = (window.innerWidth / 750) * ($downOffset || 94)
-    let upOffset = (window.innerWidth / 750) * ($upOffset || 100)
+    let maxWidth = window.innerWidth > (54 * 10) ? (54 * 10) : window.innerWidth // 最大宽度，flexible中html font-size都最大值的10倍
+    let downOffset = (maxWidth / 750) * ($downOffset || 94)
+    let upOffset = (maxWidth / 750) * ($upOffset || 100)
     let htmlContent = '<div class="pull-down-wrapper" style="height:' + downOffset + 'px">'
     htmlContent += '<img class="pull-down-icon" src="/h5/cwebassets/image/refresh_icon.png" />'
     htmlContent += '<img class="pull-down-icon refreshing" src="/h5/cwebassets/image/refreshing_icon.png" />'

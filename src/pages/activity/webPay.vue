@@ -152,10 +152,12 @@ export default {
   .contact{
     font-size: 28px;
     position: fixed;
+    max-width: 800PX;
     width: 100%;
-    left: 0;
+    left: 50%;
     bottom: 100px;
     text-align: center;
+    transform: translateX(-50%);
   }
   .tel-btn{
     color: #1EB0FD;

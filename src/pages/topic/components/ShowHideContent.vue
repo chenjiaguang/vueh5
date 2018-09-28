@@ -73,10 +73,11 @@ export default {
     }
   },
   data () {
+    let maxWidth = window.innerWidth > (54 * 10) ? (54 * 10) : window.innerWidth // 最大宽度，flexible中html font-size都最大值的10倍
     return {
       showMore: false, // 显示更多
       contentHeight: null,
-      contentMaxHeight: parseInt((window.innerWidth / 750) * 230)
+      contentMaxHeight: parseInt((maxWidth / 750) * 230)
     }
   },
   methods: {

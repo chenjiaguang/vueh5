@@ -40,6 +40,12 @@ export default {
         cid: this.$route.query.circle_id
       }
       this.$ajax('/jv/anonymous/qz/v21/circleinfo', {data: rData}).then(res => {
+        if (this.$isApp && this.$route.query.circle_id) {
+          let {id, name, cover} = res.data
+          if (cover && cover.compress) {
+            this.$appCall('h5GoApplyCircle', id, name, cover.compress)
+          }
+        }
         this.circle = res.data
       }).catch(err => {
       })
@@ -70,7 +76,7 @@ export default {
 
 <style scoped>
 .container{
-  margin-top: 41px;
+  padding-top: 41px;
   margin-left: 30px;
   margin-right: 30px;
 }
