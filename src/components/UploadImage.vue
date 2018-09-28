@@ -260,6 +260,7 @@ export default {
       _img.src = res.data.url[0]
     })
     this.uploader.on('uploadError', (res_file, reason) => {
+      console.log('uploadError', res_file, reason)
       this.images[res_file.id].uploadText = '上传失败'
     })
     this.uploader.on('error', type => {
