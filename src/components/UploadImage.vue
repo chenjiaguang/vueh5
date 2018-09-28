@@ -1,13 +1,13 @@
 <template>
   <div ref="uploader" id="uploader" class="uploader">
     <transition-group name="list" tag="div" class="images-wrapper">
-      <div class="uploader-image-item" v-for="(val, key, idx) in images" :style="{backgroundImage: 'url(' + val.url + ')', marginLeft: idx % 3 === 0 ? 0 : '1.055%', marginTop: idx < 3 ? 0 : '1.055%'}" :key="val.hash">
+      <div ref="images" @click.stop="preview(idx, key)" class="uploader-image-item" :data-sign="key" :data-big="val.hasBig" v-for="(val, key, idx) in images" :style="{backgroundImage: 'url(' + val.url + ')', marginLeft: idx % 3 === 0 ? 0 : '1.055%', marginTop: idx < 3 ? 0 : '1.055%'}" :key="val.hash">
         <div v-if="val.uploadText" class="uploader-image-item-percentage">
           <span>{{val.uploadText}}</span>
         </div>
         <div class="iconfont icon-guanbi delete-btn" @click.stop="deleteImage(val.uploadId)"></div>
       </div>
-      <div class="add-btn uploader-image-item" key="add-btn" :style="{marginLeft: Object.keys(images).length % 3 === 0 ? 0 : '1.055%', marginTop: Object.keys(images).length < 3 ? 0 : '1.055%'}">
+      <div class="add-btn uploader-image-item" :class="{hide: Object.keys(images).length >= 9}" key="add-btn" :style="{marginLeft: Object.keys(images).length % 3 === 0 ? 0 : '1.055%', marginTop: Object.keys(images).length < 3 ? 0 : '1.055%'}">
         <div id="picker" class="picker"></div>
       </div>
     </transition-group>
@@ -29,9 +29,6 @@
 }
 .select{
   user-select: auto;
-}
-.uploader{
-  margin-top: 100px;
 }
 .images-wrapper{
   display: flex;
@@ -107,6 +104,9 @@
     z-index: 1;
   }
 }
+.add-btn.hide{
+  display: none;
+}
 .picker{
   position: absolute;
   width: 100%;
@@ -137,12 +137,48 @@ export default {
       uploader: null
     }
   },
+  computed: {
+    previewImages () {
+      let _images = []
+      for (let i in this.images) {
+        let id = this.images[i].id
+        let uploadId = this.images[i].uploadId
+        let width = this.images[i].width
+        let height = this.images[i].height
+        let url = this.images[i].previewUrl
+        if (id && width && height && url) {
+          _images.push({uploadId, id, width, height, url})
+        }
+      }
+      return _images
+    }
+  },
   methods: {
     deleteImage (id) {
       let _images = this.images
       delete _images[id]
       this.images = Object.assign({}, _images)
       this.uploader.removeFile(id, true)
+    },
+    preview (idx, key) {
+      if (!this.$refs['images'][idx].dataset.big || (this.$refs['images'][idx].dataset.big.toString() !== 'true')) {
+        return false
+      }
+      let _images = []
+      let _clickEls = []
+      let _idx = null
+      for (let i = 0; i < this.$refs['images'].length; i++) {
+        if (this.$refs['images'][i].dataset.big) {
+          let {width, height, previewUrl} = this.images[this.$refs['images'][i].dataset.sign]
+          let _item = Object.assign({}, {width: width, height: height, url: previewUrl})
+          _images.push(_item)
+          _clickEls.push(this.$refs['images'][i])
+          if (this.$refs['images'][i].dataset.sign === key) {
+            _idx = _clickEls.length - 1
+          }
+        }
+      }
+      this.$previewImage.show({images: _images, idx: _idx, clickedEl: _clickEls})
     }
   },
   mounted () {
@@ -165,36 +201,66 @@ export default {
       // 不压缩image, 默认如果是jpeg，文件上传前会压缩一把再上传！
       // resize: false,
       thumb: {
-        quality: 70
-      }
+        width: 375,
+        height: 375,
+        quality: 100,
+        allowMagnify: true
+      },
+      compress: {
+        width: 160000,
+        height: 160000,
+        quality: 70,
+        allowMagnify: false,
+
+        // 是否允许裁剪。
+        crop: false,
+
+        // 是否保留头部meta信息。
+        preserveHeaders: true,
+
+        // 如果发现压缩后文件大小比原来还大，则使用原来图片
+        // 此属性可能会影响图片自动纠正功能
+        noCompressIfLarger: true,
+
+        // 单位字节，如果图片大小小于此值，不会采用压缩。
+        compressSize: 20 * 1024
+      },
+      chunked: false,
+      threads: 9
     })
-    this.uploader.on('uploadProgress', (res_file, percentage) => {
-      console.log('uploadProgress', percentage)
-      let w = res_file._info.width
-      let h = res_file._info.height
-      let wh = (w > h ? h : w)
+    this.uploader.on('fileQueued', res_file => {
       if (!this.images[res_file.id]) { // 没添加过缩略图则生成缩略图
         this.uploader.makeThumb(res_file, (err, data_url) => {
           if (err) {
             console.log('该图片不支持预览')
           } else {
             if (!this.images[res_file.id]) {
-              this.images[res_file.id] = {uploadId: res_file.id, hash: res_file.__hash, url: data_url, uploadText: percentage.toFixed(2) * 100 + '%'}
+              this.images[res_file.id] = {uploadId: res_file.id, hash: res_file.__hash, url: data_url, uploadText: '正在读取...', hasBig: false}
               this.images = Object.assign({}, this.images)
             }
           }
-        }, wh, wh)
-      } else {
-        this.images[res_file.id].uploadText = percentage.toFixed(2) * 100 + '%'
+        })
+      }
+    })
+    this.uploader.on('uploadProgress', (res_file, percentage) => {
+      if (this.images[res_file.id]) {
+        this.images[res_file.id].uploadText = parseInt(percentage.toFixed(2) * 100) + '%'
       }
     })
     this.uploader.on('uploadSuccess', (res_file, res) => {
-      console.log('this.iamges', this.images)
-      console.log('uploadSuccess', res_file, res)
       this.images[res_file.id].uploadText = ''
+      this.images[res_file.id].id = res.data.id[0]
+      let _img = document.createElement('img')
+      _img.onload = (e) => {
+        this.images[res_file.id].width = _img.width
+        this.images[res_file.id].height = _img.height
+        this.images[res_file.id].previewUrl = res.data.url[0]
+        this.images[res_file.id].hasBig = true
+      }
+      _img.src = res.data.url[0]
     })
     this.uploader.on('uploadError', (res_file, reason) => {
-      console.log('uploadError', res_file, reason)
+      this.images[res_file.id].uploadText = '上传失败'
     })
     this.uploader.on('error', type => {
       if (type === 'Q_EXCEED_NUM_LIMI') {

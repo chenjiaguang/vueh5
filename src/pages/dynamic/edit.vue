@@ -3,10 +3,10 @@
     <div class="text-box">
       <textarea class="text-content" placeholder="此刻，我想说..." v-model="dynamicText"></textarea>
     </div>
-    <div ref="picBox" class="pic-box">
+    <!-- <div ref="picBox" class="pic-box">
       <image-container :images="images" :router="$router" :showDelete="true" @deleteFunc="deleteImage" :appearAnimation="true" :isUpload="true" @addFunc="addImage" />
-    </div>
-    <upload-image ref="uploader" />
+    </div> -->
+    <upload-image v-if="!refreshing" ref="uploader" />
     <div class="options-box" v-if="topic || activity || circle || range">
       <edit-option :option="{leftIcon: 'topic_edit', title: '话题'}" v-if="topic">
         <div class="topic-box clearfix" slot="extra">
@@ -146,7 +146,7 @@ let initialData = {
   submitting: false,
   submitSuccess: false,
   showAllwaysChecked: false,
-  uploader: null
+  refreshing: false
 }
 export default {
   data () {
@@ -467,27 +467,23 @@ export default {
       this.$router.push({name: 'EditDynamicRange', query: {selected: this.range}})
     },
     submitDynamic () {
+      console.log('uploader_stats', this.$refs['uploader'].uploader.getStats(), Object.keys(this.$refs['uploader'].images).length)
       if (!utils.checkLogin()) {
         return false
       }
       let flat = false // 标记是否可提交,false可提交
+      let uploader_stats = this.$refs['uploader'].uploader.getStats() // 上传图片中或者有失败的
+      if (uploader_stats.successNum !== Object.keys(this.$refs['uploader'].images).length) {
+        flat = true
+      }
       let content = ''
       let image_ids = ''
       let topic_ids = ''
-      let uploadImages = this.images.filter(item => item.status === 'success')
-      let imageIds = this.images.map((item, idx) => {
-        if (item.status === 'submitting' || item.status === 'reading') {
-          flat = true
-        }
-        if (item.id) {
-          return item.id
-        }
-      })
       if (flat) {
-        this.$toast('图片正在上传中，请稍候发布')
+        this.$toast('有未成功上传的图片...')
         return false
       }
-      if ((!this.dynamicText || (this.dynamicText && this.dynamicText.length < 10)) && uploadImages.length === 0) {
+      if ((!this.dynamicText || (this.dynamicText && this.dynamicText.length < 10)) && uploader_stats.successNum === 0) {
         this.$toast('内容还不够10个字~')
         flat = true
       } else if (this.dynamicText && this.dynamicText.length > 2000) {
@@ -506,8 +502,8 @@ export default {
           topic_ids = topicIds.join(',')
         }
       }
-      if (imageIds && imageIds.length > 0) {
-        image_ids = imageIds.join(',')
+      for (let i in this.$refs['uploader'].images) {
+        image_ids += image_ids ? (',' + this.$refs['uploader'].images[i].id) : this.$refs['uploader'].images[i].id
       }
       if (this.submitting) {
         return false
@@ -550,19 +546,19 @@ export default {
       })
     },
     refreshData () {
-      let topic = this.$route.query.topic ? JSON.parse(this.$route.query.topic) : null
-      let activity = this.$route.query.activity ? JSON.parse(this.$route.query.activity) : null
-      let circle = this.$route.query.circle ? JSON.parse(this.$route.query.circle) : null
-      let range = this.$route.query.range !== undefined ? this.$route.query.range.toString() : null
-      let _initialData = JSON.parse(JSON.stringify(initialData))
-      let _obj = Object.assign({}, _initialData, {topic, activity, circle, range})
-      for (let item in _obj) {
-        this[item] = _obj[item]
-      }
+      this.refreshing = true
+      this.$nextTick(() => {
+        let topic = this.$route.query.topic ? JSON.parse(this.$route.query.topic) : null
+        let activity = this.$route.query.activity ? JSON.parse(this.$route.query.activity) : null
+        let circle = this.$route.query.circle ? JSON.parse(this.$route.query.circle) : null
+        let range = this.$route.query.range !== undefined ? this.$route.query.range.toString() : null
+        let _initialData = JSON.parse(JSON.stringify(initialData))
+        let _obj = Object.assign({}, _initialData, {topic, activity, circle, range})
+        for (let item in _obj) {
+          this[item] = _obj[item]
+        }
+      })
       // this.$router.replace({name: 'EditDynamic', query: this.$route.query})
-    },
-    getUploader (uploader) {
-      console.log('getUploader', uploader)
     }
   },
   computed: {
