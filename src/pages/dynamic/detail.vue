@@ -57,13 +57,14 @@
                 </div>
                 <div class="content-article-content">{{dynamic.newsArticle.name || dynamic.newsArticle.article_url}}</div>
               </a>
-              <a class="content-article-box row center" v-if="dynamic.linkInfo && dynamic.linkInfo.id" :href="dynamic.linkInfo.url">
+              <a class="content-article-box row center" v-if="dynamic.linkInfo && dynamic.linkInfo.id && dynamic.linkInfo.type==0" :href="dynamic.linkInfo.url">
                 <div v-if="dynamic.linkInfo.cover" class="content-article-img" :style="`background-image:url(${dynamic.linkInfo.cover})`"/>
                 <div v-else class="content-article-img">
                   <i class="iconfont link-image icon-link_icon"></i>
                 </div>
                 <div class="content-article-content">{{dynamic.linkInfo.title || dynamic.linkInfo.url}}</div>
               </a>
+              <DynamicContentVideoBox class="content-video-box" v-if="dynamic.linkInfo && dynamic.linkInfo.id && dynamic.linkInfo.type==1" :dynamic="dynamic"/>
             </div>
 
             <div v-if="dynamic && (dynamic.actid || dynamic.location || dynamic.circle_name)" id="foot-container" class="column">
@@ -191,6 +192,7 @@ import DynamicFixedBox from '../../components/DynamicFixedBox'
 import ScrollToTop from '../../components/ScrollToTop'
 import TopicTagBox from '../../components/TopicTagBox'
 import DetailImageContainer from '../../components/DetailImageContainer'
+import DynamicContentVideoBox from '../../components/DynamicContentVideoBox'
 import utils from '../../lib/utils'
 import NotFoundPage from '../notFoundPage'
 import MeScroll from 'mescroll.js'
@@ -229,7 +231,8 @@ export default {
     ScrollToTop,
     TopicTagBox,
     DetailImageContainer,
-    NotFoundPage
+    NotFoundPage,
+    DynamicContentVideoBox
   },
   // beforeRouteEnter (to, from, next) {
   //   if (to.query.isArticle && to.query.isArticle !== 'false') {
@@ -633,7 +636,7 @@ export default {
   background-color: #1eb0fd;
   border-radius: 6px;
 }
-/********************************************************************/
+/**********************长文**************************************/
 #article-content-container {
   margin-bottom: 60px;
 }
@@ -749,7 +752,7 @@ export default {
 #foot-container{
   margin-bottom: 36px;
 }
-/*************************************************************************/
+/************************短动态****************************************/
 .dynamic-content {
   color: #333333;
   font-size: 32px;
@@ -761,6 +764,9 @@ export default {
 .detail-image-container {
   margin-left: -30px;
   margin-right: -30px;
+  margin-bottom: 24px;
+}
+.content-video-box{
   margin-bottom: 24px;
 }
 .content-article-box {
@@ -867,7 +873,7 @@ export default {
   font-weight: bold;
   margin-bottom: 40px;
 }
-/**************************************************************************/
+/***************************评论**********************************/
 .comment-text {
   font-size: 28px;
   color: #333333;

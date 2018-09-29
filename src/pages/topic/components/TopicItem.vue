@@ -28,7 +28,7 @@
         <div class="with-article-title-text">{{itemData.newsArticle.name || itemData.newsArticle.article_url}}</div>
       </div>
     </a>
-    <a @click.stop :href="itemData.linkInfo.url" v-if="itemData.linkInfo && itemData.linkInfo.id" class="with-article">
+    <a @click.stop :href="itemData.linkInfo.url" v-if="itemData.linkInfo && itemData.linkInfo.id && itemData.linkInfo.type==0" class="with-article">
       <div class="with-article-cover" v-if="itemData.linkInfo.cover" :style="{backgroundImage: 'url(' + itemData.linkInfo.cover + ')'}"></div>
       <div class="with-article-cover" v-else>
         <i class="iconfont link-image icon-link_icon"></i>
@@ -37,6 +37,7 @@
         <div class="with-article-title-text">{{itemData.linkInfo.title || itemData.linkInfo.url}}</div>
       </div>
     </a>
+    <DynamicContentVideoBox class="with-video" v-if="itemData.linkInfo && itemData.linkInfo.id && itemData.linkInfo.type==1" :dynamic="itemData"/>
     <div class="comment-and-like clearfix">
       <div @click.stop="changeLike" class="comment-and-like-item fl" :style="{paddingLeft: 0, color: itemData.has_like ? '#FE5273' : '#333'}">
         <div class="comment-and-like-icon-box">
@@ -178,6 +179,9 @@
   margin: 4px 0 20px;
   overflow: hidden;
 }
+.with-video{
+  margin: 4px 0 20px;
+}
 .with-article-cover{
   width: 100px;
   height: 100px;
@@ -289,6 +293,7 @@
 import ImageContainer from '../../../components/ImageContainer'
 import ShowHideContent from './ShowHideContent'
 import utils from '@/lib/utils'
+import DynamicContentVideoBox from '@/components/DynamicContentVideoBox'
 import {
 } from 'cube-ui'
 export default {
@@ -307,7 +312,7 @@ export default {
   data () {
     return {}
   },
-  components: {ImageContainer, ShowHideContent},
+  components: {ImageContainer, ShowHideContent, DynamicContentVideoBox},
   computed: {
     likeNumber () {
       let num = parseInt(this.itemData.like_num)
