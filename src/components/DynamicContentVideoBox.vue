@@ -1,13 +1,13 @@
 //动态固底交互
 <template>
   <div class="content-video-box column" >
-    <div class="video-content" :style="`background-image:url(${dynamic.linkInfo.cover})`" @click.stop="jumpVideo">
-      <div class="video-content-button">
-
+    <div class="video-content" :style="`background-image:url(${dynamic.linkInfo.originalCover})`" @click.stop="jumpVideo">
+      <div class="video-content-button column center">
+          <i class='iconfont icon-play'></i>
       </div>
-      <div class="video-content-duration">
+      <!-- <div class="video-content-duration">
         02:38
-      </div>
+      </div> -->
     </div>
     <a class="video-info column" :href="dynamic.linkInfo.url">
       <div class="title">{{dynamic.linkInfo.title}}</div>
@@ -57,6 +57,11 @@ export default {
   bottom: 0;
   left: 0;
   right: 0;
+  justify-content:center;
+}
+.icon-play {
+  color: #ffffff;
+  font-size: 36px;
 }
 .video-content-duration {
   position: absolute;
