@@ -394,6 +394,7 @@ export default {
     },
     initMeScroll (idx) {
       let _down = Object.assign({}, mescrollOptions.get(94, 198).down, {
+        isLock: true,
         auto: true,
         autoShowLoading: false,
         callback: () => this.onPullingDown(idx)

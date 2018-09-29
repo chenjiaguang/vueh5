@@ -31,10 +31,10 @@
               <div class="pay-way-item clearfix" @click="changePayWay(2)" v-if="payWay.toString() === '2'"><i class="iconfont icon-zhifubaozhifu fl" style="color: #00a0e8;"></i>支付宝支付<i class="iconfont fr" :class="{'icon-gou': payWay.toString() === '2', 'icon-quan': payWay.toString() === '1'}"></i></div>
             </div>
           </div>
-          <div class="agreement-box clearfix" @click.stop="changeAgreement">
+          <!-- <div class="agreement-box clearfix" @click.stop="changeAgreement">
             <i class="iconfont fl" style="width: 4.95%" :class="{'icon-gou': agreement, 'icon-quan': !agreement}"></i>
             <div class="fl" style="width: 95.05%">我同意<span @click.stop="goAgreement" style="color: #1EB0FD">《范团活动参与协议》</span>并已确认活动真实性，同意支付 报名费用。</div>
-          </div>
+          </div> -->
         </div>
       </div>
     </div>
