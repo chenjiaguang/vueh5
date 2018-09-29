@@ -2,11 +2,11 @@
   <div class="video-page" @click.stop="toggleShowButtons" @touchmove.prevent>
     <video playsinline id="fantuan_video" class="my-video video-js vjs-default-skin" controls preload="none" poster="http://vjs.zencdn.net/v/oceans.png">
     </video>
-    <div v-show="pageData.show_buttons" class="video-mask-wrapper">
+    <div :style="{opacity: pageData.show_buttons ? 1 : 0, zIndex: 2}" class="video-mask-wrapper">
       <div @click.stop class="video-bar-wrapper">
-        <video-bar :min="0" :max="100" v-model="percent" :buffered="buffered" @setTime="setTime" @toggleFullScreen="toggleFullScreen" />
+        <video-bar ref="videoBar" :video="video" :min="pageData.min" :max="pageData.max" v-model="pageData.percent" :buffered="buffered" @setTime="setTime" @toggleFullScreen="toggleFullScreen" />
       </div>
-      <div @click.stop class="video-title">papi酱的周一放送——做人难，做女人难，在夏天做女人才更papi酱的周一放送——做人难，做女人难，在夏天做女人难！做女人难，在夏天做女人才更难！做</div>
+      <div @click.stop class="video-title">{{'paused' + pageData.paused + 'ended' + pageData.ended}}papi酱的周一放送——做人难，做女人难，在夏天做女人才更papi酱的周一放送——做人难，做女人难，在夏天做女人难！做女人难，在夏天做女人才更难！做</div>
       <div @click.stop class="comment-and-like">
         <div class="comment-and-like-item" @click.stop="changeLike" :style="{paddingLeft: 0, color: pageData.has_like ? '#FE5273' : '#fff'}">
           <div class="comment-and-like-icon-box">
@@ -26,11 +26,11 @@
           </div>
         </div>
       </div>
-      <div class="puase-and-play">
-        <i class="big-play-icon iconfont icon-puase" :class="{'icon-puase': !pageData.puase, 'icon-play': pageData.puase}"></i>
+      <div @click.stop="togglePlay" class="pause-and-play">
+        <i class="big-play-icon iconfont" :class="{'icon-pause': (!pageData.ended) && (!pageData.paused), 'icon-play': (!pageData.ended) && pageData.paused, 'icon-replay': pageData.ended && pageData.paused}"></i>
       </div>
     </div>
-    <div v-show="!pageData.show_buttons" class="video-mask-wrapper"></div>
+    <div v-show="!pageData.show_buttons" :style="{zIndex: 3}" class="video-mask-wrapper"></div>
   </div>
 </template>
 
@@ -42,22 +42,20 @@ export default {
   data () {
     return {
       video: null,
-      curremtTime: '01:34',
-      durationTime: '03:38',
-      percent: 0,
       buffered: [{
-        start: 20,
-        end: 30
-      }, {
-        start: 50,
-        end: 70
+        start: 0,
+        end: 0
       }],
       pageData: {
-        puase: false,
         show_buttons: true,
         has_like: true,
         like_num: 99,
-        comment_num: 8594
+        comment_num: 8594,
+        min: 0,
+        max: 0,
+        percent: 0,
+        paused: false,
+        ended: false
       }
     }
   },
@@ -73,11 +71,18 @@ export default {
     }
   },
   methods: {
+    togglePlay () {
+      if (this.video.paused()) {
+        this.video.play()
+      } else {
+        this.video.pause()
+      }
+    },
     toggleShowButtons () {
       this.pageData.show_buttons = !this.pageData.show_buttons
     },
-    setTime (e) {
-      console.log('setTime', e)
+    setTime (second) {
+      this.video.currentTime(second)
     },
     toggleFullScreen () {
       console.log('fullScreen')
@@ -97,8 +102,34 @@ export default {
       playbackRates: [0.5, 1, 1.5, 2]
     })
     this.video.src(
-      'https://ugcbsy.qq.com/uwMRJfz-r5jAYaQXGdGnC2_ppdhgmrDlPaRvaV7F2Ic/m0719eamxsy.mp4?sdtfrom=v3010&guid=c014f13a7b7bd9b15a8637c72e27b4fb&vkey=B3654C408E441FB0E07AE3C31FD868A3500D56C381AC75F23B18582C863861AE4F17CD2546908707F1CBF93CF22DEE1A254109D23EC2041CD4C4AD22EF653616543F80F8CC1673A780265F5924FCB68D2B5DA0733E264276E9E18F54EAC810B72933ADE3D453D6B8E31716056ABE3A517E9219943DBD2F0B&platform=2'
+      'http://111.29.8.19/vlive.qqvideo.tc.qq.com/AzYv1OJ50cnsnr9qFbShY4YhV2kIwGW3wxCQknVprn6c/v0200lc8tj6.p201.1.mp4?sdtfrom=&vkey=EBE54F2287216E43208A1AE3C96FFF171DAE72FDDD8CE06229D27AE5CAA9180BEB5A9103D3CA7D1116081BC306F4DB18FF503B09DD4A644E4244B92E3B58A9EEEA43139935EE9DD4FC9C478BF25DE04400B0A8E152A5A3AEC28B1A0603E5069293ED2C1632844601764DF3C1B3199226D7B9F8946DAAEE77&platform=10901&level=0&fmt=shd&locid=4b9c3447-cc08-4c44-8077-7ae857c375b8&size=5081865&ocid=204936108'
     )
+    this.video.on('durationchange', e => {
+      this.pageData.min = 0
+      this.pageData.max = this.video.duration()
+      this.buffered[0].start = this.video.buffered().start(0)
+      this.buffered[0].end = this.video.buffered().end(0)
+    })
+    this.video.on('timeupdate', e => {
+      this.pageData.percent = this.video.currentTime()
+    })
+    this.video.on('progress', e => {
+      this.buffered[0].start = this.video.buffered().start(0)
+      this.buffered[0].end = this.video.buffered().end(0)
+    })
+    this.video.on('play', e => {
+      console.log('play')
+      this.pageData.paused = false
+      this.pageData.ended = false
+    })
+    this.video.on('pause', e => {
+      this.pageData.paused = true
+    })
+    this.video.on('ended', e => {
+      console.log('ended')
+      this.pageData.ended = true
+    })
+    
     this.video.ready(() => {
       // this.video.getChild('ControlBar').removeChild('PlayToggle')
       this.video.getChild('ControlBar').removeChild('VolumePanel')
@@ -125,7 +156,6 @@ export default {
       }
       this.video.getChild('BigPlayButton').trigger('click')
       this.video.play()
-      console.log('this.video', this.video)
     })
   }
 }
@@ -232,6 +262,7 @@ export default {
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
+  transition: opacity 500ms;
 }
 .my-video {
   position: absolute;
@@ -361,7 +392,7 @@ export default {
 .icon-dislike_v_2_5{
   color: #fff;
 }
-.puase-and-play{
+.pause-and-play{
   width: 50PX;
   height: 50PX;
   background: rgba(0,0,0,0.5);
