@@ -1,13 +1,13 @@
 <template>
-  <div class="video-page" @touchmove.prevent>
+  <div class="video-page" @click.stop="toggleShowButtons" @touchmove.prevent>
     <video playsinline id="fantuan_video" class="my-video video-js vjs-default-skin" controls preload="none" poster="http://vjs.zencdn.net/v/oceans.png">
     </video>
-    <div class="video-mask-wrapper">
-      <div class="video-bar-wrapper">
+    <div v-show="pageData.show_buttons" class="video-mask-wrapper">
+      <div @click.stop class="video-bar-wrapper">
         <video-bar :min="0" :max="100" v-model="percent" :buffered="buffered" @setTime="setTime" @toggleFullScreen="toggleFullScreen" />
       </div>
-      <div class="video-title">papi酱的周一放送——做人难，做女人难，在夏天做女人才更papi酱的周一放送——做人难，做女人难，在夏天做女人难！做女人难，在夏天做女人才更难！做</div>
-      <div class="comment-and-like">
+      <div @click.stop class="video-title">papi酱的周一放送——做人难，做女人难，在夏天做女人才更papi酱的周一放送——做人难，做女人难，在夏天做女人难！做女人难，在夏天做女人才更难！做</div>
+      <div @click.stop class="comment-and-like">
         <div class="comment-and-like-item" @click.stop="changeLike" :style="{paddingLeft: 0, color: pageData.has_like ? '#FE5273' : '#fff'}">
           <div class="comment-and-like-icon-box">
             <transition name="fade">
@@ -26,7 +26,11 @@
           </div>
         </div>
       </div>
+      <div class="puase-and-play">
+        <i class="big-play-icon iconfont icon-puase" :class="{'icon-puase': !pageData.puase, 'icon-play': pageData.puase}"></i>
+      </div>
     </div>
+    <div v-show="!pageData.show_buttons" class="video-mask-wrapper"></div>
   </div>
 </template>
 
@@ -49,6 +53,8 @@ export default {
         end: 70
       }],
       pageData: {
+        puase: false,
+        show_buttons: true,
         has_like: true,
         like_num: 99,
         comment_num: 8594
@@ -67,8 +73,11 @@ export default {
     }
   },
   methods: {
-    setTime () {
-      console.log('setTime')
+    toggleShowButtons () {
+      this.pageData.show_buttons = !this.pageData.show_buttons
+    },
+    setTime (e) {
+      console.log('setTime', e)
     },
     toggleFullScreen () {
       console.log('fullScreen')
@@ -115,10 +124,8 @@ export default {
         console.log('onclick')
       }
       this.video.getChild('BigPlayButton').trigger('click')
-      // vjs-big-play-button
-      // vjs-control-bar
-
       this.video.play()
+      console.log('this.video', this.video)
     })
   }
 }
@@ -267,10 +274,26 @@ export default {
   margin-right: 30px;
 }
 
-// bar样式
+// 视频上覆盖的mask层样式
 .video-bar-wrapper{
   padding: 0 4%;
-  margin-top: 200px;
+}
+@media all and (orientation : landscape){
+  body .video-bar-wrapper{
+    height: 65PX;
+    display: flex;
+    align-self: stretch;
+    align-items: center;
+    background: linear-gradient(rgba(12, 12, 12, 0), rgba(0, 0, 0, 1));
+  }
+  body .video-title, body .comment-and-like{
+    display: none;
+  }
+}
+@media all and (orientation : portrait){
+  .video-bar-wrapper{
+    height: 20PX;
+  }
 }
 .video-title{
   position: relative;
@@ -338,6 +361,25 @@ export default {
 .icon-dislike_v_2_5{
   color: #fff;
 }
+.puase-and-play{
+  width: 50PX;
+  height: 50PX;
+  background: rgba(0,0,0,0.5);
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+.big-play-icon{
+  font-size: 20PX;
+  line-height: 30PX;
+  color: #fff;
+}
+
 .fade-enter-active, .fade-leave-active {
   transition: all 300ms;
 }

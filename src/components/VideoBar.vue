@@ -30,6 +30,7 @@ export default{
   },
   methods: {
     secToTime (second) {
+      this.$emit('setTime', 88)
       let t
       if (second > -1) {
         let hour = Math.floor(second / 3600)
@@ -149,6 +150,7 @@ export default{
   height: 20PX;
   display: flex;
   align-items: center;
+  flex: 1;
 }
   .slider{position:relative;flex:1;height:2PX;background:#B7B7B7;border-radius:1.5PX;cursor:pointer;overflow:visible}
   .buffered {
