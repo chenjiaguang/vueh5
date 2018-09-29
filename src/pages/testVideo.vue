@@ -26,38 +26,51 @@ export default {
       nativeControlsForTouch: false,
       playbackRates: [0.5, 1, 1.5, 2]
     })
+    // 设置视频
     this.video.src(
-      'http://baiducdnct.inter.iqiyi.com/videos/v0/20180923/88/af/b0be1e9eaf5d77682b8ce0dbd48577a9.mp4?key=06830ea559949cbcccb85a53fccb46c53&dis_k=5619d41093b46fad9e9525f04ec60362&dis_t=1538126108&dis_dz=CT-JiangSu&dis_st=44&src=iqiyi.com&uuid=a0a0c3c-5badf11c-1bb&m=v&qd_k=20c23a14b3c07f59bbc625216dab4b00&sgti=13_a4d098c2946e11e8a837a81e8486917c_1538126108503&qd_ip=dde6a711&qd_p=dde6a711&dfp=&qd_src=02020031010000000000&ssl=&ip=221.230.167.17&qd_vip=0&dis_src=vrs&qd_uid=0&qdv=1&qd_tm=1538126108685'
+      'https://vjs.zencdn.net/v/oceans.mp4'
     )
+    // 设置封面
+    // this.video.poster('http://example.com/myImage.jpg')
+    // 当前是否暂停
+    // console.log(this.video.paused())
+    // 视频播放
+    // this.video.play()
+    // 视频暂停
+    // this.video.pause()
+    // 设置当前时间
+    // this.video.currentTime(30)
     this.video.ready(() => {
-      // this.video.getChild('ControlBar').removeChild('PlayToggle')
-      this.video.getChild('ControlBar').removeChild('VolumePanel')
-      this.video.getChild('ControlBar').removeChild('PlaybackRateMenuButton')
-      this.video.getChild('ControlBar').removeChild('RemainingTimeDisplay')
-      // this.video.getChild('ControlBar').getChild('CurrentTimeDisplay')
-      this.video
-        .getChild('ControlBar')
-        .addChild(
-          this.video.getChild('ControlBar').getChild('DurationDisplay')
-        )
-      this.video
-        .getChild('ControlBar')
-        .addChild(
-          this.video.getChild('ControlBar').getChild('FullscreenToggle')
-        )
-
-      this.video.getChild('BigPlayButton').addClass('vjs-control-bar')
-      this.video.getChild('BigPlayButton').on('click', () => {
-        console.log('onclick')
-      })
-      this.video.getChild('BigPlayButton').el().onclick = () => {
-        console.log('onclick')
-      }
-      this.video.getChild('BigPlayButton').trigger('click')
-      // vjs-big-play-button
-      // vjs-control-bar
-
       this.video.play()
+      this.video.on('timeupdate', e => {
+        // console.log('播放进度更新', this.video.currentTime())
+      })
+      this.video.on('progress', e => {
+        // console.log('下载进度更新')
+        // console.log('buffered_start', this.video.buffered().start(0))
+        // console.log('buffered_end', this.video.buffered().end(0))
+      })
+      this.video.on('ended', e => {
+        console.log('播放完毕')
+      })
+      this.video.on('play', e => {
+        console.log('播放')
+      })
+      this.video.on('pause', e => {
+        console.log('暂停')
+      })
+      this.video.on('durationchange', e => {
+        console.log('总时长', this.video.duration())
+      })
+      this.video.on('error', e => {
+        console.log('播放出错')
+      })
+      this.video.on('waiting', e => {
+        console.log('缓冲')
+      })
+      this.video.on('canplay', e => {
+        console.log('可以播放（缓冲结束）')
+      })
     })
   }
 }
