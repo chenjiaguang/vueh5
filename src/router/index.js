@@ -21,7 +21,7 @@ const DynamicSendComment = resolve => require(['@/pages/dynamic/sendComment'], r
 const TopicDetail = resolve => require(['@/pages/topic/detail'], resolve)
 const SMSCode = resolve => require(['@/pages/smsCode'], resolve)
 const WeixinLoginJump = resolve => require(['@/pages/weixinLoginJump'], resolve)
-const PromotionIndex = resolve => require(['@/pages/notFoundPage'], resolve)
+const PromotionIndex = resolve => require(['@/pages/promotion/index'], resolve)
 const NewsDetail = resolve => require(['@/pages/news/articleDetail'], resolve)
 const VideoMedia = resolve => require(['@/pages/media/video'], resolve)
 // import NotFoundPage from '@/pages/notFoundPage'

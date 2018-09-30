@@ -2,11 +2,11 @@
   <div class="video-page" @click.stop="toggleShowButtons" @touchmove.prevent>
     <video playsinline id="fantuan_video" class="my-video video-js vjs-default-skin" controls preload="none" poster="http://vjs.zencdn.net/v/oceans.png">
     </video>
-    <div :style="{opacity: pageData.show_buttons ? 1 : 0, zIndex: 2}" class="video-mask-wrapper">
+    <div :style="{opacity: pageData.show_buttons ? 1 : 0, zIndex: 2, backgroundColor: (pageData.ended && pageData.paused) ? 'rgba(0,0,0,0.5)' : 'rgba(0,0,0,0)'}" class="video-mask-wrapper">
       <div @click.stop class="video-bar-wrapper">
         <video-bar ref="videoBar" :video="video" :min="pageData.min" :max="pageData.max" v-model="pageData.percent" :buffered="buffered" @setTime="setTime" @toggleFullScreen="toggleFullScreen" />
       </div>
-      <div @click.stop class="video-title">{{'paused' + pageData.paused + 'ended' + pageData.ended}}papi酱的周一放送——做人难，做女人难，在夏天做女人才更papi酱的周一放送——做人难，做女人难，在夏天做女人难！做女人难，在夏天做女人才更难！做</div>
+      <div @click.stop class="video-title">papi酱的周一放送——做人难，做女人难，在夏天做女人才更papi酱的周一放送——做人难，做女人难，在夏天做女人难！做女人难，在夏天做女人才更难！做</div>
       <div @click.stop class="comment-and-like">
         <div class="comment-and-like-item" @click.stop="changeLike" :style="{paddingLeft: 0, color: pageData.has_like ? '#FE5273' : '#fff'}">
           <div class="comment-and-like-icon-box">
@@ -26,9 +26,16 @@
           </div>
         </div>
       </div>
-      <div @click.stop="togglePlay" class="pause-and-play">
+      <div v-show="!(pageData.ended && pageData.paused)" @click.stop="togglePlay" class="pause-and-play">
         <i class="big-play-icon iconfont" :class="{'icon-pause': (!pageData.ended) && (!pageData.paused), 'icon-play': (!pageData.ended) && pageData.paused, 'icon-replay': pageData.ended && pageData.paused}"></i>
       </div>
+      <div v-show="pageData.ended && pageData.paused" @click.stop="replay" class="replay-btn column">
+        <i class="big-replay-icon iconfont icon-replay"></i>
+        <div class="big-replay-text">重新播放</div>
+      </div>
+      <!-- <div class="loading-box">
+        <i class="big-play-icon iconfont" :class="{'icon-pause': (!pageData.ended) && (!pageData.paused), 'icon-play': (!pageData.ended) && pageData.paused, 'icon-replay': pageData.ended && pageData.paused}"></i>
+      </div> -->
     </div>
     <div v-show="!pageData.show_buttons" :style="{zIndex: 3}" class="video-mask-wrapper"></div>
   </div>
@@ -71,6 +78,10 @@ export default {
     }
   },
   methods: {
+    replay () {
+      this.pageData.percent = 0
+      this.video.play()
+    },
     togglePlay () {
       if (this.video.paused()) {
         this.video.play()
@@ -102,7 +113,7 @@ export default {
       playbackRates: [0.5, 1, 1.5, 2]
     })
     this.video.src(
-      'http://111.29.8.19/vlive.qqvideo.tc.qq.com/AzYv1OJ50cnsnr9qFbShY4YhV2kIwGW3wxCQknVprn6c/v0200lc8tj6.p201.1.mp4?sdtfrom=&vkey=EBE54F2287216E43208A1AE3C96FFF171DAE72FDDD8CE06229D27AE5CAA9180BEB5A9103D3CA7D1116081BC306F4DB18FF503B09DD4A644E4244B92E3B58A9EEEA43139935EE9DD4FC9C478BF25DE04400B0A8E152A5A3AEC28B1A0603E5069293ED2C1632844601764DF3C1B3199226D7B9F8946DAAEE77&platform=10901&level=0&fmt=shd&locid=4b9c3447-cc08-4c44-8077-7ae857c375b8&size=5081865&ocid=204936108'
+      'https://ugcws.video.gtimg.com/uwMRJfz-r5jAYaQXGdGnC2_ppdhgmrDlPaRvaV7F2Ic/m0719eamxsy.mp4?sdtfrom=v3010&guid=c014f13a7b7bd9b15a8637c72e27b4fb&vkey=80283D6A38D95A4A1AE1B8B6A82A74EC64EB5A29C7349FC030BF13ACC21B61281D734E8BAC103BE5429FA2B9ED120D43B593BAC78068A84655E3857DA29ECA50F9B235E99A4E745FDAEE88E8CE847361E2ACA9C9AAD173BCD8F99DD718832BC36DAF0C892AE199CB062E890DB4EDB4395DF2B639A14C7386&platform=2'
     )
     this.video.on('durationchange', e => {
       this.pageData.min = 0
@@ -129,7 +140,12 @@ export default {
       console.log('ended')
       this.pageData.ended = true
     })
-    
+    this.video.on('waiting', () => {
+      console.log('缓冲中')
+    })
+    // 隐藏默认缓冲中的样式
+    console.log('LoadingSpinner', this.video.getChild('LoadingSpinner'))
+
     this.video.ready(() => {
       // this.video.getChild('ControlBar').removeChild('PlayToggle')
       this.video.getChild('ControlBar').removeChild('VolumePanel')
@@ -405,12 +421,34 @@ export default {
   top: 50%;
   transform: translate(-50%, -50%);
 }
+.replay-btn{
+  height: 50PX;
+  background: transparent;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  margin-top: 17PX;
+  transform: translate(-50%, -50%);
+  box-sizing: content-box;
+}
 .big-play-icon{
   font-size: 20PX;
   line-height: 30PX;
   color: #fff;
 }
-
+.big-replay-icon{
+  font-size: 40PX;
+  line-height: 44PX;
+  color: #fff;
+}
+.big-replay-text{
+  font-size: 14PX;
+  line-height: 34PX;
+  color: #fff;
+}
 .fade-enter-active, .fade-leave-active {
   transition: all 300ms;
 }
