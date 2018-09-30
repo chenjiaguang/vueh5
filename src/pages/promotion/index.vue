@@ -40,7 +40,8 @@ export default {
     return {
       btnColor: '#6273F7',
       showWeixinTip: false,
-      fingerprint: null
+      fingerprint: null,
+      timer: null
     }
   },
   components: { Weixin },
@@ -100,19 +101,27 @@ export default {
         this.showHideTip()
       } else if (browserInfo.isAndroid) { // android
         // window.location.href = 'http://a.app.qq.com/o/simple.jsp?pkgname=com.wetime.fanc'
-        this.$ajax('/jv/version/getversion').then(res => { // 获取资源链接
-          if (res && !res.error && res.data) { // 成功获取数据
-            this.addDownload()
-            window.location.href = res.data.version.apklink
-          } else {
+        window.location.href = 'launchapp://myhost/open'
+        clearTimeout(this.timer)
+        this.timer = setTimeout(() => {
+          this.$ajax('/jv/version/getversion').then(res => { // 获取资源链接
+            if (res && !res.error && res.data) { // 成功获取数据
+              this.addDownload()
+              window.location.href = res.data.version.apklink
+            } else {
+              this.$toast('获取资源失败')
+            }
+          }).catch(err => {
             this.$toast('获取资源失败')
-          }
-        }).catch(err => {
-          this.$toast('获取资源失败')
-        })
+          })
+        }, 500)
       } else if (browserInfo.isIphone) { // iphone
-        this.addDownload()
-        window.location.href = 'https://itunes.apple.com/cn/app/%E8%8C%83%E5%9B%A2/id1278226297?mt=8'
+        window.location.href = 'fantuanc://'
+        clearTimeout(this.timer)
+        this.timer = setTimeout(() => {
+          this.addDownload()
+          window.location.href = 'https://itunes.apple.com/cn/app/%E8%8C%83%E5%9B%A2/id1278226297?mt=8'
+        }, 500)
       }
     },
     showHideTip () {
