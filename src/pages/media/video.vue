@@ -1,8 +1,8 @@
 <template>
-  <div class="video-page" @click.stop="toggleShowButtons" @touchmove.prevent>
+  <div class="video-page" ref="videoPage" @click.stop="toggleShowButtons" @touchmove.prevent>
     <video playsinline id="fantuan_video" class="my-video video-js vjs-default-skin" controls preload="none" poster="http://vjs.zencdn.net/v/oceans.png">
     </video>
-    <div :style="{opacity: pageData.show_buttons ? 1 : 0, zIndex: 2, backgroundColor: (pageData.ended && pageData.paused) ? 'rgba(0,0,0,0.5)' : 'rgba(0,0,0,0)'}" class="video-mask-wrapper">
+    <div :style="{opacity: (!pageData.show_error && pageData.show_buttons) ? 1 : 0, zIndex: 2, backgroundColor: (pageData.ended && pageData.paused) ? 'rgba(0,0,0,0.5)' : 'rgba(0,0,0,0)'}" class="video-mask-wrapper">
       <div @click.stop class="video-bar-wrapper">
         <video-bar ref="videoBar" :video="video" :min="pageData.min" :max="pageData.max" v-model="pageData.percent" :buffered="buffered" @setTime="setTime" @toggleFullScreen="toggleFullScreen" />
       </div>
@@ -35,10 +35,12 @@
       </div>
       <div v-show="pageData.waiting" class="loading-box" :style="{backgroundImage: 'url(' + $assetsPublicPath + '/cwebassets/image/video_waiting.png)'}"></div>
     </div>
-    <div v-show="!pageData.show_buttons" :style="{zIndex: 3}" class="video-mask-wrapper"></div>
+    <div v-show="!pageData.show_buttons && !pageData.show_error" :style="{zIndex: 3}" class="video-mask-wrapper"></div>
     <div v-if="pageData.show_error" :style="{zIndex: 4}" class="video-mask-wrapper error">
-      <div class="error-text">视频链接已失效</div>
-      <div class="error-back-btn">返回</div>
+      <div class="error-content">
+        <div class="error-text">视频链接已失效</div>
+        <div class="error-back-btn" @click.stop="$router.go(-1)">返回</div>
+      </div>
     </div>
   </div>
 </template>
@@ -50,6 +52,7 @@ import VideoBar from '@/components/VideoBar'
 export default {
   data () {
     return {
+      timer: null,
       video: null,
       buffered: [{
         start: 0,
@@ -63,7 +66,7 @@ export default {
         min: 0,
         max: 0,
         percent: 0,
-        paused: false,
+        paused: true,
         ended: false,
         waiting: false,
         show_error: false
@@ -79,6 +82,18 @@ export default {
     commentNumber () {
       let num = parseInt(this.pageData.comment_num)
       return num > 999 ? '999+' : num
+    }
+  },
+  watch: {
+    'pageData.show_buttons' (val, oldVal) {
+      if (val) {
+        clearTimeout(this.timer)
+        this.timer = setTimeout(() => {
+          this.pageData.show_buttons = false
+        }, 3000)
+      } else {
+        clearTimeout(this.timer)
+      }
     }
   },
   methods: {
@@ -104,10 +119,17 @@ export default {
     },
     changeLike () {
       this.pageData.has_like = !this.pageData.has_like
+    },
+    resizeVideo () {
+      const _page_size = this.$refs['videoPage'].getBoundingClientRect()
+      console.log('resizeVideo', _page_size)
+      this.video.width(_page_size.width)
+      this.video.height(_page_size.height)
     }
   },
   mounted () {
     this.video = videojs('fantuan_video', {
+      autoplay: 'muted',
       muted: true,
       controls: false,
       loop: false,
@@ -116,19 +138,23 @@ export default {
       nativeControlsForTouch: false,
       playbackRates: [0.5, 1, 1.5, 2]
     })
+    // this.video.poster('http://img4.imgtn.bdimg.com/it/u=4228166401,1959572317&fm=27&gp=0.jpg')
     this.video.src(
-      'https://lmsjy.qq.com/usdfsf7b7bd9b15a8637c72e27b4fb&vkey=0208C9AD3644D667BA2919468028040329954C9A198D7380B3435882FEB623BC2B40DEEBD831CA1485CF184DB850B76E8E7B1F3B924D53D715140B6A638A88DE42C0B436C0DEE4BECE5B5E83E4696C0B135885320614420F06A10F0BF9663F555147BAFF0916AC4A03178996CD9A3686E52DCCC61D7F0D78&platform=2'
+      'https://lmydzd.qq.com/uwMRJfz-r5jAYaQXGdGnC2_ppdhgmrDlPaRvaV7F2Ic/m0027yvvett.mp4?sdtfrom=v3010&guid=c014f13a7b7bd9b15a8637c72e27b4fb&vkey=57B74D75028D600639FEF9715A5F1E949E97AB9F4EC75FB560A710155D28C89D2611AC3E836904E94F38A4FF0A9352D0D959A4509AD8ACC00B7E533819368B7202A920A94D65C8CE8ACB6F015E599B82D2D4ECD1611BEC09F0CE1953EED5E08A5AC1601B37EC6AC54A0078E697BABC0452FE14FCC6EE14E0&platform=2'
     )
-    this.video.on('durationchange', e => {
+    this.video.on('durationchange', e => { // 播放长度更新
       this.pageData.min = 0
       this.pageData.max = this.video.duration()
       this.buffered[0].start = this.video.buffered().start(0)
       this.buffered[0].end = this.video.buffered().end(0)
     })
-    this.video.on('timeupdate', e => {
+    // this.video.on('volumechange', () => {
+    //   this.video.muted(false)
+    // })
+    this.video.on('timeupdate', e => { // 播放进度更新
       this.pageData.percent = this.video.currentTime()
     })
-    this.video.on('progress', e => {
+    this.video.on('progress', e => { // 缓冲加载数据成功
       let len = this.video.buffered().length
       let _buffered = []
       for (let i = 0; i < len; i++) {
@@ -136,59 +162,41 @@ export default {
       }
       this.buffered = _buffered
     })
-    this.video.on('play', e => {
+    this.video.on('play', e => { // 播放
       console.log('play')
       this.pageData.paused = false
       this.pageData.ended = false
     })
-    this.video.on('pause', e => {
+    this.video.on('pause', e => { // 暂停
       this.pageData.paused = true
     })
-    this.video.on('ended', e => {
-      console.log('ended')
+    this.video.on('ended', e => { // 播放完毕
       this.pageData.ended = true
     })
-    this.video.on('waiting', () => {
-      console.log('缓冲中')
+    this.video.on('waiting', () => { // 正在缓冲
       this.pageData.waiting = true
     })
-    this.video.on('canplay', () => {
+    this.video.on('canplay', () => { // 可播放
       this.pageData.waiting = false
     })
+    this.video.on('firstplay', () => { // 可播放
+      console.log('firstplay')
+    })
+    this.video.on('volumechange', () => {
+      console.log('volumechange')
+    })
+    // window.addEventListener('resize', this.resizeVideo, false)
     this.video.on('error', e => { // 播放出错
-      console.log('播放出错')
+      console.log('error')
       this.pageData.show_error = true
-      console.log(444, this.pageData.show_error)
     })
     // 隐藏默认缓冲中的样式
     this.video.getChild('LoadingSpinner').hide()
 
     this.video.ready(() => {
-      // this.video.getChild('ControlBar').removeChild('PlayToggle')
-      this.video.getChild('ControlBar').removeChild('VolumePanel')
-      this.video.getChild('ControlBar').removeChild('PlaybackRateMenuButton')
-      this.video.getChild('ControlBar').removeChild('RemainingTimeDisplay')
-      // this.video.getChild('ControlBar').getChild('CurrentTimeDisplay')
-      this.video
-        .getChild('ControlBar')
-        .addChild(
-          this.video.getChild('ControlBar').getChild('DurationDisplay')
-        )
-      this.video
-        .getChild('ControlBar')
-        .addChild(
-          this.video.getChild('ControlBar').getChild('FullscreenToggle')
-        )
-
-      this.video.getChild('BigPlayButton').addClass('vjs-control-bar')
-      this.video.getChild('BigPlayButton').on('click', () => {
-        console.log('onclick')
-      })
-      this.video.getChild('BigPlayButton').el().onclick = () => {
-        console.log('onclick')
-      }
-      this.video.getChild('BigPlayButton').trigger('click')
-      this.video.play()
+      console.log('ready')
+      // this.video.requestFullscreen()
+      // this.video.play()
     })
   }
 }
@@ -301,15 +309,19 @@ export default {
   transition: opacity 500ms;
 }
 .my-video {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  margin: auto;
-  width: auto;
-  height: auto;
-  z-index: 1;
+  // position: absolute;
+  // top: 0;
+  // left: 0;
+  // right: 0;
+  // bottom: 0;
+  // margin: auto;
+  // width: auto;
+  // height: auto;
+  // z-index: 1;
+  // max-width: 100%;
+  // max-height: 100%;
+  width: 100%;
+  height: 100%;
 }
 .my-control-bar {
   position: absolute;
@@ -491,8 +503,12 @@ export default {
   }
 }
 .video-mask-wrapper.error{
-  justify-content: center;
-  background-color: rgba(0,0,0,0.5);
+  background-color: rgba(0,0,0,1);
+}
+.error-content{
+  position: absolute;
+  width: 100%;
+  top: 17%;
 }
 .error-text{
   font-size: 14PX;

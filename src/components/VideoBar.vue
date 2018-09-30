@@ -167,7 +167,7 @@ export default{
       if (this.slider) {
         return this.slider.offsetWidth * this.scale - this.thunk.offsetWidth / 2  + 'px'
       } else {
-        return 0 + 'px'
+        return -12.5 + 'px'
       }
     }
   }
@@ -189,7 +189,7 @@ export default{
     height: 100%;
   }
   .slider .process{position:absolute;left:0;top:0;width:100%;height:100%;border-radius:1.5PX 0 0 1.5PX;background:#1EB0FD;/*transition:width 250ms linear;*/}
-  .slider .thunk{position:absolute;left:0;top:-11PX;width:25PX;height:25PX;display:flex;justify-content: center;align-items: center;/*transition:left 250ms linear;*/}
+  .slider .thunk{position:absolute;left:-12.5PX;top:-11PX;width:25PX;height:25PX;display:flex;justify-content: center;align-items: center;/*transition:left 250ms linear;*/}
   .slider .block{width:60%;height:60%;border-radius:50%;box-shadow:0 0 2.5PX rgba(0,0,0,0.5);background:#fff;transition:.2s all}
   .start-time,.end-time{
     font-size: 12PX;
