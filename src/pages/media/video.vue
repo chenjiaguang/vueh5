@@ -36,7 +36,7 @@
       <div v-show="pageData.waiting" class="loading-box" :style="{backgroundImage: 'url(' + $assetsPublicPath + '/cwebassets/image/video_waiting.png)'}"></div>
     </div>
     <div v-show="!pageData.show_buttons" :style="{zIndex: 3}" class="video-mask-wrapper"></div>
-    <div v-if="pageData.show_error" :style="{zIndex: 4}" class="video-mask-wrapper">
+    <div v-if="pageData.show_error" :style="{zIndex: 4}" class="video-mask-wrapper error">
       <div class="error-text">视频链接已失效</div>
       <div class="error-back-btn">返回</div>
     </div>
@@ -158,6 +158,7 @@ export default {
     this.video.on('error', e => { // 播放出错
       console.log('播放出错')
       this.pageData.show_error = true
+      console.log(444, this.pageData.show_error)
     })
     // 隐藏默认缓冲中的样式
     this.video.getChild('LoadingSpinner').hide()
@@ -489,21 +490,27 @@ export default {
     transform: rotate(360deg)
   }
 }
+.video-mask-wrapper.error{
+  justify-content: center;
+  background-color: rgba(0,0,0,0.5);
+}
 .error-text{
   font-size: 14PX;
   line-height: 18PX;
+  padding: 0 4%;
   color: #fff;
+  text-align: center;
 }
 .error-back-btn{
   width: 90PX;
   height: 40PX;
-  font-size: 40PX;
+  font-size: 15PX;
   line-height: 40PX;
   color: #fff;
   background: #1EB0FD;
   text-align: center;
   border-radius: 3PX;
-  margin-top: 23PX;
+  margin: 23PX auto 0;
 }
 .fade-enter-active, .fade-leave-active {
   transition: all 300ms;
