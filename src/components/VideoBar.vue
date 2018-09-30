@@ -68,6 +68,9 @@ export default{
       this.per = Math.ceil((this.max - this.min) * scale + this.min)
       this.per = Math.max(this.per, this.min)
       this.per = Math.min(this.per, this.max)
+      if (this.per >= this.max) {
+        this.per = this.max - 1
+      }
       this.$emit('setTime', this.per)
       if (this.video.paused()) {
         this.video.play()
@@ -111,7 +114,9 @@ export default{
       _this.pressDown = true
       let width = parseInt(_this.width)
       let disX = e.touches[0].clientX
-      _this.video.pause()
+      if (!_this.video.paused()) {
+        _this.video.pause()
+      }
       document.ontouchmove = function (e) {
         // value, left, width
         // 当value变化的时候，会通过计算属性修改left，width
@@ -122,17 +127,24 @@ export default{
         _this.per = Math.ceil((_this.max - _this.min) * scale + _this.min)
         _this.per = Math.max(_this.per, _this.min)
         _this.per = Math.min(_this.per, _this.max)
+        if (_this.per >= _this.max) {
+          _this.per = _this.max - 1
+        }
         _this.$emit('setTime', _this.per)
       }
       document.ontouchend = function () {
         _this.pressDown = false
         document.ontouchmove = document.ontouchend = null
-        _this.video.play()
+        if (_this.video.paused()) {
+          _this.video.play()
+        }
       }
       document.ontouchcancel = function () {
         _this.pressDown = false
         document.ontouchmove = document.ontouchend = null
-        _this.video.play()
+        if (_this.video.paused()) {
+          _this.video.play()
+        }
       }
       return false
     }

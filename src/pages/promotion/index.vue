@@ -83,10 +83,19 @@ export default {
       }
       this.getFingerPrint(_fun)
     },
+    openFantuanC () {
+      let browserInfo = download.browserInfo()
+      if (browserInfo.isWeixin || browserInfo.isQqInstalled || browserInfo.isWeibo) { // 微信内置、qq内置、微博内置浏览器会警告用户，在此引导用户在其他浏览器中打开，此种情况不计算下载量
+        this.showHideTip()
+      } else if (browserInfo.isAndroid) { // android
+        window.location.href = 'launchapp://myhost/open'
+      } else if (browserInfo.isIphone) { // iphone
+        window.location.href = 'fantuanc://'
+      }
+    },
     downloadFantTuanC () { // 下载
       let browserInfo = download.browserInfo()
-      console.log('browserInfo', browserInfo)
-      if ((browserInfo.isWeixin || browserInfo.isQqInstalled || browserInfo.isWeibo) && browserInfo.isAndroid) { // 微信内置、qq内置、微博内置浏览器会警告用户，在此引导用户在其他浏览器中打开，此种情况不计算下载量(android)
+      if (browserInfo.isWeixin || browserInfo.isQqInstalled || browserInfo.isWeibo) { // 微信内置、qq内置、微博内置浏览器会警告用户，在此引导用户在其他浏览器中打开，此种情况不计算下载量
         // tip引导在其他浏览器中打开
         this.showHideTip()
       } else if (browserInfo.isAndroid) { // android
@@ -112,7 +121,8 @@ export default {
   },
   mounted () {
     this.addVisits()
-    download.click()
+    // download.click()
+    this.openFantuanC()
   }
 }
 </script>

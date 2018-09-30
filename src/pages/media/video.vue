@@ -26,18 +26,20 @@
           </div>
         </div>
       </div>
-      <div v-show="!(pageData.ended && pageData.paused)" @click.stop="togglePlay" class="pause-and-play">
+      <div v-show="!pageData.waiting && !(pageData.ended && pageData.paused)" @click.stop="togglePlay" class="pause-and-play">
         <i class="big-play-icon iconfont" :class="{'icon-pause': (!pageData.ended) && (!pageData.paused), 'icon-play': (!pageData.ended) && pageData.paused, 'icon-replay': pageData.ended && pageData.paused}"></i>
       </div>
-      <div v-show="pageData.ended && pageData.paused" @click.stop="replay" class="replay-btn column">
+      <div v-show="!pageData.waiting && pageData.ended && pageData.paused" @click.stop="replay" class="replay-btn column">
         <i class="big-replay-icon iconfont icon-replay"></i>
         <div class="big-replay-text">重新播放</div>
       </div>
-      <!-- <div class="loading-box">
-        <i class="big-play-icon iconfont" :class="{'icon-pause': (!pageData.ended) && (!pageData.paused), 'icon-play': (!pageData.ended) && pageData.paused, 'icon-replay': pageData.ended && pageData.paused}"></i>
-      </div> -->
+      <div v-show="pageData.waiting" class="loading-box" :style="{backgroundImage: 'url(' + $assetsPublicPath + '/cwebassets/image/video_waiting.png)'}"></div>
     </div>
     <div v-show="!pageData.show_buttons" :style="{zIndex: 3}" class="video-mask-wrapper"></div>
+    <div v-if="pageData.show_error" :style="{zIndex: 4}" class="video-mask-wrapper">
+      <div class="error-text">视频链接已失效</div>
+      <div class="error-back-btn">返回</div>
+    </div>
   </div>
 </template>
 
@@ -62,7 +64,9 @@ export default {
         max: 0,
         percent: 0,
         paused: false,
-        ended: false
+        ended: false,
+        waiting: false,
+        show_error: false
       }
     }
   },
@@ -113,7 +117,7 @@ export default {
       playbackRates: [0.5, 1, 1.5, 2]
     })
     this.video.src(
-      'https://ugcws.video.gtimg.com/uwMRJfz-r5jAYaQXGdGnC2_ppdhgmrDlPaRvaV7F2Ic/m0719eamxsy.mp4?sdtfrom=v3010&guid=c014f13a7b7bd9b15a8637c72e27b4fb&vkey=80283D6A38D95A4A1AE1B8B6A82A74EC64EB5A29C7349FC030BF13ACC21B61281D734E8BAC103BE5429FA2B9ED120D43B593BAC78068A84655E3857DA29ECA50F9B235E99A4E745FDAEE88E8CE847361E2ACA9C9AAD173BCD8F99DD718832BC36DAF0C892AE199CB062E890DB4EDB4395DF2B639A14C7386&platform=2'
+      'https://lmsjy.qq.com/usdfsf7b7bd9b15a8637c72e27b4fb&vkey=0208C9AD3644D667BA2919468028040329954C9A198D7380B3435882FEB623BC2B40DEEBD831CA1485CF184DB850B76E8E7B1F3B924D53D715140B6A638A88DE42C0B436C0DEE4BECE5B5E83E4696C0B135885320614420F06A10F0BF9663F555147BAFF0916AC4A03178996CD9A3686E52DCCC61D7F0D78&platform=2'
     )
     this.video.on('durationchange', e => {
       this.pageData.min = 0
@@ -125,8 +129,12 @@ export default {
       this.pageData.percent = this.video.currentTime()
     })
     this.video.on('progress', e => {
-      this.buffered[0].start = this.video.buffered().start(0)
-      this.buffered[0].end = this.video.buffered().end(0)
+      let len = this.video.buffered().length
+      let _buffered = []
+      for (let i = 0; i < len; i++) {
+        _buffered.push({start: this.video.buffered().start(i), end: this.video.buffered().end(i)})
+      }
+      this.buffered = _buffered
     })
     this.video.on('play', e => {
       console.log('play')
@@ -142,9 +150,17 @@ export default {
     })
     this.video.on('waiting', () => {
       console.log('缓冲中')
+      this.pageData.waiting = true
+    })
+    this.video.on('canplay', () => {
+      this.pageData.waiting = false
+    })
+    this.video.on('error', e => { // 播放出错
+      console.log('播放出错')
+      this.pageData.show_error = true
     })
     // 隐藏默认缓冲中的样式
-    console.log('LoadingSpinner', this.video.getChild('LoadingSpinner'))
+    this.video.getChild('LoadingSpinner').hide()
 
     this.video.ready(() => {
       // this.video.getChild('ControlBar').removeChild('PlayToggle')
@@ -194,6 +210,9 @@ export default {
 }
 .video-js .vjs-time-control {
   line-height: 40px;
+}
+.video-js .vjs-error-display {
+  display: none;
 }
 
 .video-js .vjs-big-play-button {
@@ -448,6 +467,43 @@ export default {
   font-size: 14PX;
   line-height: 34PX;
   color: #fff;
+}
+.loading-box{
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  width: 30PX;
+  height: 30PX;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  margin-top: -15PX;
+  margin-left: -15PX;
+  animation: linearRotate 1s linear infinite;
+}
+@keyframes linearRotate {
+  0% {
+    transform: rotate(0deg)
+  }
+  100% {
+    transform: rotate(360deg)
+  }
+}
+.error-text{
+  font-size: 14PX;
+  line-height: 18PX;
+  color: #fff;
+}
+.error-back-btn{
+  width: 90PX;
+  height: 40PX;
+  font-size: 40PX;
+  line-height: 40PX;
+  color: #fff;
+  background: #1EB0FD;
+  text-align: center;
+  border-radius: 3PX;
+  margin-top: 23PX;
 }
 .fade-enter-active, .fade-leave-active {
   transition: all 300ms;
