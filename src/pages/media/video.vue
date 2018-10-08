@@ -1,12 +1,11 @@
 <template>
-  <div class="video-page" ref="videoPage" @click.stop="toggleShowButtons" @touchmove.prevent>
-    <video playsinline id="fantuan_video" class="my-video video-js vjs-default-skin" controls preload="none" poster="http://vjs.zencdn.net/v/oceans.png">
-    </video>
+  <div class="video-page" ref="videoPage" @touchstart="pageTouchstart"  @touchmove.prevent @touchend="pageTouchend" @click.stop="toggleShowButtons">
+    <video playsinline id="fantuan_video" class="my-video video-js"></video>
     <div :style="{opacity: (!pageData.show_error && pageData.show_buttons) ? 1 : 0, zIndex: 2, backgroundColor: (pageData.ended && pageData.paused) ? 'rgba(0,0,0,0.5)' : 'rgba(0,0,0,0)'}" class="video-mask-wrapper">
       <div @click.stop class="video-bar-wrapper">
         <video-bar ref="videoBar" :video="video" :min="pageData.min" :max="pageData.max" v-model="pageData.percent" :buffered="buffered" @setTime="setTime" @toggleFullScreen="toggleFullScreen" />
       </div>
-      <div @click.stop class="video-title">papi酱的周一放送——做人难，做女人难，在夏天做女人才更papi酱的周一放送——做人难，做女人难，在夏天做女人难！做女人难，在夏天做女人才更难！做</div>
+      <div @click.stop class="video-title">{{pageData.title}}</div>
       <div @click.stop class="comment-and-like">
         <div class="comment-and-like-item" @click.stop="changeLike" :style="{paddingLeft: 0, color: pageData.has_like ? '#FE5273' : '#fff'}">
           <div class="comment-and-like-icon-box">
@@ -19,14 +18,14 @@
             <span>{{likeNumber || '赞'}}</span>
           </div>
         </div>
-        <div class="comment-and-like-item" style="padding-right: 0;">
+        <div class="comment-and-like-item" @click.stop="goComment" style="padding-right: 0;">
           <div class="comment-and-like-icon-box">
             <i class="iconfont icon-comment_icon comment-and-like-icon"></i>
             <span>{{commentNumber || '评论'}}</span>
           </div>
         </div>
       </div>
-      <div v-show="!pageData.waiting && !(pageData.ended && pageData.paused)" @click.stop="togglePlay" class="pause-and-play">
+      <div ref="bigPlayBtn" v-show="!pageData.waiting && !(pageData.ended && pageData.paused)" @click.stop="togglePlay" class="pause-and-play">
         <i class="big-play-icon iconfont" :class="{'icon-pause': (!pageData.ended) && (!pageData.paused), 'icon-play': (!pageData.ended) && pageData.paused, 'icon-replay': pageData.ended && pageData.paused}"></i>
       </div>
       <div v-show="!pageData.waiting && pageData.ended && pageData.paused" @click.stop="replay" class="replay-btn column">
@@ -46,9 +45,11 @@
 </template>
 
 <script>
+import utils from '@/lib/utils'
 import videojs from 'video.js'
 import 'video.js/dist/video-js.min.css'
 import VideoBar from '@/components/VideoBar'
+// from参数(1表示上个页面是列表页，2表示上个页面是详情页)
 export default {
   data () {
     return {
@@ -59,16 +60,18 @@ export default {
         end: 0
       }],
       pageData: {
+        first: true,
+        title: '',
         show_buttons: true,
-        has_like: true,
-        like_num: 99,
-        comment_num: 8594,
+        has_like: this.$route.query.has_like,
+        like_num: this.$route.query.like_num,
+        comment_num: this.$route.query.comment_num,
         min: 0,
         max: 0,
         percent: 0,
         paused: true,
         ended: false,
-        waiting: false,
+        waiting: true,
         show_error: false
       }
     }
@@ -97,6 +100,19 @@ export default {
     }
   },
   methods: {
+    pageTouchstart () {
+      if (this.pageData.show_buttons) {
+        clearTimeout(this.timer)
+      }
+    },
+    pageTouchend () {
+      if (this.pageData.show_buttons) {
+        clearTimeout(this.timer)
+        this.timer = setTimeout(() => {
+          this.pageData.show_buttons = false
+        }, 3000)
+      }
+    },
     replay () {
       this.pageData.percent = 0
       this.video.play()
@@ -117,87 +133,181 @@ export default {
     toggleFullScreen () {
       console.log('fullScreen')
     },
-    changeLike () {
-      this.pageData.has_like = !this.pageData.has_like
-    },
-    resizeVideo () {
-      const _page_size = this.$refs['videoPage'].getBoundingClientRect()
-      console.log('resizeVideo', _page_size)
-      this.video.width(_page_size.width)
-      this.video.height(_page_size.height)
-    }
-  },
-  mounted () {
-    this.video = videojs('fantuan_video', {
-      autoplay: 'muted',
-      muted: true,
-      controls: false,
-      loop: false,
-      fluid: false,
-      inactivityTimeout: 5000,
-      nativeControlsForTouch: false,
-      playbackRates: [0.5, 1, 1.5, 2]
-    })
-    // this.video.poster('http://img4.imgtn.bdimg.com/it/u=4228166401,1959572317&fm=27&gp=0.jpg')
-    this.video.src(
-      'https://lmydzd.qq.com/uwMRJfz-r5jAYaQXGdGnC2_ppdhgmrDlPaRvaV7F2Ic/m0027yvvett.mp4?sdtfrom=v3010&guid=c014f13a7b7bd9b15a8637c72e27b4fb&vkey=57B74D75028D600639FEF9715A5F1E949E97AB9F4EC75FB560A710155D28C89D2611AC3E836904E94F38A4FF0A9352D0D959A4509AD8ACC00B7E533819368B7202A920A94D65C8CE8ACB6F015E599B82D2D4ECD1611BEC09F0CE1953EED5E08A5AC1601B37EC6AC54A0078E697BABC0452FE14FCC6EE14E0&platform=2'
-    )
-    this.video.on('durationchange', e => { // 播放长度更新
-      this.pageData.min = 0
-      this.pageData.max = this.video.duration()
-      this.buffered[0].start = this.video.buffered().start(0)
-      this.buffered[0].end = this.video.buffered().end(0)
-    })
-    // this.video.on('volumechange', () => {
-    //   this.video.muted(false)
-    // })
-    this.video.on('timeupdate', e => { // 播放进度更新
-      this.pageData.percent = this.video.currentTime()
-    })
-    this.video.on('progress', e => { // 缓冲加载数据成功
+    showVideoBuffered () {
       let len = this.video.buffered().length
       let _buffered = []
       for (let i = 0; i < len; i++) {
         _buffered.push({start: this.video.buffered().start(i), end: this.video.buffered().end(i)})
       }
       this.buffered = _buffered
-    })
-    this.video.on('play', e => { // 播放
-      console.log('play')
-      this.pageData.paused = false
-      this.pageData.ended = false
-    })
-    this.video.on('pause', e => { // 暂停
-      this.pageData.paused = true
-    })
-    this.video.on('ended', e => { // 播放完毕
-      this.pageData.ended = true
-    })
-    this.video.on('waiting', () => { // 正在缓冲
-      this.pageData.waiting = true
-    })
-    this.video.on('canplay', () => { // 可播放
-      this.pageData.waiting = false
-    })
-    this.video.on('firstplay', () => { // 可播放
-      console.log('firstplay')
-    })
-    this.video.on('volumechange', () => {
-      console.log('volumechange')
-    })
-    // window.addEventListener('resize', this.resizeVideo, false)
-    this.video.on('error', e => { // 播放出错
-      console.log('error')
-      this.pageData.show_error = true
-    })
-    // 隐藏默认缓冲中的样式
-    this.video.getChild('LoadingSpinner').hide()
-
-    this.video.ready(() => {
-      console.log('ready')
-      // this.video.requestFullscreen()
-      // this.video.play()
-    })
+    },
+    getSecondFromDuration (duration) {
+      let timeArr = duration.split(':').reverse()
+      let seconds = 0
+      timeArr.forEach((item, idx) => {
+        if (idx === 0) {
+          seconds += parseInt(item)
+        } else if (idx === 1) {
+          seconds += parseInt(item) * 60
+        } else if (idx === 2) {
+          seconds += parseInt(item) * 3600
+        }
+      })
+      return seconds
+    },
+    goComment () {
+      if (this.$route.query.from === '2') {
+        this.$router.go(-1)
+      }
+    },
+    changeLike () {
+      if (!utils.checkLogin()) {
+        return false
+      }
+      const isLike = this.pageData.has_like
+      const likeNum = parseInt(this.pageData.like_num)
+      let rData = {
+        id: this.$route.query.dynamic_id,
+        like: !isLike,
+        type: 0
+      }
+      this.pageData.has_like = !isLike
+      this.pageData.like_num = likeNum + (isLike ? -1 : 1)
+      this.submitting = true
+      this.$ajax('/jv/qz/like', {data: rData}).then(res => {
+        if (!res || (res && Boolean(res.error))) { // 出错时重置点赞
+          this.pageData.has_like = isLike
+          this.pageData.like_num = likeNum
+          this.submitting = false
+        } else {
+          this.submitting = false
+        }
+      }).catch(err => {
+        this.pageData.has_like = isLike
+        this.pageData.like_num = likeNum
+        this.submitting = false
+      })
+    },
+    getVideoAddress () {
+      this.$ajax('/jv/anonymous/qz/linkanalysis/getVideoAddress', {data: {linkid: this.$route.query.video_id}}).then(res => {
+        if (res && !res.error && res.data && res.data.videoAddress) {
+          console.log('data', res.data)
+          this.pageData.title = res.data.title
+          this.initVideo(res.data.videoAddress, res.data.originalCover, res.data.duration)
+        } else {
+          this.pageData.show_error = true
+        }
+      }).catch(err => {
+        this.pageData.show_error = true
+      })
+    },
+    initVideo (url, poster, duration) {
+      this.video = videojs('fantuan_video', {
+        preload: 'metadata',
+        autoplay: false,
+        muted: false,
+        controls: false,
+        loop: false,
+        fluid: false,
+        inactivityTimeout: 5000,
+        nativeControlsForTouch: false,
+        playbackRates: [0.5, 1, 1.5, 2]
+      })
+      this.video.src(url)
+      // this.video.poster(this.$route.query.poster)
+      this.video.on('durationchange', e => { // 播放长度更新
+        this.pageData.min = 0
+        this.pageData.max = this.video.duration()
+        this.showVideoBuffered()
+      })
+      this.video.on('timeupdate', e => { // 播放进度更新
+        this.pageData.percent = this.video.currentTime()
+      })
+      this.video.on('progress', e => { // 缓冲加载数据成功
+        this.showVideoBuffered()
+      })
+      this.video.on('play', e => { // 播放
+        this.pageData.paused = false
+        this.pageData.ended = false
+      })
+      this.video.on('pause', e => { // 暂停
+        this.pageData.paused = true
+      })
+      this.video.on('ended', e => { // 播放完毕
+        this.pageData.ended = true
+      })
+      this.video.on('waiting', () => { // 正在缓冲
+        this.pageData.waiting = true
+      })
+      this.video.on('canplay', () => { // 可播放
+        console.log('canplay')
+        this.pageData.waiting = false
+        if (this.pageData.first) {
+          this.pageData.first = false
+          this.video.currentTime(parseInt(this.$route.query.current_time || 0))
+          this.video.play()
+        }
+      })
+      this.video.on('firstplay', () => { // 可播放
+        console.log('firstplay')
+      })
+      this.video.on('volumechange', () => {
+        console.log('volumechange')
+      })
+      this.video.on('error', e => { // 播放出错
+        console.log('error')
+        this.pageData.show_error = true
+      })
+      // 隐藏默认缓冲中的样式
+      this.video.getChild('LoadingSpinner').hide()
+      this.video.ready(() => {
+        console.log('this.video', this.video)
+        this.pageData.min = 0
+        this.pageData.max = this.getSecondFromDuration(duration)
+        this.pageData.waiting = false
+        this.pageData.percent = parseInt(this.$route.query.current_time || 0)
+        this.video.poster(poster)
+        // let current = parseInt(this.$route.query.current_time || 0)
+        // console.log('current', current)
+        // this.video.currentTime(current.toString())
+        // this.video.play()
+      })
+    }
+  },
+  mounted () {
+    this.getVideoAddress()
+  },
+  beforeDestroy () {
+    if (this.video && this.video.dispose) {
+      this.video.dispose()
+    }
+  },
+  beforeRouteLeave (to, from, next) {
+    from.params.videoPoint = this.video.currentTime()
+    next()
+    // if (to.name === 'Agreement' || to.name === 'SMSCode' || this.pass || this.exceed || !this.feeId) {
+    //   this.pass = false
+    //   if (window._alert_id) { // 如果有alert弹窗，则关闭弹窗
+    //     this.$modal.hideAlert(window._alert_id)
+    //   }
+    //   next()
+    // } else {
+    //   if (!this.showPrompt) {
+    //     this.showPrompt = true
+    //     this.$prompt.showPrompt({contentText: '离开后，您的订单将不再保留，确定要放弃订单？', leftText: '放弃订单', rightText: '继续支付'}, () => {
+    //       this.showPrompt = false
+    //     }, () => {
+    //       this.cancelOrder(() => {
+    //         this.showPrompt = false
+    //         this.pass = true
+    //         this.$router.go(-1)
+    //       })
+    //     })
+    //     next(false)
+    //   } else {
+    //     next(false)
+    //   }
+    // }
   }
 }
 </script>

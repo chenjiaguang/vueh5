@@ -17,7 +17,7 @@
 </template>
 <script>
 export default {
-  props: ['dynamic'],
+  props: ['dynamic', 'currentTime'],
   data () {
     return {}
   },
@@ -26,8 +26,8 @@ export default {
   methods: {
     jumpVideo () {
       this.$router.push({
-        name: 'Video',
-        query: { dynamic_id: this.dynamic.id, video: this.dynamic.linkInfo.url }
+        name: 'VideoMedia',
+        query: { dynamic_id: this.dynamic.id, video_id: this.dynamic.linkInfo.id, like_num: this.dynamic.like_num, comment_num: this.dynamic.comment_num, has_like: this.dynamic.has_like, current_time: this.currentTime, from: '2' }
       })
     }
   },

@@ -64,7 +64,7 @@
                 </div>
                 <div class="content-article-content">{{dynamic.linkInfo.title || dynamic.linkInfo.url}}</div>
               </a>
-              <DynamicContentVideoBox class="content-video-box" v-if="dynamic.linkInfo && dynamic.linkInfo.id && dynamic.linkInfo.type==1" :dynamic="dynamic"/>
+              <DynamicContentVideoBox class="content-video-box" v-if="dynamic.linkInfo && dynamic.linkInfo.id && dynamic.linkInfo.type==1" :dynamic="dynamic" :currentTime="videoPoint"/>
             </div>
 
             <div v-if="dynamic && (dynamic.actid || dynamic.location || dynamic.circle_name)" id="foot-container" class="column">
@@ -209,6 +209,7 @@ export default {
       this.$appCall('h5GoLongDynamic', this.$route.query.id)
     }
     return {
+      videoPoint: 0,
       mescroll: null, // mescroll实例对象
       dynamic: null,
       isLoad: false,
@@ -560,6 +561,13 @@ export default {
         placeholder
       })
     }
+  },
+  beforeRouteEnter (to, from, next) {
+    next(vm => {
+      if (from.name === 'VideoMedia' && from.params && from.params.videoPoint) {
+        vm.videoPoint = from.params.videoPoint
+      }
+    })
   }
 }
 </script>
