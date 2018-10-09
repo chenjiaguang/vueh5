@@ -33,7 +33,7 @@ export default {
   mounted () {
     /**
      * 分享打开计数功能 不带next 返回bool表示是否有路由更新
-     * type: 1：圈子 2：话题 3：短动态 4：长文 5：活动
+     * type: 1：群组 2：话题 3：短动态 4：长文 5：活动
      */
     if (
       this.$route.query.isShareOpen &&

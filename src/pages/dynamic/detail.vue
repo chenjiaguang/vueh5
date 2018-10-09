@@ -27,7 +27,7 @@
                 <!-- 右 -->
                 <div>
                   <transition name="fade-quick">
-                    <div class="follow-button" v-if="!dynamic.is_following&&!dynamic.is_owner"  @click="clickFollow(dynamic.uid)">+ 关注</div>
+                    <div class="follow-button" v-if="!dynamic.is_following&&!dynamic.is_owner"  @click="clickFollow(dynamic.uid)"><i class="iconfont follow-btn-icon icon-add"></i>关注</div>
                   </transition>
                 </div>
               </div>
@@ -491,7 +491,7 @@ export default {
             this.following = false
           }
         }).catch(err => {
-          console.log('加入圈子出错', err)
+          console.log('加入群组出错', err)
           this.following = false
         })
       }
@@ -506,7 +506,7 @@ export default {
         this.$toast('正在申请...')
         return false
       }
-      this.$prompt.showPrompt({contentText: '加入圈子才能进行更多操作哦~', leftText: '我再想想', rightText: _rightText}, () => {
+      this.$prompt.showPrompt({contentText: '加入群组才能进行更多操作哦~', leftText: '我再想想', rightText: _rightText}, () => {
         this.applyJoinCircle()
       }, () => {
         console.log('cancel')
@@ -625,14 +625,23 @@ export default {
   font-size: 24px;
 }
 .follow-button {
-  width: 98px;
-  height: 44px;
+  display: flex;
+  width: 128px;
+  height: 48px;
   text-align: center;
   font-size: 24px;
-  line-height: 44px;
+  line-height: 48px;
   color: #ffffff;
   background-color: #1eb0fd;
-  border-radius: 6px;
+  border-radius: 24px;
+  justify-content: center;
+}
+.follow-btn-icon{
+  font-size: 40px;
+  display: block;
+  transform: scale(0.5, 0.5);
+  margin-left: -10px;
+  margin-right: -4px;
 }
 .follow-cancel-button {
   width: 98px;

@@ -16,7 +16,7 @@
         </div>
       </edit-option>
       <edit-option :option="{leftIcon: 'activity_edit', title: activity.title}" v-if="activity"></edit-option>
-      <edit-option :option="{leftIcon: 'circle', title: '发布于圈子', rightText: circle.title}" v-if="circle">
+      <edit-option :option="{leftIcon: 'circle', title: '发布于群组', rightText: circle.title}" v-if="circle">
         <div class="topic-box clearfix" slot="extra">
           <div @click.stop="showAllwaysChecked = !showAllwaysChecked" class="check-sync fr">
             <i class="iconfont check-icon" :class="{'icon-checked': showAllwaysChecked, 'icon-uncheck': !showAllwaysChecked}"></i><span>同步到动态</span>

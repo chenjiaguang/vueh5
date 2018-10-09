@@ -21,7 +21,7 @@
       <div ref="innerWrapper" class="scroll-wrapper" :style="{height: $winHeight + 'px'}">
         <div @touchmove="bannerTouchMove" @touchstart="bannerTouchStart" @touchend="bannerTouchEnd" class="nav-scroll-list-wrap" ref="navWrapper" :style="{height: tabBarHeight + 'px'}" v-if="tabs && tabs.length > 1 && showTabbar">
           <cube-tab-bar v-model="selectedLabel" class="tab-box" @change="changeTabBar" :style="{height: tabBarHeight + 'px'}">
-            <cube-tab v-for="(item) in tabs" ref="tabItem" :label="item.title" :key="item.title">
+            <cube-tab v-for="(item) in tabs" class="tab-item" ref="tabItem" :label="item.title" :key="item.title">
             </cube-tab>
           </cube-tab-bar>
           <div class="tab-slider">
@@ -42,7 +42,7 @@
                     <dynamic-item v-if="index === 0" v-for="(item, idx) in tabs[index].data" :key="item.id" :itemData="item" :hideBlock="idx === tabs[index].data.length - 1" :router="$router" @changeLike="changeLike" />
                     <activity-item v-if="index === 1" v-for="(item, idx) in tabs[index].data" :key="item.id" :itemData="item" :hideBlock="idx === tabs[index].data.length - 1" />
                   </div>
-                  <div v-else-if="tabs[index].paging.is_end && tabs[index].data && tabs[index].data.length === 0" class="empty-box" :style="{minHeight: ($winHeight - ((tabs && tabs.length) > 1 ? tabBarHeight : 0)) - (circle.followed ? 0 : followBoxHeight) + 1 + 'px'}">{{circle.followed ? ('该圈子暂无' + index === 0 ? '动态' : '活动') : '加入圈子才能进行更多操作哦~'}}</div>
+                  <div v-else-if="tabs[index].paging.is_end && tabs[index].data && tabs[index].data.length === 0" class="empty-box" :style="{minHeight: ($winHeight - ((tabs && tabs.length) > 1 ? tabBarHeight : 0)) - (circle.followed ? 0 : followBoxHeight) + 1 + 'px'}">{{circle.followed ? ('该群组暂无' + index === 0 ? '动态' : '活动') : '加入群组才能进行更多操作哦~'}}</div>
                 </div>
               </swiper-slide>
           </swiper>
@@ -60,7 +60,7 @@
                   <dynamic-item v-if="index === 0" v-for="(item, idx) in tabs[index].data" :key="idx" :itemData="item" :hideBlock="idx === tabs[index].data.length - 1" :router="$router" @changeLike="changeLike" />
                   <activity-item v-if="index === 1" v-for="(item, idx) in tabs[index].data" :key="idx" :itemData="item" :hideBlock="idx === tabs[index].data.length - 1" />
                 </div>
-                <div v-else-if="tabs[index].paging.is_end && tabs[index].data && tabs[index].data.length === 0" class="empty-box">该圈子暂无{{index === 0 ? '动态' : '活动'}}</div>
+                <div v-else-if="tabs[index].paging.is_end && tabs[index].data && tabs[index].data.length === 0" class="empty-box">该群组暂无{{index === 0 ? '动态' : '活动'}}</div>
               </div>
             </cube-slide-item>
           </cube-slide>
@@ -71,7 +71,7 @@
     <i class="iconfont icon-camera publish-icon" :style="{marginRight: marginRight + 'px'}" v-if="circle.followed" @click="goPublish"></i>
     <div v-if="!circle.followed && circle.followed !== null" class="follow-box" :style="{height: followBoxHeight + 'px'}" @click="joinCircle">
       <div class="follow-icon" :style="{backgroundImage: 'url(' + $assetsPublicPath + '/cwebassets/image/add_circle_icon.png)'}"></div>
-      <div class="follow-text">申请加入圈子</div>
+      <div class="follow-text">申请加入群组</div>
     </div>
   </div>
 </template>
@@ -178,7 +178,7 @@ export default {
       })
     },
     'circle.name': function (val, oldVal) {
-      document.title = val || '范团圈子'
+      document.title = val || '范团群组'
     }
   },
   methods: {
@@ -209,7 +209,7 @@ export default {
             this.following = false
           }
         }).catch(err => {
-          console.log('加入圈子出错', err)
+          console.log('加入群组出错', err)
           this.following = false
         })
       }
@@ -224,7 +224,7 @@ export default {
         this.$toast('正在申请...')
         return false
       }
-      this.$prompt.showPrompt({contentText: '加入圈子才能进行更多操作哦~', leftText: '我再想想', rightText: _rightText}, () => {
+      this.$prompt.showPrompt({contentText: '加入群组才能进行更多操作哦~', leftText: '我再想想', rightText: _rightText}, () => {
         this.applyJoinCircle()
       }, () => {
         console.log('cancel')
@@ -370,7 +370,7 @@ export default {
         if (err.msg) {
           this.$toast(err.msg)
         } else {
-          this.$toast('获取圈子失败')
+          this.$toast('获取群组失败')
         }
       })
     },
@@ -642,8 +642,10 @@ fl{
   position: relative;
   z-index: 1;
   width: 100%;
-  height: 288px;
-  background-color: rgba(32,31,31,0.3)
+  min-height: 288px;
+  background-color: rgba(32,31,31,0.3);
+  box-sizing: border-box;
+  padding-bottom: 36px;
 }
 .top-header-text{
   padding-left: 220px;
@@ -655,6 +657,7 @@ fl{
   font-weight: bold;
   color: #fff;
   line-height: 42px;
+  word-break: break-all;
 }
 .top-header-intro{
   font-size: 24px;
@@ -666,6 +669,9 @@ fl{
   display: -webkit-box;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
+  word-break: break-all;
+  box-sizing: content-box;
+  min-height: 106px;
 }
 .top-header-overview{
   font-size: 24px;
@@ -689,16 +695,29 @@ fl{
 }
 .scroll-wrapper{
   position: relative;
-  background: #F5F5F5;
+  background: #F2F2F2;
 }
 .nav-scroll-list-wrap{
   position: relative;
   background-color: #fff;
 }
 .tab-box{
+  display: flex;
   height: 88px;
   position: relative;
   z-index: 1;
+  justify-content: center;
+  align-items: center;
+  padding: 0 4%;
+}
+.tab-item{
+  flex-grow: 0;
+  flex-shrink: 0;
+  margin-left: 130px;
+  white-space: nowrap
+}
+.tab-item:first-child{
+  margin-left: 0;
 }
 .tab-slider{
   width: 100%;
@@ -709,10 +728,10 @@ fl{
   z-index: 2;
 }
 .tab-slider-body{
-  width: 40px;
-  height: 6px;
+  width: 50px;
+  height: 100%;
   position: absolute;
-  left: -20px;
+  left: -25px;
   bottom: 0;
   background: #1EB0FD;
   border-radius: 4px;
@@ -730,10 +749,9 @@ fl{
 }
 .cube-tab{
   font-size: 36px;
-  color: #666;
-}
-.cube-tab_active{
   color: #333;
+}
+.cube-tab_active /deep/ div{
   font-weight: bold;
 }
 .publish-icon{

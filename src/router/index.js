@@ -146,7 +146,7 @@ const router = new Router({
       name: 'CircleDetail',
       component: CircleDetail,
       meta: {
-        title: '范团圈子',
+        title: '范团群组',
         keepAlive: true
       }
     },

@@ -474,7 +474,7 @@ export default {
             this.following = false
           }
         }).catch(err => {
-          console.log('加入圈子出错', err)
+          console.log('加入群组出错', err)
           this.following = false
         })
       }
@@ -489,7 +489,7 @@ export default {
         this.$toast('正在申请...')
         return false
       }
-      this.$prompt.showPrompt({contentText: '加入圈子才能进行更多操作哦~', leftText: '我再想想', rightText: _rightText}, () => {
+      this.$prompt.showPrompt({contentText: '加入群组才能进行更多操作哦~', leftText: '我再想想', rightText: _rightText}, () => {
         this.applyJoinCircle()
       }, () => {
         console.log('cancel')

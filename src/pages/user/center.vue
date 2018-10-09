@@ -16,7 +16,7 @@
             </div>
             <transition v-if="!user.is_owner" appear appear-class="follow-appear">
               <div class="follow-btn-wrapper">
-                <div @click="changeFollow" class="follow-btn" :style="{color: followStatusText === '关注' ? '#fff' : '#666', backgroundColor: followStatusText === '关注' ? '#1EB0FD' : '#fff', borderColor: followStatusText === '关注' ? '#1EB0FD' : '#B7B7B7'}"><i class="iconfont follow-btn-icon" :class="{'icon-add_focus': followStatusText === '关注', 'icon-focused': followStatusText === '已关注', 'icon-transform': followStatusText === '互相关注'}"></i>{{followStatusText}}</div>
+                <div @click="changeFollow" class="follow-btn" :style="{color: '#fff', backgroundColor: followStatusText === '关注' ? '#1EB0FD' : '#A9A9A9', borderColor: followStatusText === '关注' ? '#1EB0FD' : '#A9A9A9'}"><i class="iconfont follow-btn-icon" :class="{'icon-add': followStatusText === '关注', 'icon-focused': followStatusText === '已关注', 'icon-transform': followStatusText === '好友'}"></i>{{followStatusText}}</div>
               </div>
             </transition>
           </div>
@@ -511,7 +511,7 @@ export default {
       } else if (this.user.is_following && !this.user.is_being_followed) { // 已关注该用户，但该用户未关注我
         text = '已关注'
       } else if (this.user.is_following && this.user.is_being_followed) { // 已关注该用户，且该用户关注我
-        text = '互相关注'
+        text = '好友'
       }
       return text
     }
@@ -640,7 +640,7 @@ export default {
   padding-left: 28px;
 }
 .follow-btn-wrapper{
-  width: 134px;
+  width: 128px;
   height: 48px;
   line-height: 48px;
   position: relative;
@@ -668,16 +668,16 @@ export default {
   top: 0;
   border-style: solid;
   border-width: 3px;
-  border-radius: 18px;
+  border-radius: 72px;
   box-sizing: border-box;
-  font-size: 60px;
+  font-size: 72px;
   text-align: center;
   transition: all 500ms;
 }
 .follow-btn-icon{
-  font-size: 54px;
+  font-size: 60px;
   color: inherit;
-  margin-right: 24px;
+  margin-right: 18px;
 }
 .nav-scroll-list-wrap{
   position: relative;
@@ -742,6 +742,7 @@ export default {
 .empty-image{
   display: block;
   width: 240px;
+  height: 240px;
   height: 240px;
   margin: 0 auto;
 }

@@ -27,10 +27,10 @@ For a detailed explanation on how things work, check out the [guide](http://vuej
 # 电子票:/h5/activity/ticket    query['checkcode':后端返回的checkcode]
 # 查看地图:/h5/map    query['lng':地址经度, 'lat':地址纬度, 'title'?:详细地址]
 # 用户协议:/h5/agreement    query['type':协议类型['user':用户协议, 'author':作者协议, 'activity':活动协议]]
-# 范团圈子:/h5/circle/detail    query['circle_id':圈子id, 'jump_tab'?:默认展示的tab索引,从0开始] 
+# 范团群组:/h5/circle/detail    query['circle_id':群组id, 'jump_tab'?:默认展示的tab索引,从0开始] 
 # 范团名片:/h5/user/center    query['user_id':用户id] 
 # 范团话题:/h5/topic/detail    query['topic_id':话题id, 'jump_tab'?:默认展示的tab索引,从0开始]
-# 发动态:/h5/dynamic/edit    query['topic'?:话题，数组形如[{id:xxx, title: xxxx}], 'activity'?:活动，对象形如{id: xxx, title: xxxx}, 'circle'?:圈子，对象形如{id: xxx, title: xxxx}, 'range'?:可见范围，字符串0或1或2]
+# 发动态:/h5/dynamic/edit    query['topic'?:话题，数组形如[{id:xxx, title: xxxx}], 'activity'?:活动，对象形如{id: xxx, title: xxxx}, 'circle'?:群组，对象形如{id: xxx, title: xxxx}, 'range'?:可见范围，字符串0或1或2]
 # 选择可见范围(发动态):/h5/dynamic/chooserange    query['selected':选中的可见范围，字符串0或1或2]
 
 {
@@ -104,7 +104,7 @@ For a detailed explanation on how things work, check out the [guide](http://vuej
       name: 'CircleDetail',
       component: CircleDetail,
       meta: {
-        title: '范团圈子',
+        title: '范团群组',
         keepAlive: true
       }
     },

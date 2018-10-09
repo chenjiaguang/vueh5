@@ -216,6 +216,7 @@ export default {
       this.video.src(url)
       // this.video.poster(this.$route.query.poster)
       this.video.on('durationchange', e => { // 播放长度更新
+        console.log('durationchange')
         this.pageData.min = 0
         this.pageData.max = this.video.duration()
         this.showVideoBuffered()
@@ -239,14 +240,23 @@ export default {
       this.video.on('waiting', () => { // 正在缓冲
         this.pageData.waiting = true
       })
-      this.video.on('canplay', () => { // 可播放
-        console.log('canplay')
-        this.pageData.waiting = false
+      this.video.on('loadeddata', () => { // 加载数据成功
+        console.log('loadeddata')
         if (this.pageData.first) {
           this.pageData.first = false
           this.video.currentTime(parseInt(this.$route.query.current_time || 0))
-          this.video.play()
         }
+      })
+      this.video.on('componentresize', () => { // 尺寸更改
+        console.log('componentresize')
+      })
+      this.video.on('canplay', () => { // 可播放
+        console.log('canplay')
+        this.pageData.waiting = false
+        // if (this.pageData.first) {
+        //   this.pageData.first = false
+        //   this.video.currentTime(parseInt(this.$route.query.current_time || 0))
+        // }
       })
       this.video.on('firstplay', () => { // 可播放
         console.log('firstplay')
@@ -267,11 +277,21 @@ export default {
         this.pageData.waiting = false
         this.pageData.percent = parseInt(this.$route.query.current_time || 0)
         this.video.poster(poster)
-        // let current = parseInt(this.$route.query.current_time || 0)
-        // console.log('current', current)
-        // this.video.currentTime(current.toString())
-        // this.video.play()
       })
+    },
+    orientationChange () {
+      let orientation = window.orientation
+      switch (orientation) {
+      case 90:
+      case -90:
+        orientation = 'landscape'
+        // 这里是横屏
+        break
+      default:
+        orientation = 'portrait'
+        // 这里是竖屏
+        break
+      }
     }
   },
   mounted () {
@@ -285,29 +305,6 @@ export default {
   beforeRouteLeave (to, from, next) {
     from.params.videoPoint = this.video.currentTime()
     next()
-    // if (to.name === 'Agreement' || to.name === 'SMSCode' || this.pass || this.exceed || !this.feeId) {
-    //   this.pass = false
-    //   if (window._alert_id) { // 如果有alert弹窗，则关闭弹窗
-    //     this.$modal.hideAlert(window._alert_id)
-    //   }
-    //   next()
-    // } else {
-    //   if (!this.showPrompt) {
-    //     this.showPrompt = true
-    //     this.$prompt.showPrompt({contentText: '离开后，您的订单将不再保留，确定要放弃订单？', leftText: '放弃订单', rightText: '继续支付'}, () => {
-    //       this.showPrompt = false
-    //     }, () => {
-    //       this.cancelOrder(() => {
-    //         this.showPrompt = false
-    //         this.pass = true
-    //         this.$router.go(-1)
-    //       })
-    //     })
-    //     next(false)
-    //   } else {
-    //     next(false)
-    //   }
-    // }
   }
 }
 </script>

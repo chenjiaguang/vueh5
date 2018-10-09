@@ -118,7 +118,7 @@ export default {
   },
   /**
    * 分享打开计数功能 自带next
-   * type: 1：圈子 2：话题 3：短动态 4：长文 5：活动
+   * type: 1：群组 2：话题 3：短动态 4：长文 5：活动
    */
   beforeRouteEnterHandleShareOpen: function (to, from, next, type) {
     if (this.beforeRouteEnterHandleShareOpenDontNext(to, from, next, type)) {
@@ -134,7 +134,7 @@ export default {
   },
   /**
    * 分享打开计数功能 不带next 返回bool表示是否有路由更新
-   * type: 1：圈子 2：话题 3：短动态 4：长文 5：活动
+   * type: 1：群组 2：话题 3：短动态 4：长文 5：活动
    */
   beforeRouteEnterHandleShareOpenDontNext: function (to, from, next, type) {
     if (to.query.isShareOpen && to.query.isShareOpen !== 'false') {

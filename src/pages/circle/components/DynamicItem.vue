@@ -15,7 +15,16 @@
       <image-container :images="itemData.covers" :router="router" :appearAnimation="false" :showDelete="false" />
     </div>
     <div v-if="itemData.location" class="publish-address">{{itemData.location}}</div>
-    <div v-if="itemData.activity" class="at-activity"><i class="iconfont icon-activity activity-sign"></i>{{itemData.activity.title}}</div>
+    <!-- <div v-if="itemData.activity" class="at-activity"><i class="iconfont icon-activity activity-sign"></i>{{itemData.activity.title}}</div> -->
+    <!-- 活动模块 -->
+    <div class="content-activity-box row center" v-if="itemData.activity && itemData.activity.id" @click.stop="goActivity(itemData.activity.id)">
+      <div class="content-activity-img" :style="`background-image:url(${itemData.activity.covers?itemData.activity.covers[0].compress:''})`"/>
+      <div class="content-activity-right column space-between">
+        <div class="content-activity-title">{{itemData.activity.title}}</div>
+        <div class="content-activity-address">{{itemData.activity.address}}</div>
+        <div class="content-activity-time_text">{{itemData.activity.time_text}}</div>
+      </div>
+    </div>
     <a @click.stop :href="itemData.newsArticle.article_url" v-if="itemData.newsArticle && itemData.newsArticle.id" class="with-article">
       <div class="with-article-cover" v-if="itemData.newsArticle.covers && itemData.newsArticle.covers[0]" :style="{backgroundImage: 'url(' + (itemData.newsArticle.covers[0].compress || itemData.newsArticle.covers[0].url) + ')'}"></div>
       <div class="with-article-cover" v-else>
@@ -35,25 +44,25 @@
       </div>
     </a>
     <DynamicContentVideoBox class="with-video" v-if="itemData.linkInfo && itemData.linkInfo.id && itemData.linkInfo.type==1" :dynamic="itemData"/>
-    <div class="comment-and-like clearfix">
-      <div @click.stop="changeLike" class="comment-and-like-item fl" :style="{paddingLeft: 0, color: itemData.has_like ? '#FE5273' : '#333'}">
+    <div class="comment-and-like">
+      <div @click.stop="changeLike" class="comment-and-like-item">
         <div class="comment-and-like-icon-box">
-          <!-- <transition-group name="fade" mode="in-out">
-            <i v-if="itemData.has_like" key="like" class="iconfont icon-like comment-and-like-icon"></i>
-            <i v-else key="dislike" class="iconfont icon-dislike comment-and-like-icon"></i>
-          </transition-group> -->
-          <transition
+          <transition-group name="fade" mode="in-out">
+            <i v-if="itemData.has_like" key="like" class="iconfont icon-like_v_2_5 comment-and-like-icon"></i>
+            <i v-else key="dislike" class="iconfont icon-dislike_v_2_5 comment-and-like-icon"></i>
+          </transition-group>
+          <!-- <transition
             enter-active-class="animated wobble"
             leave-active-class="hide"
           >
             <i v-if="itemData.has_like" class='iconfont icon-like comment-and-like-icon'></i>
           </transition>
-          <i v-if="!itemData.has_like" class='iconfont icon-dislike comment-and-like-icon'></i>
+          <i v-if="!itemData.has_like" class='iconfont icon-dislike comment-and-like-icon'></i> -->
           <span>{{likeNumber || '赞'}}</span>
         </div>
       </div>
-      <div @click.stop="goDynamic" class="comment-and-like-item fl" style="padding-right: 0;">
-        <div class="comment-and-like-icon-box">
+      <div @click.stop="goDynamic" class="comment-and-like-item">
+        <div class="comment-and-like-icon-box comment-box">
           <i class="iconfont icon-comment_icon comment-and-like-icon"></i>
           <span>{{commentNumber || '评论'}}</span>
         </div>
@@ -198,66 +207,105 @@
 }
 .comment-and-like{
   width: 100%;
-  height:68px;
-  line-height: 68px;
+  height:104px;
   text-align: center;
   position: relative;
-}
-.comment-and-like-border{
-  width: 100%;
-  height: 2px;
-  transform: scale(0.5, 0.5);
-  transform-origin: 0 0;
-  position: absolute;
-  left: 0;
-  top: 0;
-  background: #E5E5E5;
-  z-index: 1;
+  display: flex;
 }
 .comment-and-like-item{
-  width: 50%;
   height: 100%;
   box-sizing: border-box;
-  padding: 0 30px;
   color: '#333';
   position: relative;
+  background-color:#fff;
 }
 .comment-and-like-icon-box{
   height: 100%;
+  line-height: 104px;
+  margin-right: 60px;
   overflow: hidden;
   text-align: center;
-  position: absolute;
-  padding-left: 70px;
-  padding-right: 20px;
-  left: 50%;
-  top: 0;
-  transform: translateX(-50%);
+  position: relative;
+  padding-left: 56px;
+}
+.comment-box{
+  padding-left: 58px;
+}
+.comment-box .comment-and-like-icon{
+  left: 2px;
 }
 .comment-and-like-icon{
   display: block;
   position: absolute;
-  left: 20px;
-  // top: 50%;
-  // transform: translateY(-50%);
-  font-size: 32px;
-  line-height: 66px;
+  left: 0;
+  top: 0;
+  font-size: 44px;
+  line-height: 104px;
   color: inherit;
-  overflow: visible;
+}
+.icon-like_v_2_5{
+  color: #FF6574;
 }
 .gray-block{
   width: 110%;
-  height: 10px;
+  height: 16px;
   position: relative;
   left: -5%;
-  background: #F5F5F5;
+  background: #F2F2F2;
 }
 .fade-enter-active, .fade-leave-active {
-  transition: all .5s;
+  transition: all 300ms;
 }
 .fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
   opacity: 0;
   transform: scale(0.5, 0.5);
 }
+
+// 活动模块------------------------
+.content-activity-box {
+  background-color: #f5f5f5;
+  height: 128px;
+  margin: 4px 0 20px;
+}
+.content-activity-img {
+  height: 100px;
+  width: 100px;
+  margin-left: 14px;
+  background-size: cover;
+  background-position: center;
+}
+.content-activity-right {
+  flex: 1;
+  margin-left: 20px;
+  margin-right: 14px;
+}
+.content-activity-title {
+  flex: 1;
+  width: 542px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: #333333;
+  font-size: 28px;
+  line-height: 34px;
+  margin-bottom: 14px;
+}
+.content-activity-address {
+  flex: 1;
+  width: 542px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: #999999;
+  font-size: 24px;
+  margin-bottom: 14px;
+}
+.content-activity-time_text {
+  flex: 1;
+  color: #999999;
+  font-size: 24px;
+}
+// 活动模块 end ------------------------
 </style>
 
 <script>
@@ -313,6 +361,9 @@ export default {
     },
     goUser () {
       this.router.push({ name: 'UserCenter', query: { user_id: this.itemData.uid }, params: {resetData: true} })
+    },
+    goActivity (id) {
+      this.$router.push({name: 'ActivityDetail', query: {id: id}})
     }
   }
 }
