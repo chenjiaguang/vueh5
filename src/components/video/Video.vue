@@ -15,13 +15,13 @@
             <transition name="fade">
               <i v-if="!pageData.has_like" class='iconfont icon-dislike_v_2_5 comment-and-like-icon'></i>
             </transition>
-            <span>{{likeNumber || '赞'}}</span>
+            <span>{{likeNumber || ''}}</span>
           </div>
         </div>
         <div class="comment-and-like-item" @click.stop="goComment" style="padding-right: 0;">
           <div class="comment-and-like-icon-box">
             <i class="iconfont icon-comment_icon comment-and-like-icon"></i>
-            <span>{{commentNumber || '评论'}}</span>
+            <span>{{commentNumber || ''}}</span>
           </div>
         </div>
       </div>

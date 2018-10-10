@@ -8,13 +8,13 @@
       >
         <div v-if="dynamic.has_like" class="like-icon-box">
           <i class='iconfont icon-like'></i>
-          <span class="like-comment-box-text">{{likeNumber || '赞'}}</span>
+          <span class="like-comment-box-text">{{likeNumber || ''}}</span>
         </div>
       </transition>
 
       <div v-if="!dynamic.has_like" class="like-icon-box">
         <i class='iconfont icon-dislike'></i>
-        <span class="like-comment-box-text">{{likeNumber || '赞'}}</span>
+        <span class="like-comment-box-text">{{likeNumber || ''}}</span>
       </div> -->
       <div class="comment-and-like-icon-box">
         <transition name="fade">
@@ -23,16 +23,16 @@
         <transition name="fade">
           <i v-if="!dynamic.has_like" class='iconfont icon-dislike_v_2_5 comment-and-like-icon'></i>
         </transition>
-        <span>{{likeNumber || '赞'}}</span>
+        <span>{{likeNumber || ''}}</span>
       </div>
       <div class="right-line"></div>
     </div>
     <div class="comment-and-like-item" @click="clickComment(dynamic.id)">
       <!-- <i class="iconfont icon-comment_icon2"></i>
-      <span class="like-comment-box-text">{{commentNumber || '评论'}}</span> -->
+      <span class="like-comment-box-text">{{commentNumber || ''}}</span> -->
       <div class="comment-and-like-icon-box">
         <i class="iconfont icon-comment_icon comment-and-like-icon"></i>
-        <span>{{commentNumber || '评论'}}</span>
+        <span>{{commentNumber || ''}}</span>
       </div>
     </div>
   </div>

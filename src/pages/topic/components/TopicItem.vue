@@ -61,13 +61,13 @@
             <i v-if="itemData.has_like" class='iconfont icon-like comment-and-like-icon'></i>
           </transition>
           <i v-if="!itemData.has_like" class='iconfont icon-dislike comment-and-like-icon'></i> -->
-          <span>{{likeNumber || '赞'}}</span>
+          <span>{{likeNumber || ''}}</span>
         </div>
       </div>
       <div @click.stop="goDynamic" class="comment-and-like-item">
         <div class="comment-and-like-icon-box comment-box">
           <i class="iconfont icon-comment_icon comment-and-like-icon"></i>
-          <span>{{commentNumber || '评论'}}</span>
+          <span>{{commentNumber || ''}}</span>
         </div>
       </div>
       <div class="comment-and-like-border" :style="{transform: 'scale(1,' + $tranScale + ')'}"></div>
