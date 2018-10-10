@@ -7,6 +7,7 @@ import toast from './components/toast'
 import modal from './components/modal'
 import prompt from './components/prompt'
 import Preview from './components/preview'
+import Video from './components/video'
 import appCall from './lib/appCall'
 import '@/iconfont/iconfont.css'
 
@@ -32,6 +33,7 @@ Vue.prototype.$toast = toast
 Vue.prototype.$modal = modal
 Vue.prototype.$prompt = prompt
 Vue.prototype.$previewImage = Preview
+Vue.prototype.$video = Video
 Vue.prototype.$appCall = appCall
 Vue.use(VueLazyload, {
   preLoad: 1.3,

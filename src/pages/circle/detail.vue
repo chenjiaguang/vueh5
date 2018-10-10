@@ -136,7 +136,8 @@ const initialData = {
   mescroll: [],
   following: false,
   maxWidth: _maxWidth,
-  marginRight: _marginRight
+  marginRight: _marginRight,
+  videoPoint: {}
 }
 export default {
   mixins: [MeScrollSupportArr, CloseImagePreviewer, WeixinShareInKeepAlive],
@@ -591,9 +592,21 @@ export default {
       this.wrapperTouchY = 0
     }
   },
-  // beforeRouteEnter (to, from, next) {
-  //   utils.beforeRouteEnterHandleShareOpen(to, from, next, 1)
-  // },
+  beforeRouteEnter (to, from, next) {
+    next(vm => {
+      if (from.name === 'VideoMedia' && from.params && (from.params.videoPoint || from.params.videoPoint === 0)) {
+        let _data = vm.tabs[0].data
+        for (let i = 0; i < _data.length; i++) {
+          console.log('beforeRouteEnter', from.query.dynamic_id, _data[i].id)
+          if (_data[i].id === from.query.dynamic_id) {
+            _data[i].videoPoint = from.params.videoPoint
+            break
+          }
+        }
+        vm.tabs[0].data = _data
+      }
+    })
+  },
   mounted () {
     this.fetchCircle()
     this.initSlideBlock()

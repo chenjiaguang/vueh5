@@ -460,6 +460,21 @@ export default {
   },
   activated () {
     this.$forceUpdate()
+  },
+  beforeRouteEnter (to, from, next) {
+    next(vm => {
+      if (from.name === 'VideoMedia' && from.params && (from.params.videoPoint || from.params.videoPoint === 0)) {
+        let _data = vm.tabs[0].data
+        for (let i = 0; i < _data.length; i++) {
+          console.log('beforeRouteEnter', from.query.dynamic_id, _data[i].id)
+          if (_data[i].id === from.query.dynamic_id) {
+            _data[i].videoPoint = from.params.videoPoint
+            break
+          }
+        }
+        vm.tabs[0].data = _data
+      }
+    })
   }
 }
 </script>

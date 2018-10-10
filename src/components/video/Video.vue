@@ -1,12 +1,12 @@
 <template>
-  <div class="video-page" ref="videoPage" @touchstart="pageTouchstart"  @touchmove.prevent @touchend="pageTouchend" @click.stop="toggleShowButtons">
+  <div class="video-page" id="video-page" ref="videoPage" @touchstart="pageTouchstart" @touchmove.prevent @touchend="pageTouchend" @click.stop="toggleShowButtons" :style="{zIndex: pageData.show ? zIndex : 2}">
     <video playsinline id="fantuan_video" class="my-video video-js"></video>
     <div :style="{opacity: (!pageData.show_error && pageData.show_buttons) ? 1 : 0, zIndex: 2, backgroundColor: (pageData.ended && pageData.paused) ? 'rgba(0,0,0,0.5)' : 'rgba(0,0,0,0)'}" class="video-mask-wrapper">
       <div @click.stop class="video-bar-wrapper">
-        <video-bar ref="videoBar" :video="video" :min="pageData.min" :max="pageData.max" v-model="pageData.percent" :buffered="buffered" @setTime="setTime" @toggleFullScreen="toggleFullScreen" />
+        <video-bar ref="videoBar" :video="video" :min="pageData.min" :max="pageData.max" v-model="pageData.percent" :buffered="buffered" @setTime="setTime" />
       </div>
       <div @click.stop class="video-title">{{pageData.title}}</div>
-      <div @click.stop class="comment-and-like" v-if="$route.query.dynamic_id">
+      <div @click.stop class="comment-and-like">
         <div class="comment-and-like-item" @click.stop="changeLike" :style="{paddingLeft: 0, color: pageData.has_like ? '#FE5273' : '#fff'}">
           <div class="comment-and-like-icon-box">
             <transition name="fade">
@@ -25,9 +25,9 @@
           </div>
         </div>
       </div>
-      <div ref="bigPlayBtn" v-show="!pageData.waiting && !(pageData.ended && pageData.paused)" @click.stop="togglePlay" class="pause-and-play">
+      <button id="pause-and-play" ref="bigPlayBtn" v-show="!pageData.waiting && !(pageData.ended && pageData.paused)" @click.stop="togglePlay" class="pause-and-play">
         <i class="big-play-icon iconfont" :class="{'icon-pause': (!pageData.ended) && (!pageData.paused), 'icon-play': (!pageData.ended) && pageData.paused, 'icon-replay': pageData.ended && pageData.paused}"></i>
-      </div>
+      </button>
       <div v-show="!pageData.waiting && pageData.ended && pageData.paused" @click.stop="replay" class="replay-btn column">
         <i class="big-replay-icon iconfont icon-replay"></i>
         <div class="big-replay-text">重新播放</div>
@@ -60,20 +60,23 @@ export default {
         end: 0
       }],
       pageData: {
+        show: false,
         first: true,
         title: '',
         show_buttons: true,
-        has_like: this.$route.query.has_like,
-        like_num: this.$route.query.like_num,
-        comment_num: this.$route.query.comment_num,
+        has_like: false,
+        like_num: 0,
+        comment_num: 0,
         min: 0,
         max: 0,
         percent: 0,
         paused: true,
         ended: false,
         waiting: true,
-        show_error: false
-      }
+        show_error: false,
+        video_time: 0
+      },
+      zIndex: 999
     }
   },
   components: {VideoBar},
@@ -88,6 +91,9 @@ export default {
     }
   },
   watch: {
+    '$route' (val, oldVal) {
+      console.log('watch-route')
+    },
     'pageData.show_buttons' (val, oldVal) {
       if (val) {
         clearTimeout(this.timer)
@@ -96,6 +102,11 @@ export default {
         }, 3000)
       } else {
         clearTimeout(this.timer)
+      }
+    },
+    'pageData.show' (val, oldVal) {
+      if (val && !oldVal) {
+        this.video.play()
       }
     }
   },
@@ -118,6 +129,7 @@ export default {
       this.video.play()
     },
     togglePlay () {
+      console.log('togglePlay')
       if (this.video.paused()) {
         this.video.play()
       } else {
@@ -129,9 +141,6 @@ export default {
     },
     setTime (second) {
       this.video.currentTime(second)
-    },
-    toggleFullScreen () {
-      console.log('fullScreen')
     },
     showVideoBuffered () {
       let len = this.video.buffered().length
@@ -156,10 +165,8 @@ export default {
       return seconds
     },
     goComment () {
-      if (this.$route.query.from.toString() === '2') {
+      if (this.pageData.from === '2') {
         this.$router.go(-1)
-      } else if (this.$route.query.from.toString() === '1') {
-        this.$router.push({name: 'DynamicDetail', query: {id: this.$route.query.dynamic_id}})
       }
     },
     changeLike () {
@@ -169,7 +176,7 @@ export default {
       const isLike = this.pageData.has_like
       const likeNum = parseInt(this.pageData.like_num)
       let rData = {
-        id: this.$route.query.dynamic_id,
+        id: this.pageData.dynamic_id,
         like: !isLike,
         type: 0
       }
@@ -191,7 +198,7 @@ export default {
       })
     },
     getVideoAddress () {
-      this.$ajax('/jv/anonymous/qz/linkanalysis/getVideoAddress', {data: {linkid: this.$route.query.video_id}}).then(res => {
+      this.$ajax('/jv/anonymous/qz/linkanalysis/getVideoAddress', {data: {linkid: this.pageData.video_id}}).then(res => {
         if (res && !res.error && res.data && res.data.videoAddress) {
           console.log('data', res.data)
           this.pageData.title = res.data.title
@@ -205,7 +212,7 @@ export default {
     },
     initVideo (url, poster, duration) {
       this.video = videojs('fantuan_video', {
-        preload: 'metadata',
+        preload: 'auto',
         autoplay: false,
         muted: false,
         controls: false,
@@ -215,7 +222,8 @@ export default {
         nativeControlsForTouch: false,
         playbackRates: [0.5, 1, 1.5, 2]
       })
-      this.video.src(url)
+      console.log('url', url)
+      // this.video.src(url)
       // this.video.poster(this.$route.query.poster)
       this.video.on('durationchange', e => { // 播放长度更新
         console.log('durationchange')
@@ -224,6 +232,7 @@ export default {
         this.showVideoBuffered()
       })
       this.video.on('timeupdate', e => { // 播放进度更新
+        console.log('timeupdate', this.video.currentTime())
         this.pageData.percent = this.video.currentTime()
       })
       this.video.on('progress', e => { // 缓冲加载数据成功
@@ -243,10 +252,16 @@ export default {
         this.pageData.waiting = true
       })
       this.video.on('loadeddata', () => { // 加载数据成功
-        console.log('loadeddata')
+        console.log('loadeddata', this.pageData.video_time)
         if (this.pageData.first) {
           this.pageData.first = false
-          this.video.currentTime(parseInt(this.$route.query.current_time || 0))
+          this.video.currentTime(parseInt(this.pageData.video_time || 0))
+        }
+      })
+      this.video.on('loadstart', () => {
+        console.log('loadstart')
+        if (this.video.paused()) {
+          this.video.play()
         }
       })
       this.video.on('componentresize', () => { // 尺寸更改
@@ -275,10 +290,11 @@ export default {
       this.video.ready(() => {
         console.log('this.video', this.video)
         this.pageData.min = 0
-        this.pageData.max = this.getSecondFromDuration(duration)
+        // this.pageData.max = this.getSecondFromDuration(duration)
         this.pageData.waiting = false
-        this.pageData.percent = parseInt(this.$route.query.current_time || 0)
-        this.video.poster(poster)
+        // this.pageData.percent = parseInt(this.$route.query.current_time || 0)
+        // this.video.poster(poster)
+        // this.video.play()
       })
     },
     orientationChange () {
@@ -298,6 +314,7 @@ export default {
   },
   mounted () {
     this.getVideoAddress()
+    // this.initVideo()
   },
   beforeDestroy () {
     if (this.video && this.video.dispose) {
@@ -305,9 +322,7 @@ export default {
     }
   },
   beforeRouteLeave (to, from, next) {
-    if (this.video) {
-      from.params.videoPoint = this.pageData.ended ? 0 : this.video.currentTime()
-    }
+    from.params.videoPoint = this.pageData.ended ? 0 : this.video.currentTime()
     next()
   }
 }
@@ -403,9 +418,11 @@ export default {
 
 <style lang="scss" scoped>
 .video-page {
-  position: relative;
+  position: fixed;
   width: 100%;
   height: 100%;
+  top: 0;
+  left: 60%;
 }
 .video-mask-wrapper{
   position: absolute;

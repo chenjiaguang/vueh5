@@ -17,7 +17,7 @@
 </template>
 <script>
 export default {
-  props: ['dynamic', 'currentTime'],
+  props: ['dynamic', 'currentTime', 'from'],
   data () {
     return {}
   },
@@ -27,12 +27,28 @@ export default {
     jumpVideo () {
       this.$router.push({
         name: 'VideoMedia',
-        query: { dynamic_id: this.dynamic.id, video_id: this.dynamic.linkInfo.id, like_num: this.dynamic.like_num, comment_num: this.dynamic.comment_num, has_like: this.dynamic.has_like, current_time: this.currentTime, from: '2' }
+        query: { dynamic_id: this.dynamic.id, video_id: this.dynamic.linkInfo.id, like_num: this.dynamic.like_num, comment_num: this.dynamic.comment_num, has_like: this.dynamic.has_like, current_time: (this.dynamic.videoPoint || this.currentTime), from: (this.from || 2) }
       })
+      // window._video.video.src('http://180.97.241.182/69742340BE14381AEEE2013792/03000A01005BA74AEFAF57145E3147B235BE07-6BFE-4965-82D5-45C9D04B2030.mp4?ccode=0501&duration=96&expire=18000&psid=8526f9f3ef86abc67816fdaac80da61a&ups_client_netip=3ad03118&ups_ts=1539142975&ups_userid=&utid=PmNEFJKjaBECAXFMEmvcD8cT&vid=XMzgzNDg3MDE4NA&vkey=Ace7b2b900c9261991a9e9d1c82c123e1&sp=')
+      // window._video.video.play()
+      // this.$ajax('/jv/anonymous/qz/linkanalysis/getVideoAddress', {data: {linkid: this.dynamic.linkInfo.id}}).then(res => {
+      //   if (res && !res.error && res.data && res.data.videoAddress) {
+      //     console.log('data', res.data)
+      //     // this.initVideo(res.data.videoAddress, res.data.originalCover, res.data.duration)
+      //     // this.$video.show({video_url: res.data.videoAddress, poster: res.data.originalCover, video_time: 0})
+      //     document.getElementsByClassName('pause-and-play')[0].click()
+      //   } else {
+      //     // this.pageData.show_error = true
+      //   }
+      // }).catch(err => {
+      //   // this.pageData.show_error = true
+      // })
     }
   },
   mounted () {
-    console.log('dynamic', this.dynamic)
+    // if (!window._video) {
+    //   this.$video.init({video_id: this.dynamic.linkInfo.id})
+    // }
   }
 }
 </script>
@@ -40,8 +56,8 @@ export default {
 <style lang="scss" type="text/scss" scoped>
 .video-content {
   position: relative;
-  width: 690px;
-  height: 388px;
+  width: 100%;
+  padding-top: 56.23%;
   background-color: #eeeeee;
   background-size: cover;
   background-position: center;

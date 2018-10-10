@@ -43,7 +43,7 @@
         <div class="with-article-title-text">{{itemData.linkInfo.title || itemData.linkInfo.url}}</div>
       </div>
     </a>
-    <DynamicContentVideoBox class="with-video" v-if="itemData.linkInfo && itemData.linkInfo.id && itemData.linkInfo.type==1" :dynamic="itemData"/>
+    <DynamicContentVideoBox class="with-video" v-if="itemData.linkInfo && itemData.linkInfo.id && itemData.linkInfo.type==1" :dynamic="itemData" :from="1" :currentTime="itemData.videoPoint || 0"/>
     <div class="comment-and-like">
       <div @click.stop="changeLike" class="comment-and-like-item">
         <div class="comment-and-like-icon-box">

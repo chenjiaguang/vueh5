@@ -64,7 +64,7 @@
                 </div>
                 <div class="content-article-content">{{dynamic.linkInfo.title || dynamic.linkInfo.url}}</div>
               </a>
-              <DynamicContentVideoBox class="content-video-box" v-if="dynamic.linkInfo && dynamic.linkInfo.id && dynamic.linkInfo.type==1" :dynamic="dynamic" :currentTime="videoPoint"/>
+              <DynamicContentVideoBox class="content-video-box" v-if="dynamic.linkInfo && dynamic.linkInfo.id && dynamic.linkInfo.type==1" :dynamic="dynamic" :currentTime="videoPoint" :from="2"/>
             </div>
 
             <div v-if="dynamic && (dynamic.actid || dynamic.location || dynamic.circle_name)" id="foot-container" class="column">
@@ -86,7 +86,7 @@
             </div>
             <div class="comment-and-like">
               <div class="gray-block"></div>
-              <div class="comment-and-like-header">
+              <div ref="commentArea" class="comment-and-like-header">
                 <div class="comment-header">评论{{parseInt(dynamic.comment_num) ? (' ' + dynamic.comment_num) : ''}}</div>
                 <div class="like-header" v-if="dynamic&&dynamic.like_num>0">
                   <span>{{dynamic.like_num}}人点了赞</span>
@@ -265,7 +265,6 @@ export default {
     }
   },
   activated () {
-    console.log('window.history', window.history)
     if (this.isArticle) {
       document.title = '长文详情'
     } else {
@@ -564,7 +563,7 @@ export default {
   },
   beforeRouteEnter (to, from, next) {
     next(vm => {
-      if (from.name === 'VideoMedia' && from.params && from.params.videoPoint) {
+      if (from.name === 'VideoMedia' && from.params && (from.params.videoPoint || from.params.videoPoint === 0)) {
         vm.videoPoint = from.params.videoPoint
       }
     })
