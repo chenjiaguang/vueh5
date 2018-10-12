@@ -1,6 +1,6 @@
 <template>
   <div class="video-page" ref="videoPage" @touchstart="pageTouchstart"  @touchmove.prevent @touchend="pageTouchend" @click.stop="toggleShowButtons">
-    <video playsinline id="fantuan_video" class="my-video video-js"></video>
+    <video playsinline webkit-playsinline x5-playsinline x5-video-player-type="h5" id="fantuan_video" class="my-video video-js"></video>
     <div :style="{opacity: (!pageData.show_error && pageData.show_buttons) ? 1 : 0, zIndex: 2, backgroundColor: (pageData.ended && pageData.paused) ? 'rgba(0,0,0,0.5)' : 'rgba(0,0,0,0)'}" class="video-mask-wrapper">
       <div @click.stop class="video-bar-wrapper">
         <video-bar ref="videoBar" :video="video" :min="pageData.min" :max="pageData.max" v-model="pageData.percent" :buffered="buffered" @setTime="setTime" @toggleFullScreen="toggleFullScreen" />

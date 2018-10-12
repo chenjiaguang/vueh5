@@ -179,7 +179,9 @@ export default {
       })
     },
     'circle.name': function (val, oldVal) {
-      document.title = val || '范团群组'
+      if (val) {
+        document.title = val
+      }
     }
   },
   methods: {
@@ -613,6 +615,9 @@ export default {
   },
   activated () {
     this.$forceUpdate()
+    if (this.circle && this.circle.name) {
+      document.title = this.circle.name
+    }
   }
 }
 </script>

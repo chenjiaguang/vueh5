@@ -17,17 +17,6 @@
     <div class="dynamic-picture" v-if="itemData.covers && itemData.covers.length > 0">
       <image-container :images="itemData.covers" :router="router" :appearAnimation="false" :showDelete="false" />
     </div>
-    <div v-if="itemData.location" class="publish-address">{{itemData.location}}</div>
-    <!-- <div v-if="itemData.activity" class="at-activity"><i class="iconfont icon-activity activity-sign"></i>{{itemData.activity.title}}</div> -->
-    <!-- 活动模块 -->
-    <div class="content-activity-box row center" v-if="itemData.activity && itemData.activity.id" @click.stop="goActivity(itemData.activity.id)">
-      <div class="content-activity-img" :style="`background-image:url(${itemData.activity.covers?itemData.activity.covers[0].compress:''})`"/>
-      <div class="content-activity-right column space-between">
-        <div class="content-activity-title">{{itemData.activity.title}}</div>
-        <div class="content-activity-address">{{itemData.activity.address}}</div>
-        <div class="content-activity-time_text">{{itemData.activity.time_text}}</div>
-      </div>
-    </div>
     <a @click.stop :href="itemData.newsArticle.article_url" v-if="itemData.newsArticle && itemData.newsArticle.id" class="with-article">
       <div class="with-article-cover" v-if="itemData.newsArticle.covers && itemData.newsArticle.covers[0]" :style="{backgroundImage: 'url(' + (itemData.newsArticle.covers[0].compress || itemData.newsArticle.covers[0].url) + ')'}"></div>
       <div class="with-article-cover" v-else>
@@ -47,6 +36,17 @@
       </div>
     </a>
     <DynamicContentVideoBox class="with-video" v-if="itemData.linkInfo && itemData.linkInfo.id && itemData.linkInfo.type==1" :dynamic="itemData" :from="1" :currentTime="itemData.videoPoint || 0"/>
+    <div v-if="itemData.location" class="publish-address">{{itemData.location}}</div>
+    <!-- <div v-if="itemData.activity" class="at-activity"><i class="iconfont icon-activity activity-sign"></i>{{itemData.activity.title}}</div> -->
+    <!-- 活动模块 -->
+    <div class="content-activity-box row center" v-if="itemData.activity && itemData.activity.id" @click.stop="goActivity(itemData.activity.id)">
+      <div class="content-activity-img" :style="`background-image:url(${itemData.activity.covers?itemData.activity.covers[0].compress:''})`"/>
+      <div class="content-activity-right column space-between">
+        <div class="content-activity-title">{{itemData.activity.title}}</div>
+        <div class="content-activity-address">{{itemData.activity.address}}</div>
+        <div class="content-activity-time_text">{{itemData.activity.time_text}}</div>
+      </div>
+    </div>
     <div class="comment-and-like clearfix">
       <div @click.stop="changeLike" class="comment-and-like-item">
         <div class="comment-and-like-icon-box">
