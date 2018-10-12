@@ -14,11 +14,11 @@ export default {
   data () {
     return {
       shareType: {
-        CircleDetail: 1,
-        TopicDetail: 2,
+        '/h5/circle/detail': 1,
+        '/h5/topic/detail': 2,
         ShortDynamicl: 3,
         LongDynamic: 4,
-        ActivutyDetail: 5
+        '/activity/detail': 5
       },
       transitionName: 'none',
       mounted () {
@@ -31,28 +31,37 @@ export default {
     }
   },
   mounted () {
+    // 获取地址中的参数
+    let searchStr = window.location.search.replace('?', '')
+    let searchArr = searchStr.split('&')
+    let searchObj = {}
+    searchArr.forEach(item => {
+      let temArr = item.split('=')
+      searchObj[temArr[0]] = temArr[1]
+    })
     /**
      * 分享打开计数功能 不带next 返回bool表示是否有路由更新
      * type: 1：群组 2：话题 3：短动态 4：长文 5：活动
      */
     if (
-      this.$route.query.isShareOpen &&
-      this.$route.query.isShareOpen !== 'false'
+      searchObj.isShareOpen &&
+      searchObj.isShareOpen !== 'false'
     ) {
       let _type = ''
-      if (this.$route.name === 'dynamicDetail') {
+      if (window.location.pathname === '/h5/dynamic/detail') {
         // 动态详情页分为短动态和长文、其他的按路由来确定type
         if (
-          this.$route.query.isArticle &&
-          this.$route.query.isArticle !== 'false'
+          searchObj.isArticle &&
+          searchObj.isArticle !== 'false'
         ) {
           _type = 4
         } else {
           _type = 3
         }
       } else {
-        _type = this.shareType[this.$route.name]
+        _type = this.shareType[window.location.pathname]
       }
+      console.log('_type', _type)
       if (_type) {
         this.$ajax('/jv/share/anonymous/open', { data: { type: _type } })
       }
