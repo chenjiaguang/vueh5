@@ -625,15 +625,18 @@ export default {
 }
 .follow-button {
   display: flex;
-  width: 128px;
-  height: 48px;
+  width: 124px;
+  height: 44px;
   text-align: center;
   font-size: 24px;
-  line-height: 48px;
+  line-height: 44px;
   color: #ffffff;
-  background-color: #1eb0fd;
+  /* background-color: #1eb0fd; */
+  border: 2px solid #1eb0fd;
+  color: #1eb0fd;
   border-radius: 24px;
   justify-content: center;
+  box-sizing: content-box;
 }
 .follow-btn-icon{
   font-size: 40px;

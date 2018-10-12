@@ -16,7 +16,7 @@
             </div>
             <transition v-if="!user.is_owner" appear appear-class="follow-appear">
               <div class="follow-btn-wrapper">
-                <div @click="changeFollow" class="follow-btn" :style="{color: '#fff', backgroundColor: followStatusText === '关注' ? '#1EB0FD' : '#A9A9A9', borderColor: followStatusText === '关注' ? '#1EB0FD' : '#A9A9A9'}"><i class="iconfont follow-btn-icon" :class="{'icon-add': followStatusText === '关注', 'icon-focused': followStatusText === '已关注', 'icon-transform': followStatusText === '好友'}"></i>{{followStatusText}}</div>
+                <div @click="changeFollow" class="follow-btn" :style="{color: followStatusText === '关注' ? '#1EB0FD' : '#A9A9A9', backgroundColor: '#fff', borderColor: followStatusText === '关注' ? '#1EB0FD' : '#A9A9A9'}"><i class="iconfont follow-btn-icon" :class="{'icon-add': followStatusText === '关注', 'icon-focused': followStatusText === '已关注', 'icon-transform': followStatusText === '互相关注'}"></i>关注</div>
               </div>
             </transition>
           </div>
@@ -511,7 +511,7 @@ export default {
       } else if (this.user.is_following && !this.user.is_being_followed) { // 已关注该用户，但该用户未关注我
         text = '已关注'
       } else if (this.user.is_following && this.user.is_being_followed) { // 已关注该用户，且该用户关注我
-        text = '好友'
+        text = '互相关注'
       }
       return text
     }
@@ -675,14 +675,14 @@ export default {
 .follow-btn{
   width: 300%;
   height: 300%;
-  line-height: 138px;
+  line-height: 132px;
   transform: scale(0.3333, 0.3333);
   transform-origin: 0 0;
   position: absolute;
   left: 0;
   top: 0;
   border-style: solid;
-  border-width: 3px;
+  border-width: 6px;
   border-radius: 72px;
   box-sizing: border-box;
   font-size: 72px;
