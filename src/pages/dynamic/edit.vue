@@ -11,7 +11,7 @@
       <edit-option :option="{leftIcon: 'topic_edit', title: '话题'}" v-if="topic">
         <div class="topic-box clearfix" slot="extra">
           <div class="topic-item fl" v-for="(item, idx) in topic" :key="idx">
-            <i class="iconfont icon-topic topic-icon"></i>{{item.title}}
+            <i class="iconfont icon-topic_v_2_5 topic-icon"></i>{{item.title}}
           </div>
         </div>
       </edit-option>

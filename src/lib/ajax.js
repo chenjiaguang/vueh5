@@ -8,6 +8,9 @@ import utils from './utils'
 axios.defaults.method = 'post'
 const loginText = '请登录'
 axios.interceptors.request.use(function (config) {
+  if (config.method === 'get') {
+    axios.defaults.method = 'get'
+  }
   if (config.checkLogin) {
     if (!utils.checkLogin()) {
       return Promise.reject(loginText)

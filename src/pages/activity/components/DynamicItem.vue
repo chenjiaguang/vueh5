@@ -245,7 +245,7 @@
   position: absolute;
   left: 0;
   top: 0;
-  font-size: 44px;
+  font-size: 36px;
   line-height: 104px;
   color: inherit;
 }

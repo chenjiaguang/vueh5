@@ -8,7 +8,7 @@
           <div class="top-header-overview">
             <div class="top-header-avatar" :style="{backgroundImage: 'url(' + (topicInfo.cover.staticImage || topicInfo.cover.url) + ')'}"></div>
             <div class="top-header-others">
-              <div class="top-header-title" v-if="topicInfo.title"><i class="iconfont icon-topic top-header-icon"></i><span class="top-header-title-text">{{topicInfo.title}}</span></div>
+              <div class="top-header-title" v-if="topicInfo.title"><i class="iconfont icon-topic_v_2_5 top-header-icon"></i><span class="top-header-title-text">{{topicInfo.title}}</span></div>
               <div class="top-header-dynum" v-if="topicInfo.dyCount">{{topicInfo.dyCount}}条动态</div>
               <div class="top-header-tags" v-if="topicInfo.tcName">
                 <div class="top-header-tag-item"><span>{{topicInfo.tcName}}</span></div>

@@ -12,7 +12,7 @@
     </div>
     <show-hide-content :content="(itemData.type && itemData.type.toString() === '18') ? itemData.title : (itemData.content || '')" :isLongDynamic="(itemData.type && itemData.type.toString() === '18') ? true : false" />
     <div v-if="itemData.topicInfo && itemData.topicInfo.length > 0" class="topic-box clearfix">
-      <div v-for="(item, idx) in itemData.topicInfo" :key="idx" @click.stop="goTopic(idx)" class="topic-item fl"><i class="iconfont icon-topic relative-topic-icon"></i>{{item.title}}</div>
+      <div v-for="(item, idx) in itemData.topicInfo" :key="idx" @click.stop="goTopic(idx)" class="topic-item fl"><i class="iconfont icon-topic_v_2_5 relative-topic-icon"></i>{{item.title}}</div>
     </div>
     <div class="dynamic-picture" v-if="itemData.covers && itemData.covers.length > 0">
       <image-container :images="itemData.covers" :router="router" :appearAnimation="false" :showDelete="false" />
@@ -265,7 +265,7 @@
   position: absolute;
   left: 0;
   top: 0;
-  font-size: 44px;
+  font-size: 36px;
   line-height: 104px;
   color: inherit;
 }
