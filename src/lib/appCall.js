@@ -96,7 +96,7 @@ export default function (func, overlay) {
     } else if (arguments[0] === 'h5GoCircleDetail') { // 跳转群组详情
       request_str = `_${arguments[0]}={"id":${JSON.stringify(arguments[1])},"name":${JSON.stringify(arguments[2])},"hasAct":${JSON.stringify(arguments[3])}}`
     } else if (arguments[0] === 'h5GoTopicDetail') { // 跳转话题详情
-      request_str = `_${arguments[0]}={"id":${JSON.stringify(arguments[1])},"title":${JSON.stringify(arguments[2])},"content":${JSON.stringify(arguments[3])},"beginColor":${JSON.stringify(arguments[4])},"endColor":${JSON.stringify(arguments[5])}}`
+      request_str = `_${arguments[0]}={"id":${JSON.stringify(arguments[1])},"title":${JSON.stringify(arguments[2])},"content":${JSON.stringify(arguments[3])},"tcName":${JSON.stringify(arguments[4])},"coverUrl":${JSON.stringify(arguments[5])},"dyCount":${JSON.stringify(arguments[6])}}`
     } else if (arguments[0] === 'h5GoUserCenter') { // 跳转用户名片
       request_str = `_${arguments[0]}={"id":${JSON.stringify(arguments[1])},"is_news":${JSON.stringify(arguments[2])},"type":${JSON.stringify(arguments[3])}}`
     }

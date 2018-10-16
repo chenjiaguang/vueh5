@@ -292,8 +292,8 @@ export default {
         }
         if (res && !res.error && res.data) { // 成功获取数据
           if (this.$isApp) {
-            let {id, title, content, beginColor, endColor} = res.data
-            this.$appCall('h5GoTopicDetail', id, title, content, beginColor, endColor)
+            let {id, title, content, beginColor, endColor, tcName, cover, dyCount} = res.data
+            this.$appCall('h5GoTopicDetail', id, title, content, tcName, cover, dyCount)
           }
           this.tabs[idx].fetching = false
           this.tabs[idx].paging = res.data.paging
