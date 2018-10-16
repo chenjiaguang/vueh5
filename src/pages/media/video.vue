@@ -1,6 +1,6 @@
 <template>
   <div class="video-page" ref="videoPage" @touchstart="pageTouchstart"  @touchmove.prevent @touchend="pageTouchend" @click.stop="toggleShowButtons">
-    <video ref="video" playsinline webkit-playsinline x5-playsinline x5-video-player-type="h5" x5-video-player-fullscreen="true" id="fantuan_video" class="my-video video-js"></video>
+    <!-- <video ref="video" playsinline webkit-playsinline x5-playsinline x5-video-player-type="h5" x5-video-player-fullscreen="true" id="fantuan_video" class="my-video video-js"></video> -->
     <!-- <video src="https://baobab.kaiyanapp.com/api/v1/playUrl?vid=4468&resourceType=video&editionType=default&source=aliyun&ptl=true" playsinline webkit-playsinline x5-playsinline x5-video-player-type="h5" x5-video-player-fullscreen="true" controls></video> -->
     <!-- <canvas id="canvas" width="375" height="200"></canvas> -->
     <div :style="{opacity: (!pageData.show_error && pageData.show_buttons) ? 1 : 0, zIndex: 2, backgroundColor: (pageData.ended && pageData.paused) ? 'rgba(0,0,0,0.5)' : 'rgba(0,0,0,0)'}" class="video-mask-wrapper">
@@ -17,13 +17,13 @@
             <transition name="fade">
               <i v-if="!pageData.has_like" class='iconfont icon-dislike_v_2_5 comment-and-like-icon'></i>
             </transition>
-            <span>{{likeNumber || ''}}</span>
+            <span>{{likeNumber || '赞'}}</span>
           </div>
         </div>
         <div class="comment-and-like-item" @click.stop="goComment" style="padding-right: 0;">
           <div class="comment-and-like-icon-box">
             <i class="iconfont icon-comment_icon comment-and-like-icon"></i>
-            <span>{{commentNumber || ''}}</span>
+            <span>{{commentNumber || '评论'}}</span>
           </div>
         </div>
       </div>
@@ -200,26 +200,13 @@ export default {
         this.submitting = false
       })
     },
-    // getVideoAddress () {
-    //   this.$ajax('/jv/anonymous/qz/linkanalysis/getVideoAddress', {data: {linkid: this.$route.query.video_id}}).then(res => {
-    //     if (res && !res.error && res.data && res.data.videoAddress) {
-    //       console.log('data', res.data)
-    //       this.pageData.title = res.data.title
-    //       this.initVideo(res.data.videoAddress, res.data.originalCover, res.data.duration)
-    //     } else {
-    //       this.pageData.show_error = true
-    //     }
-    //   }).catch(err => {
-    //     this.pageData.show_error = true
-    //   })
-    // },
     refreshVideoAddress () {
       this.$ajax('/jv/anonymous/qz/linkanalysis/refresh', {data: {linkid: this.$route.query.video_id}}).then(res => {
         this.refresh = true
         if (res && !res.error && res.data && res.data.videoAddress) {
           this.pageData.title = res.data.title
           localStorage.video_title = res.data.title
-          this.video.refresh()
+          this.video.dispose()
           this.initVideo(res.data.videoAddress, res.data.originalCover, res.data.duration)
         } else {
           this.pageData.show_error = true
@@ -230,86 +217,104 @@ export default {
     },
     initVideo (url, poster, duration) {
       this.pageData.video_url = url
-      this.pageData.poster_url = url
+      this.pageData.poster_url = poster
       localStorage.video_url = url
-      localStorage.poster_url = url
-      this.$nextTick(() => {
-        this.video = videojs('fantuan_video', {
-          preload: true,
-          autoplay: false,
-          muted: false,
-          controls: false,
-          loop: false,
-          fluid: false,
-          inactivityTimeout: 5000,
-          nativeControlsForTouch: false,
-          playbackRates: [0.5, 1, 1.5, 2],
-          sources: [
-            {
-              src: url,
-              type: 'video/mp4'
-            }
-          ]
-        })
-        this.video.poster(this.$route.query.poster)
-        this.video.on('durationchange', e => { // 播放长度更新
-          console.log('durationchange')
-          this.pageData.min = 0
-          this.pageData.max = this.video.duration()
-          this.showVideoBuffered()
-        })
-        this.video.on('timeupdate', e => { // 播放进度更新
-          this.pageData.percent = this.video.currentTime()
-        })
-        this.video.on('progress', e => { // 缓冲加载数据成功
-          this.showVideoBuffered()
-        })
-        this.video.on('play', e => { // 播放
-          this.pageData.paused = false
-          this.pageData.ended = false
-        })
-        this.video.on('pause', e => { // 暂停
-          this.pageData.paused = true
-        })
-        this.video.on('ended', e => { // 播放完毕
-          this.pageData.ended = true
-        })
-        this.video.on('waiting', () => { // 正在缓冲
-          this.pageData.waiting = true
-        })
-        this.video.on('loadeddata', () => { // 加载数据成功
-          console.log('loadeddata')
-          if (this.pageData.first) {
-            this.pageData.first = false
-            this.video.currentTime(parseInt(this.$route.query.current_time || 0))
+      localStorage.poster_url = poster
+      // 动态往页面上添加video
+      let _video = document.createElement('video')
+      _video.setAttribute('playsinline', 'playsinline')
+      _video.setAttribute('webkit-playsinline', true)
+      _video.setAttribute('x5-playsinline', true)
+      _video.setAttribute('x5-video-player-type', 'h5')
+      _video.setAttribute('x5-video-player-fullscreen', true)
+      _video.setAttribute('id', 'fantuan_video')
+      _video.className = 'my-video video-js'
+      const len = Object.keys(this.$refs['videoPage'].dataset).length
+      let attr = ''
+      for (let i = 0; i < len; i++) {
+        console.log('key', Object.keys(this.$refs['videoPage'].dataset)[i])
+        if (Object.keys(this.$refs['videoPage'].dataset)[i].indexOf('v-') > -1) {
+          attr = Object.keys(this.$refs['videoPage'].dataset)[i]
+        }
+      }
+      // 添加对应的dataset
+      _video.setAttribute('data-' + attr, '')
+      this.$refs['videoPage'].appendChild(_video)
+      this.video = videojs('fantuan_video', {
+        preload: true,
+        autoplay: false,
+        muted: false,
+        controls: false,
+        loop: false,
+        fluid: false,
+        inactivityTimeout: 5000,
+        nativeControlsForTouch: false,
+        playbackRates: [0.5, 1, 1.5, 2],
+        sources: [
+          {
+            src: url,
+            type: 'video/mp4'
+          },
+          {
+            src: url,
+            type: 'video/webm'
           }
-        })
-        this.video.on('canplay', () => { // 可播放
-          console.log('canplay')
-          this.pageData.waiting = false
-        // if (this.pageData.first) {
-        //   this.pageData.first = false
-        //   this.video.currentTime(parseInt(this.$route.query.current_time || 0))
-        // }
-        })
-        this.video.on('error', e => { // 播放出错
-          console.log('error')
-          if (this.refresh) {
-            this.pageData.show_error = true
-            return false
-          }
-          this.refreshVideoAddress()
-        })
-        // 隐藏默认缓冲中的样式
-        this.video.getChild('LoadingSpinner').hide()
-        this.video.ready(() => {
-        // console.log('this.video', this.video)
-          this.pageData.min = 0
-          this.pageData.max = this.getSecondFromDuration(duration)
-          this.pageData.waiting = false
-          this.pageData.percent = parseInt(this.$route.query.current_time || 0)
-          // this.video.poster(poster)
-        })
+        ]
+      })
+      // this.video.poster(poster)
+      this.video.on('durationchange', e => { // 播放长度更新
+        console.log('durationchange')
+        this.pageData.min = 0
+        this.pageData.max = this.video.duration()
+        this.showVideoBuffered()
+      })
+      this.video.on('timeupdate', e => { // 播放进度更新
+        this.pageData.percent = this.video.currentTime()
+      })
+      this.video.on('progress', e => { // 缓冲加载数据成功
+        this.showVideoBuffered()
+      })
+      this.video.on('play', e => { // 播放
+        this.pageData.paused = false
+        this.pageData.ended = false
+      })
+      this.video.on('pause', e => { // 暂停
+        this.pageData.paused = true
+      })
+      this.video.on('ended', e => { // 播放完毕
+        this.pageData.ended = true
+      })
+      this.video.on('waiting', () => { // 正在缓冲
+        this.pageData.waiting = true
+      })
+      this.video.on('loadeddata', () => { // 加载数据成功
+        console.log('loadeddata')
+        if (this.pageData.first) {
+          this.pageData.first = false
+          this.video.currentTime(parseInt(this.$route.query.current_time || 0))
+        }
+      })
+      this.video.on('canplay', () => { // 可播放
+        console.log('canplay')
+        this.pageData.waiting = false
+      })
+      this.video.on('error', e => { // 播放出错
+        console.log('error')
+        if (this.refresh) {
+          this.pageData.show_error = true
+          return false
+        }
+        this.refreshVideoAddress()
+      })
+      // 隐藏默认缓冲中的样式
+      this.video.getChild('LoadingSpinner').hide()
+      this.video.ready(() => {
+        console.log('ready')
+        this.pageData.min = 0
+        this.pageData.max = this.getSecondFromDuration(duration)
+        this.pageData.waiting = false
+        this.pageData.percent = parseInt(this.$route.query.current_time || 0)
+        this.video.poster(poster)
       })
     },
     orientationChange () {
@@ -331,7 +336,7 @@ export default {
     // this.getVideoAddress()
     let {video_duration} = this.$route.query
     let {video_url, poster_url} = this.pageData
-    this.initVideo(video_url || localStorage.video_url, poster_url, video_duration)
+    this.initVideo(video_url || localStorage.video_url, poster_url || localStorage.poster_url, video_duration)
   },
   beforeDestroy () {
     if (this.video && this.video.dispose) {
@@ -453,7 +458,7 @@ export default {
   overflow: hidden;
 }
 .video-mask-wrapper{
-  position: fixed;
+  position: absolute;
   left: 0;
   bottom: 0;
   width: 100%;
@@ -465,21 +470,11 @@ export default {
   transition: opacity 500ms;
 }
 .my-video {
-  // position: absolute;
-  // top: 0;
-  // left: 0;
-  // right: 0;
-  // bottom: 0;
-  // margin: auto;
-  // width: auto;
-  // height: auto;
-  // z-index: 1;
-  // max-width: 100%;
-  // max-height: 100%;
-  position: fixed;
+  position: absolute;
   width: 100%;
   height: 100%;
-  // display: none;
+  left: 0;
+  top: 0;
 }
 .my-control-bar {
   position: absolute;

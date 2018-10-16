@@ -23,7 +23,7 @@
         <transition name="fade">
           <i v-if="!dynamic.has_like" class='iconfont icon-dislike_v_2_5 comment-and-like-icon'></i>
         </transition>
-        <span>{{likeNumber || ''}}</span>
+        <span>{{likeNumber || '赞'}}</span>
       </div>
       <div class="right-line"></div>
     </div>
@@ -32,7 +32,7 @@
       <span class="like-comment-box-text">{{commentNumber || ''}}</span> -->
       <div class="comment-and-like-icon-box">
         <i class="iconfont icon-comment_icon comment-and-like-icon"></i>
-        <span>{{commentNumber || ''}}</span>
+        <span>{{commentNumber || '评论'}}</span>
       </div>
     </div>
   </div>
