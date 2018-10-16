@@ -556,9 +556,14 @@ fl{
   position: absolute;
   transform: scale(0.5, 0.5);
   transform-origin: 0 0;
+  white-space: nowrap;
+}
+.top-header-tag-item span{
+  font-weight: bold;
 }
 .top-header-title-text{
   vertical-align: middle;
+  font-weight: bold;
 }
 .top-header-intro{
   font-size: 24px;
