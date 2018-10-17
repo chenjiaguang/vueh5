@@ -50,6 +50,8 @@
 import utils from '@/lib/utils'
 import videojs from 'video.js'
 import 'video.js/dist/video-js.min.css'
+import 'videojs-flash'
+// import 'videojs-flvjs/dist/videojs-flvjs.min.js'
 import VideoBar from '@/components/VideoBar'
 // from参数(1表示上个页面是列表页，2表示上个页面是详情页)
 export default {
@@ -232,6 +234,7 @@ export default {
       })
     },
     initVideo (url, poster, duration) {
+      videojs.options.flash.swf = 'https://vjs.zencdn.net/swf/5.4.2/video-js.swf'
       this.pageData.video_url = url
       this.pageData.poster_url = poster
       localStorage.video_url = url
@@ -244,6 +247,9 @@ export default {
       _video.setAttribute('x5-video-player-type', 'h5')
       _video.setAttribute('x5-video-player-fullscreen', true)
       _video.setAttribute('id', 'fantuan_video')
+      _video.setAttribute('width', '100%')
+      _video.setAttribute('height', '100%')
+      _video.setAttribute('src', url)
       _video.className = 'my-video video-js'
       const len = Object.keys(this.$refs['videoPage'].dataset).length
       let attr = ''
@@ -263,6 +269,7 @@ export default {
         controls: false,
         loop: false,
         fluid: false,
+        techOrder: ['flash'],
         inactivityTimeout: 5000,
         nativeControlsForTouch: false,
         playbackRates: [0.5, 1, 1.5, 2],
@@ -274,6 +281,14 @@ export default {
           {
             src: url,
             type: 'video/webm'
+          },
+          {
+            src: url,
+            type: 'video/ogg'
+          },
+          {
+            src: url,
+            type: 'rtmp/flv'
           }
         ]
       })
