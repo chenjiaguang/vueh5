@@ -50,7 +50,15 @@
 import utils from '@/lib/utils'
 import videojs from 'video.js'
 import 'video.js/dist/video-js.min.css'
-import 'videojs-flash'
+import Flash from 'videojs-flash'
+Flash.isSupported = function () {
+  // for Chrome Desktop and Safari Desktop
+  if (videojs.browser.IS_CHROME && !videojs.browser.IS_ANDROID || videojs.browser.IS_SAFARI && !videojs.browser.IS_IOS) {
+    return true;
+  }
+  // for other browsers
+  return true;
+};
 // import 'videojs-flvjs/dist/videojs-flvjs.min.js'
 import VideoBar from '@/components/VideoBar'
 // from参数(1表示上个页面是列表页，2表示上个页面是详情页)
@@ -247,8 +255,8 @@ export default {
       _video.setAttribute('x5-video-player-type', 'h5')
       _video.setAttribute('x5-video-player-fullscreen', true)
       _video.setAttribute('id', 'fantuan_video')
-      _video.setAttribute('width', '100%')
-      _video.setAttribute('height', '100%')
+      _video.setAttribute('width', '401px')
+      _video.setAttribute('height', '301px')
       _video.setAttribute('src', url)
       _video.className = 'my-video video-js'
       const len = Object.keys(this.$refs['videoPage'].dataset).length
