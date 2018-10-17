@@ -51,14 +51,6 @@ import utils from '@/lib/utils'
 import videojs from 'video.js'
 import 'video.js/dist/video-js.min.css'
 import Flash from 'videojs-flash'
-Flash.isSupported = function () {
-  // for Chrome Desktop and Safari Desktop
-  if (videojs.browser.IS_CHROME && !videojs.browser.IS_ANDROID || videojs.browser.IS_SAFARI && !videojs.browser.IS_IOS) {
-    return true;
-  }
-  // for other browsers
-  return true;
-};
 // import 'videojs-flvjs/dist/videojs-flvjs.min.js'
 import VideoBar from '@/components/VideoBar'
 // from参数(1表示上个页面是列表页，2表示上个页面是详情页)
@@ -277,7 +269,7 @@ export default {
         controls: false,
         loop: false,
         fluid: false,
-        techOrder: ['flash'],
+        techOrder: ['flash', 'html5'],
         inactivityTimeout: 5000,
         nativeControlsForTouch: false,
         playbackRates: [0.5, 1, 1.5, 2],
