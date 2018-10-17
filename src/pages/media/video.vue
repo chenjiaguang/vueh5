@@ -1,5 +1,5 @@
 <template>
-  <div class="video-page" ref="videoPage" @touchstart="pageTouchstart"  @touchmove.prevent @touchend="pageTouchend" @click.stop="toggleShowButtons">
+  <div class="video-page" :style="{backgroundImage: 'url(' + (video ? pageData.poster_url : '') + ')'}" ref="videoPage" @touchstart="pageTouchstart"  @touchmove.prevent @touchend="pageTouchend" @click.stop="toggleShowButtons">
     <!-- <video ref="video" playsinline webkit-playsinline x5-playsinline x5-video-player-type="h5" x5-video-player-fullscreen="true" id="fantuan_video" class="my-video video-js"></video> -->
     <!-- <video src="https://baobab.kaiyanapp.com/api/v1/playUrl?vid=4468&resourceType=video&editionType=default&source=aliyun&ptl=true" playsinline webkit-playsinline x5-playsinline x5-video-player-type="h5" x5-video-player-fullscreen="true" controls></video> -->
     <!-- <canvas id="canvas" width="375" height="200"></canvas> -->
@@ -98,13 +98,25 @@ export default {
   },
   watch: {
     'pageData.show_buttons' (val, oldVal) {
-      if (val) {
+      if (val && !oldVal) {
         clearTimeout(this.timer)
         this.timer = setTimeout(() => {
           this.pageData.show_buttons = false
         }, 3000)
       } else {
         clearTimeout(this.timer)
+      }
+    },
+    'pageData.ended' (val, oldVal) {
+      if (val && !oldVal) {
+        this.pageData.show_buttons = true
+        this.$nextTick(() => {
+          clearTimeout(this.timer)
+        })
+      } else if (!val && oldVal) {
+        this.timer = setTimeout(() => {
+          this.pageData.show_buttons = false
+        }, 3000)
       }
     }
   },
@@ -115,7 +127,7 @@ export default {
       }
     },
     pageTouchend () {
-      if (this.pageData.show_buttons) {
+      if (this.pageData.show_buttons && !this.pageData.ended) {
         clearTimeout(this.timer)
         this.timer = setTimeout(() => {
           this.pageData.show_buttons = false
@@ -135,6 +147,9 @@ export default {
       }
     },
     toggleShowButtons () {
+      if (this.pageData.ended) {
+        return false
+      }
       this.pageData.show_buttons = !this.pageData.show_buttons
     },
     setTime (second) {
@@ -206,7 +221,8 @@ export default {
         if (res && !res.error && res.data && res.data.videoAddress) {
           this.pageData.title = res.data.title
           localStorage.video_title = res.data.title
-          this.video.dispose()
+          // document.getElementById('fantuan_video').style.display = 'none'
+          // this.video.dispose()
           this.initVideo(res.data.videoAddress, res.data.originalCover, res.data.duration)
         } else {
           this.pageData.show_error = true
@@ -269,6 +285,9 @@ export default {
         this.showVideoBuffered()
       })
       this.video.on('timeupdate', e => { // 播放进度更新
+        if (this.pageData.waiting) {
+          this.pageData.waiting = false
+        }
         this.pageData.percent = this.video.currentTime()
       })
       this.video.on('progress', e => { // 缓冲加载数据成功
@@ -294,16 +313,18 @@ export default {
           this.video.currentTime(parseInt(this.$route.query.current_time || 0))
         }
       })
-      this.video.on('canplay', () => { // 可播放
-        console.log('canplay')
-        this.pageData.waiting = false
-      })
+      // this.video.on('canplay', () => { // 可播放
+      //   console.log('canplay')
+      //   this.pageData.waiting = false
+      // })
       this.video.on('error', e => { // 播放出错
         console.log('error')
         if (this.refresh) {
           this.pageData.show_error = true
           return false
         }
+        this.pageData.waiting = true
+        this.video.dispose()
         this.refreshVideoAddress()
       })
       // 隐藏默认缓冲中的样式
@@ -456,6 +477,10 @@ export default {
   width: 100%;
   height: 100%;
   overflow: hidden;
+  background-color: #000;
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
 }
 .video-mask-wrapper{
   position: absolute;

@@ -8,7 +8,7 @@
           <div class="top-header-overview">
             <div class="top-header-avatar" :style="{backgroundImage: 'url(' + (topicInfo.cover.staticImage || topicInfo.cover.url) + ')'}"></div>
             <div class="top-header-others">
-              <div class="top-header-title" v-if="topicInfo.title"><i class="iconfont icon-topic_v_2_5 top-header-icon"></i><span class="top-header-title-text">{{topicInfo.title}}</span></div>
+              <div class="top-header-title" v-if="topicInfo.title"><i class="iconfont icon-topic_v_2_5 top-header-icon"></i><span class="top-header-title-text">{{topicInfo.title}}</span><div class="end-mask"></div></div>
               <div class="top-header-dynum" v-if="topicInfo.dyCount">{{topicInfo.dyCount}}条动态</div>
               <div class="top-header-tags" v-if="topicInfo.tcName">
                 <div class="top-header-tag-item"><span>{{topicInfo.tcName}}</span></div>
@@ -522,6 +522,10 @@ fl{
   background-size: cover;
   background-color: #eeeeee;
 }
+.top-header-others{
+  flex: 1;
+  overflow: hidden;
+}
 .top-header-title{
   font-size: 36px;
   line-height: 44px;
@@ -529,6 +533,18 @@ fl{
   font-weight: bold;
   word-break: break-all;
   white-space: normal;
+  position: relative;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.end-mask{
+  width: 64px;
+  height: 100%;
+  background: linear-gradient(90deg, rgba(255,255,255,0.12), rgba(255,255,255,1));
+  position: absolute;
+  right: 0;
+  top: 0;
+  z-index: 1;
 }
 .top-header-dynum{
   font-size: 24px;
