@@ -28,7 +28,7 @@ export default {
       this.$router.push({
         name: 'VideoMedia',
         query: { dynamic_id: this.dynamic.id, video_id: this.dynamic.linkInfo.id, like_num: this.dynamic.like_num, comment_num: this.dynamic.comment_num, has_like: this.dynamic.has_like, current_time: (this.dynamic.videoPoint || this.currentTime), from: (this.from || 2), video_duration: this.dynamic.linkInfo.duration },
-        params: { video_url: this.dynamic.linkInfo.videoAddress, poster_url: this.dynamic.linkInfo.originalCover, video_title: this.dynamic.linkInfo.title }
+        params: { video_url: this.dynamic.linkInfo.videoAddress, poster_url: this.dynamic.linkInfo.originalCover, video_title: this.dynamic.content || this.dynamic.linkInfo.title }
       })
       // window._video.video.src('http://180.97.241.182/69742340BE14381AEEE2013792/03000A01005BA74AEFAF57145E3147B235BE07-6BFE-4965-82D5-45C9D04B2030.mp4?ccode=0501&duration=96&expire=18000&psid=8526f9f3ef86abc67816fdaac80da61a&ups_client_netip=3ad03118&ups_ts=1539142975&ups_userid=&utid=PmNEFJKjaBECAXFMEmvcD8cT&vid=XMzgzNDg3MDE4NA&vkey=Ace7b2b900c9261991a9e9d1c82c123e1&sp=')
       // window._video.video.play()

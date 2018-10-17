@@ -3,7 +3,7 @@
     <!-- <video ref="video" playsinline webkit-playsinline x5-playsinline x5-video-player-type="h5" x5-video-player-fullscreen="true" id="fantuan_video" class="my-video video-js"></video> -->
     <!-- <video src="https://baobab.kaiyanapp.com/api/v1/playUrl?vid=4468&resourceType=video&editionType=default&source=aliyun&ptl=true" playsinline webkit-playsinline x5-playsinline x5-video-player-type="h5" x5-video-player-fullscreen="true" controls></video> -->
     <!-- <canvas id="canvas" width="375" height="200"></canvas> -->
-    <div :style="{opacity: (!pageData.show_error && pageData.show_buttons) ? 1 : 0, zIndex: 2, backgroundColor: (pageData.ended && pageData.paused) ? 'rgba(0,0,0,0.5)' : 'rgba(0,0,0,0)'}" class="video-mask-wrapper">
+    <div :class="{ended: pageData.ended && pageData.paused}" :style="{opacity: (!pageData.show_error && pageData.show_buttons) ? 1 : 0, zIndex: 2}" class="video-mask-wrapper">
       <div @click.stop class="video-bar-wrapper">
         <video-bar ref="videoBar" :video="video" :min="pageData.min" :max="pageData.max" v-model="pageData.percent" :buffered="buffered" @setTime="setTime" @toggleFullScreen="toggleFullScreen" />
       </div>
@@ -50,7 +50,7 @@
 import utils from '@/lib/utils'
 import videojs from 'video.js'
 import 'video.js/dist/video-js.min.css'
-import Flash from 'videojs-flash'
+import 'videojs-flash'
 // import 'videojs-flvjs/dist/videojs-flvjs.min.js'
 import VideoBar from '@/components/VideoBar'
 // from参数(1表示上个页面是列表页，2表示上个页面是详情页)
@@ -488,7 +488,7 @@ export default {
   height: 200PX;
 }
 .video-page {
-  position: relative;
+  position: fixed;
   width: 100%;
   height: 100%;
   overflow: hidden;
@@ -507,7 +507,10 @@ export default {
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  transition: opacity 500ms;
+  transition: all 500ms;
+}
+.video-mask-wrapper.ended{
+  background-color: rgba(0,0,0,0.5);
 }
 .my-video {
   position: absolute;

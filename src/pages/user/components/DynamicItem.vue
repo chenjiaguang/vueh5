@@ -43,7 +43,7 @@
       <div class="content-activity-img" :style="`background-image:url(${itemData.activity.covers?itemData.activity.covers[0].compress:''})`"/>
       <div class="content-activity-right column space-between">
         <div class="content-activity-title">{{itemData.activity.title}}</div>
-        <div class="content-activity-address">{{itemData.activity.address}}</div>
+        <div class="content-activity-address">{{itemData.activity.address || '线上活动'}}</div>
         <div class="content-activity-time_text">{{itemData.activity.time_text}}</div>
       </div>
     </div>
