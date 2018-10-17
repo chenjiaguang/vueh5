@@ -207,7 +207,8 @@
 }
 .comment-and-like{
   width: 100%;
-  height:104px;
+  height:80px;
+  line-height:80px;
   text-align: center;
   position: relative;
   display: flex;
@@ -221,7 +222,6 @@
 }
 .comment-and-like-icon-box{
   height: 100%;
-  line-height: 104px;
   margin-right: 60px;
   overflow: hidden;
   text-align: center;
@@ -240,7 +240,6 @@
   left: 0;
   top: 0;
   font-size: 36px;
-  line-height: 104px;
   color: inherit;
 }
 .icon-like_v_2_5{
