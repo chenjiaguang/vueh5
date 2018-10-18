@@ -90,7 +90,7 @@
   .header{
     font-size: 32px;
     line-height: 44px;
-    font-weight: 600;
+    font-weight: bold;
     padding-bottom: 25px;
   }
   .image-container{
@@ -148,7 +148,7 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    font-weight: 600;
+    font-weight: bold;
   }
   .cost{
     color: #ff3f53;
@@ -216,14 +216,14 @@
   .join-header{
     font-size: 32px;
     line-height: 42px;
-    font-weight: 600;
+    font-weight: bold;
     padding-top: 55px;
     padding-left: 34px;
   }
   .dynamic-header{
     font-size: 32px;
     line-height: 42px;
-    font-weight: 600;
+    font-weight: bold;
     padding-top: 20px;
     padding-left: 34px;
   }
@@ -321,7 +321,7 @@
     background-color: #fff;
     font-size: 30px;
     color: #fff;
-    font-weight: 600;
+    font-weight: bold;
     line-height: 100px;
     text-align: center;
     position: fixed;

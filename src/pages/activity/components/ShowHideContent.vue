@@ -29,7 +29,7 @@
   .header{
     font-size: 32px;
     line-height: 44px;
-    font-weight: 600;
+    font-weight: bold;
     padding-bottom: 25px;
     padding-top: 66px;
   }
