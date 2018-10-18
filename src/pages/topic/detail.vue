@@ -166,7 +166,7 @@ export default {
       })
     },
     'topicInfo.title': function (val, oldVal) {
-      document.title = val || '范团话题'
+      document.title = val
     }
   },
   methods: {
@@ -460,6 +460,9 @@ export default {
   },
   activated () {
     this.$forceUpdate()
+    if (this.topicInfo && this.topicInfo.title) {
+      document.title = this.topicInfo.title
+    }
   },
   beforeRouteEnter (to, from, next) {
     next(vm => {
