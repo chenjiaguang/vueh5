@@ -141,7 +141,7 @@ export default {
       this.video.play()
     },
     togglePlay () {
-      console.log('togglePlay', this.video)
+      // console.log('togglePlay', this.video)
       if (this.video.paused()) {
         this.video.play()
       } else {
@@ -254,7 +254,7 @@ export default {
       const len = Object.keys(this.$refs['videoPage'].dataset).length
       let attr = ''
       for (let i = 0; i < len; i++) {
-        console.log('key', Object.keys(this.$refs['videoPage'].dataset)[i])
+        // console.log('key', Object.keys(this.$refs['videoPage'].dataset)[i])
         if (Object.keys(this.$refs['videoPage'].dataset)[i].indexOf('v-') > -1) {
           attr = Object.keys(this.$refs['videoPage'].dataset)[i]
         }
@@ -294,9 +294,10 @@ export default {
       })
       // this.video.poster(poster)
       this.video.on('durationchange', e => { // 播放长度更新
-        console.log('durationchange')
-        this.pageData.min = 0
-        this.pageData.max = this.video.duration()
+        // console.log('durationchange', isNaN(this.video.duration()))
+        if (!isNaN(this.video.duration())) {
+          this.pageData.max = this.video.duration()
+        }
         this.showVideoBuffered()
       })
       this.video.on('timeupdate', e => { // 播放进度更新
@@ -322,7 +323,7 @@ export default {
         this.pageData.waiting = true
       })
       this.video.on('loadeddata', () => { // 加载数据成功
-        console.log('loadeddata')
+        // console.log('loadeddata')
         if (this.pageData.first) {
           this.pageData.first = false
           this.video.currentTime(parseInt(this.$route.query.current_time || 0))
@@ -333,7 +334,7 @@ export default {
       //   this.pageData.waiting = false
       // })
       this.video.on('error', e => { // 播放出错
-        console.log('error')
+        // console.log('error')
         if (this.refresh) {
           this.pageData.show_error = true
           return false
@@ -345,9 +346,7 @@ export default {
       // 隐藏默认缓冲中的样式
       this.video.getChild('LoadingSpinner').hide()
       this.video.ready(() => {
-        console.log('ready')
-        this.pageData.min = 0
-        this.pageData.max = this.getSecondFromDuration(duration)
+        // console.log('ready')
         this.pageData.waiting = false
         this.pageData.percent = parseInt(this.$route.query.current_time || 0)
         this.video.poster(poster)
@@ -372,6 +371,10 @@ export default {
     // this.getVideoAddress()
     let {video_duration} = this.$route.query
     let {video_url, poster_url} = this.pageData
+    // 设置最小、最大时间
+    this.pageData.min = 0
+    this.pageData.max = this.getSecondFromDuration(video_duration)
+    // 初始化视频
     this.initVideo(video_url || localStorage.video_url, poster_url || localStorage.poster_url, video_duration)
   },
   beforeDestroy () {
