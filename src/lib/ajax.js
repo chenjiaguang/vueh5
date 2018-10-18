@@ -8,6 +8,9 @@ import utils from './utils'
 axios.defaults.method = 'post'
 const loginText = '请登录'
 axios.interceptors.request.use(function (config) {
+  if (config.method === 'get') {
+    axios.defaults.method = 'get'
+  }
   if (config.checkLogin) {
     if (!utils.checkLogin()) {
       return Promise.reject(loginText)
@@ -31,6 +34,7 @@ axios.interceptors.request.use(function (config) {
   if (config.contentType) {
     config.headers['Content-Type'] = config.contentType
   }
+  config.headers['version'] = '2.5.1'
   return config
 }, function (error) {
   // 对请求错误做些什么

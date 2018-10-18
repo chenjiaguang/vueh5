@@ -5,9 +5,7 @@
         <img class="logo" :src="$assetsPublicPath + '/cwebassets/image/van_logo.png'" />
         <div class="text-box title">有范又有趣的海南生活圈</div>
       </div>
-      <div class="go" @click="openFantTuanC">
-        立即打开
-      </div>
+      <div class="go" @click="openFantTuanC">立即打开</div>
       <weixin :show="showWeixinTip" @changeShow="showHideTip" />
     </div>
   </div>
@@ -15,9 +13,8 @@
 
 <style lang="scss" type="text/scss" scoped>
 .box {
-  height: 128px;
-  padding-top: 20px;
-  padding-bottom: 20px;
+  height: 110px;
+  padding-top: 15px;
   padding-left: 30px;
   padding-right: 30px;
   background-color: #FAFAFA;
@@ -27,18 +24,19 @@
   border-bottom-style: solid;
 }
 .logo {
-  height: 88px;
-  width: 88px;
+  height: 80px;
+  width: 80px;
+  border-radius: 20px;
 }
 .go {
   height: 46px;
-  width: 139px;
+  width: 140px;
   background-color: #1fb0fd;
   color: #ffffff;
   font-size: 24px;
   line-height: 46px;
   text-align: center;
-  border-radius: 6px;
+  border-radius: 12px;
 }
 .text-box {
   margin-left: 20px;
@@ -46,7 +44,7 @@
 .title {
   color: #666666;
   font-size: 32px;
-  line-height: 88px;
+  line-height: 80px;
 }
 </style>
 

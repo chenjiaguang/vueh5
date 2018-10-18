@@ -23,7 +23,7 @@ const SMSCode = resolve => require(['@/pages/smsCode'], resolve)
 const WeixinLoginJump = resolve => require(['@/pages/weixinLoginJump'], resolve)
 const PromotionIndex = resolve => require(['@/pages/promotion/index'], resolve)
 const NewsDetail = resolve => require(['@/pages/news/articleDetail'], resolve)
-const TestVideo = resolve => require(['@/pages/testVideo'], resolve)
+const VideoMedia = resolve => require(['@/pages/media/video'], resolve)
 // import NotFoundPage from '@/pages/notFoundPage'
 // import Home from '@/pages/home'
 // import CircleDetail from '@/pages/circle/detail'
@@ -146,7 +146,7 @@ const router = new Router({
       name: 'CircleDetail',
       component: CircleDetail,
       meta: {
-        title: '范团圈子',
+        title: '范团群组',
         keepAlive: true
       }
     },
@@ -231,9 +231,9 @@ const router = new Router({
       }
     },
     {
-      path: prefix + '/test/video',
-      name: 'TestVideo',
-      component: TestVideo,
+      path: prefix + '/media/video',
+      name: 'VideoMedia',
+      component: VideoMedia,
       meta: {
         title: '视频播放'
       }

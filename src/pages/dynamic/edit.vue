@@ -11,12 +11,12 @@
       <edit-option :option="{leftIcon: 'topic_edit', title: '话题'}" v-if="topic">
         <div class="topic-box clearfix" slot="extra">
           <div class="topic-item fl" v-for="(item, idx) in topic" :key="idx">
-            <i class="iconfont icon-topic topic-icon"></i>{{item.title}}
+            <i class="iconfont icon-topic_v_2_5 topic-icon"></i>{{item.title}}
           </div>
         </div>
       </edit-option>
       <edit-option :option="{leftIcon: 'activity_edit', title: activity.title}" v-if="activity"></edit-option>
-      <edit-option :option="{leftIcon: 'circle', title: '发布于圈子', rightText: circle.title}" v-if="circle">
+      <edit-option :option="{leftIcon: 'circle', title: '发布于群组', rightText: circle.title}" v-if="circle">
         <div class="topic-box clearfix" slot="extra">
           <div @click.stop="showAllwaysChecked = !showAllwaysChecked" class="check-sync fr">
             <i class="iconfont check-icon" :class="{'icon-checked': showAllwaysChecked, 'icon-uncheck': !showAllwaysChecked}"></i><span>同步到动态</span>

@@ -1,6 +1,6 @@
 <template>
   <div v-if="circle" class="container column">
-    <div class="title">申请加入圈子</div>
+    <div class="title">申请加入群组</div>
     <div class="circleInfo row center">
       <img class="avatar" :src="circle.cover.compress"/>
       <div class="circlename">{{circle.name}}</div>

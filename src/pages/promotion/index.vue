@@ -36,10 +36,12 @@ import Fingerprint2 from 'fingerprintjs2'
 
 export default {
   data () {
+    console.log('mounted')
     return {
       btnColor: '#6273F7',
       showWeixinTip: false,
-      fingerprint: null
+      fingerprint: null,
+      timer: null
     }
   },
   components: { Weixin },

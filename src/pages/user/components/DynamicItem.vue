@@ -12,13 +12,11 @@
     </div>
     <show-hide-content :content="(itemData.type && itemData.type.toString() === '18') ? itemData.title : (itemData.content || '')" :isLongDynamic="(itemData.type && itemData.type.toString() === '18') ? true : false" />
     <div v-if="itemData.topicInfo && itemData.topicInfo.length > 0" class="topic-box clearfix">
-      <div v-for="(item, idx) in itemData.topicInfo" :key="idx" @click.stop="goTopic(idx)" class="topic-item fl"><i class="iconfont icon-topic relative-topic-icon"></i>{{item.title}}</div>
+      <div v-for="(item, idx) in itemData.topicInfo" :key="idx" @click.stop="goTopic(idx)" class="topic-item fl"><i class="iconfont icon-topic_v_2_5 relative-topic-icon"></i>{{item.title}}</div>
     </div>
     <div class="dynamic-picture" v-if="itemData.covers && itemData.covers.length > 0">
       <image-container :images="itemData.covers" :router="router" :appearAnimation="false" :showDelete="false" />
     </div>
-    <div v-if="itemData.location" class="publish-address">{{itemData.location}}</div>
-    <div v-if="itemData.activity" class="at-activity"><i class="iconfont icon-activity activity-sign"></i>{{itemData.activity.title}}</div>
     <a @click.stop :href="itemData.newsArticle.article_url" v-if="itemData.newsArticle && itemData.newsArticle.id" class="with-article">
       <div class="with-article-cover" v-if="itemData.newsArticle.covers && itemData.newsArticle.covers[0]" :style="{backgroundImage: 'url(' + (itemData.newsArticle.covers[0].compress || itemData.newsArticle.covers[0].url) + ')'}"></div>
       <div class="with-article-cover" v-else>
@@ -28,7 +26,7 @@
         <div class="with-article-title-text">{{itemData.newsArticle.name || itemData.newsArticle.article_url}}</div>
       </div>
     </a>
-    <a @click.stop :href="itemData.linkInfo.url" v-if="itemData.linkInfo && itemData.linkInfo.id" class="with-article">
+    <a @click.stop :href="itemData.linkInfo.url" v-if="itemData.linkInfo && itemData.linkInfo.id && itemData.linkInfo.type==0" class="with-article">
       <div class="with-article-cover" v-if="itemData.linkInfo.cover" :style="{backgroundImage: 'url(' + itemData.linkInfo.cover + ')'}"></div>
       <div class="with-article-cover" v-else>
         <i class="iconfont link-image icon-link_icon"></i>
@@ -37,27 +35,39 @@
         <div class="with-article-title-text">{{itemData.linkInfo.title || itemData.linkInfo.url}}</div>
       </div>
     </a>
+    <DynamicContentVideoBox class="with-video" v-if="itemData.linkInfo && itemData.linkInfo.id && itemData.linkInfo.type==1" :dynamic="itemData" :from="1" :currentTime="itemData.videoPoint || 0"/>
+    <div v-if="itemData.location" class="publish-address">{{itemData.location}}</div>
+    <!-- <div v-if="itemData.activity" class="at-activity"><i class="iconfont icon-activity activity-sign"></i>{{itemData.activity.title}}</div> -->
+    <!-- 活动模块 -->
+    <div class="content-activity-box row center" v-if="itemData.activity && itemData.activity.id" @click.stop="goActivity(itemData.activity.id)">
+      <div class="content-activity-img" :style="`background-image:url(${itemData.activity.covers?itemData.activity.covers[0].compress:''})`"/>
+      <div class="content-activity-right column space-between">
+        <div class="content-activity-title">{{itemData.activity.title}}</div>
+        <div class="content-activity-address">{{itemData.activity.address || '线上活动'}}</div>
+        <div class="content-activity-time_text">{{itemData.activity.time_text}}</div>
+      </div>
+    </div>
     <div class="comment-and-like clearfix">
-      <div @click.stop="changeLike" class="comment-and-like-item fl" :style="{paddingLeft: 0, color: itemData.has_like ? '#FE5273' : '#333'}">
+      <div @click.stop="changeLike" class="comment-and-like-item">
         <div class="comment-and-like-icon-box">
-          <!-- <transition-group name="fade" mode="in-out">
-            <i v-if="itemData.has_like" key="like" class="iconfont icon-like comment-and-like-icon"></i>
-            <i v-else key="dislike" class="iconfont icon-dislike comment-and-like-icon"></i>
-          </transition-group> -->
-          <transition
+          <transition-group name="fade" mode="in-out">
+            <i v-if="itemData.has_like" key="like" class="iconfont icon-like_v_2_5 comment-and-like-icon"></i>
+            <i v-else key="dislike" class="iconfont icon-dislike_v_2_5 comment-and-like-icon"></i>
+          </transition-group>
+          <!-- <transition
             enter-active-class="animated wobble"
             leave-active-class="hide"
           >
             <i v-if="itemData.has_like" class='iconfont icon-like comment-and-like-icon'></i>
           </transition>
-          <i v-if="!itemData.has_like" class='iconfont icon-dislike comment-and-like-icon'></i>
-          <span>{{likeNumber || '赞'}}</span>
+          <i v-if="!itemData.has_like" class='iconfont icon-dislike comment-and-like-icon'></i> -->
+          <span>{{likeNumber || ''}}</span>
         </div>
       </div>
-      <div @click.stop="goDynamic" class="comment-and-like-item fl" style="padding-right: 0;">
-        <div class="comment-and-like-icon-box">
+      <div @click.stop="goDynamic" class="comment-and-like-item">
+        <div class="comment-and-like-icon-box comment-box">
           <i class="iconfont icon-comment_icon comment-and-like-icon"></i>
-          <span>{{commentNumber || '评论'}}</span>
+          <span>{{commentNumber || ''}}</span>
         </div>
       </div>
       <div class="comment-and-like-border" :style="{transform: 'scale(1,' + $tranScale + ')'}"></div>
@@ -176,6 +186,9 @@
   position: relative;
   margin: 4px 0 20px;
 }
+.with-video{
+  margin: 4px 0 20px;
+}
 .with-article-cover{
   width: 100px;
   height: 100px;
@@ -220,71 +233,111 @@
 }
 .comment-and-like{
   width: 100%;
-  height:68px;
-  line-height: 68px;
+  height:80px;
+  line-height: 80px;
   text-align: center;
   position: relative;
-}
-.comment-and-like-border{
-  width: 100%;
-  height: 2px;
-  transform: scale(1, 0.5);
-  transform-origin: 0 0;
-  position: absolute;
-  left: 0;
-  top: 0;
-  background: #E5E5E5;
-  z-index: 1;
+  display: flex;
 }
 .comment-and-like-item{
-  width: 50%;
   height: 100%;
   box-sizing: border-box;
-  padding: 0 30px;
   color: '#333';
   position: relative;
+  background-color:#fff;
 }
 .comment-and-like-icon-box{
   height: 100%;
+  margin-right: 60px;
   overflow: hidden;
   text-align: center;
-  position: absolute;
-  padding-left: 70px;
-  padding-right: 20px;
-  left: 50%;
-  top: 0;
-  transform: translateX(-50%);
+  position: relative;
+  padding-left: 56px;
+}
+.comment-box{
+  padding-left: 58px;
+}
+.comment-box .comment-and-like-icon{
+  left: 2px;
 }
 .comment-and-like-icon{
   display: block;
   position: absolute;
-  left: 20px;
-  // top: 50%;
-  // transform: translateY(-50%);
-  font-size: 32px;
-  line-height: 66px;
+  left: 0;
+  top: 0;
+  font-size: 36px;
   color: inherit;
+}
+.icon-like_v_2_5{
+  color: #FF6574;
 }
 .gray-block{
   width: 110%;
-  height: 10px;
+  height: 16px;
   position: relative;
   left: -5%;
-  background: #F5F5F5;
+  background: #F2F2F2;
 }
 .fade-enter-active, .fade-leave-active {
-  transition: all .5s;
+  transition: all 300ms;
 }
 .fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
   opacity: 0;
   transform: scale(0.5, 0.5);
 }
+
+// 活动模块------------------------
+.content-activity-box {
+  background-color: #f5f5f5;
+  height: 128px;
+  margin: 4px 0 20px;
+}
+.content-activity-img {
+  height: 100px;
+  width: 100px;
+  margin-left: 14px;
+  background-size: cover;
+  background-position: center;
+}
+.content-activity-right {
+  flex: 1;
+  margin-left: 20px;
+  margin-right: 14px;
+}
+.content-activity-title {
+  flex: 1;
+  width: 542px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: #333333;
+  font-size: 28px;
+  line-height: 34px;
+  margin-bottom: 14px;
+}
+.content-activity-address {
+  flex: 1;
+  width: 542px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: #999999;
+  font-size: 24px;
+  margin-bottom: 14px;
+}
+.content-activity-time_text {
+  flex: 1;
+  color: #999999;
+  font-size: 24px;
+}
+// 活动模块 end ------------------------
 </style>
 
 <script>
 import ImageContainer from '../../../components/ImageContainer'
 import ShowHideContent from './ShowHideContent'
 import utils from '@/lib/utils'
+import DynamicContentVideoBox from '@/components/DynamicContentVideoBox'
 export default {
   props: {
     itemData: {
@@ -301,7 +354,11 @@ export default {
   data () {
     return {}
   },
-  components: {ImageContainer, ShowHideContent},
+  components: {
+    ImageContainer,
+    ShowHideContent,
+    DynamicContentVideoBox
+  },
   computed: {
     likeNumber () {
       let num = parseInt(this.itemData.like_num)
@@ -335,6 +392,9 @@ export default {
     },
     goTopic (idx) {
       this.router.push({ name: 'TopicDetail', query: { topic_id: this.itemData.topicInfo[idx].id }, params: {resetData: true} })
+    },
+    goActivity (id) {
+      this.$router.push({name: 'ActivityDetail', query: {id: id}})
     }
   }
 }

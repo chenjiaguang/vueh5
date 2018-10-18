@@ -1,25 +1,39 @@
 //动态固底交互
 <template>
   <div class="fix-box">
-    <div class="like-box" @click="clickLike(dynamic.id)" :style="{color: dynamic.has_like ? '#fe5273' : '#666'}">
-      <transition
+    <div class="comment-and-like-item" @click="clickLike(dynamic.id)">
+      <!-- <transition
         enter-active-class="animated wobble"
         leave-active-class="hide"
       >
         <div v-if="dynamic.has_like" class="like-icon-box">
           <i class='iconfont icon-like'></i>
-          <span class="like-comment-box-text">{{likeNumber || '赞'}}</span>
+          <span class="like-comment-box-text">{{likeNumber || ''}}</span>
         </div>
       </transition>
 
       <div v-if="!dynamic.has_like" class="like-icon-box">
         <i class='iconfont icon-dislike'></i>
-        <span class="like-comment-box-text">{{likeNumber || '赞'}}</span>
+        <span class="like-comment-box-text">{{likeNumber || ''}}</span>
+      </div> -->
+      <div class="comment-and-like-icon-box">
+        <transition name="fade">
+          <i v-if="dynamic.has_like" class='iconfont icon-like_v_2_5 comment-and-like-icon'></i>
+        </transition>
+        <transition name="fade">
+          <i v-if="!dynamic.has_like" class='iconfont icon-dislike_v_2_5 comment-and-like-icon'></i>
+        </transition>
+        <span>{{likeNumber || '赞'}}</span>
       </div>
+      <div class="right-line"></div>
     </div>
-    <div class="comment-box" @click="clickComment(dynamic.id)">
-      <i class="iconfont icon-comment_icon2"></i>
-      <span class="like-comment-box-text">{{commentNumber || '评论'}}</span>
+    <div class="comment-and-like-item" @click="clickComment(dynamic.id)">
+      <!-- <i class="iconfont icon-comment_icon2"></i>
+      <span class="like-comment-box-text">{{commentNumber || ''}}</span> -->
+      <div class="comment-and-like-icon-box">
+        <i class="iconfont icon-comment_icon comment-and-like-icon"></i>
+        <span>{{commentNumber || '评论'}}</span>
+      </div>
     </div>
   </div>
 </template>
@@ -71,7 +85,7 @@ export default {
             this.following = false
           }
         }).catch(err => {
-          console.log('加入圈子出错', err)
+          console.log('加入群组出错', err)
           this.following = false
         })
       }
@@ -82,7 +96,7 @@ export default {
         return false
       }
       let _rightText = need_audit ? '申请加入' : '立即加入'
-      this.$prompt.showPrompt({contentText: '加入圈子才能进行更多操作哦~', leftText: '我再想想', rightText: _rightText}, () => {
+      this.$prompt.showPrompt({contentText: '加入群组才能进行更多操作哦~', leftText: '我再想想', rightText: _rightText}, () => {
         this.applyJoinCircle()
       }, () => {
         console.log('cancel')
@@ -141,58 +155,58 @@ export default {
   flex-direction: row;
   align-items: center;
 }
-.comment-box {
+.comment-and-like-item{
   width: 50%;
   height: 100%;
+  box-sizing: border-box;
+  padding: 0 4%;
+  color: #333;
   position: relative;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+}
+.comment-and-like-icon-box{
+  height: 100%;
   overflow: hidden;
-  color: #666;
-}
-.comment-box:before{
-  content: "";
-  display: block;
-  width: 2px;
-  height: 36px;
-  background-color: #BBBBBB;
+  text-align: center;
   position: absolute;
-  left: 0;
-  top: 50%;
-  transform: scale(0.5, 1) translateY(-50%);
-  transform-origin: 0 0;
-}
-.icon-comment_icon2 {
-  font-size: 35px;
-  color: #666;
-}
-.like-box {
-  width: 50%;
-  height: 100%;
-  display: block;
-  position: relative;
-}
-.like-icon-box{
-  width: 34%;
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: absolute;
-  left: 33%;
+  padding-left: 72px;
+  padding-right: 18px;
+  left: 50%;
   top: 0;
+  transform: translateX(-50%);
+  font-size: 26px;
+  line-height: 80px;
 }
-.like-comment-box-text{
-  font-size: 24px;
-  margin-left: 16px;
+.right-line{
+  width: 2px;
+  height: 72px;
+  background: #bbb;
+  position: absolute;
+  top: 50%;
+  right: 0;
+  transform: scale(0.5, 0.5) translateY(-50%);
+  transform-origin: 100% 0;
 }
-.icon-like {
-  font-size: 35px;
-  color: #fe5273;
+.comment-and-like-icon{
+  display: block;
+  position: absolute;
+  left: 18px;
+  // top: 50%;
+  // transform: translateY(-50%);
+  font-size: 36px;
+  color: inherit;
+  overflow: visible;
 }
-.icon-dislike {
-  font-size: 35px;
-  color: #666;
+.icon-like_v_2_5{
+  color: #FE5273;
+}
+.icon-dislike_v_2_5{
+  color: #333;
+}
+.fade-enter-active, .fade-leave-active {
+  transition: all 300ms;
+}
+.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+  opacity: 0;
+  transform: scale(0.5, 0.5)
 }
 </style>

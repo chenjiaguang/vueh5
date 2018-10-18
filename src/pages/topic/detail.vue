@@ -4,19 +4,25 @@
       <div ref="topBanner" @touchmove="bannerTouchMove" @touchstart="bannerTouchStart" @touchend="bannerTouchEnd">
         <download-box v-if="$route.query.isShareOpen && !$isApp" />
         <header ref="topHeader" class="top-header">
-          <div class="top-header-bg" :style="{backgroundImage: 'linear-gradient(60deg,#' + topicInfo.beginColor + ',#' + topicInfo.endColor + ')'}"></div>
-          <div class="top-header-content-wrapper">
-            <div class="top-header-content">
-              <div class="top-header-title" v-if="topicInfo.title"><i class="iconfont icon-topic top-header-icon"></i><span class="top-header-title-text">{{topicInfo.title}}</span></div>
-              <div class="top-header-intro">{{topicInfo.content}}</div>
+          <!-- <div class="top-header-bg" :style="{backgroundImage: 'linear-gradient(60deg,#' + topicInfo.beginColor + ',#' + topicInfo.endColor + ')'}"></div> -->
+          <div class="top-header-overview">
+            <div class="top-header-avatar" :style="{backgroundImage: 'url(' + (topicInfo.cover.staticImage || topicInfo.cover.url) + ')'}"></div>
+            <div class="top-header-others">
+              <div class="top-header-title" v-if="topicInfo.title"><i class="iconfont icon-topic_v_2_5 top-header-icon"></i><span class="top-header-title-text">{{topicInfo.title}}</span><div class="end-mask"></div></div>
+              <div class="top-header-dynum" v-if="topicInfo.dyCount">{{topicInfo.dyCount}}条动态</div>
+              <div class="top-header-tags" v-if="topicInfo.tcName">
+                <div class="top-header-tag-item"><span>{{topicInfo.tcName}}</span></div>
+              </div>
             </div>
           </div>
+          <div class="top-header-intro"><span style="font-weight:bold;">简介：</span>{{topicInfo.content}}</div>
         </header>
+        <div class="gray-block"></div>
       </div>
       <div ref="innerWrapper" class="scroll-wrapper" :style="{height: $winHeight + 'px'}">
         <div @touchmove="bannerTouchMove" @touchstart="bannerTouchStart" @touchend="bannerTouchEnd" class="nav-scroll-list-wrap" ref="navWrapper" :style="{height: tabBarHeight + 'px'}" v-if="tabs && tabs.length > 1">
-          <cube-tab-bar v-model="selectedLabel" class="tab-box clearfix" @change="changeTabBar" :style="{height: tabBarHeight + 'px'}">
-            <cube-tab v-for="(item) in tabs" class="fl" ref="tabItem" :label="item.title" :key="item.title">
+          <cube-tab-bar v-model="selectedLabel" class="tab-box" @change="changeTabBar" :style="{height: tabBarHeight + 'px'}">
+            <cube-tab v-for="(item) in tabs" :class="{current: selectedLabel === item.title}" ref="tabItem" :label="item.title" :key="item.title">
             </cube-tab>
           </cube-tab-bar>
           <div class="tab-slider">
@@ -95,7 +101,8 @@ const initialData = {
   showBackTop: false,
   topicInfo: {
     beginColor: 'B0B0B0',
-    endColor: 'F9F9F9'
+    endColor: 'F9F9F9',
+    cover: {}
   },
   tabs: [
     {
@@ -159,7 +166,7 @@ export default {
       })
     },
     'topicInfo.title': function (val, oldVal) {
-      document.title = val || '范团话题'
+      document.title = val
     }
   },
   methods: {
@@ -285,14 +292,14 @@ export default {
         }
         if (res && !res.error && res.data) { // 成功获取数据
           if (this.$isApp) {
-            let {id, title, content, beginColor, endColor} = res.data
-            this.$appCall('h5GoTopicDetail', id, title, content, beginColor, endColor)
+            let {id, title, content, beginColor, endColor, tcName, cover, dyCount} = res.data
+            this.$appCall('h5GoTopicDetail', id, title, content, tcName, cover.staticImage || cover.url, dyCount)
           }
           this.tabs[idx].fetching = false
           this.tabs[idx].paging = res.data.paging
           if (pn.toString() === '1') { // 刷新
-            let {id, title, state, content, beginColor, endColor} = res.data
-            this.topicInfo = {id, title, state, content, beginColor, endColor}
+            let {id, title, state, content, beginColor, endColor, dyCount, cover, tcName} = res.data
+            this.topicInfo = {id, title, state, content, beginColor, endColor, dyCount, cover, tcName}
             this.tabs[idx].data = res.data.list
             this.$nextTick(() => {
               this.mescroll[idx].endSuccess(res.data.list.length, !res.data.paging.is_end)
@@ -453,11 +460,35 @@ export default {
   },
   activated () {
     this.$forceUpdate()
+    if (this.topicInfo && this.topicInfo.title) {
+      document.title = this.topicInfo.title
+    }
+  },
+  beforeRouteEnter (to, from, next) {
+    next(vm => {
+      if (from.name === 'VideoMedia' && from.params && (from.params.videoPoint || from.params.videoPoint === 0)) {
+        let _data = vm.tabs[0].data
+        for (let i = 0; i < _data.length; i++) {
+          console.log('beforeRouteEnter', from.query.dynamic_id, _data[i].id)
+          if (_data[i].id === from.query.dynamic_id) {
+            _data[i].videoPoint = from.params.videoPoint
+            break
+          }
+        }
+        vm.tabs[0].data = _data
+      }
+    })
   }
 }
 </script>
 
 <style scoped>
+.gray-block{
+  width: 100%;
+  height: 16px;
+  position: relative;
+  background: #F2F2F2;
+}
 .clearfix:after{
   content: "";
   display: block;
@@ -478,70 +509,116 @@ fl{
   width: 100%;
   position: relative;
   overflow: hidden;
+  padding: 26px 4% 30px;
 }
-.top-header-bg{
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
+.top-header-overview{
+  display: flex;
+}
+.top-header-avatar{
+  width: 158px;
+  height: 158px;
+  border-radius: 10px;
+  margin-top: 4px;
+  margin-right: 30px;
   background-repeat: no-repeat;
-  background-size: cover;
   background-position: center;
-  z-index: 0;
+  background-size: cover;
+  background-color: #eeeeee;
 }
-.top-header-content-wrapper{
-  position: relative;
-  z-index: 1;
-  width: 100%;
-  height: 264px;
-}
-.top-header-content{
-  position: absolute;
-  width: 100%;
-  left: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  padding: 0 4%;
-  box-sizing: border-box;
+.top-header-others{
+  flex: 1;
+  overflow: hidden;
 }
 .top-header-title{
-  font-size: 46px;
-  line-height: 56px;
-  color: #fff;
+  font-size: 36px;
+  line-height: 44px;
+  color: #333;
+  font-weight: bold;
+  word-break: break-all;
   white-space: normal;
+  position: relative;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.end-mask{
+  width: 64px;
+  height: 100%;
+  background: linear-gradient(90deg, rgba(255,255,255,0.12), rgba(255,255,255,1));
+  position: absolute;
+  right: 0;
+  top: 0;
+  z-index: 1;
+}
+.top-header-dynum{
+  font-size: 24px;
+  line-height: 32px;
+  padding-top: 12px;
+  color: #666;
+}
+.top-header-tags{
+  height: 32px;
+  color: #333;
+  position: relative;
+  margin-top: 30px;
+}
+.top-header-tag-item{
+  display: flex;
+  height: 200%;
+  font-size: 40px;
+  background: #FFEB88;
+  border-radius: 12px;
+  color: #333;
+  padding: 0 22px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  transform: scale(0.5, 0.5);
+  transform-origin: 0 0;
+  white-space: nowrap;
+}
+.top-header-tag-item span{
+  font-weight: bold;
 }
 .top-header-title-text{
   vertical-align: middle;
+  font-weight: bold;
 }
 .top-header-intro{
   font-size: 24px;
   color: #fff;
-  line-height: 32px;
-  padding-top: 18px;
+  line-height: 30px;
   overflow : hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
   white-space: normal;
+  word-break: break-all;
+  color: #666666;
+  padding-top: 27px;
 }
 .top-header-icon{
-  font-size: 46px;
+  font-size: 34px;
+  color: #FF611A;
   vertical-align: middle;
   margin-right: 10px;
-  position: relative;
-  top: -2px;
 }
 .scroll-wrapper{
   position: relative;
-  background: #F5F5F5;
+  background: #F2F2F2;
 }
 .nav-scroll-list-wrap{
   position: relative;
   background-color: #fff;
 }
 .tab-box{
-  display: block;
+  display: flex;
   height: 96px;
   line-height: 96px;
   padding: 0 4%;
+  justify-content: center;
+  align-items: center;
 }
 .tab-slider{
   width: 100%;
@@ -551,12 +628,12 @@ fl{
   bottom: 0;
 }
 .tab-slider-body{
-  width: 40px;
+  width: 50px;
   height: 100%;
   position: absolute;
-  left: -20px;
+  left: -25px;
   bottom: 0;
-  background: #FF611A;
+  background: #1EB0FD;
   border-radius: 4px;
   transition: transform 300ms;
 }
@@ -571,24 +648,20 @@ fl{
   background: #e5e5e5;
 }
 .cube-tab-bar{
-  justify-content: flex-start;
+  justify-content: center;
 }
 .cube-tab{
   flex-grow: 0;
-  margin-left: 45px;
+  margin-left: 130px;
   font-size: 36px;
-  color: #666;
+  color: #333;
   white-space: nowrap;
   padding: 0;
 }
 .cube-tab:first-child{
   margin-left: 0;
 }
-.cube-tab_active{
-  color: #333;
-  font-weight: bold;
-}
-div.cube-tab_active div{
+.cube-tab_active /deep/ div{
   font-weight: bold;
 }
 .empty-box{

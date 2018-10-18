@@ -16,7 +16,7 @@
             </div>
             <transition v-if="!user.is_owner" appear appear-class="follow-appear">
               <div class="follow-btn-wrapper">
-                <div @click="changeFollow" class="follow-btn" :style="{color: followStatusText === '关注' ? '#fff' : '#666', backgroundColor: followStatusText === '关注' ? '#1EB0FD' : '#fff', borderColor: followStatusText === '关注' ? '#1EB0FD' : '#B7B7B7'}"><i class="iconfont follow-btn-icon" :class="{'icon-add_focus': followStatusText === '关注', 'icon-focused': followStatusText === '已关注', 'icon-transform': followStatusText === '互相关注'}"></i>{{followStatusText}}</div>
+                <div @click="changeFollow" class="follow-btn" :style="{color: followStatusText === '关注' ? '#1EB0FD' : '#A9A9A9', backgroundColor: '#fff', borderColor: followStatusText === '关注' ? '#1EB0FD' : '#A9A9A9'}"><i class="iconfont follow-btn-icon" :class="{'icon-add': followStatusText === '关注', 'icon-focused': followStatusText === '已关注', 'icon-transform': followStatusText === '互相关注'}"></i>关注</div>
               </div>
             </transition>
           </div>
@@ -528,6 +528,21 @@ export default {
   },
   activated () {
     this.$forceUpdate()
+  },
+  beforeRouteEnter (to, from, next) {
+    next(vm => {
+      if (from.name === 'VideoMedia' && from.params && (from.params.videoPoint || from.params.videoPoint === 0)) {
+        let _data = vm.tabs[0].data
+        for (let i = 0; i < _data.length; i++) {
+          console.log('beforeRouteEnter', from.query.dynamic_id, _data[i].id)
+          if (_data[i].id === from.query.dynamic_id) {
+            _data[i].videoPoint = from.params.videoPoint
+            break
+          }
+        }
+        vm.tabs[0].data = _data
+      }
+    })
   }
 }
 </script>
@@ -640,7 +655,7 @@ export default {
   padding-left: 28px;
 }
 .follow-btn-wrapper{
-  width: 134px;
+  width: 128px;
   height: 48px;
   line-height: 48px;
   position: relative;
@@ -660,24 +675,24 @@ export default {
 .follow-btn{
   width: 300%;
   height: 300%;
-  line-height: 138px;
+  line-height: 132px;
   transform: scale(0.3333, 0.3333);
   transform-origin: 0 0;
   position: absolute;
   left: 0;
   top: 0;
   border-style: solid;
-  border-width: 3px;
-  border-radius: 18px;
+  border-width: 6px;
+  border-radius: 72px;
   box-sizing: border-box;
-  font-size: 60px;
+  font-size: 72px;
   text-align: center;
   transition: all 500ms;
 }
 .follow-btn-icon{
-  font-size: 54px;
+  font-size: 60px;
   color: inherit;
-  margin-right: 24px;
+  margin-right: 18px;
 }
 .nav-scroll-list-wrap{
   position: relative;
@@ -742,6 +757,7 @@ export default {
 .empty-image{
   display: block;
   width: 240px;
+  height: 240px;
   height: 240px;
   margin: 0 auto;
 }
