@@ -18,7 +18,7 @@ export default {
         '/h5/topic/detail': 2,
         ShortDynamicl: 3,
         LongDynamic: 4,
-        '/activity/detail': 5
+        '/h5/activity/detail': 5
       },
       transitionName: 'none',
       mounted () {
@@ -61,7 +61,6 @@ export default {
       } else {
         _type = this.shareType[window.location.pathname]
       }
-      console.log('_type', _type)
       if (_type) {
         this.$ajax('/jv/share/anonymous/open', { data: { type: _type } })
       }
