@@ -29,6 +29,11 @@ export default {
         user: this.$assetsPublicPath + '/cwebassets/userAgreement.html',
         author: this.$assetsPublicPath + '/cwebassets/authorAgreement.html',
         activity: this.$assetsPublicPath + '/cwebassets/activityAgreement.html'
+      },
+      titleObject: {
+        user: '范团用户协议',
+        author: '范团作者协议',
+        activity: '范团活动协议'
       }
     }
   },
@@ -37,6 +42,16 @@ export default {
     if (_type) {
       this.src = this.srcObject[_type]
     }
+  },
+  beforeRouteEnter (to, from, next) {
+    next(vm => {
+      if (vm.$route.query && vm.$route.query.type) {
+        let _title = vm.titleObject[vm.$route.query.type]
+        if (_title) {
+          document.title = _title
+        }
+      }
+    })
   }
 }
 </script>
