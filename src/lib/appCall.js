@@ -24,7 +24,7 @@ export default function (func, overlay) {
     } else if (arguments[0] === 'goLongDynamic') {
       window.android['goLongDetail'] && window.android['goLongDetail'](arguments[1])
     } else if (arguments[0] === 'h5GoUserCenter') { // 跳转用户名片
-      window.android[arguments[0]] && window.android[arguments[0]](arguments[1])
+      window.android[arguments[0]] && window.android[arguments[0]](arguments[1], arguments[2])
     } else if (arguments[0] === 'h5GoArticleDetail') { // 跳转文章详情页
       window.android[arguments[0]] && window.android[arguments[0]](arguments[1])
     } else if (new_arguments.length) { // 有参数时
