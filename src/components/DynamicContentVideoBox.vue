@@ -90,7 +90,7 @@ export default {
 }
 .video-info {
   background-color: #f5f5f5;
-  padding: 17px 0 16px 17px;
+  padding: 15px 0 16px 15px;
   color: #666666;
   font-size: 24px;
 }
@@ -98,6 +98,10 @@ export default {
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
-  margin-bottom: 12px;
+  line-height: 28px;
+  margin-bottom: 8px;
+}
+.from{
+  line-height: 28px;
 }
 </style>
