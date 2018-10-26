@@ -14,6 +14,7 @@ const ActivityTicket = resolve => require(['@/pages/activity/ticket'], resolve)
 const MapPage = resolve => require(['@/pages/mapPage'], resolve)
 const Agreement = resolve => require(['@/pages/agreement'], resolve)
 const UserCenter = resolve => require(['@/pages/user/center'], resolve)
+const UserCenterTest = resolve => require(['@/pages/user/centerTest'], resolve)
 const EditDynamic = resolve => require(['@/pages/dynamic/edit'], resolve)
 const EditDynamicRange = resolve => require(['@/pages/dynamic/chooseRange'], resolve)
 const DynamicDetail = resolve => require(['@/pages/dynamic/detail'], resolve)
@@ -156,6 +157,15 @@ const router = new Router({
       component: UserCenter,
       meta: {
         title: '范团名片',
+        keepAlive: true
+      }
+    },
+    {
+      path: prefix + '/user/center/test',
+      name: 'UserCenterTest',
+      component: UserCenterTest,
+      meta: {
+        title: '范团名片测试',
         keepAlive: true
       }
     },
