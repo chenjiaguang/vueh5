@@ -196,7 +196,7 @@
 }
 .with-article-title-text{
   width: 100%;
-  font-size:28px;
+  font-size: 28px;
   line-height: 36px;
   color: #333;
   overflow : hidden;
@@ -204,12 +204,9 @@
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
-  position: absolute;
-  left: 0;
-  top: 50%;
-  transform: translateY(-50%);
   white-space: normal;
   word-break: break-all;
+  background: red;
 }
 .comment-and-like{
   width: 100%;

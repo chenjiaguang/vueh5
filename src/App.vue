@@ -75,7 +75,6 @@ html {
   height: 100%;
 }
 #app {
-  height: 100%;
   max-width: 800PX;
   margin: 0 auto;
   background-color: #fff;
