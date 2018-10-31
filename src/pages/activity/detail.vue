@@ -31,7 +31,7 @@
       <div class="tag-container clearfix">
         <div class="fl tag-item" v-for="(item, idx) in activity.tags" :key="idx">{{item}}<div class="tag-border"></div></div>
       </div>
-      <show-hide-content :content="activity.content" :router="$router" v-if="activity.content && activity.content.length > 0" />
+      <show-hide-content :content="activity.content" :htmlContent="activity.htmlContent" :router="$router" v-if="activity.content && activity.content.length > 0 || activity.htmlContent" />
     </div>
     <div class="join-wrapper" v-if="activity.join && activity.join.length > 0">
       <div class="color-block"></div>
@@ -392,6 +392,7 @@ const initialData = {
     id: '',
     banner: '',
     content: [],
+    htmlContent: '',
     title: '',
     sponsor: { // 主办方
       name: '',
@@ -495,7 +496,84 @@ export default {
         console.log('cancel')
       })
     },
+    getTimeText (date) {
+      let oDate = new Date(date)
+      let _year = oDate.getFullYear()
+      let _month = oDate.getMonth() + 1
+      _month = _month.toString().length < 2 ? '0' + _month : _month
+      let _date = oDate.getDate()
+      _date = _date.toString().length < 2 ? '0' + _date : _date
+      let _hours = oDate.getHours()
+      _hours = _hours.toString().length < 2 ? '0' + _hours : _hours
+      let _minutes = oDate.getMinutes()
+      _minutes = _minutes.toString().length < 2 ? '0' + _minutes : _minutes
+      let _string = _year + '-' + _month + '-' + _date + ' ' + _hours + ':' + _minutes
+      // 如果是今年，则把年份去掉
+      let replaceStr = new Date().getFullYear() + '-'
+      _string = _string.replace(replaceStr, '')
+      return _string
+    },
+    previewActivity () {
+      let rData = {
+        circleId: this.$route.query.circleId,
+        token: this.$route.query.token
+      }
+      this.$ajax('/jv/qz/draft/activity/search', {data: rData}).then(res => { // 获取活动数据
+        if (res && res.data && !res.error) {
+          let contentObj = JSON.parse(res.data.content)
+          this.activity.id = 'preview'
+          this.activity.banner = contentObj.form.cover.url
+          this.activity.title = contentObj.form.name
+          this.activity.sponsor.name = contentObj.form.sponsor_name
+          this.activity.sponsor.tel = contentObj.form.sponsor_tel
+          this.activity.address.title = contentObj.form.address_data.location
+          this.activity.address.coordinate.lng = contentObj.form.address_data.lnglat[0]
+          this.activity.address.coordinate.lat = contentObj.form.address_data.lnglat[1]
+          let _start = new Date(contentObj.form.activity_time.start)
+          let _end = new Date(contentObj.form.activity_time.end)
+          this.activity.date = this.getTimeText(_start) + ' 至 ' + this.getTimeText(_end)
+          let minCost = 0
+          let maxCost = 0
+          let priceText = ''
+          contentObj.form.ticket_data.forEach(item => {
+            if (!minCost || (minCost && parseFloat(item.price) < minCost)) {
+              minCost = item.price
+            }
+            if (parseFloat(item.price) > maxCost) {
+              maxCost = item.price
+            }
+          })
+          if (maxCost.toString === 0) {
+            priceText = '免费'
+          } else if (minCost === maxCost) {
+            priceText = minCost
+          } else if (minCost !== maxCost) {
+            priceText = minCost + '~' + maxCost
+          }
+          this.activity.cost = priceText
+          let _deadline_date = new Date(contentObj.form.deadline_date)
+          this.activity.deadline =  contentObj.form.deadline.toString() === '1' ? this.getTimeText(_end) : this.getTimeText(_deadline_date)
+          this.activity.htmlContent = contentObj.form.editorContent
+          this.activity.statusText = '购票'
+          let tagsArr = []
+          if (contentObj.form.has_insurance.toString() === '1') {
+            tagsArr.push('费用中包含保险')
+          }
+          tagsArr.push('不可退票')
+          if (contentObj.form.ticket_limit) {
+            tagsArr.push('限购' + contentObj.form.ticket_limit + '张')
+          }
+          this.activity.tags = tagsArr
+        }
+      }).catch(err => {
+        console.log('获取数据失败')
+      })
+    },
     fetchActivity () {
+      if (this.$route.query.circleId && this.$route.query.token) {
+        this.previewActivity()
+        return false
+      }
       let rData = {
         id: this.$route.query.id
       }
@@ -570,6 +648,9 @@ export default {
       this.$router.push({name: 'mapPage', query: { lng: option.lng, lat: option.lat, title: option.title || '' }})
     },
     goPublish () {
+      if (this.$route.query.isPreview) { // 预览模式下不可点击
+        return false
+      }
       let {followed} = this.circle
       if (!followed) {
         this.joinCircle()
@@ -610,7 +691,7 @@ export default {
       })
     },
     goOrder () {
-      if (this.activity.statusText !== '购票' || !utils.checkLogin() || this.submitting) { // 未登录或不可购票时终止
+      if (this.$route.query.isPreview || this.activity.statusText !== '购票' || !utils.checkLogin() || this.submitting) { // 未登录或不可购票时终止,预览模式下不可点击
         return false
       }
       let {followed} = this.circle

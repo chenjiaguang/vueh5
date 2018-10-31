@@ -1,16 +1,17 @@
 <template>
     <div class="content-container" ref="contentWrapper" :style="{height: showMore ? (contentWrapperHeight + 'px') : (contentWrapperHeight ? halfScreenHeight + 'px' : 'auto')}">
-        <div ref="contentContainer" @resize="() => {console.log('resize')}">
+        <div ref="contentContainer">
           <div ref="contentHeader" class="header">活动介绍</div>
           <div ref="contentContext" class="content-context">
-              <template v-for="(item, idx) in content">
+              <div v-if="htmlContent" v-html="htmlContent"></div>
+              <template v-else v-for="(item, idx) in content">
                 <p :key="idx" v-if="item.type === '1'" class="content-text" @load="load">{{item.content}}</p>
                 <div :key="idx" v-else-if="item.type === '2' && item.content" class="image-box">
                   <img ref="contentImage" :src="item.content.image" class="image" @load="load" @click.stop="() => preview(contentImages.idxArr.indexOf(idx), $refs['contentImage'][contentImages.idxArr.indexOf(idx)], item.content.image)" />
                   <div v-if="item.content.description" class="description" @load="load">{{item.content.description}}</div>
                 </div>
               </template>
-              <img src="" @error="bottomErr" style="width:0;height:0;display:none;" />
+              <img v-if="!htmlContent" src="" @error="bottomErr" style="width:0;height:0;display:none;" />
           </div>
         </div>
         <div v-if="contentWrapperHeight && contentWrapperHeight > halfScreenHeight" ref="contentBtn" class="show-hide-btn" @click.stop="changeShowContext"><span class="show-hide-text">{{showMore ? '收起' : '查看更多图文详情'}}<i class="pull-sign iconfont icon-pull_down" :style="{transform: showMore ? 'scale(0.25) rotate(180deg)' : 'scale(0.25) rotate(0)'}"></i></span></div>
@@ -108,6 +109,10 @@ export default {
     content: {
       type: Array,
       required: true
+    },
+    htmlContent: {
+      type: String,
+      required: false
     },
     router: {
       required: false

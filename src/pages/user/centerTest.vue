@@ -1,6 +1,6 @@
 <template>
   <div class="user-center-page mescroll content-scroll-wrapper" id="mescroll0">
-    <div ref="topBanner" @touchmove="bannerTouchMove" @touchstart="bannerTouchStart" @touchend="bannerTouchEnd">
+    <div ref="topBanner">
       <download-box v-if="$route.query.isShareOpen && !$isApp" />
       <header ref="topHeader" class="top-header" :style="{backgroundImage: 'url(' + user.cover + ')'}">
         <div class="top-header-left">
@@ -25,8 +25,8 @@
         </div>
       </header>
     </div>
-    <div ref="innerWrapper" class="scroll-wrapper">
-      <div @touchmove="bannerTouchMove" @touchstart="bannerTouchStart" @touchend="bannerTouchEnd" class="nav-scroll-list-wrap" ref="navWrapper" :style="{height: tabBarHeight + 'px'}" v-if="tabs && tabs.length > 1 && showTabbar">
+    <div class="nav-wrap" ref="navWrapper" :style="{height: tabBarHeight + 'px', zIndex: '99999'}" v-if="tabs && tabs.length > 1 && showTabbar">
+      <div class="nav-content" ref="navContent" :style="{height: tabBarHeight + 'px'}">
         <cube-tab-bar v-model="selectedLabel" class="tab-box" @change="changeTabBar" :style="{height: tabBarHeight + 'px'}">
           <cube-tab v-for="(item) in tabs" ref="tabItem" :label="item.title" :key="item.title">
           </cube-tab>
@@ -36,6 +36,8 @@
         </div>
         <div class="tab-border" :style="{transform: 'scale(1,' + $tranScale + ')'}"></div>
       </div>
+    </div>
+    <div class="scroll-wrapper" ref="scrollWrapper">
       <div class="tabs-wrapper" :style="{width: '100%', overflow: 'hidden'}">
         <div class="tab-scroller" :style="{width: 100 * tabs.length + '%'}">
           <div v-for="(item, index) in tabs" v-show="selectedIdx === index" :key="item.title" :style="{width: 100 / tabs.length + '%', overflow: 'hidden', backgroundColor: '#F2F2F2'}">
@@ -90,9 +92,9 @@
                     <div class="relation-left">地区</div>
                     <div class="relation-right">{{tabs[index].data.location || '可能不在地球上'}}</div>
                   </div>
-                  <div class="relationship-item" @click.stop="goGrowth">
+                  <div class="relationship-item">
                     <div class="relation-left">等级</div>
-                    <div class="relation-right relationship-space-between"><span class="space-between-flex1">LV.{{tabs[index].data.level}}</span><i class="iconfont icon-goforward space-between-flex0"></i></div>
+                    <div class="relation-right">LV.{{tabs[index].data.level}}</div>
                   </div>
                 </div>
                 <div class="gray-block"></div>
@@ -110,28 +112,8 @@
           </div>
         </div>
       </div>
-      <!-- <div class="tabs-wrapper" ref="slideWrapper" :style="{height: ($winHeight - ((tabs && tabs.length) > 1 ? tabBarHeight : 0)) + 'px'}">
-        <cube-slide ref="slideInstance" :data="tabs" :initialIndex="selectedIdx" :autoPlay="false" :allowVertical="false" :showDots="false" :loop="false" :speed="200" :options="{listenScroll: true, probeType: 3, stopPropagation: true, click: false, preventDefault: false}" @change="changeSlide" @scroll="slideScroll">
-          <cube-slide-item v-for="(item, index) in tabs" :key="item.title" :style="{height: ($winHeight - ((tabs && tabs.length) > 1 ? tabBarHeight : 0)) + 'px'}">
-              <div :id="'mescroll' + index" class="mescroll content-scroll-wrapper" :style="{width: $winWidth + 'px', height: '100%', overflowY: 'auto', overflowX: 'hidden'}">
-              <transition name="loading-scale">
-                <div class="first-loading-box" v-if="!tabs[index].paging.pn">
-                  <loading-view />
-                </div>
-              </transition>
-              <div v-if="tabs[index].paging.pn && tabs[index].data && tabs[index].data.length !== 0" :style="{minHeight: ($winHeight - ((tabs && tabs.length) > 1 ? tabBarHeight : 0)) + 0.5 + 'px', backgroundColor: '#fff'}">
-                <dynamic-item v-for="(item, idx) in tabs[index].data" :key="idx" :itemData="item" :hideBlock="idx === tabs[index].data.length - 1" :router="$router" @changeLike="(data) => changeLike(data, index)" />
-              </div>
-              <div v-else-if="tabs[index].paging.is_end && tabs[index].data && tabs[index].data.length === 0" class="empty-box">
-                <img :src="$assetsPublicPath + '/cwebassets/image/empty_dynamic.png'" class="empty-image" />
-                暂无{{index === 0 ? '动态' : '文章'}}
-              </div>
-            </div>
-          </cube-slide-item>
-        </cube-slide>
-      </div> -->
     </div>
-    <scroll-to-top v-if="mescroll && mescroll.length > 0" :visible="showBackTop" :position="{bottom: (($winWidth > (54 * 10) ? (54 * 10) : $winWidth) / 750) * 178, right: (($winWidth > (54 * 10) ? (54 * 10) : $winWidth) / 750) * 54}" :scroll="mescroll[selectedIdx]"/>
+    <scroll-to-top v-if="mescroll && mescroll.length > 0" :visible="showBackTop" :position="{bottom: (($winWidth > (54 * 10) ? (54 * 10) : $winWidth) / 750) * 178, right: (($winWidth > (54 * 10) ? (54 * 10) : $winWidth) / 750) * 54}" :scroll="mescroll[0]"/>
   </div>
 </template>
 
@@ -179,19 +161,22 @@ const initialData = {
       title: '资料',
       data: {},
       paging: {},
-      fetching: false
+      fetching: false,
+      scrollTop: 0
     },
     {
       title: '动态',
       data: [],
       paging: {},
-      fetching: false
+      fetching: false,
+      scrollTop: 0
     },
     {
       title: '文章',
       data: [],
       paging: {},
-      fetching: false
+      fetching: false,
+      scrollTop: 0
     }
     // 目前只显示动态
   ],
@@ -252,12 +237,39 @@ export default {
     }
   },
   methods: {
+    setSticky () {
+      this.mescroll[0].optUp.onScroll = (mescroll, y, isUp) => {
+        // 设置吸顶
+        if (y >= this.$refs['navWrapper'].offsetTop) {
+          this.$refs['navContent'].classList.add('nav-fixed')
+        } else {
+          this.$refs['navContent'].classList.remove('nav-fixed')
+        }
+        // 显示隐藏返回顶部按钮
+        if (y > window.innerHeight && !this.showBackTop) {
+          this.showBackTop = true
+        } else if (y < window.innerHeight && this.showBackTop) {
+          this.showBackTop = false
+        }
+      }
+    },
     changeTabBar (tabTitle) { // 点击tab切换
-      console.log('changeTabBar')
+      const bannerHeight = this.$refs['topBanner'].getBoundingClientRect().height
+      // 记录点击前tab的滚动高度
+      let preIdx = this.selectedIdx
+      let preTop = this.mescroll[0].getScrollTop()
+      this.tabs[preIdx].scrollTop = preTop
       this.tabs.forEach((item, index) => {
         if (item.title === tabTitle) {
           this.selectedLabel = tabTitle
           this.selectedIdx = index
+          let currentTop = this.tabs[index].scrollTop || 0
+          // this.mescroll[0].scrollTo(currentTop, 0)
+          if (currentTop > bannerHeight) { // 滚动到所点击tap原来记录的滚动高度
+            this.$nextTick(() => {
+              this.mescroll[0].scrollTo(currentTop, 0)
+            })
+          }
           let pos = this.$refs['tabItem'][index].$el.getBoundingClientRect()
           let slideX = pos.left + pos.width / 2
           this.tabSlideX = slideX + 'px'
@@ -270,56 +282,27 @@ export default {
             } else if (index === 2) {
               this.fetchArticleList()
             }
+          } else if (this.tabs[index].paging.is_end) {
+            this.mescroll[0].endSuccess(0, false)
+          } else if (!this.tabs[index].paging.is_end) {
+            this.mescroll[0].endSuccess(10, true)
           }
         }
       })
     },
-    changeSlide (idx) { // 滑动slide触发tab切换
-      this.selectedLabel = this.tabs[idx].title
-      this.selectedIdx = idx
-      if (!this.tabs[idx].paging.pn) {
-        this.initMeScroll()
-      }
-    },
-    slideScroll ({x, y}) { // 滑动slide
-      if (!this.$refs['tabItem'] || this.tabs.length <= 1) {
-        return false
-      }
-      let slideTotalWidth = this.$refs['slideInstance'].$el.getBoundingClientRect().width * this.tabs.length
-      let pre = this.selectedIdx === 0 ? null : this.$refs['tabItem'][this.selectedIdx - 1]
-      let next = this.selectedIdx === (this.tabs.length - 1) ? null : this.$refs['tabItem'][this.selectedIdx + 1]
-      let current = this.$refs['tabItem'][this.selectedIdx]
-      let position = {pre: pre ? pre.$el.getBoundingClientRect() : null, next: next ? next.$el.getBoundingClientRect() : null, current: current.$el.getBoundingClientRect()}
-      let relativeX = this.selectedIdx === 0 ? 0 : -this.$refs['slideInstance'].$el.getBoundingClientRect().width * this.selectedIdx // 基准x位置
-      let relativeSlideX = position.current.left + position.current.width / 2
-      let preSlideX = position.pre ? (position.pre.left + position.pre.width / 2) : null
-      let nextSlideX = position.next ? (position.next.left + position.next.width / 2) : null
-      let touchX = x - relativeX
-      let slideX = 0
-      if (this.selectedIdx === 0) {
-        slideX = nextSlideX - relativeSlideX
-      } else if (this.selectedIdx === this.tabs.length - 1) {
-        slideX = relativeSlideX - preSlideX
-      } else if (touchX > 0) {
-        slideX = relativeSlideX - preSlideX
-      } else if (touchX <= 0) {
-        slideX = nextSlideX - relativeSlideX
-      }
-      let moveX = (touchX / this.$refs['slideInstance'].$el.getBoundingClientRect().width) * slideX
-      this.tabSlideX = relativeSlideX - moveX + 'px'
-    },
     fetchUserInfo () { // 获取用户资料
       console.log('获取用户资料')
-      if (this.tabs[this.selectedIdx].fetching) { // 正在拉取动态数据
+      if (this.tabs[0].fetching) { // 正在拉取动态数据
         this.mescroll[0].endErr()
         return false
       }
       let rData = {
         id: this.$route.query.user_id
       }
-      this.tabs[this.selectedIdx].fetching = true
+      this.tabs[0].fetching = true
       this.$ajax('/jv/anonymous/user/social/data', {data: rData}).then(res => {
         console.log('fetchUserInfo.res', res)
+        this.tabs[0].fetching = false
         if (res && !res.error && res.data) {
           if (this.$isApp) {
             let {id, is_news} = res.data.user
@@ -329,6 +312,7 @@ export default {
             this.user = res.data.user
             this.tabs[0].data = res.data.user
             this.tabs[0].paging.pn = 1
+            this.tabs[0].paging.is_end = true
             if (!res.data.user.has_articles) { // 没有文章tab
               this.tabs.splice(2, 1)
               this.selectedLabel = '资料'
@@ -337,11 +321,17 @@ export default {
             } else { // 有文章tab,显示导航
               this.showTabbar = true
             }
-            this.mescroll[0].endSuccess(1, false)
+            // this.mescroll[0].lockUpScroll(true)
+            this.$nextTick(() => {
+              this.mescroll[0].endSuccess(0, false)
+              this.setSticky()
+            })
           }
         }
       }).catch(err => {
+        this.tabs[0].fetching = false
         this.showTabbar = true
+        this.setSticky()
         this.mescroll[0].endErr()
         console.log('err')
       })
@@ -369,9 +359,6 @@ export default {
             this.$appCall('h5GoUserCenter', id, is_news, '1') // type传1
           }
           this.lastYear = res.data.lastYear
-          if (res.data.user) {
-            this.user = res.data.user
-          }
           this.showTabbar = true
           this.tabs[1].paging = res.data.paging
           this.tabs[1].fetching = false
@@ -389,6 +376,7 @@ export default {
           }
           this.$nextTick(() => {
             this.mescroll[0].endSuccess(res.data.list.length, !res.data.paging.is_end)
+            this.setSticky()
             if (res.data.paging.is_end) {
               this.mescroll[0].showNoMore()
             }
@@ -407,8 +395,68 @@ export default {
         }
       })
     },
-    fetchArticleList () { // 获取文章列表
+    fetchArticleList (pn) { // 获取文章列表
       console.log('获取文章列表')
+      if (this.tabs[2].fetching) { // 正在拉取动态数据
+        this.mescroll[0].endErr()
+        return false
+      }
+      let rData = { // type  1,动态  2,文章
+        id: this.$route.query.user_id,
+        pn: pn,
+        snapshot: this.tabs[2].paging.snapshot || '',
+        limit: 10,
+        lastYear: ''
+      }
+      this.tabs[2].fetching = true
+      this.$ajax('/jv/anonymous/user/social/article', {data: rData}).then(res => {
+        if (res && res.msg) {
+          this.$toast(res.msg)
+        }
+        if (res && !res.error && res.data) { // 成功获取数据
+          if (this.$isApp) {
+            let {id, is_news} = res.data.user
+            this.$appCall('h5GoUserCenter', id, is_news, '1') // type传1
+          }
+          this.lastYear = res.data.lastYear
+          if (res.data.user) {
+            this.user = res.data.user
+          }
+          this.showTabbar = true
+          this.tabs[2].paging = res.data.paging
+          this.tabs[2].fetching = false
+          if (pn === 1) { // 第一页
+            this.tabs[2].data = res.data.list
+            this.setShareData({
+              type: '',
+              title: res.data.shareInfo.shareTitle,
+              desc: res.data.shareInfo.shareContent,
+              url: res.data.shareInfo.shareUrl,
+              imgUrl: res.data.shareInfo.shareImage
+            })
+          } else { // 非第一页
+            this.tabs[2].data = this.tabs[2].data.concat(res.data.list)
+          }
+          this.$nextTick(() => {
+            this.mescroll[0].endSuccess(res.data.list.length, !res.data.paging.is_end)
+            this.setSticky()
+            if (res.data.paging.is_end) {
+              this.mescroll[0].showNoMore()
+            }
+          })
+        } else {
+          this.tabs[2].fetching = false
+          this.mescroll[0].endErr()
+        }
+      }).catch(err => {
+        this.tabs[2].fetching = false
+        this.mescroll[0].endErr()
+        if (err && err.msg) {
+          this.$toast(err.msg)
+        } else {
+          this.$toast('获取用户数据失败')
+        }
+      })
     },
     initSlideBlock () {
       if (this.timer) {
@@ -565,7 +613,6 @@ export default {
       })
       let _up = Object.assign({}, mescrollOptions.get().up, {
         callback: () => this.onPullingUp(),
-        onScroll: this.onMeScroll,
         htmlNodata: '<div style="height:0"></div>'
       })
       this.mescroll[0] = new MeScroll('body', {down: _down, up: _up})
@@ -575,20 +622,6 @@ export default {
         this.fetchDynamicList()
       } else if (this.$route.query.jump_tab && this.$route.query.jump_tab.toString() === '0') { // 初始tab为0
         this.fetchUserInfo()
-      }
-    },
-    onMeScroll (mescroll, y, isUp) {
-      if (y <= 0 && !isUp && this.pageTop !== 0) {
-        this.pageTop = 0
-      } else if (y > 0 && isUp && this.pageTop === 0) {
-        let bannerPos = this.$refs['topBanner'].getBoundingClientRect()
-        let bannerHeight = bannerPos.height
-        this.pageTop = -bannerHeight
-      }
-      if (y > this.$winHeight && !this.showBackTop) {
-        this.showBackTop = true
-      } else if (y < this.$winHeight && this.showBackTop) {
-        this.showBackTop = false
       }
     },
     bannerTouchStart (e) {
@@ -656,6 +689,7 @@ export default {
     // }
     // 目前只显示动态
     // this.fetchUserInfo()
+    this.fetchUserInfo()
     this.initMeScroll()
     this.initSlideBlock()
   },
@@ -966,9 +1000,12 @@ export default {
   color: #666;
 }
 
-.nav-scroll-list-wrap{
+.nav-wrap{
   position: relative;
   background-color: #fff;
+}
+.nav-content{
+  background: #fff;
 }
 .tab-box{
   height: 88px;
@@ -1029,5 +1066,14 @@ body .cube-tab-bar{
   height: 240px;
   height: 240px;
   margin: 0 auto;
+}
+
+/* 吸顶效果 */
+.nav-fixed{
+  z-index: 9999;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
 }
 </style>
