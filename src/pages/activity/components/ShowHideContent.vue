@@ -1,20 +1,19 @@
 <template>
-    <div class="content-container" ref="contentWrapper" :style="{height: showMore ? (contentWrapperHeight + 'px') : (contentWrapperHeight ? halfScreenHeight + 'px' : 'auto')}">
-        <div ref="contentContainer">
-          <div ref="contentHeader" class="header">活动介绍</div>
-          <div ref="contentContext" class="content-context">
-              <div v-if="htmlContent" v-html="htmlContent"></div>
-              <template v-else v-for="(item, idx) in content">
-                <p :key="idx" v-if="item.type === '1'" class="content-text" @load="load">{{item.content}}</p>
-                <div :key="idx" v-else-if="item.type === '2' && item.content" class="image-box">
-                  <img ref="contentImage" :src="item.content.image" class="image" @load="load" @click.stop="() => preview(contentImages.idxArr.indexOf(idx), $refs['contentImage'][contentImages.idxArr.indexOf(idx)], item.content.image)" />
-                  <div v-if="item.content.description" class="description" @load="load">{{item.content.description}}</div>
-                </div>
-              </template>
-              <img v-if="!htmlContent" src="" @error="bottomErr" style="width:0;height:0;display:none;" />
-          </div>
+    <div class="content-container">
+      <div :style="{height: (contextHeight && !showMore && contextHeight > halfScreenHeight) ? (halfScreenHeight + 'px') : 'auto', position: 'relative', overflow: 'hidden'}">
+        <div class="header">活动介绍</div>
+        <div v-resize.initial="resize" class="content-context">
+          <div v-if="htmlContent" v-html="htmlContent"></div>
+          <template v-else v-for="(item, idx) in content">
+            <p :key="idx" v-if="item.type === '1'" class="content-text">{{item.content}}</p>
+            <div :key="idx" v-else-if="item.type === '2' && item.content" class="image-box">
+              <img ref="contentImage" :src="item.content.image" class="image" @click.stop="() => preview(contentImages.idxArr.indexOf(idx), $refs['contentImage'][contentImages.idxArr.indexOf(idx)], item.content.image)" />
+              <div v-if="item.content.description" class="description">{{item.content.description}}</div>
+            </div>
+          </template>
         </div>
-        <div v-if="contentWrapperHeight && contentWrapperHeight > halfScreenHeight" ref="contentBtn" class="show-hide-btn" @click.stop="changeShowContext"><span class="show-hide-text">{{showMore ? '收起' : '查看更多图文详情'}}<i class="pull-sign iconfont icon-pull_down" :style="{transform: showMore ? 'scale(0.25) rotate(180deg)' : 'scale(0.25) rotate(0)'}"></i></span></div>
+        <div v-if="contextHeight && contextHeight > halfScreenHeight" :style="{position: (contextHeight && !showMore && contextHeight > halfScreenHeight) ? 'absolute' : 'static', bottom: 0, left: 0}" ref="contentBtn" class="show-hide-btn" @click.stop="changeShowContext"><span class="show-hide-text">{{showMore ? '收起' : '查看更多图文详情'}}<i class="pull-sign iconfont icon-pull_down" :style="{transform: showMore ? 'scale(0.25) rotate(180deg)' : 'scale(0.25) rotate(0)'}"></i></span></div>
+      </div>
     </div>
 </template>
 
@@ -57,10 +56,10 @@
     text-align: center;
   }
   .show-hide-btn{
-    width: 92%;
+    width: 110%;
     height: 84px;
     background-color: #fff;
-    margin-left: 4%;
+    margin-left: -5%;
     line-height:84px;
     font-size: 24px;
     text-align: center;
@@ -104,7 +103,11 @@
 </style>
 
 <script>
+import resize from 'vue-resize-directive'
 export default {
+  directives: {
+    resize
+  },
   props: {
     content: {
       type: Array,
@@ -123,40 +126,17 @@ export default {
       initial: false,
       setted: false,
       showMore: false, // 显示更多
-      contentWrapperHeight: null,
-      halfScreenHeight: parseInt(window.innerHeight * 0.5),
-      loadError: false
+      contextHeight: null,
+      halfScreenHeight: parseInt(window.innerHeight * 0.5)
     }
   },
   methods: {
     changeShowContext () {
-      let currentHeight = this.$refs['contentWrapper'].offsetHeight
-      if (currentHeight > this.halfScreenHeight) {
-        this.$refs['contentContainer'].style.height = this.halfScreenHeight + 'px'
-        this.showMore = false
-      } else {
-        this.$refs['contentContainer'].style.height = this.contentWrapperHeight + 'px'
-        this.showMore = true
-      }
+      this.showMore = !this.showMore
     },
-    load () {
-      this.$nextTick(() => {
-        if (!this.$refs['contentContainer']) { // 已设置过就不再设置,防止重复添加高度
-          return false
-        }
-        let btnHeight = (84 / 750) * (window.innerWidth > (54 * 10) ? (54 * 10) : window.innerWidth)
-        let wrapperHeight = this.$refs['contentContainer'].offsetHeight
-        if (wrapperHeight > this.halfScreenHeight) { // 大于半屏
-          this.contentWrapperHeight = wrapperHeight + btnHeight
-        }
-      })
-    },
-    bottomErr () {
-      if (this.loadError) {
-        return false
-      }
-      this.loadError = true
-      this.load()
+    resize (ele) {
+      let pos = ele.getBoundingClientRect()
+      this.contextHeight = pos.height
     },
     preview (idx, el, placeholder) {
       this.$previewImage.show({images: this.contentImages.imageArr, idx, clickedEl: el, placeholder})

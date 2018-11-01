@@ -690,11 +690,14 @@ export default {
     // 目前只显示动态
     // this.fetchUserInfo()
     this.fetchUserInfo()
-    this.initMeScroll()
+    // this.initMeScroll()
     this.initSlideBlock()
   },
   activated () {
-    this.$forceUpdate()
+    this.initMeScroll()
+  },
+  deactivated () {
+    this.mescroll[0].destroy()
   },
   beforeRouteEnter (to, from, next) {
     next(vm => {

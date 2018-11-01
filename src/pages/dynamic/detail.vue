@@ -1,7 +1,7 @@
 <template>
-  <div class="dynamic-detail-page" :style="{height: $winHeight + 'px'}">
-    <div v-if="dynamic" :style="{height: $winHeight-(80/750*($winWidth > (54 * 10) ? (54 * 10) : $winWidth)) + 'px'}">
-      <div id="mescroll" class="mescroll">
+  <div class="dynamic-detail-page">
+    <div v-if="dynamic">
+      <div>
         <div>
           <download-box v-if="$route.query.isShareOpen && !$isApp" />
           <div class="container">
@@ -390,7 +390,7 @@ export default {
 
           this.isLoad = true
           this.$nextTick(() => {
-            this.mescroll = new MeScroll('mescroll', {
+            this.mescroll = new MeScroll('body', {
               down: {
                 use: false
               },
