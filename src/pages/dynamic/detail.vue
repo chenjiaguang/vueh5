@@ -815,8 +815,9 @@ export default {
   text-overflow: ellipsis;
   display: -webkit-box;
   -webkit-line-clamp: 2;
-  /* autoprefixer: ignore next */
+  /*! autoprefixer: off */
   -webkit-box-orient: vertical;
+  /* autoprefixer: on */
   font-size: 28px;
   line-height: 36px;
   margin-left: 20px;

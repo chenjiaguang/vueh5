@@ -592,8 +592,9 @@ fl{
   text-overflow: ellipsis;
   display: -webkit-box;
   -webkit-line-clamp: 2;
-  /* autoprefixer: ignore next */
+  /*! autoprefixer: off */
   -webkit-box-orient: vertical;
+  /* autoprefixer: on */
   white-space: normal;
   word-break: break-all;
   color: #666666;

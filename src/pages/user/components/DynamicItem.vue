@@ -212,7 +212,7 @@
   margin-right: 20px;
   position: relative;
   height: 100%;
-  box-sizing: centent-box;
+  box-sizing: content-box;
 }
 .with-article-title-text{
   width: 100%;
@@ -223,8 +223,9 @@
   text-overflow: ellipsis;
   display: -webkit-box;
   -webkit-line-clamp: 2;
-  /* autoprefixer: ignore next */
+  /*! autoprefixer: off */
   -webkit-box-orient: vertical;
+  /* autoprefixer: on */
   position: absolute;
   left: 0;
   top: 50%;
