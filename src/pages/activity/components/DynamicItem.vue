@@ -203,7 +203,9 @@
   text-overflow: ellipsis;
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  /* autoprefixer: off */
   -webkit-box-orient: vertical;
+  /* autoprefixer: on */
   position: absolute;
   left: 0;
   top: 50%;
