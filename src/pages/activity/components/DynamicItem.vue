@@ -190,23 +190,27 @@
 .with-article-title{
   margin-left: 134px;
   margin-right: 20px;
-  position: relative;
-  height: 100%;
-  box-sizing: centent-box;
+  overflow: hidden;
+  box-sizing: content-box;
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
 }
 .with-article-title-text{
   width: 100%;
-  font-size: 28px;
+  font-size:28px;
   line-height: 36px;
   color: #333;
   overflow : hidden;
   text-overflow: ellipsis;
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  /*! autoprefixer: off */
   -webkit-box-orient: vertical;
+  /* autoprefixer: on */
   white-space: normal;
   word-break: break-all;
-  background: red;
 }
 .comment-and-like{
   width: 100%;

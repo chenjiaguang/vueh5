@@ -6,10 +6,13 @@
         <div class="top-header-left">
           <div class="name-and-gender">
             <div class="user-name">{{user.chatNickName || user.username}}</div>
-            <i v-if="user.sex && (user.sex.toString() === '1' || user.sex.toString() === '2')" class="user-gender iconfont" :class="{'icon-gender1': user.sex && user.sex.toString() === '1', 'icon-gender2': user.sex && user.sex.toString() === '2'}" :style="{color: (user.sex && user.sex.toString() === '1') ? '#1EB0FD' : '#FF4081'}"></i>
           </div>
-          <div class="constellation-and-location" v-if="user.constellation || user.location">
-            <div class="user-constellation" v-if="user.constellation"><span>{{user.constellation}}</span></div>
+          <div class="constellation-and-location" v-if="user.constellation || user.location || (user.sex && (user.sex.toString() === '1' || user.sex.toString() === '2'))">
+            <div class="user-constellation" v-if="user.constellation">
+              <i v-if="user.sex && (user.sex.toString() === '1' || user.sex.toString() === '2')" class="user-gender iconfont" :class="{'icon-gender1': user.sex && user.sex.toString() === '1', 'icon-gender2': user.sex && user.sex.toString() === '2'}"></i>
+              <i v-if="user.sex && (user.sex.toString() === '1' || user.sex.toString() === '2') && user.constellation" class="separator-dot iconfont icon-dian"></i>
+              <span v-if="user.constellation">{{user.constellation}}</span>
+            </div>
             <div class="user-location" v-if="user.location"><span>{{user.location}}</span></div>
           </div>
           <div class="vip-user" v-if="user.is_vip_user"><i class="iconfont icon-vip vip-icon"></i>{{user.vip_intro}}</div>
@@ -113,7 +116,7 @@
             <!-- 文章 -->
             <div v-else-if="tabs[index].paging.pn && index === 2 && tabs[index].data && tabs[index].data.length !== 0" :style="{backgroundColor: '#fff'}">
               <div class="gray-block"></div>
-              <dynamic-item v-for="(item, idx) in tabs[index].data" :key="item.id" :itemData="item" :hideBlock="idx === tabs[index].data.length - 1" :router="$router" @changeLike="(data) => changeLike(data, index)" />
+              <article-item v-for="item in tabs[index].data" :key="item.id" :itemData="item" />
             </div>
             <div v-else-if="tabs[index].paging.is_end && tabs[index].data && tabs[index].data.length === 0" class="empty-box">
               <!-- <img :src="$assetsPublicPath + '/cwebassets/image/empty_dynamic.png'" class="empty-image" /> -->
@@ -136,6 +139,7 @@
 import Vue from 'vue'
 import DownloadBox from '../../components/DownloadBox'
 import DynamicItem from './components/DynamicItem'
+import ArticleItem from './components/ArticleItem'
 import LoadingView from '@/components/LoadingView'
 import ScrollToTop from '@/components/ScrollToTop'
 import utils from '@/lib/utils'
@@ -235,7 +239,7 @@ export default {
     let _obj = Object.assign({}, _initialData, {selectedIdx, selectedLabel, isShareOpen})
     return _obj
   },
-  components: {DownloadBox, DynamicItem, LoadingView, ScrollToTop},
+  components: {DownloadBox, DynamicItem, ArticleItem, LoadingView, ScrollToTop},
   watch: {
     '$route': function (val, oldVal) {
       utils.checkReloadWithKeepAliveNew(this, val, oldVal, 'UserCenter', ['user_id', 'jump_tab'], () => {
@@ -846,15 +850,21 @@ export default {
   font-size: 42px;
   line-height: 58px;
   align-items: center;
-  margin-left: 30px;
+  padding-left: 30px;
 }
 .user-name{
   flex-shrink: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .user-gender{
   flex-shrink: 0;
-  margin-left: 10px;
-  font-size: 36px;
+  font-size: 24px;
+}
+.separator-dot{
+  font-size: 24px;
+  margin: 0 -2px;
 }
 .constellation-and-location{
   width: 100%;
@@ -909,7 +919,9 @@ export default {
   text-overflow: ellipsis;
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  /*! autoprefixer: off */
   -webkit-box-orient: vertical;
+  /* autoprefixer: on */
 }
 .follow-btn{
   width: 128px;
