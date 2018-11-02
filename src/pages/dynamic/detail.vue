@@ -1,5 +1,5 @@
 <template>
-  <div class="dynamic-detail-page">
+  <div id="dynamic-detail" class="dynamic-detail-page">
     <div v-if="dynamic">
       <div>
         <div>
@@ -390,7 +390,7 @@ export default {
 
           this.isLoad = true
           this.$nextTick(() => {
-            this.mescroll = new MeScroll('body', {
+            this.mescroll = new MeScroll('dynamic-detail', {
               down: {
                 use: false
               },

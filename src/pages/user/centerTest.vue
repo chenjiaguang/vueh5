@@ -1,5 +1,5 @@
 <template>
-  <div class="user-center-page mescroll content-scroll-wrapper" id="mescroll0">
+  <div class="user-center-page mescroll content-scroll-wrapper" id="user-center">
     <div ref="topBanner">
       <download-box v-if="$route.query.isShareOpen && !$isApp" />
       <header ref="topHeader" class="top-header" :style="{backgroundImage: 'url(' + user.cover + ')'}">
@@ -275,6 +275,7 @@ export default {
           this.tabSlideX = slideX + 'px'
           // this.$refs['swiper'].swiper.slideTo(index, 300)
           if (!this.tabs[index].paging.pn) {
+            console.log('111')
             if (index === 0) {
               this.fetchUserInfo()
             } else if (index === 1) {
@@ -283,9 +284,15 @@ export default {
               this.fetchArticleList()
             }
           } else if (this.tabs[index].paging.is_end) {
-            this.mescroll[0].endSuccess(0, false)
+            console.log('222')
+            this.$nextTick(() => {
+              this.mescroll[0].endSuccess(0, false)
+            })
           } else if (!this.tabs[index].paging.is_end) {
-            this.mescroll[0].endSuccess(10, true)
+            console.log('333')
+            this.$nextTick(() => {
+              this.mescroll[0].endSuccess(10, true)
+            })
           }
         }
       })
@@ -313,25 +320,20 @@ export default {
             this.tabs[0].data = res.data.user
             this.tabs[0].paging.pn = 1
             this.tabs[0].paging.is_end = true
+            this.showTabbar = true
             if (!res.data.user.has_articles) { // 没有文章tab
               this.tabs.splice(2, 1)
-              this.selectedLabel = '资料'
-              this.selectedIdx = 0
-              this.showTabbar = true
-            } else { // 有文章tab,显示导航
-              this.showTabbar = true
             }
-            // this.mescroll[0].lockUpScroll(true)
             this.$nextTick(() => {
-              this.mescroll[0].endSuccess(0, false)
               this.setSticky()
+              this.mescroll[0].endSuccess(1, false)
             })
           }
         }
       }).catch(err => {
         this.tabs[0].fetching = false
         this.showTabbar = true
-        this.setSticky()
+        this.$nextTick(this.setSticky)
         this.mescroll[0].endErr()
         console.log('err')
       })
@@ -359,9 +361,9 @@ export default {
             this.$appCall('h5GoUserCenter', id, is_news, '1') // type传1
           }
           this.lastYear = res.data.lastYear
-          this.showTabbar = true
           this.tabs[1].paging = res.data.paging
           this.tabs[1].fetching = false
+          this.showTabbar = true
           if (pn === 1) { // 第一页
             this.tabs[1].data = res.data.list
             this.setShareData({
@@ -374,12 +376,12 @@ export default {
           } else { // 非第一页
             this.tabs[1].data = this.tabs[1].data.concat(res.data.list)
           }
+          if (res.data.paging.is_end) {
+            this.mescroll[0].showNoMore()
+          }
           this.$nextTick(() => {
-            this.mescroll[0].endSuccess(res.data.list.length, !res.data.paging.is_end)
             this.setSticky()
-            if (res.data.paging.is_end) {
-              this.mescroll[0].showNoMore()
-            }
+            this.mescroll[0].endSuccess(res.data.list.length, !res.data.paging.is_end)
           })
         } else {
           this.tabs[1].fetching = false
@@ -387,6 +389,7 @@ export default {
         }
       }).catch(err => {
         this.tabs[1].fetching = false
+        this.$nextTick(this.setSticky)
         this.mescroll[0].endErr()
         if (err && err.msg) {
           this.$toast(err.msg)
@@ -422,9 +425,9 @@ export default {
           if (res.data.user) {
             this.user = res.data.user
           }
-          this.showTabbar = true
           this.tabs[2].paging = res.data.paging
           this.tabs[2].fetching = false
+          this.showTabbar = true
           if (pn === 1) { // 第一页
             this.tabs[2].data = res.data.list
             this.setShareData({
@@ -437,12 +440,12 @@ export default {
           } else { // 非第一页
             this.tabs[2].data = this.tabs[2].data.concat(res.data.list)
           }
+          if (res.data.paging.is_end) {
+            this.mescroll[0].showNoMore()
+          }
           this.$nextTick(() => {
-            this.mescroll[0].endSuccess(res.data.list.length, !res.data.paging.is_end)
             this.setSticky()
-            if (res.data.paging.is_end) {
-              this.mescroll[0].showNoMore()
-            }
+            this.mescroll[0].endSuccess(res.data.list.length, !res.data.paging.is_end)
           })
         } else {
           this.tabs[2].fetching = false
@@ -450,6 +453,7 @@ export default {
         }
       }).catch(err => {
         this.tabs[2].fetching = false
+        this.$nextTick(this.setSticky)
         this.mescroll[0].endErr()
         if (err && err.msg) {
           this.$toast(err.msg)
@@ -480,8 +484,9 @@ export default {
           this.mescroll[i].destroy()
         }
       }
-      let selectedIdx = parseInt(this.$route.query.jump_tab || 0)
-      let selectedLabel = (this.$route.query.jump_tab && this.$route.query.jump_tab.toString() === '1') ? '文章' : '动态'
+      let _initialData = JSON.parse(JSON.stringify(initialData))
+      let selectedIdx = parseInt(this.$route.query.jump_tab || 1)
+      let selectedLabel = _initialData.tabs[parseInt(selectedIdx)].title
       let _this = this
       // let swiperOption = {
       //   initialSlide: selectedIdx,
@@ -500,7 +505,6 @@ export default {
       //     }
       //   }
       // }
-      let _initialData = JSON.parse(JSON.stringify(initialData))
       let _obj = Object.assign({}, _initialData, {selectedIdx, selectedLabel})
       for (let item in _obj) {
         this[item] = _obj[item]
@@ -511,6 +515,7 @@ export default {
       //   this.initMeScroll(0)
       // }
       // 目前只显示动态
+      // this.fetchUserInfo()
       this.initMeScroll()
       this.initSlideBlock()
     },
@@ -615,7 +620,7 @@ export default {
         callback: () => this.onPullingUp(),
         htmlNodata: '<div style="height:0"></div>'
       })
-      this.mescroll[0] = new MeScroll('body', {down: _down, up: _up})
+      this.mescroll[0] = new MeScroll('user-center', {down: _down, up: _up})
       if (this.$route.query.jump_tab && this.$route.query.jump_tab.toString() === '2') { // 初始tab为2
         this.fetchArticleList()
       } else if ((!this.$route.query.jump_tab) || (this.$route.query.jump_tab && this.$route.query.jump_tab.toString() === '1')) { // 初始tab为1
@@ -690,14 +695,8 @@ export default {
     // 目前只显示动态
     // this.fetchUserInfo()
     this.fetchUserInfo()
-    // this.initMeScroll()
-    this.initSlideBlock()
-  },
-  activated () {
     this.initMeScroll()
-  },
-  deactivated () {
-    this.mescroll[0].destroy()
+    this.initSlideBlock()
   },
   beforeRouteEnter (to, from, next) {
     next(vm => {
