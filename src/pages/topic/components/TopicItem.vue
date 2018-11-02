@@ -212,9 +212,12 @@
 .with-article-title{
   margin-left: 134px;
   margin-right: 20px;
-  position: relative;
-  height: 100%;
+  overflow: hidden;
   box-sizing: content-box;
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
 }
 .with-article-title-text{
   width: 100%;
@@ -228,10 +231,6 @@
   /*! autoprefixer: off */
   -webkit-box-orient: vertical;
   /* autoprefixer: on */
-  position: absolute;
-  left: 0;
-  top: 50%;
-  transform: translateY(-50%);
   white-space: normal;
   word-break: break-all;
 }
