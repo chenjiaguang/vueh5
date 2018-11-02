@@ -265,9 +265,8 @@ export default {
   }
   .activity-address{
     display: -webkit-box;
-    /* autoprefixer: off */
+    /* autoprefixer: ignore next */
     -webkit-box-orient: vertical;
-    /* autoprefixer: on */
     -webkit-line-clamp: 2;
     overflow: hidden;
   }
