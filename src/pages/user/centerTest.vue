@@ -21,7 +21,9 @@
         </div>
         <div class="top-header-right">
           <div class="top-header-avatar" :style="{backgroundImage: 'url(' + user.avatar_url + ')', opacity: user.avatar_url ? 1 : 0}"></div>
-          <div @click="changeFollow" class="follow-btn" :style="{backgroundColor: followStatusText === '关注' ? '#1EB0FD' : '#B2B2B2'}"><i class="iconfont follow-btn-icon" :class="{'icon-add': followStatusText === '关注', 'icon-focused': followStatusText === '已关注', 'icon-transform': followStatusText === '互相关注'}"></i>关注</div>
+          <transition v-if="!user.is_owner" appear appear-class="follow-appear">
+            <div @click="changeFollow" class="follow-btn" :style="{backgroundColor: followStatusText === '关注' ? '#1EB0FD' : '#B2B2B2'}"><i class="iconfont follow-btn-icon" :class="{'icon-add': followStatusText === '关注', 'icon-focused': followStatusText === '已关注', 'icon-transform': followStatusText === '互相关注'}"></i>关注</div>
+          </transition>
         </div>
       </header>
     </div>
@@ -46,15 +48,13 @@
                 <loading-view />
               </div>
             </transition>
-            <div v-if="tabs[index].paging.pn && index !== 0 && tabs[index].data && tabs[index].data.length !== 0" :style="{backgroundColor: '#fff'}">
-              <dynamic-item v-for="(item, idx) in tabs[index].data" :key="item.id" :itemData="item" :hideBlock="idx === tabs[index].data.length - 1" :router="$router" @changeLike="(data) => changeLike(data, index)" />
-            </div>
-            <div v-else-if="tabs[index].paging.pn && index === 0" :style="{backgroundColor: '#fff'}">
+            <!-- 资料 -->
+            <div v-if="tabs[index].paging.pn && index === 0" :style="{backgroundColor: '#fff'}">
               <div class="gray-block"></div>
-              <div class="info-relationship">
+              <div class="info-relationship" v-if="!user.is_owner">
                 <div class="info-title">关系<div class="border-bottom"></div></div>
                 <div>
-                  <div class="relationship-item" v-if="!tabs[index].data.isChatFriend">
+                  <div class="relationship-item" v-if="tabs[index].data.isChatFriend">
                     <div class="relation-left">好友</div>
                     <div class="relation-right">已经是好友啦</div>
                   </div>
@@ -62,11 +62,11 @@
                     <div class="relation-left">好友</div>
                     <div class="relation-right relationship-space-between"><span class="space-between-flex1">看了这么久，不如加好友？</span><i class="iconfont icon-goforward space-between-flex0"></i></div>
                   </div>
-                  <div class="relationship-item" v-if="tabs[index].data.chatNickName">
+                  <div class="relationship-item" v-if="tabs[index].data.isChatFriend && tabs[index].data.chatNickName">
                     <div class="relation-left">备注</div>
                     <div class="relation-right">{{tabs[index].data.chatNickName}}</div>
                   </div>
-                  <div class="relationship-item" v-if="tabs[index].data.chatPhone">
+                  <div class="relationship-item" v-if="tabs[index].data.isChatFriend && tabs[index].data.chatPhone">
                     <div class="relation-left">电话</div>
                     <a class="relation-right" style="color:#507DAF" :href="'tel:' + (tabs[index].data.chatPhone)">{{tabs[index].data.chatPhone}}</a>
                   </div>
@@ -105,10 +105,23 @@
                 <div class="gray-block"></div>
               </div>
             </div>
-            <div v-else-if="tabs[index].paging.is_end && tabs[index].data && tabs[index].data.length === 0" class="empty-box" :style="{minHeight: ($winHeight - ((tabs && tabs.length) > 1 ? tabBarHeight : 0)) + 1 + 'px'}">
-              <img :src="$assetsPublicPath + '/cwebassets/image/empty_dynamic.png'" class="empty-image" />
-              暂无{{index === 0 ? '动态' : '文章'}}
+            <!-- 动态 -->
+            <div v-else-if="tabs[index].paging.pn && index === 1 && tabs[index].data && tabs[index].data.length !== 0" :style="{backgroundColor: '#fff'}">
+              <div class="gray-block"></div>
+              <dynamic-item v-for="(item, idx) in tabs[index].data" :key="item.id" :itemData="item" :hideBlock="idx === tabs[index].data.length - 1" :router="$router" @changeLike="(data) => changeLike(data, index)" />
             </div>
+            <!-- 文章 -->
+            <div v-else-if="tabs[index].paging.pn && index === 2 && tabs[index].data && tabs[index].data.length !== 0" :style="{backgroundColor: '#fff'}">
+              <div class="gray-block"></div>
+              <dynamic-item v-for="(item, idx) in tabs[index].data" :key="item.id" :itemData="item" :hideBlock="idx === tabs[index].data.length - 1" :router="$router" @changeLike="(data) => changeLike(data, index)" />
+            </div>
+            <div v-else-if="tabs[index].paging.is_end && tabs[index].data && tabs[index].data.length === 0" class="empty-box">
+              <!-- <img :src="$assetsPublicPath + '/cwebassets/image/empty_dynamic.png'" class="empty-image" /> -->
+              TA很神秘，什么都没有发
+            </div>
+            <!-- <div v-else class="empty-box" :style="{minHeight: ($winHeight - ((tabs && tabs.length) > 1 ? tabBarHeight : 0)) + 1 + 'px'}">
+              TA很神秘，什么都没有发
+            </div> -->
           </div>
         </div>
       </div>
@@ -277,7 +290,7 @@ export default {
           if (!this.tabs[index].paging.pn) {
             console.log('111')
             if (index === 0) {
-              this.fetchUserInfo()
+              this.fetchUserInfo(true)
             } else if (index === 1) {
               this.fetchDynamicList()
             } else if (index === 2) {
@@ -285,19 +298,24 @@ export default {
             }
           } else if (this.tabs[index].paging.is_end) {
             console.log('222')
+            // this.mescroll[0].endSuccess(1, false)
             this.$nextTick(() => {
-              this.mescroll[0].endSuccess(0, false)
+              console.log('endSuccess-changeTabBar')
+              this.mescroll[0].endSuccess(1, false)
+              this.mescroll[0].showNoMore()
             })
           } else if (!this.tabs[index].paging.is_end) {
             console.log('333')
             this.$nextTick(() => {
+              console.log('endSuccess-changeTabBar')
               this.mescroll[0].endSuccess(10, true)
+              // this.mescroll[0].showUpScroll()
             })
           }
         }
       })
     },
-    fetchUserInfo () { // 获取用户资料
+    fetchUserInfo (islist) { // 获取用户资料
       console.log('获取用户资料')
       if (this.tabs[0].fetching) { // 正在拉取动态数据
         this.mescroll[0].endErr()
@@ -317,21 +335,24 @@ export default {
           }
           if (res.data.user) {
             this.user = res.data.user
-            this.tabs[0].data = res.data.user
-            this.tabs[0].paging.pn = 1
-            this.tabs[0].paging.is_end = true
             this.showTabbar = true
             if (!res.data.user.has_articles) { // 没有文章tab
               this.tabs.splice(2, 1)
             }
-            this.$nextTick(() => {
-              this.setSticky()
-              this.mescroll[0].endSuccess(1, false)
-            })
+            this.$nextTick(this.setSticky)
+            if (islist) { // 列表调用的时候该参数位true,否则为false
+              this.tabs[0].data = res.data.user
+              this.tabs[0].paging.pn = 1
+              this.tabs[0].paging.is_end = true
+              this.$nextTick(() => {
+                console.log('endSuccess-fetchUserInfo')
+                this.mescroll[0].endSuccess(1, false)
+                this.mescroll[0].showNoMore()
+              })
+            }
           }
         }
       }).catch(err => {
-        this.tabs[0].fetching = false
         this.showTabbar = true
         this.$nextTick(this.setSticky)
         this.mescroll[0].endErr()
@@ -381,6 +402,7 @@ export default {
           }
           this.$nextTick(() => {
             this.setSticky()
+            console.log('endSuccess-fetchDynamicList')
             this.mescroll[0].endSuccess(res.data.list.length, !res.data.paging.is_end)
           })
         } else {
@@ -445,6 +467,7 @@ export default {
           }
           this.$nextTick(() => {
             this.setSticky()
+            console.log('endSuccess-fetchArticleList')
             this.mescroll[0].endSuccess(res.data.list.length, !res.data.paging.is_end)
           })
         } else {
@@ -524,7 +547,7 @@ export default {
       if (this.selectedIdx === 1) {
         this.fetchDynamicList(pn)
       } else if (this.selectedIdx === 2) { // 拉取文章列表
-        this.fetchUserInfo()
+        this.fetchUserInfo(true)
       } else if (this.selectedIdx === 0) { // 拉去用户资料
         this.fetchArticleList(pn)
       }
@@ -537,7 +560,7 @@ export default {
       }
       let pn = parseInt(this.tabs[idx].paging.pn) + 1
       if (idx === 0) {
-        this.fetchUserInfo()
+        this.fetchUserInfo(true)
       } else if (idx === 1) {
         this.fetchDynamicList(pn)
       } else if (idx === 2) {
@@ -626,7 +649,7 @@ export default {
       } else if ((!this.$route.query.jump_tab) || (this.$route.query.jump_tab && this.$route.query.jump_tab.toString() === '1')) { // 初始tab为1
         this.fetchDynamicList()
       } else if (this.$route.query.jump_tab && this.$route.query.jump_tab.toString() === '0') { // 初始tab为0
-        this.fetchUserInfo()
+        this.fetchUserInfo(true)
       }
     },
     bannerTouchStart (e) {
@@ -694,7 +717,7 @@ export default {
     // }
     // 目前只显示动态
     // this.fetchUserInfo()
-    this.fetchUserInfo()
+    this.fetchUserInfo(false)
     this.initMeScroll()
     this.initSlideBlock()
   },
@@ -730,7 +753,9 @@ export default {
 }
 .user-center-page{
   width: 100%;
-  overflow: auto;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: #F2F2F2;
 }
 .outer-scroller{
   width: 100%;
@@ -896,6 +921,15 @@ export default {
   text-align: center;
   transition: all 500ms;
   color: #fff;
+  &.follow-appear{
+    transform: scale(0, 0);
+    height: 0;
+  }
+  &.v-leave-to, &.v-leave-active{
+    transition: all 0ms;
+    transform: scale(0, 0);
+    height: 0;
+  }
 }
 .follow-btn-icon{
   font-size: 20px;
@@ -1056,10 +1090,10 @@ body .cube-tab-bar{
   font-weight: bold;
 }
 .empty-box{
-  padding: 140px 0;
-  font-size: 28px;
+  padding: 130px 0 0 0;
+  font-size: 34px;
+  line-height: 58px;
   color: #999;
-  line-height: 68px;
   text-align: center;
 }
 .empty-image{

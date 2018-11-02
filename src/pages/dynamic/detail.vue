@@ -1,5 +1,5 @@
 <template>
-  <div id="dynamic-detail" class="dynamic-detail-page">
+  <div id="dynamic-detail" class="dynamic-detail-page mescroll">
     <div v-if="dynamic">
       <div>
         <div>
