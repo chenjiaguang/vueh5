@@ -116,7 +116,7 @@
             <!-- 文章 -->
             <div v-else-if="tabs[index].paging.pn && index === 2 && tabs[index].data && tabs[index].data.length !== 0" :style="{backgroundColor: '#fff'}">
               <div class="gray-block"></div>
-              <article-items v-for="item in tabs[index].data" :key="item.id" :itemData="item" />
+              <article-item v-for="item in tabs[index].data" :key="item.id" :itemData="item" />
             </div>
             <div v-else-if="tabs[index].paging.is_end && tabs[index].data && tabs[index].data.length === 0" class="empty-box">
               <!-- <img :src="$assetsPublicPath + '/cwebassets/image/empty_dynamic.png'" class="empty-image" /> -->
@@ -139,7 +139,7 @@
 import Vue from 'vue'
 import DownloadBox from '../../components/DownloadBox'
 import DynamicItem from './components/DynamicItem'
-import ArticleItems from './components/ArticleItems'
+import ArticleItem from './components/ArticleItem'
 import LoadingView from '@/components/LoadingView'
 import ScrollToTop from '@/components/ScrollToTop'
 import utils from '@/lib/utils'
@@ -240,7 +240,7 @@ export default {
     let _obj = Object.assign({}, _initialData, {selectedIdx, selectedLabel, isShareOpen})
     return _obj
   },
-  components: {DownloadBox, DynamicItem, ArticleItems, LoadingView, ScrollToTop},
+  components: {DownloadBox, DynamicItem, ArticleItem, LoadingView, ScrollToTop},
   watch: {
     '$route': function (val, oldVal) {
       utils.checkReloadWithKeepAliveNew(this, val, oldVal, 'UserCenter', ['user_id', 'jump_tab'], () => {
