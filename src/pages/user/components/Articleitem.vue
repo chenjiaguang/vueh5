@@ -1,5 +1,6 @@
 <template>
   <div class="article-item" @click.stop="goArticle">
+    <!-- 大小写更改 -->
     <div class="article-left">
       <div class="article-title">{{itemData.name}}</div>
       <div class="article-overview">
