@@ -12,7 +12,7 @@
               <div class="user-constellation" v-if="user.constellation">
                 <i v-if="user.sex && (user.sex.toString() === '1' || user.sex.toString() === '2')" class="user-gender iconfont" :class="{'icon-gender1': user.sex && user.sex.toString() === '1', 'icon-gender2': user.sex && user.sex.toString() === '2'}"></i>
                 <i v-if="user.sex && (user.sex.toString() === '1' || user.sex.toString() === '2') && user.constellation" class="separator-dot iconfont icon-dian"></i>
-                <span v-if="user.constellation">{{user.constellation}}</span>
+                <span class="user-constellation-text" v-if="user.constellation">{{user.constellation}}</span>
               </div>
               <div class="user-location" v-if="user.location"><span>{{user.location}}</span></div>
             </div>
@@ -867,16 +867,22 @@ export default {
 .user-gender{
   flex-shrink: 0;
   font-size: 24px;
+  line-height: 32px;
 }
 .separator-dot{
   font-size: 24px;
   margin: 0 -2px;
+  line-height: 32px;
+}
+.user-constellation-text{
+  font-size: 24px;
+  line-height: 32px;
 }
 .constellation-and-location{
   width: 100%;
   display: flex;
   font-size: 24px;
-  line-height: 28px;
+  line-height: 32px;
   padding: 8px 0 8px 20px;
   overflow: hidden;
 }
@@ -885,11 +891,15 @@ export default {
   display: flex;
   align-items: center;
   padding: 0 12px;
-  border-radius: 18px;
+  border-radius: 20px;
   background: rgba(0,0,0,0.3);
   margin-left: 10px;
   flex-shrink: 0;
   border: 2px solid rgba(255,255,255,0.3);
+  box-sizing: content-box;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
 }
 .user-location{
   flex-shrink: 1;
