@@ -3,30 +3,32 @@
     <div ref="topBanner">
       <download-box v-if="$route.query.isShareOpen && !$isApp" />
       <header ref="topHeader" class="top-header" :style="{backgroundImage: 'url(' + user.cover + ')'}">
-        <div class="top-header-left">
-          <div class="name-and-gender">
-            <div class="user-name">{{user.chatNickName || user.username}}</div>
-          </div>
-          <div class="constellation-and-location" v-if="user.constellation || user.location || (user.sex && (user.sex.toString() === '1' || user.sex.toString() === '2'))">
-            <div class="user-constellation" v-if="user.constellation">
-              <i v-if="user.sex && (user.sex.toString() === '1' || user.sex.toString() === '2')" class="user-gender iconfont" :class="{'icon-gender1': user.sex && user.sex.toString() === '1', 'icon-gender2': user.sex && user.sex.toString() === '2'}"></i>
-              <i v-if="user.sex && (user.sex.toString() === '1' || user.sex.toString() === '2') && user.constellation" class="separator-dot iconfont icon-dian"></i>
-              <span v-if="user.constellation">{{user.constellation}}</span>
+        <div class="top-header-content">
+          <div class="top-header-left">
+            <div class="name-and-gender">
+              <div class="user-name">{{user.chatNickName || user.username}}</div>
             </div>
-            <div class="user-location" v-if="user.location"><span>{{user.location}}</span></div>
+            <div class="constellation-and-location" v-if="user.constellation || user.location || (user.sex && (user.sex.toString() === '1' || user.sex.toString() === '2'))">
+              <div class="user-constellation" v-if="user.constellation">
+                <i v-if="user.sex && (user.sex.toString() === '1' || user.sex.toString() === '2')" class="user-gender iconfont" :class="{'icon-gender1': user.sex && user.sex.toString() === '1', 'icon-gender2': user.sex && user.sex.toString() === '2'}"></i>
+                <i v-if="user.sex && (user.sex.toString() === '1' || user.sex.toString() === '2') && user.constellation" class="separator-dot iconfont icon-dian"></i>
+                <span v-if="user.constellation">{{user.constellation}}</span>
+              </div>
+              <div class="user-location" v-if="user.location"><span>{{user.location}}</span></div>
+            </div>
+            <div class="vip-user" v-if="user.is_vip_user"><i class="iconfont icon-vip vip-icon"></i>{{user.vip_intro}}</div>
+            <div class="user-intro">{{user.intro}}</div>
+            <div class="focus-and-fans">
+              <div class="user-follow"><span class="follow-text">关注</span><span class="num">{{followNumber}}</span></div>
+              <div class="user-fans"><span class="fans-text">粉丝</span><span class="num">{{fansNumber}}</span></div>
+            </div>
           </div>
-          <div class="vip-user" v-if="user.is_vip_user"><i class="iconfont icon-vip vip-icon"></i>{{user.vip_intro}}</div>
-          <div class="user-intro">{{user.intro}}</div>
-          <div class="focus-and-fans">
-            <div class="user-follow"><span class="follow-text">关注</span><span class="num">{{followNumber}}</span></div>
-            <div class="user-fans"><span class="fans-text">粉丝</span><span class="num">{{fansNumber}}</span></div>
+          <div class="top-header-right">
+            <div class="top-header-avatar" :style="{backgroundImage: 'url(' + user.avatar_url + ')', opacity: user.avatar_url ? 1 : 0}"></div>
+            <transition v-if="!user.is_owner" appear appear-class="follow-appear">
+              <div @click="changeFollow" class="follow-btn" :style="{backgroundColor: followStatusText === '关注' ? '#1EB0FD' : '#B2B2B2'}"><i class="iconfont follow-btn-icon" :class="{'icon-add': followStatusText === '关注', 'icon-focused': followStatusText === '已关注', 'icon-transform': followStatusText === '互相关注'}"></i>关注</div>
+            </transition>
           </div>
-        </div>
-        <div class="top-header-right">
-          <div class="top-header-avatar" :style="{backgroundImage: 'url(' + user.avatar_url + ')', opacity: user.avatar_url ? 1 : 0}"></div>
-          <transition v-if="!user.is_owner" appear appear-class="follow-appear">
-            <div @click="changeFollow" class="follow-btn" :style="{backgroundColor: followStatusText === '关注' ? '#1EB0FD' : '#B2B2B2'}"><i class="iconfont follow-btn-icon" :class="{'icon-add': followStatusText === '关注', 'icon-focused': followStatusText === '已关注', 'icon-transform': followStatusText === '互相关注'}"></i>关注</div>
-          </transition>
         </div>
       </header>
     </div>
@@ -766,13 +768,18 @@ export default {
 .top-header{
   width: 100%;
   height: 332px;
-  box-sizing: content-box;
-  position: relative;
   background-color:#292929;
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;
+}
+.top-header-content{
+  width: 100%;
+  height: 100%;
+  box-sizing: content-box;
+  position: relative;
   display: flex;
+  background: rgba(0,0,0,0.1);
 }
 .top-header-left{
   width: 68%;
@@ -879,9 +886,10 @@ export default {
   align-items: center;
   padding: 0 12px;
   border-radius: 18px;
-  background: rgba(255,255,255,0.3);
+  background: rgba(0,0,0,0.3);
   margin-left: 10px;
   flex-shrink: 0;
+  border: 2px solid rgba(255,255,255,0.3);
 }
 .user-location{
   flex-shrink: 1;
