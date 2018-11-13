@@ -2,10 +2,10 @@
   <keep-alive>
     <div class="option-box" @click.stop="onTap">
       <div class="option-header clearfix" :style="{paddingRight: option.rightIcon ? '11%' : 0}">
-        <i :class="leftIconClass" v-if="option.leftIcon"></i>
-        <div class="title fl" :style="{width: (option.rightText || option.rightIcon) ? '60%' : '100%'}">{{option.title}}</div>
+        <i :class="leftIconClass" v-if="option.leftIcon" :style="{color: disabled ? '#999' : '#4B4B4B'}"></i>
+        <div class="title fl" :style="{width: (option.rightText || option.rightIcon) ? '60%' : '100%', color: disabled ? '#999' : '#333'}">{{option.title}}</div>
         <div class="right-text fr" v-if="option.rightText">{{option.rightText}}</div>
-        <i :class="rightIconClass" v-if="option.rightIcon"></i>
+        <i :class="rightIconClass" v-if="option.rightIcon" :style="{color: disabled ? '#999' : '#4B4B4B'}"></i>
       </div>
       <div class="extra-box">
         <slot name="extra"></slot>
@@ -78,6 +78,10 @@ export default {
     option: {
       type: Object,
       required: true
+    },
+    disabled: {
+      type: Boolean,
+      required: false
     }
   },
   data () {
@@ -109,6 +113,9 @@ export default {
   },
   methods: {
     onTap () {
+      if (this.disabled) {
+        return false
+      }
       this.$emit('tapFunc')
     }
   }

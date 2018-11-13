@@ -338,6 +338,15 @@ export default {
             let {id, is_news} = res.data.user
             this.$appCall('h5GoUserCenter', id, is_news, '1') // type传1
           }
+          if (res.data.shareInfo) {
+            this.setShareData({
+              type: '',
+              title: res.data.shareInfo.shareTitle,
+              desc: res.data.shareInfo.shareContent,
+              url: res.data.shareInfo.shareUrl,
+              imgUrl: res.data.shareInfo.shareImage
+            })
+          }
           if (res.data.user) {
             this.user = res.data.user
             this.showTabbar = true
@@ -392,13 +401,6 @@ export default {
           this.showTabbar = true
           if (pn === 1) { // 第一页
             this.tabs[1].data = res.data.list
-            this.setShareData({
-              type: '',
-              title: res.data.shareInfo.shareTitle,
-              desc: res.data.shareInfo.shareContent,
-              url: res.data.shareInfo.shareUrl,
-              imgUrl: res.data.shareInfo.shareImage
-            })
           } else { // 非第一页
             this.tabs[1].data = this.tabs[1].data.concat(res.data.list)
           }
@@ -457,13 +459,6 @@ export default {
           this.showTabbar = true
           if (pn === 1) { // 第一页
             this.tabs[2].data = res.data.list
-            this.setShareData({
-              type: '',
-              title: res.data.shareInfo.shareTitle,
-              desc: res.data.shareInfo.shareContent,
-              url: res.data.shareInfo.shareUrl,
-              imgUrl: res.data.shareInfo.shareImage
-            })
           } else { // 非第一页
             this.tabs[2].data = this.tabs[2].data.concat(res.data.list)
           }

@@ -260,9 +260,6 @@
 .comment-box{
   padding-left: 58px;
 }
-.comment-box .comment-and-like-icon{
-  left: 2px;
-}
 .comment-and-like-icon{
   display: block;
   position: absolute;
@@ -270,6 +267,9 @@
   top: 0;
   font-size: 36px;
   color: inherit;
+}
+.comment-box .comment-and-like-icon{
+  left: 2px;
 }
 .icon-like_v_2_5{
   color: #FF6574;

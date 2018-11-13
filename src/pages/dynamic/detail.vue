@@ -7,7 +7,7 @@
           <div class="container">
             <div v-if="dynamic" id="title-container" class="column">
               <div v-if="dynamic.title" class="title">{{dynamic.title}}</div>
-              <div class="row space-between center">
+              <div class="row space-between center overview">
                 <!-- 左 -->
                 <div class="row">
                   <img class="avatar" :src="dynamic.avatar" @click="clickUser(dynamic.uid)"/>
@@ -25,11 +25,9 @@
                   </div>
                 </div>
                 <!-- 右 -->
-                <div>
-                  <transition name="fade-quick">
-                    <div class="follow-button" v-if="!dynamic.is_following&&!dynamic.is_owner"  @click="clickFollow(dynamic.uid)"><i class="iconfont follow-btn-icon icon-add"></i>关注</div>
-                  </transition>
-                </div>
+                <transition name="fade-quick">
+                  <div class="follow-button" v-if="!dynamic.is_following&&!dynamic.is_owner"  @click="clickFollow(dynamic.uid)"><i class="iconfont follow-btn-icon icon-add"></i><span>关注</span></div>
+                </transition>
               </div>
             </div>
 
@@ -623,27 +621,32 @@ export default {
   color: #1eb0fd;
   font-size: 24px;
 }
+.overview{
+  position: relative;
+}
 .follow-button {
   display: flex;
-  width: 124px;
-  height: 44px;
+  width: 248px;
+  height: 88px;
   text-align: center;
-  font-size: 24px;
-  line-height: 44px;
+  font-size: 48px;
+  line-height: 60px;
   color: #ffffff;
   /* background-color: #1eb0fd; */
-  border: 2px solid #1eb0fd;
-  color: #1eb0fd;
-  border-radius: 24px;
+  border: 4px solid #1EB0FD;
+  color: #1EB0FD;
+  border-radius: 48px;
   justify-content: center;
+  align-items: center;
   box-sizing: content-box;
+  transform: scale(0.5, 0.5) translate(50%, -100%);
+  position: absolute;
+  right: 0;
+  top: 50%;
 }
 .follow-btn-icon{
-  font-size: 40px;
-  display: block;
-  transform: scale(0.5, 0.5);
-  margin-left: -10px;
-  margin-right: -4px;
+  font-size: 36px;
+  margin-right: 14px;
 }
 .follow-cancel-button {
   width: 98px;
@@ -917,13 +920,12 @@ export default {
   color: #225894;
   font-size: 28px;
   line-height: 28px;
-  margin-bottom: 14px;
+  margin-bottom: 26px;
 }
 .comment-content {
   color: #333333;
   font-size: 30px;
   line-height: 42px;
-  margin-bottom: 14px;
   word-break: break-all;
   white-space: pre-wrap;
 }
@@ -931,9 +933,10 @@ export default {
   color: #999999;
   font-size: 24px;
   line-height: 24px;
-  margin-bottom: 24px;
+  margin-top: 14px;
 }
 .comment-replies-box {
+  margin-top: 24px;
   padding-top: 18px;
   padding-bottom: 10px;
   padding-left: 24px;
