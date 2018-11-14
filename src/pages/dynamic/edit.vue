@@ -23,7 +23,7 @@
           </div>
         </div>
       </edit-option>
-      <edit-option :option="{leftIcon: 'range_' + range, title: rangeMap[range.toString()], rightIcon: 'next'}" :disabled="(topic && topic[0]) ? true : false" @tapFunc="changeRange" v-if="range || range === 0"></edit-option>
+      <edit-option :option="{leftIcon: rangeIconMap[range.toString()], title: rangeMap[range.toString()], rightIcon: 'next'}" :disabled="(topic && topic[0]) ? true : false" @tapFunc="changeRange" v-if="range || range === 0"></edit-option>
     </div>
     <div class="submit-btn" @click.stop="submitDynamic">发布</div>
   </div>
@@ -138,6 +138,11 @@ let initialData = {
   activity: {},
   circle: {},
   range: 0,
+  rangeIconMap: {
+    0: 'dysign1',
+    1: 'dysign3',
+    2: 'dysign2'
+  },
   rangeMap: {
     0: '公开',
     1: '仅好友可见',

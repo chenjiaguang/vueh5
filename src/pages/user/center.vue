@@ -26,7 +26,7 @@
           <div class="top-header-right">
             <div class="top-header-avatar" :style="{backgroundImage: 'url(' + user.avatar_url + ')', opacity: user.avatar_url ? 1 : 0}"></div>
             <transition v-if="!user.is_owner" appear appear-class="follow-appear">
-              <div @click="changeFollow" class="follow-btn" :style="{backgroundColor: followStatusText === '关注' ? '#1EB0FD' : '#B2B2B2'}"><i class="iconfont follow-btn-icon" :class="{'icon-add': followStatusText === '关注', 'icon-focused': followStatusText === '已关注', 'icon-transform': followStatusText === '互相关注'}"></i>关注</div>
+              <div @click="changeFollow" class="follow-btn" :style="{backgroundColor: followStatusText === '关注' ? '#1EB0FD' : 'rgba(0,0,0,0.3)'}"><i class="iconfont follow-btn-icon" :class="{'icon-add': followStatusText === '关注', 'icon-focused': followStatusText === '已关注', 'icon-transform': followStatusText === '互相关注'}"></i>关注</div>
             </transition>
           </div>
         </div>
@@ -577,7 +577,7 @@ export default {
         like: !isLike,
         type: 0
       }
-      this.tabs[0].data.forEach(i => {
+      this.tabs[1].data.forEach(i => {
         if (i.id === item.id) {
           i.has_like = !isLike
           i.like_num = likeNum + (isLike ? -1 : 1)
@@ -586,7 +586,7 @@ export default {
       })
       this.$ajax('/jv/qz/like', {data: rData}).then(res => {
         if (!res || (res && Boolean(res.error))) { // 出错时重置点赞
-          this.tabs[0].data.forEach(i => {
+          this.tabs[1].data.forEach(i => {
             if (i.id === item.id) {
               i.has_like = isLike
               i.like_num = likeNum
@@ -594,14 +594,14 @@ export default {
             }
           })
         } else {
-          this.tabs[0].data.forEach(i => {
+          this.tabs[1].data.forEach(i => {
             if (i.id === item.id) {
               i.submitting = false
             }
           })
         }
       }).catch(err => {
-        this.tabs[0].data.forEach(i => {
+        this.tabs[1].data.forEach(i => {
           if (i.id === item.id) {
             i.has_like = isLike
             i.like_num = likeNum
