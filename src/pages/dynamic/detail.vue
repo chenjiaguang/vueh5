@@ -10,7 +10,10 @@
               <div class="row space-between center overview">
                 <!-- 左 -->
                 <div class="row">
-                  <img class="avatar" :src="dynamic.avatar" @click="clickUser(dynamic.uid)"/>
+                  <div class="avatar-wrapper">
+                    <img class="avatar" :src="dynamic.avatar" @click="clickUser(dynamic.uid)" />
+                    <img v-if="dynamic.userInfo && dynamic.userInfo.vipUser" class="vip-icon" :src="$assetsPublicPath + '/cwebassets/image/vip.png'" />
+                  </div>
                   <div class="flex column space-between">
                     <!-- 上 -->
                     <div class="row">
@@ -98,7 +101,10 @@
                   <div v-for="(comment) in dynamic.comment_list" class="transition-quick" :key="'comments'+comment.id">
                     <div class="comment-box row space-between">
                       <div class="column">
-                        <img class="user-avatar" :src="comment.avatar" @click="clickUser(comment.uid)" />
+                        <div class="user-avatar-wrapper">
+                          <img class="user-avatar" :src="comment.avatar" @click="clickUser(comment.uid)" />
+                          <img v-if="comment.userInfo && comment.userInfo.vipUser" class="vip-icon" :src="$assetsPublicPath + '/cwebassets/image/vip.png'" />
+                        </div>
                       </div>
                       <div class="comment-right-box column" >
                         <div class="row">
@@ -597,11 +603,29 @@ export default {
   line-height: 68px;
   font-weight: bold;
 }
-.avatar {
+.avatar-wrapper {
   height: 76px;
   width: 76px;
-  border-radius: 38px;
   margin-right: 24px;
+  position: relative;
+}
+.avatar{
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-radius: 38px;
+  z-index: 1;
+}
+.vip-icon{
+  display: block;
+  width: 34.2%;
+  height: 34.2%;
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  z-index: 2;
 }
 .username {
   color: #333333;
@@ -904,11 +928,20 @@ export default {
   margin-bottom: 40px;
   font-weight: bold;
 }
-.user-avatar {
+.user-avatar-wrapper{
   height: 60px;
   width: 60px;
-  border-radius: 30px;
   margin-right: 20px;
+  position: relative;
+}
+.user-avatar {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  border-radius: 30px;
+  top: 0;
+  left: 0;
+  z-index: 1;
 }
 .comment-box {
   margin-bottom: 40px;

@@ -398,7 +398,7 @@ export default {
           this.lastYear = res.data.lastYear
           this.tabs[1].paging = res.data.paging
           this.tabs[1].fetching = false
-          this.showTabbar = true
+          // this.showTabbar = true
           if (pn === 1) { // 第一页
             this.tabs[1].data = res.data.list
           } else { // 非第一页
@@ -408,7 +408,6 @@ export default {
             this.mescroll[0].showNoMore()
           }
           this.$nextTick(() => {
-            this.setSticky()
             console.log('endSuccess-fetchDynamicList')
             this.mescroll[0].endSuccess(res.data.list.length, !res.data.paging.is_end)
           })
@@ -418,7 +417,6 @@ export default {
         }
       }).catch(err => {
         this.tabs[1].fetching = false
-        this.$nextTick(this.setSticky)
         this.mescroll[0].endErr()
         if (err && err.msg) {
           this.$toast(err.msg)
@@ -456,7 +454,7 @@ export default {
           }
           this.tabs[2].paging = res.data.paging
           this.tabs[2].fetching = false
-          this.showTabbar = true
+          // this.showTabbar = true
           if (pn === 1) { // 第一页
             this.tabs[2].data = res.data.list
           } else { // 非第一页
@@ -466,7 +464,6 @@ export default {
             this.mescroll[0].showNoMore()
           }
           this.$nextTick(() => {
-            this.setSticky()
             console.log('endSuccess-fetchArticleList')
             this.mescroll[0].endSuccess(res.data.list.length, !res.data.paging.is_end)
           })
@@ -476,7 +473,6 @@ export default {
         }
       }).catch(err => {
         this.tabs[2].fetching = false
-        this.$nextTick(this.setSticky)
         this.mescroll[0].endErr()
         if (err && err.msg) {
           this.$toast(err.msg)
@@ -491,7 +487,8 @@ export default {
       }
       this.timer = setInterval(() => {
         const initialTab = parseInt(this.$route.query.jump_tab || 1)
-        if (this.$refs['tabItem']) {
+        if (this.$refs['tabItem'] && this.$refs['tabItem'][initialTab]) {
+          // console.log('initialTab', initialTab, this.$refs['tabItem'][initialTab])
           let appPos = document.getElementById('app').getBoundingClientRect()
           let pos = this.$refs['tabItem'][initialTab].$el.getBoundingClientRect()
           let slideX = pos.left + pos.width / 2 - appPos.left
@@ -501,6 +498,7 @@ export default {
       }, 30)
     },
     refreshData () {
+      console.log('refreshData')
       if (this.mescroll) {
         for (let i = 0; i < this.mescroll.length; i++) {
           this.mescroll[i].setScrollTop(0)
@@ -529,9 +527,13 @@ export default {
       //   }
       // }
       let _obj = Object.assign({}, _initialData, {selectedIdx, selectedLabel})
+      console.log('_obj', _obj)
       for (let item in _obj) {
         this[item] = _obj[item]
       }
+      this.fetchUserInfo(false)
+      this.initMeScroll()
+      this.initSlideBlock()
       // if (this.$route.query.jump_tab && this.$route.query.jump_tab.toString() === '1') { // 初始tab为1
       //   this.initMeScroll(1)
       // } else if ((!this.$route.query.jump_tab || (this.$route.query.jump_tab && this.$route.query.jump_tab.toString() === '0'))) { // 初始tab为0
@@ -539,8 +541,6 @@ export default {
       // }
       // 目前只显示动态
       // this.fetchUserInfo()
-      this.initMeScroll()
-      this.initSlideBlock()
     },
     onPullingDown () {
       if (this.selectedIdx === 1) {

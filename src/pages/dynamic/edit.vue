@@ -23,7 +23,7 @@
           </div>
         </div>
       </edit-option>
-      <edit-option :option="{leftIcon: 'range_' + range, title: rangeMap[range.toString()], rightIcon: 'next'}" :disabled="topic && topic[0]" @tapFunc="changeRange" v-if="range || range === 0"></edit-option>
+      <edit-option :option="{leftIcon: 'range_' + range, title: rangeMap[range.toString()], rightIcon: 'next'}" :disabled="(topic && topic[0]) ? true : false" @tapFunc="changeRange" v-if="range || range === 0"></edit-option>
     </div>
     <div class="submit-btn" @click.stop="submitDynamic">发布</div>
   </div>

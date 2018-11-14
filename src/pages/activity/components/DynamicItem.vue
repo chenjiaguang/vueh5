@@ -1,7 +1,10 @@
 <template>
   <div class="dynamic-item" @click.stop="goDynamic">
     <div class="user-overview">
-      <div class="user-avatar" @click.stop="goUser" :style="{backgroundImage: 'url(' + itemData.avatar + ')'}"></div>
+      <div class="user-avatar-wrapper">
+        <div class="user-avatar" @click.stop="goUser" :style="{backgroundImage: 'url(' + itemData.avatar + ')'}"></div>
+        <img v-if="itemData.is_vip_user" class="vip-icon" :src="$assetsPublicPath + '/cwebassets/image/vip.png'" />
+      </div>
       <div class="user-name clearfix">
         <span @click.stop="goUser" class="user-name-text fl">{{itemData.username}}</span>
         <img v-if="itemData.is_circle_manager" :src="$assetsPublicPath + '/cwebassets/image/manager.png'" class="user-tag fl" />
@@ -101,16 +104,33 @@
   min-height: 76px;
   box-sizing: content-box;
 }
-.user-avatar{
+.user-avatar-wrapper{
   width: 76px;
   height: 76px;
   position: absolute;
   left: 0;
   top: 30px;
+}
+.user-avatar{
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  left: 0;
+  top: 0;
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;
   border-radius: 50%;
+  z-index: 1;
+}
+.vip-icon{
+  display: block;
+  width: 34.2%;
+  height: 34.2%;
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  z-index: 2;
 }
 .user-name{
   padding-left: 100px;
