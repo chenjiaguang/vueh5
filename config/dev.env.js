@@ -4,9 +4,9 @@ const prodEnv = require('./prod.env')
 
 module.exports = merge(prodEnv, {
   NODE_ENV: '"development"',
-  API_DOMAIN: '"http://fanttest.fantuanlife.com"',
-  WEIXINLOGINJUMP_HTTPS: '"https://fanttest.fantuanlife.com/h5/weixinLoginJump"',
+  API_DOMAIN: '"http://fanttest.fantuan.cn"',
+  WEIXINLOGINJUMP_HTTPS: '"https://fanttest.fantuan.cn/h5/weixinLoginJump"',
   WEIXINLOGINJUMP_HTTP: '"http://192.168.1.199:8080/h5/weixinLoginJump"',
-  LOCATION_DOMAIN: '"https://fanttest.fantuanlife.com/cweb/index.html#"',
-  LOGO_URL:'"http://fanttest.fantuanlife.com/h5/cwebassets/image/van_logo.png"'
+  LOCATION_DOMAIN: '"https://fanttest.fantuan.cn/cweb/index.html#"',
+  LOGO_URL:'"http://fanttest.fantuan.cn/h5/cwebassets/image/van_logo.png"'
 })

@@ -12,7 +12,7 @@ module.exports = {
     assetsPublicPath: '/h5/',
     proxyTable: [{
       context: ['/jv', '/login', '/logout', 'uimage', '/upload', '/article', '/news', '/default', '/circle', '/dynamic', '/manager', '/user', '/check', '/special'],
-      target: 'http://fanttest.fantuanlife.com',
+      target: 'http://fanttest.fantuan.cn',
       changeOrigin: true
     }],
 
