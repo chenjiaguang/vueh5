@@ -19,7 +19,7 @@
       <edit-option :option="{leftIcon: 'circle', title: '发布于群组', rightText: circle.title}" v-if="circle">
         <div class="topic-box clearfix" slot="extra">
           <div @click.stop="showAllwaysChecked = !showAllwaysChecked" class="check-sync fr">
-            <i class="iconfont check-icon" :class="{'icon-checked': showAllwaysChecked, 'icon-uncheck': !showAllwaysChecked}"></i><span>同步到动态</span>
+            <i class="iconfont check-icon" :class="{'icon-checked': showAllwaysChecked, 'icon-uncheck': !showAllwaysChecked}"></i><span>公开到个人主页</span>
           </div>
         </div>
       </edit-option>
