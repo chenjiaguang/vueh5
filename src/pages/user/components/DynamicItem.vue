@@ -1,14 +1,17 @@
 <template>
   <div class="dynamic-item" @click.stop="goDynamic">
     <div class="user-overview">
-      <div class="user-avatar" @click.stop="goUser" :style="{backgroundImage: 'url(' + itemData.avatar + ')'}"></div>
+      <div class="user-avatar-wrapper">
+        <div class="user-avatar" @click.stop="goUser" :style="{backgroundImage: 'url(' + itemData.avatar + ')'}"></div>
+        <img v-if="itemData.is_vip_user" class="vip-icon" :src="$assetsPublicPath + '/cwebassets/image/vip.png'" />
+      </div>
       <div class="user-name clearfix">
         <span @click.stop="goUser" class="user-name-text fl">{{itemData.username}}</span>
         <!-- <img v-if="itemData.is_manager" :src="$assetsPublicPath + '/cwebassets/image/manager.png'" class="user-tag fl" />
         <img v-if="itemData.is_owner" :src="$assetsPublicPath + '/cwebassets/image/circle_owner.png'" class="user-tag fl" />
         <img v-if="itemData.is_settop" :src="$assetsPublicPath + '/cwebassets/image/settop.png'" class="user-tag fl" /> -->
       </div>
-      <div class="publish-time-and-circle">{{itemData.time}}<span class="from-circle" v-if="itemData.circle_name">发布于<span class="from-circle-text">{{itemData.circle_name}}</span></span></div>
+      <div class="publish-time-and-circle">{{itemData.time}}<i class="iconfont icon-dian"></i><i class="iconfont" :class="{'icon-dysign1': (itemData.range && (itemData.range.toString() === '0' || itemData.range.toString() === '3')), 'icon-dysign2': (itemData.range && itemData.range.toString() === '2'), 'icon-dysign3': (itemData.range && itemData.range.toString() === '1'), 'icon-dysign4': (itemData.range && itemData.range.toString() !== '1' && itemData.range.toString() !== '3')}"></i><span class="from-circle" v-if="itemData.circle_name">发布于<span class="from-circle-text">{{itemData.circle_name}}</span></span></div>
     </div>
     <show-hide-content :content="(itemData.type && itemData.type.toString() === '18') ? itemData.title : (itemData.content || '')" :isLongDynamic="(itemData.type && itemData.type.toString() === '18') ? true : false" />
     <div v-if="itemData.topicInfo && itemData.topicInfo.length > 0" class="topic-box clearfix">
@@ -103,16 +106,33 @@
   min-height: 76px;
   box-sizing: content-box;
 }
-.user-avatar{
+.user-avatar-wrapper{
   width: 76px;
   height: 76px;
   position: absolute;
   left: 0;
   top: 30px;
+}
+.user-avatar{
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  left: 0;
+  top: 0;
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;
   border-radius: 50%;
+  z-index: 1;
+}
+.vip-icon{
+  display: block;
+  width: 34.2%;
+  height: 34.2%;
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  z-index: 2;
 }
 .user-name{
   padding-left: 100px;
@@ -332,6 +352,14 @@
   font-size: 24px;
 }
 // 活动模块 end ------------------------
+
+.icon-dian, .icon-dysign1, .icon-dysign2, .icon-dysign3, .icon-dysign4{
+  font-size: 24px;
+  color: #999;
+}
+.icon-dian{
+  margin: 0 -2px;
+}
 </style>
 
 <script>

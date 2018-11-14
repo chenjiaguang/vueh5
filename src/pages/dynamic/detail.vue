@@ -1,16 +1,19 @@
 <template>
-  <div class="dynamic-detail-page" :style="{height: $winHeight + 'px'}">
-    <div v-if="dynamic" :style="{height: $winHeight-(80/750*($winWidth > (54 * 10) ? (54 * 10) : $winWidth)) + 'px'}">
-      <div id="mescroll" class="mescroll">
+  <div id="dynamic-detail" class="dynamic-detail-page mescroll">
+    <div v-if="dynamic">
+      <div>
         <div>
           <download-box v-if="$route.query.isShareOpen && !$isApp" />
           <div class="container">
             <div v-if="dynamic" id="title-container" class="column">
               <div v-if="dynamic.title" class="title">{{dynamic.title}}</div>
-              <div class="row space-between center">
+              <div class="row space-between center overview">
                 <!-- 左 -->
                 <div class="row">
-                  <img class="avatar" :src="dynamic.avatar" @click="clickUser(dynamic.uid)"/>
+                  <div class="avatar-wrapper">
+                    <img class="avatar" :src="dynamic.avatar" @click="clickUser(dynamic.uid)" />
+                    <img v-if="dynamic.userInfo && dynamic.userInfo.vipUser" class="vip-icon" :src="$assetsPublicPath + '/cwebassets/image/vip.png'" />
+                  </div>
                   <div class="flex column space-between">
                     <!-- 上 -->
                     <div class="row">
@@ -25,11 +28,9 @@
                   </div>
                 </div>
                 <!-- 右 -->
-                <div>
-                  <transition name="fade-quick">
-                    <div class="follow-button" v-if="!dynamic.is_following&&!dynamic.is_owner"  @click="clickFollow(dynamic.uid)"><i class="iconfont follow-btn-icon icon-add"></i>关注</div>
-                  </transition>
-                </div>
+                <transition name="fade-quick">
+                  <div class="follow-button" v-if="!dynamic.is_following&&!dynamic.is_owner"  @click="clickFollow(dynamic.uid)"><i class="iconfont follow-btn-icon icon-add"></i><span>关注</span></div>
+                </transition>
               </div>
             </div>
 
@@ -100,7 +101,10 @@
                   <div v-for="(comment) in dynamic.comment_list" class="transition-quick" :key="'comments'+comment.id">
                     <div class="comment-box row space-between">
                       <div class="column">
-                        <img class="user-avatar" :src="comment.avatar" @click="clickUser(comment.uid)" />
+                        <div class="user-avatar-wrapper">
+                          <img class="user-avatar" :src="comment.avatar" @click="clickUser(comment.uid)" />
+                          <img v-if="comment.userInfo && comment.userInfo.vipUser" class="vip-icon" :src="$assetsPublicPath + '/cwebassets/image/vip.png'" />
+                        </div>
                       </div>
                       <div class="comment-right-box column" >
                         <div class="row">
@@ -390,7 +394,7 @@ export default {
 
           this.isLoad = true
           this.$nextTick(() => {
-            this.mescroll = new MeScroll('mescroll', {
+            this.mescroll = new MeScroll('dynamic-detail', {
               down: {
                 use: false
               },
@@ -599,11 +603,29 @@ export default {
   line-height: 68px;
   font-weight: bold;
 }
-.avatar {
+.avatar-wrapper {
   height: 76px;
   width: 76px;
-  border-radius: 38px;
   margin-right: 24px;
+  position: relative;
+}
+.avatar{
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-radius: 38px;
+  z-index: 1;
+}
+.vip-icon{
+  display: block;
+  width: 34.2%;
+  height: 34.2%;
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  z-index: 2;
 }
 .username {
   color: #333333;
@@ -623,27 +645,32 @@ export default {
   color: #1eb0fd;
   font-size: 24px;
 }
+.overview{
+  position: relative;
+}
 .follow-button {
   display: flex;
-  width: 124px;
-  height: 44px;
+  width: 248px;
+  height: 88px;
   text-align: center;
-  font-size: 24px;
-  line-height: 44px;
+  font-size: 48px;
+  line-height: 60px;
   color: #ffffff;
   /* background-color: #1eb0fd; */
-  border: 2px solid #1eb0fd;
-  color: #1eb0fd;
-  border-radius: 24px;
+  border: 4px solid #1EB0FD;
+  color: #1EB0FD;
+  border-radius: 48px;
   justify-content: center;
+  align-items: center;
   box-sizing: content-box;
+  transform: scale(0.5, 0.5) translate(50%, -100%);
+  position: absolute;
+  right: 0;
+  top: 50%;
 }
 .follow-btn-icon{
-  font-size: 40px;
-  display: block;
-  transform: scale(0.5, 0.5);
-  margin-left: -10px;
-  margin-right: -4px;
+  font-size: 36px;
+  margin-right: 14px;
 }
 .follow-cancel-button {
   width: 98px;
@@ -901,11 +928,20 @@ export default {
   margin-bottom: 40px;
   font-weight: bold;
 }
-.user-avatar {
+.user-avatar-wrapper{
   height: 60px;
   width: 60px;
-  border-radius: 30px;
   margin-right: 20px;
+  position: relative;
+}
+.user-avatar {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  border-radius: 30px;
+  top: 0;
+  left: 0;
+  z-index: 1;
 }
 .comment-box {
   margin-bottom: 40px;
@@ -917,13 +953,12 @@ export default {
   color: #225894;
   font-size: 28px;
   line-height: 28px;
-  margin-bottom: 14px;
+  margin-bottom: 26px;
 }
 .comment-content {
   color: #333333;
   font-size: 30px;
   line-height: 42px;
-  margin-bottom: 14px;
   word-break: break-all;
   white-space: pre-wrap;
 }
@@ -931,9 +966,10 @@ export default {
   color: #999999;
   font-size: 24px;
   line-height: 24px;
-  margin-bottom: 24px;
+  margin-top: 14px;
 }
 .comment-replies-box {
+  margin-top: 24px;
   padding-top: 18px;
   padding-bottom: 10px;
   padding-left: 24px;

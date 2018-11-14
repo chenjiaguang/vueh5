@@ -1,90 +1,147 @@
 <template>
-  <div :style="{height: $winHeight + 'px'}" class="user-center-page">
-    <div ref="pageContainer" style="transition: all 300ms" :style="{transform: 'translateY(' + pageTop + 'px)'}">
-      <div ref="topBanner" @touchmove="bannerTouchMove" @touchstart="bannerTouchStart" @touchend="bannerTouchEnd">
-        <download-box v-if="$route.query.isShareOpen && !$isApp" />
-        <header ref="topHeader" class="top-header">
-          <div class="top-header-bg" :style="{backgroundImage: 'url(' + user.cover + ')'}">
-            <div class="top-header-avatar" :style="{backgroundImage: 'url(' + user.avatar_url + ')', opacity: user.avatar_url ? 1 : 0}"></div>
-          </div>
-          <div class="top-header-overview">
-            <div class="user-name"><span style="vertical-align: middle">{{user.username}}</span><img v-if="user.is_news" class="author-sign" :src="$assetsPublicPath + '/cwebassets/image/author_icon.png'" /><img v-if="!user.is_news && user.level" class="level-sign" :src="$assetsPublicPath + '/cwebassets/image/level' + user.level + '.png'" /></div>
-            <div class="user-intro" v-if="user.intro">{{user.intro}}</div>
-            <div v-if="user.id" class="follow-and-fans clearfix">
-              <div class="follow-box fl"><span class="follow-and-fans-text">关注</span><span class="follow-and-fans-number">{{followNumber}}</span></div>
-              <div class="fans-box fl"><span class="follow-and-fans-text">粉丝</span><span class="follow-and-fans-number">{{fansNumber}}</span></div>
+  <div class="user-center-page mescroll" id="user-center">
+    <div ref="topBanner">
+      <download-box v-if="$route.query.isShareOpen && !$isApp" />
+      <header ref="topHeader" class="top-header" :style="{backgroundImage: 'url(' + user.cover + ')'}">
+        <div class="top-header-content">
+          <div class="top-header-left">
+            <div class="name-and-gender">
+              <div class="user-name">{{user.chatNickName || user.username}}</div>
             </div>
-            <transition v-if="!user.is_owner" appear appear-class="follow-appear">
-              <div class="follow-btn-wrapper">
-                <div @click="changeFollow" class="follow-btn" :style="{color: followStatusText === '关注' ? '#1EB0FD' : '#A9A9A9', backgroundColor: '#fff', borderColor: followStatusText === '关注' ? '#1EB0FD' : '#A9A9A9'}"><i class="iconfont follow-btn-icon" :class="{'icon-add': followStatusText === '关注', 'icon-focused': followStatusText === '已关注', 'icon-transform': followStatusText === '互相关注'}"></i>关注</div>
+            <div class="constellation-and-location" v-if="user.constellation || user.location || (user.sex && (user.sex.toString() === '1' || user.sex.toString() === '2'))">
+              <div class="user-constellation" v-if="user.constellation">
+                <i v-if="user.sex && (user.sex.toString() === '1' || user.sex.toString() === '2')" class="user-gender iconfont" :class="{'icon-gender1': user.sex && user.sex.toString() === '1', 'icon-gender2': user.sex && user.sex.toString() === '2'}"></i>
+                <i v-if="user.sex && (user.sex.toString() === '1' || user.sex.toString() === '2') && user.constellation" class="separator-dot iconfont icon-dian"></i>
+                <span class="user-constellation-text" v-if="user.constellation">{{user.constellation}}</span>
               </div>
+              <div class="user-location" v-if="user.location"><span>{{user.location}}</span></div>
+            </div>
+            <div class="vip-user" v-if="user.is_vip_user"><i class="iconfont icon-vip vip-icon"></i>{{user.vip_intro}}</div>
+            <div class="user-intro">{{user.intro}}</div>
+            <div class="focus-and-fans">
+              <div class="user-follow"><span class="follow-text">关注</span><span class="num">{{followNumber}}</span></div>
+              <div class="user-fans"><span class="fans-text">粉丝</span><span class="num">{{fansNumber}}</span></div>
+            </div>
+          </div>
+          <div class="top-header-right">
+            <div class="top-header-avatar" :style="{backgroundImage: 'url(' + user.avatar_url + ')', opacity: user.avatar_url ? 1 : 0}"></div>
+            <transition v-if="!user.is_owner" appear appear-class="follow-appear">
+              <div @click="changeFollow" class="follow-btn" :style="{backgroundColor: followStatusText === '关注' ? '#1EB0FD' : 'rgba(0,0,0,0.3)'}"><i class="iconfont follow-btn-icon" :class="{'icon-add': followStatusText === '关注', 'icon-focused': followStatusText === '已关注', 'icon-transform': followStatusText === '互相关注'}"></i>关注</div>
             </transition>
           </div>
-        </header>
-      </div>
-      <div ref="innerWrapper" class="scroll-wrapper" :style="{height: $winHeight + 'px'}">
-        <div @touchmove="bannerTouchMove" @touchstart="bannerTouchStart" @touchend="bannerTouchEnd" class="nav-scroll-list-wrap" ref="navWrapper" :style="{height: tabBarHeight + 'px'}" v-if="tabs && tabs.length > 1 && showTabbar">
-          <cube-tab-bar v-model="selectedLabel" class="tab-box clearfix" @change="changeTabBar" :style="{height: tabBarHeight + 'px'}">
-            <cube-tab v-for="(item) in tabs" class="fl" ref="tabItem" :label="item.title" :key="item.title">
-            </cube-tab>
-          </cube-tab-bar>
-          <div class="tab-slider">
-            <div class="tab-slider-body" :style="{transform: 'translateX(' + tabSlideX + ')'}"></div>
-          </div>
-          <div class="tab-border" :style="{transform: 'scale(1,' + $tranScale + ')'}"></div>
         </div>
-        <div class="tabs-wrapper" :style="{height: ($winHeight - ((tabs && tabs.length) > 1 ? tabBarHeight : 0)) + 'px'}">
-          <swiper class="swiper-wrapper swiper-no-swiping" ref="swiper" :style="{width: '100%', height: '100%'}" :options="swiperOption">
-              <swiper-slide v-for="(item, index) in tabs" :key="item.title" :style="{width: '100%', height: '100%'}">
-                <div :id="'mescroll' + index" class="mescroll content-scroll-wrapper" :style="{width: $winWidth + 'px', height: '100%', overflowY: 'auto', overflowX: 'hidden'}">
-                  <!-- <transition name="loading-scale">
-                    <div class="first-loading-box" v-if="!tabs[index].paging.pn">
-                      <loading-view />
-                    </div>
-                  </transition> -->
-                  <div v-if="tabs[index].paging.pn && tabs[index].data && tabs[index].data.length !== 0" :style="{minHeight: ($winHeight - ((tabs && tabs.length) > 1 ? tabBarHeight : 0)) + 1 + 'px', backgroundColor: '#fff'}">
-                    <dynamic-item v-for="(item, idx) in tabs[index].data" :key="item.id" :itemData="item" :hideBlock="idx === tabs[index].data.length - 1" :router="$router" @changeLike="(data) => changeLike(data, index)" />
-                  </div>
-                  <div v-else-if="tabs[index].paging.is_end && tabs[index].data && tabs[index].data.length === 0" class="empty-box" :style="{minHeight: ($winHeight - ((tabs && tabs.length) > 1 ? tabBarHeight : 0)) + 1 + 'px'}">
-                    <img :src="$assetsPublicPath + '/cwebassets/image/empty_dynamic.png'" class="empty-image" />
-                    暂无{{index === 0 ? '动态' : '文章'}}
-                  </div>
-                </div>
-              </swiper-slide>
-          </swiper>
+      </header>
+    </div>
+    <div class="nav-wrap" ref="navWrapper" :style="{height: tabBarHeight + 'px', zIndex: '99999'}" v-if="tabs && tabs.length > 1 && showTabbar">
+      <div class="nav-content" ref="navContent" :style="{height: tabBarHeight + 'px'}">
+        <cube-tab-bar v-model="selectedLabel" class="tab-box" @change="changeTabBar" :style="{height: tabBarHeight + 'px'}">
+          <cube-tab v-for="(item) in tabs" ref="tabItem" :label="item.title" :key="item.title">
+          </cube-tab>
+        </cube-tab-bar>
+        <div class="tab-slider">
+          <div class="tab-slider-body" :style="{transform: 'translateX(' + tabSlideX + ')'}"></div>
         </div>
-        <!-- <div class="tabs-wrapper" ref="slideWrapper" :style="{height: ($winHeight - ((tabs && tabs.length) > 1 ? tabBarHeight : 0)) + 'px'}">
-          <cube-slide ref="slideInstance" :data="tabs" :initialIndex="selectedIdx" :autoPlay="false" :allowVertical="false" :showDots="false" :loop="false" :speed="200" :options="{listenScroll: true, probeType: 3, stopPropagation: true, click: false, preventDefault: false}" @change="changeSlide" @scroll="slideScroll">
-            <cube-slide-item v-for="(item, index) in tabs" :key="item.title" :style="{height: ($winHeight - ((tabs && tabs.length) > 1 ? tabBarHeight : 0)) + 'px'}">
-               <div :id="'mescroll' + index" class="mescroll content-scroll-wrapper" :style="{width: $winWidth + 'px', height: '100%', overflowY: 'auto', overflowX: 'hidden'}">
-                <transition name="loading-scale">
-                  <div class="first-loading-box" v-if="!tabs[index].paging.pn">
-                    <loading-view />
-                  </div>
-                </transition>
-                <div v-if="tabs[index].paging.pn && tabs[index].data && tabs[index].data.length !== 0" :style="{minHeight: ($winHeight - ((tabs && tabs.length) > 1 ? tabBarHeight : 0)) + 0.5 + 'px', backgroundColor: '#fff'}">
-                  <dynamic-item v-for="(item, idx) in tabs[index].data" :key="idx" :itemData="item" :hideBlock="idx === tabs[index].data.length - 1" :router="$router" @changeLike="(data) => changeLike(data, index)" />
-                </div>
-                <div v-else-if="tabs[index].paging.is_end && tabs[index].data && tabs[index].data.length === 0" class="empty-box">
-                  <img :src="$assetsPublicPath + '/cwebassets/image/empty_dynamic.png'" class="empty-image" />
-                  暂无{{index === 0 ? '动态' : '文章'}}
-                </div>
-              </div>
-            </cube-slide-item>
-          </cube-slide>
-        </div> -->
+        <div class="tab-border" :style="{transform: 'scale(1,' + $tranScale + ')'}"></div>
       </div>
     </div>
-    <scroll-to-top v-if="mescroll && mescroll.length > 0" :visible="showBackTop" :position="{bottom: (($winWidth > (54 * 10) ? (54 * 10) : $winWidth) / 750) * 178, right: (($winWidth > (54 * 10) ? (54 * 10) : $winWidth) / 750) * 54}" :scroll="mescroll[selectedIdx]"/>
+    <div>
+      <div :style="{width: '100%', overflow: 'hidden'}">
+        <div :style="{width: 100 * tabs.length + '%'}">
+          <div v-for="(item, index) in tabs" v-show="selectedIdx === index" :key="item.title" :style="{width: 100 / tabs.length + '%', overflow: 'hidden', backgroundColor: '#F2F2F2'}">
+            <transition name="loading-scale">
+              <div class="first-loading-box" v-if="!tabs[index].paging.pn">
+                <loading-view />
+              </div>
+            </transition>
+            <!-- 资料 -->
+            <div v-if="tabs[index].paging.pn && index === 0" :style="{backgroundColor: '#fff'}">
+              <div class="gray-block"></div>
+              <div class="info-relationship" v-if="!user.is_owner">
+                <div class="info-title">关系<div class="border-bottom"></div></div>
+                <div>
+                  <div class="relationship-item" v-if="tabs[index].data.isChatFriend">
+                    <div class="relation-left">好友</div>
+                    <div class="relation-right">已经是好友啦</div>
+                  </div>
+                  <div class="relationship-item" v-else @click.stop="beFriend">
+                    <div class="relation-left">好友</div>
+                    <div class="relation-right relationship-space-between"><span class="space-between-flex1">看了这么久，不如加好友？</span><i class="iconfont icon-goforward space-between-flex0"></i></div>
+                  </div>
+                  <div class="relationship-item" v-if="tabs[index].data.isChatFriend && tabs[index].data.chatNickName">
+                    <div class="relation-left">备注</div>
+                    <div class="relation-right">{{tabs[index].data.chatNickName}}</div>
+                  </div>
+                  <div class="relationship-item" v-if="tabs[index].data.isChatFriend && tabs[index].data.chatPhone">
+                    <div class="relation-left">电话</div>
+                    <a class="relation-right" style="color:#507DAF" :href="'tel:' + (tabs[index].data.chatPhone)">{{tabs[index].data.chatPhone}}</a>
+                  </div>
+                </div>
+                <div class="gray-block"></div>
+              </div>
+              <div class="info-base">
+                <div class="info-title">基本信息<div class="border-bottom"></div></div>
+                <div>
+                  <div class="relationship-item">
+                    <div class="relation-left">昵称</div>
+                    <div class="relation-right">{{tabs[index].data.username}}</div>
+                  </div>
+                  <div class="relationship-item">
+                    <div class="relation-left">性别</div>
+                    <div class="relation-right">{{setText[tabs[index].data.sex.toString()] || '保密'}}</div>
+                  </div>
+                  <div class="relationship-item">
+                    <div class="relation-left">星座</div>
+                    <div class="relation-right">{{tabs[index].data.constellation || '还没被人类发现的星座'}}</div>
+                  </div>
+                   <div class="relationship-item">
+                    <div class="relation-left">地区</div>
+                    <div class="relation-right">{{tabs[index].data.location || '可能不在地球上'}}</div>
+                  </div>
+                  <div class="relationship-item">
+                    <div class="relation-left">等级</div>
+                    <div class="relation-right">LV.{{tabs[index].data.level}}</div>
+                  </div>
+                </div>
+                <div class="gray-block"></div>
+              </div>
+              <div class="info-intro">
+                <div class="info-title">签名<div class="border-bottom"></div></div>
+                <div class="info-slogen-text">{{tabs[index].data.intro || 'TA很低调，什么都没写'}}</div>
+                <div class="gray-block"></div>
+              </div>
+            </div>
+            <!-- 动态 -->
+            <div v-else-if="tabs[index].paging.pn && index === 1 && tabs[index].data && tabs[index].data.length !== 0" :style="{backgroundColor: '#fff'}">
+              <div class="gray-block"></div>
+              <dynamic-item v-for="(item, idx) in tabs[index].data" :key="item.id" :itemData="item" :hideBlock="idx === tabs[index].data.length - 1" :router="$router" @changeLike="(data) => changeLike(data, index)" />
+            </div>
+            <!-- 文章 -->
+            <div v-else-if="tabs[index].paging.pn && index === 2 && tabs[index].data && tabs[index].data.length !== 0" :style="{backgroundColor: '#fff'}">
+              <div class="gray-block"></div>
+              <article-item v-for="item in tabs[index].data" :key="item.id" :itemData="item" />
+            </div>
+            <div v-else-if="tabs[index].paging.is_end && tabs[index].data && tabs[index].data.length === 0" class="empty-box">
+              <!-- <img :src="$assetsPublicPath + '/cwebassets/image/empty_dynamic.png'" class="empty-image" /> -->
+              TA很神秘，什么都没有发
+            </div>
+            <!-- <div v-else class="empty-box" :style="{minHeight: ($winHeight - ((tabs && tabs.length) > 1 ? tabBarHeight : 0)) + 1 + 'px'}">
+              TA很神秘，什么都没有发
+            </div> -->
+          </div>
+        </div>
+      </div>
+    </div>
+    <scroll-to-top v-if="mescroll && mescroll.length > 0" :visible="showBackTop" :position="{bottom: (($winWidth > (54 * 10) ? (54 * 10) : $winWidth) / 750) * 178, right: (($winWidth > (54 * 10) ? (54 * 10) : $winWidth) / 750) * 54}" :scroll="mescroll[0]"/>
   </div>
 </template>
 
 <script type="text/ecmascript-6">
-import 'swiper/dist/css/swiper.css'
-import { swiper, swiperSlide } from 'vue-awesome-swiper'
+// import 'swiper/dist/css/swiper.css'
+// import { swiper, swiperSlide } from 'vue-awesome-swiper'
 import Vue from 'vue'
 import DownloadBox from '../../components/DownloadBox'
 import DynamicItem from './components/DynamicItem'
+import ArticleItem from './components/ArticleItem'
 import LoadingView from '@/components/LoadingView'
 import ScrollToTop from '@/components/ScrollToTop'
 import utils from '@/lib/utils'
@@ -104,30 +161,49 @@ Vue.use(Slide)
 
 let maxWidth = window.innerWidth > (54 * 10) ? (54 * 10) : window.innerWidth // 最大宽度，flexible中html font-size都最大值的10倍
 const initialData = {
+  beingFriend: false,
   showBackTop: false,
   lastYear: '',
   user: {
     is_owner: true
   },
+  setText: {
+    1: '男',
+    2: '女'
+  },
+  emptyText: {
+    0: '获取用户资料失败',
+    1: 'TA很神秘，什么都没有发',
+    2: 'TA很神秘，什么都没有发'
+  },
   tabs: [
+    {
+      title: '资料',
+      data: {},
+      paging: {},
+      fetching: false,
+      scrollTop: 0
+    },
     {
       title: '动态',
       data: [],
       paging: {},
-      fetching: false
+      fetching: false,
+      scrollTop: 0
+    },
+    {
+      title: '文章',
+      data: [],
+      paging: {},
+      fetching: false,
+      scrollTop: 0
     }
-    // {
-    //   title: '文章',
-    //   data: [],
-    //   paging: {},
-    //   fetching: false
-    // }
     // 目前只显示动态
   ],
-  swiperOption: {},
+  // swiperOption: {},
   tabBarHeight: parseInt((maxWidth / 750) * 88),
   selectedLabel: '动态',
-  selectedIdx: 0,
+  selectedIdx: 1,
   tabSlideX: -window.innerWidth + 'px',
   timer: null,
   following: false,
@@ -139,33 +215,34 @@ const initialData = {
 export default {
   mixins: [MeScrollSupportArr, WeixinShareInKeepAlive],
   data () {
-    let selectedIdx = parseInt(this.$route.query.jump_tab || 0)
-    let selectedLabel = (this.$route.query.jump_tab && this.$route.query.jump_tab.toString() === '1') ? '文章' : '动态'
+    let _initialData = JSON.parse(JSON.stringify(initialData))
+    let selectedIdx = parseInt(this.$route.query.jump_tab || 1)
+    console.log('selectedIdx', selectedIdx)
+    let selectedLabel = _initialData.tabs[parseInt(selectedIdx)].title
     let isShareOpen = this.$route.params.isShareOpen
     let _this = this
-    let swiperOption = {
-      initialSlide: selectedIdx,
-      setWrapperSize: true,
-      pagination: {
-        el: '.swiper-pagination',
-        type: 'fraction'
-      },
-      on: {
-        slideChangeTransitionStart: function () {
-          let appPos = document.getElementById('app').getBoundingClientRect()
-          let pos = _this.$refs['tabItem'][this.activeIndex].$el.getBoundingClientRect()
-          let slideX = pos.left + pos.width / 2 - appPos.left
-          _this.selectedLabel = _this.tabs[this.activeIndex].title
-          _this.tabSlideX = slideX + 'px'
-          _this.$refs['swiper'].swiper.slideTo(this.activeIndex, 300)
-        }
-      }
-    }
-    let _initialData = JSON.parse(JSON.stringify(initialData))
-    let _obj = Object.assign({}, _initialData, {selectedIdx, selectedLabel, isShareOpen, swiperOption})
+    // let swiperOption = {
+    //   initialSlide: selectedIdx,
+    //   setWrapperSize: true,
+    //   pagination: {
+    //     el: '.swiper-pagination',
+    //     type: 'fraction'
+    //   },
+    //   on: {
+    //     slideChangeTransitionStart: function () {
+    //       let appPos = document.getElementById('app').getBoundingClientRect()
+    //       let pos = _this.$refs['tabItem'][this.activeIndex].$el.getBoundingClientRect()
+    //       let slideX = pos.left + pos.width / 2 - appPos.left
+    //       _this.selectedLabel = _this.tabs[this.activeIndex].title
+    //       _this.tabSlideX = slideX + 'px'
+    //       _this.$refs['swiper'].swiper.slideTo(this.activeIndex, 300)
+    //     }
+    //   }
+    // }
+    let _obj = Object.assign({}, _initialData, {selectedIdx, selectedLabel, isShareOpen})
     return _obj
   },
-  components: {DownloadBox, DynamicItem, LoadingView, ScrollToTop, swiper, swiperSlide},
+  components: {DownloadBox, DynamicItem, ArticleItem, LoadingView, ScrollToTop},
   watch: {
     '$route': function (val, oldVal) {
       utils.checkReloadWithKeepAliveNew(this, val, oldVal, 'UserCenter', ['user_id', 'jump_tab'], () => {
@@ -180,71 +257,189 @@ export default {
     }
   },
   methods: {
+    setSticky () {
+      this.mescroll[0].optUp.onScroll = (mescroll, y, isUp) => {
+        // 设置吸顶
+        if (y >= this.$refs['navWrapper'].offsetTop) {
+          this.$refs['navContent'].classList.add('nav-fixed')
+        } else {
+          this.$refs['navContent'].classList.remove('nav-fixed')
+        }
+        // 显示隐藏返回顶部按钮
+        if (y > window.innerHeight && !this.showBackTop) {
+          this.showBackTop = true
+        } else if (y < window.innerHeight && this.showBackTop) {
+          this.showBackTop = false
+        }
+      }
+    },
     changeTabBar (tabTitle) { // 点击tab切换
+      const bannerHeight = this.$refs['topBanner'].getBoundingClientRect().height
+      // 记录点击前tab的滚动高度
+      let preIdx = this.selectedIdx
+      let preTop = this.mescroll[0].getScrollTop()
+      this.tabs[preIdx].scrollTop = preTop
       this.tabs.forEach((item, index) => {
         if (item.title === tabTitle) {
           this.selectedLabel = tabTitle
           this.selectedIdx = index
+          let currentTop = this.tabs[index].scrollTop || 0
+          if (currentTop > bannerHeight) { // 滚动到所点击tap原来记录的滚动高度
+            this.$nextTick(() => {
+              this.mescroll[0].scrollTo(currentTop, 0)
+            })
+          }
           let pos = this.$refs['tabItem'][index].$el.getBoundingClientRect()
           let slideX = pos.left + pos.width / 2
           this.tabSlideX = slideX + 'px'
-          this.$refs['swiper'].swiper.slideTo(index, 300)
           if (!this.tabs[index].paging.pn) {
-            this.initMeScroll(index)
+            console.log('111')
+            if (index === 0) {
+              this.fetchUserInfo(true)
+            } else if (index === 1) {
+              this.fetchDynamicList(1)
+            } else if (index === 2) {
+              this.fetchArticleList(1)
+            }
+          } else if (this.tabs[index].paging.is_end) {
+            console.log('222')
+            // this.mescroll[0].endSuccess(1, false)
+            this.$nextTick(() => {
+              console.log('endSuccess-changeTabBar')
+              this.mescroll[0].endSuccess(1, false)
+              this.mescroll[0].showNoMore()
+            })
+          } else if (!this.tabs[index].paging.is_end) {
+            console.log('333')
+            this.$nextTick(() => {
+              console.log('endSuccess-changeTabBar')
+              this.mescroll[0].endSuccess(10, true)
+              // this.mescroll[0].showUpScroll()
+            })
           }
         }
       })
     },
-    changeSlide (idx) { // 滑动slide触发tab切换
-      this.selectedLabel = this.tabs[idx].title
-      this.selectedIdx = idx
-      if (!this.tabs[idx].paging.pn) {
-        this.initMeScroll(idx)
-      }
-    },
-    slideScroll ({x, y}) { // 滑动slide
-      if (!this.$refs['tabItem'] || this.tabs.length <= 1) {
+    fetchUserInfo (islist) { // 获取用户资料
+      console.log('获取用户资料')
+      if (this.tabs[0].fetching) { // 正在拉取动态数据
+        this.mescroll[0].endErr()
         return false
       }
-      let slideTotalWidth = this.$refs['slideInstance'].$el.getBoundingClientRect().width * this.tabs.length
-      let pre = this.selectedIdx === 0 ? null : this.$refs['tabItem'][this.selectedIdx - 1]
-      let next = this.selectedIdx === (this.tabs.length - 1) ? null : this.$refs['tabItem'][this.selectedIdx + 1]
-      let current = this.$refs['tabItem'][this.selectedIdx]
-      let position = {pre: pre ? pre.$el.getBoundingClientRect() : null, next: next ? next.$el.getBoundingClientRect() : null, current: current.$el.getBoundingClientRect()}
-      let relativeX = this.selectedIdx === 0 ? 0 : -this.$refs['slideInstance'].$el.getBoundingClientRect().width * this.selectedIdx // 基准x位置
-      let relativeSlideX = position.current.left + position.current.width / 2
-      let preSlideX = position.pre ? (position.pre.left + position.pre.width / 2) : null
-      let nextSlideX = position.next ? (position.next.left + position.next.width / 2) : null
-      let touchX = x - relativeX
-      let slideX = 0
-      if (this.selectedIdx === 0) {
-        slideX = nextSlideX - relativeSlideX
-      } else if (this.selectedIdx === this.tabs.length - 1) {
-        slideX = relativeSlideX - preSlideX
-      } else if (touchX > 0) {
-        slideX = relativeSlideX - preSlideX
-      } else if (touchX <= 0) {
-        slideX = nextSlideX - relativeSlideX
+      let rData = {
+        id: this.$route.query.user_id
       }
-      let moveX = (touchX / this.$refs['slideInstance'].$el.getBoundingClientRect().width) * slideX
-      this.tabSlideX = relativeSlideX - moveX + 'px'
+      this.tabs[0].fetching = true
+      this.$ajax('/jv/anonymous/user/social/data', {data: rData}).then(res => {
+        console.log('fetchUserInfo.res', res)
+        this.tabs[0].fetching = false
+        if (res && !res.error && res.data) {
+          if (this.$isApp) {
+            let {id, is_news} = res.data.user
+            this.$appCall('h5GoUserCenter', id, is_news, '1') // type传1
+          }
+          if (res.data.shareInfo) {
+            this.setShareData({
+              type: '',
+              title: res.data.shareInfo.shareTitle,
+              desc: res.data.shareInfo.shareContent,
+              url: res.data.shareInfo.shareUrl,
+              imgUrl: res.data.shareInfo.shareImage
+            })
+          }
+          if (res.data.user) {
+            this.user = res.data.user
+            this.showTabbar = true
+            if (!res.data.user.has_articles) { // 没有文章tab
+              this.tabs.splice(2, 1)
+            }
+            this.$nextTick(this.setSticky)
+            if (islist) { // 列表调用的时候该参数位true,否则为false
+              this.tabs[0].data = res.data.user
+              this.tabs[0].paging.pn = 1
+              this.tabs[0].paging.is_end = true
+              this.$nextTick(() => {
+                console.log('endSuccess-fetchUserInfo')
+                this.mescroll[0].endSuccess(1, false)
+                this.mescroll[0].showNoMore()
+              })
+            }
+          }
+        }
+      }).catch(err => {
+        this.showTabbar = true
+        this.$nextTick(this.setSticky)
+        this.mescroll[0].endErr()
+        console.log('err')
+      })
     },
-    fetchList (tabIdx, pn) {
-      if (this.tabs[tabIdx].fetching) { // 正在拉取动态数据
-        this.mescroll[tabIdx].endErr()
+    fetchDynamicList (pn) {
+      if (this.tabs[1].fetching) { // 正在拉取动态数据
+        this.mescroll[0].endErr()
         return false
       }
-      let _type = tabIdx === 0 ? 1 : 2
       let rData = { // type  1,动态  2,文章
         id: this.$route.query.user_id,
-        type: _type,
         pn: pn,
-        snapshot: this.tabs[tabIdx].paging.snapshot || '',
+        snapshot: this.tabs[1].paging.snapshot || '',
         limit: 10,
         lastYear: ''
       }
-      this.tabs[tabIdx].fetching = true
-      this.$ajax('/jv/anonymous/user/social', {data: rData}).then(res => {
+      this.tabs[1].fetching = true
+      this.$ajax('/jv/anonymous/user/social/dynamic', {data: rData}).then(res => {
+        if (res && res.msg) {
+          this.$toast(res.msg)
+        }
+        if (res && !res.error && res.data) { // 成功获取数据
+          if (this.$isApp) {
+            let {id, is_news} = res.data.user
+            this.$appCall('h5GoUserCenter', id, is_news, '1') // type传1
+          }
+          this.lastYear = res.data.lastYear
+          this.tabs[1].paging = res.data.paging
+          this.tabs[1].fetching = false
+          // this.showTabbar = true
+          if (pn === 1) { // 第一页
+            this.tabs[1].data = res.data.list
+          } else { // 非第一页
+            this.tabs[1].data = this.tabs[1].data.concat(res.data.list)
+          }
+          if (res.data.paging.is_end) {
+            this.mescroll[0].showNoMore()
+          }
+          this.$nextTick(() => {
+            console.log('endSuccess-fetchDynamicList')
+            this.mescroll[0].endSuccess(res.data.list.length, !res.data.paging.is_end)
+          })
+        } else {
+          this.tabs[1].fetching = false
+          this.mescroll[0].endErr()
+        }
+      }).catch(err => {
+        this.tabs[1].fetching = false
+        this.mescroll[0].endErr()
+        if (err && err.msg) {
+          this.$toast(err.msg)
+        } else {
+          this.$toast('获取用户数据失败')
+        }
+      })
+    },
+    fetchArticleList (pn) { // 获取文章列表
+      console.log('获取文章列表')
+      if (this.tabs[2].fetching) { // 正在拉取动态数据
+        this.mescroll[0].endErr()
+        return false
+      }
+      let rData = { // type  1,动态  2,文章
+        id: this.$route.query.user_id,
+        pn: pn,
+        snapshot: this.tabs[2].paging.snapshot || '',
+        limit: 10,
+        lastYear: ''
+      }
+      this.tabs[2].fetching = true
+      this.$ajax('/jv/anonymous/user/social/article', {data: rData}).then(res => {
         if (res && res.msg) {
           this.$toast(res.msg)
         }
@@ -256,48 +451,29 @@ export default {
           this.lastYear = res.data.lastYear
           if (res.data.user) {
             this.user = res.data.user
-            if (!res.data.user.has_articles) { // 没有文章tab
-              this.tabs.splice(1, 1)
-              if (_type === 2) {
-                this.selectedLabel = '动态'
-                this.selectedIdx = 0
-                if (!this.tabs[0].paging.pn) { // 动态没拉取过数据
-                  this.initMeScroll(0)
-                  return false
-                }
-              }
-            } else { // 有文章tab,显示导航
-              this.showTabbar = true
-            }
           }
-          this.tabs[tabIdx].paging = res.data.paging
-          this.tabs[tabIdx].fetching = false
+          this.tabs[2].paging = res.data.paging
+          this.tabs[2].fetching = false
+          // this.showTabbar = true
           if (pn === 1) { // 第一页
-            this.tabs[tabIdx].data = res.data.list
-
-            this.setShareData({
-              type: '',
-              title: res.data.shareInfo.shareTitle,
-              desc: res.data.shareInfo.shareContent,
-              url: res.data.shareInfo.shareUrl,
-              imgUrl: res.data.shareInfo.shareImage
-            })
+            this.tabs[2].data = res.data.list
           } else { // 非第一页
-            this.tabs[tabIdx].data = this.tabs[tabIdx].data.concat(res.data.list)
+            this.tabs[2].data = this.tabs[2].data.concat(res.data.list)
+          }
+          if (res.data.paging.is_end) {
+            this.mescroll[0].showNoMore()
           }
           this.$nextTick(() => {
-            this.mescroll[tabIdx].endSuccess(res.data.list.length, !res.data.paging.is_end)
-            if (res.data.paging.is_end) {
-              this.mescroll[tabIdx].showNoMore()
-            }
+            console.log('endSuccess-fetchArticleList')
+            this.mescroll[0].endSuccess(res.data.list.length, !res.data.paging.is_end)
           })
         } else {
-          this.tabs[tabIdx].fetching = false
-          this.mescroll[tabIdx].endErr()
+          this.tabs[2].fetching = false
+          this.mescroll[0].endErr()
         }
       }).catch(err => {
-        this.tabs[tabIdx].fetching = false
-        this.mescroll[tabIdx].endErr()
+        this.tabs[2].fetching = false
+        this.mescroll[0].endErr()
         if (err && err.msg) {
           this.$toast(err.msg)
         } else {
@@ -310,8 +486,9 @@ export default {
         clearInterval(this.timer)
       }
       this.timer = setInterval(() => {
-        const initialTab = parseInt(this.$route.query.jump_tab || 0)
-        if (this.$refs['tabItem']) {
+        const initialTab = parseInt(this.$route.query.jump_tab || 1)
+        if (this.$refs['tabItem'] && this.$refs['tabItem'][initialTab]) {
+          // console.log('initialTab', initialTab, this.$refs['tabItem'][initialTab])
           let appPos = document.getElementById('app').getBoundingClientRect()
           let pos = this.$refs['tabItem'][initialTab].$el.getBoundingClientRect()
           let slideX = pos.left + pos.width / 2 - appPos.left
@@ -321,56 +498,73 @@ export default {
       }, 30)
     },
     refreshData () {
+      console.log('refreshData')
       if (this.mescroll) {
         for (let i = 0; i < this.mescroll.length; i++) {
           this.mescroll[i].setScrollTop(0)
           this.mescroll[i].destroy()
         }
       }
-      let selectedIdx = parseInt(this.$route.query.jump_tab || 0)
-      let selectedLabel = (this.$route.query.jump_tab && this.$route.query.jump_tab.toString() === '1') ? '文章' : '动态'
-      let _this = this
-      let swiperOption = {
-        initialSlide: selectedIdx,
-        setWrapperSize: true,
-        pagination: {
-          el: '.swiper-pagination',
-          type: 'fraction'
-        },
-        on: {
-          slideChangeTransitionStart: function () {
-            let pos = _this.$refs['tabItem'][this.activeIndex].$el.getBoundingClientRect()
-            let slideX = pos.left + pos.width / 2
-            _this.selectedLabel = _this.tabs[this.activeIndex].title
-            _this.tabSlideX = slideX + 'px'
-            _this.$refs['swiper'].swiper.slideTo(this.activeIndex, 300)
-          }
-        }
-      }
       let _initialData = JSON.parse(JSON.stringify(initialData))
-      let _obj = Object.assign({}, _initialData, {selectedIdx, selectedLabel, swiperOption, swiper, swiperSlide})
+      let selectedIdx = parseInt(this.$route.query.jump_tab || 1)
+      let selectedLabel = _initialData.tabs[parseInt(selectedIdx)].title
+      let _this = this
+      // let swiperOption = {
+      //   initialSlide: selectedIdx,
+      //   setWrapperSize: true,
+      //   pagination: {
+      //     el: '.swiper-pagination',
+      //     type: 'fraction'
+      //   },
+      //   on: {
+      //     slideChangeTransitionStart: function () {
+      //       let pos = _this.$refs['tabItem'][this.activeIndex].$el.getBoundingClientRect()
+      //       let slideX = pos.left + pos.width / 2
+      //       _this.selectedLabel = _this.tabs[this.activeIndex].title
+      //       _this.tabSlideX = slideX + 'px'
+      //       _this.$refs['swiper'].swiper.slideTo(this.activeIndex, 300)
+      //     }
+      //   }
+      // }
+      let _obj = Object.assign({}, _initialData, {selectedIdx, selectedLabel})
+      console.log('_obj', _obj)
       for (let item in _obj) {
         this[item] = _obj[item]
       }
+      this.fetchUserInfo(false)
+      this.initMeScroll()
+      this.initSlideBlock()
       // if (this.$route.query.jump_tab && this.$route.query.jump_tab.toString() === '1') { // 初始tab为1
       //   this.initMeScroll(1)
       // } else if ((!this.$route.query.jump_tab || (this.$route.query.jump_tab && this.$route.query.jump_tab.toString() === '0'))) { // 初始tab为0
       //   this.initMeScroll(0)
       // }
       // 目前只显示动态
-      this.initMeScroll(0)
-      this.initSlideBlock()
+      // this.fetchUserInfo()
     },
-    onPullingDown (idx) {
-      this.fetchList(idx, 1)
+    onPullingDown () {
+      if (this.selectedIdx === 1) {
+        this.fetchDynamicList(1)
+      } else if (this.selectedIdx === 2) { // 拉取文章列表
+        this.fetchUserInfo(true)
+      } else if (this.selectedIdx === 0) { // 拉去用户资料
+        this.fetchArticleList(1)
+      }
     },
-    onPullingUp (idx) {
+    onPullingUp () {
+      let idx = this.selectedIdx
       if (!(this.tabs[idx].paging && this.tabs[idx].paging.pn && !this.tabs[idx].paging.is_end)) { // 未生成paging，或者paging.pn不存在，或者已是最后一页     终止操作
         this.mescroll[idx].endErr()
         return false
       }
       let pn = parseInt(this.tabs[idx].paging.pn) + 1
-      this.fetchList(idx, pn)
+      if (idx === 0) {
+        this.fetchUserInfo(true)
+      } else if (idx === 1) {
+        this.fetchDynamicList(pn)
+      } else if (idx === 2) {
+        this.fetchArticleList(pn)
+      }
     },
     changeLike (item, idx) {
       if (!utils.checkLogin()) {
@@ -383,7 +577,7 @@ export default {
         like: !isLike,
         type: 0
       }
-      this.tabs[0].data.forEach(i => {
+      this.tabs[1].data.forEach(i => {
         if (i.id === item.id) {
           i.has_like = !isLike
           i.like_num = likeNum + (isLike ? -1 : 1)
@@ -392,7 +586,7 @@ export default {
       })
       this.$ajax('/jv/qz/like', {data: rData}).then(res => {
         if (!res || (res && Boolean(res.error))) { // 出错时重置点赞
-          this.tabs[0].data.forEach(i => {
+          this.tabs[1].data.forEach(i => {
             if (i.id === item.id) {
               i.has_like = isLike
               i.like_num = likeNum
@@ -400,14 +594,14 @@ export default {
             }
           })
         } else {
-          this.tabs[0].data.forEach(i => {
+          this.tabs[1].data.forEach(i => {
             if (i.id === item.id) {
               i.submitting = false
             }
           })
         }
       }).catch(err => {
-        this.tabs[0].data.forEach(i => {
+        this.tabs[1].data.forEach(i => {
           if (i.id === item.id) {
             i.has_like = isLike
             i.like_num = likeNum
@@ -437,52 +631,51 @@ export default {
         this.following = false
       })
     },
-    initMeScroll (idx) {
+    initMeScroll () {
       let _down = Object.assign({}, mescrollOptions.get().down, {
         isLock: true,
         auto: true,
         autoShowLoading: false,
-        callback: () => this.onPullingDown(idx)
+        callback: () => this.onPullingDown()
       })
       let _up = Object.assign({}, mescrollOptions.get().up, {
-        callback: () => this.onPullingUp(idx),
-        onScroll: this.onMeScroll,
+        callback: () => this.onPullingUp(),
         htmlNodata: '<div style="height:0"></div>'
       })
-      this.mescroll[idx] = new MeScroll('mescroll' + idx, {down: _down, up: _up})
-    },
-    onMeScroll (mescroll, y, isUp) {
-      if (y <= 0 && !isUp && this.pageTop !== 0) {
-        this.pageTop = 0
-      } else if (y > 0 && isUp && this.pageTop === 0) {
-        let bannerPos = this.$refs['topBanner'].getBoundingClientRect()
-        let bannerHeight = bannerPos.height
-        this.pageTop = -bannerHeight
-      }
-      if (y > this.$winHeight && !this.showBackTop) {
-        this.showBackTop = true
-      } else if (y < this.$winHeight && this.showBackTop) {
-        this.showBackTop = false
+      this.mescroll[0] = new MeScroll('user-center', {down: _down, up: _up})
+      if (this.$route.query.jump_tab && this.$route.query.jump_tab.toString() === '2') { // 初始tab为2
+        this.fetchArticleList(1)
+      } else if ((!this.$route.query.jump_tab) || (this.$route.query.jump_tab && this.$route.query.jump_tab.toString() === '1')) { // 初始tab为1
+        this.fetchDynamicList(1)
+      } else if (this.$route.query.jump_tab && this.$route.query.jump_tab.toString() === '0') { // 初始tab为0
+        this.fetchUserInfo(true)
       }
     },
-    bannerTouchStart (e) {
-      this.wrapperTouchY = e.touches[0].screenY
+    beFriend () { // 申请成为好友
+      console.log('申请成为好友')
+      if (this.beingFriend) { // 正在申请则不做任何回应
+        return false
+      }
+      this.$prompt.showPrompt({contentText: '向TA发送好友申请？', leftText: '取消', rightText: '发送'}, () => {
+        this.requestFriend()
+      }, () => {
+        console.log('cancel')
+      })
     },
-    bannerTouchMove (e) {
-      if (e.changedTouches[0].screenY < this.wrapperTouchY && this.pageTop === 0) {
-        let bannerPos = this.$refs['topBanner'].getBoundingClientRect()
-        let bannerHeight = bannerPos.height
-        let currentTabScrollY = this.mescroll[this.selectedIdx].getScrollTop()
-        if (currentTabScrollY === 0) {
-          this.mescroll[this.selectedIdx].scrollTo(1, 0)
+    requestFriend () {
+      let rData = {
+        toId: this.user.id
+      }
+      this.beingFriend = true
+      this.$ajax('/jv/user/friend/apply', {data: rData}).then(res => {
+        this.beingFriend = false
+        if (res && !res.error) { // 发送成功
+          this.$toast('发送成功，耐心等待一下吧~')
         }
-        this.pageTop = -bannerHeight
-      } else if (e.changedTouches[0].screenY > this.wrapperTouchY && this.pageTop !== 0) {
-        this.pageTop = 0
-      }
-    },
-    bannerTouchEnd (e) {
-      this.wrapperTouchY = 0
+      }).catch(err => {
+        this.beingFriend = false
+        console.log('err', err)
+      })
     }
   },
   computed: {
@@ -523,11 +716,10 @@ export default {
     //   this.initMeScroll(0)
     // }
     // 目前只显示动态
-    this.initMeScroll(0)
+    // this.fetchUserInfo()
+    this.fetchUserInfo(false)
+    this.initMeScroll()
     this.initSlideBlock()
-  },
-  activated () {
-    this.$forceUpdate()
   },
   beforeRouteEnter (to, from, next) {
     next(vm => {
@@ -561,107 +753,198 @@ export default {
 }
 .user-center-page{
   width: 100%;
-  height: 100%;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: #F2F2F2;
 }
 .outer-scroller{
   width: 100%;
 }
 .top-header{
   width: 100%;
+  height: 332px;
+  background-color:#292929;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+}
+.top-header-content{
+  width: 100%;
+  height: 100%;
   box-sizing: content-box;
   position: relative;
+  display: flex;
+  background: rgba(0,0,0,0.1);
+}
+.top-header-left{
+  width: 68%;
+  flex-grow: 0;
+  flex-shrink: 0;
+  height: 100%;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+.top-header-right{
+  width: 32%;
+  flex-shrink: 0;
+  flex-grow: 0;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow: hidden;
+}
+.top-header-avatar{
+  width: 172px;
+  height: 172px;
+  border: 4px solid #fff;
+  border-radius: 50%;
+  margin: 44px 0 24px;
+  box-sizing: content-box;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+}
+.focus-and-fans{
+  height: 88px;
+  display: flex;
+  padding: 0 10px;
+  margin-top: 8px;
 }
 .top-header-bg{
   position: relative;
   z-index: 1;
   width: 100%;
   height: 386px;
-  background-color:#292929;
-  background-repeat: no-repeat;
-  background-size: cover;
-  background-position: center;
 }
-.top-header-avatar{
-  position: absolute;
-  left: 4%;
-  bottom: -90px;
-  width: 180px;
-  height: 180px;
-  border-radius: 50%;
-  background-repeat: no-repeat;
-  background-size: cover;
-  background-position: center;
-  transition: opacity 300ms;
-}
-.top-header-overview{
-  padding: 135px 4% 55px;
-}
-.user-name{
-  font-size: 42px;
-  line-height: 52px;
-  font-weight: bold;
-}
-.author-sign{
-  height: 32px;
-  margin-left:20px;
-  vertical-align: middle;
-  position: relative;
-  bottom: -3px;
-}
-.level-sign{
-  height: 26px;
-  margin-left:20px;
-  vertical-align: middle;
-  position: relative;
-  bottom: -7px;
-}
-.user-intro{
-  font-size: 28px;
-  line-height: 38px;
-  color: #999;
-  padding-top: 15px;
-}
-.follow-and-fans{
-  font-size: 28px;
-  line-height: 38px;
-  padding-top: 14px;
-}
-.follow-and-fans-text{
-  color: #666;
-  margin-right: 14px;
-  font-weight: normal;
-}
-.follow-and-fans-number{
-  font-weight: bold;
-}
-.follow-box{
-  padding-right: 28px;
+.user-follow, .user-fans{
+  padding: 0 20px;
+  font-size: 24px;
+  display: flex;
+  align-items: center;
   position: relative;
 }
-.follow-box:before{
+.user-fans:before{
   content: "";
   display: block;
-  width: 3px;
-  height: 60px;
-  background: #999;
+  width: 2px;
+  height: 20px;
   position: absolute;
-  right: 0;
+  left: 0;
   top: 50%;
-  transform: translateY(-50%) scale(0.3333, 0.3333);
-  transform-origin: 100% 50%;
+  margin-top: -10px;
+  background: #fff;
 }
-.fans-box{
-  padding-left: 28px;
+.follow-text, .fans-text{
+  margin-top: 4px;
 }
-.follow-btn-wrapper{
+.num{
+  font-size: 36px;
+  font-weight: bold;
+  margin-left: 10px;
+}
+.name-and-gender{
+  width: 100%;
+  display: flex;
+  font-size: 42px;
+  line-height: 58px;
+  align-items: center;
+  padding-left: 30px;
+}
+.user-name{
+  flex-shrink: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.user-gender{
+  flex-shrink: 0;
+  font-size: 24px;
+  line-height: 32px;
+}
+.separator-dot{
+  font-size: 24px;
+  margin: 0 -2px;
+  line-height: 32px;
+}
+.user-constellation-text{
+  font-size: 24px;
+  line-height: 32px;
+}
+.constellation-and-location{
+  width: 100%;
+  display: flex;
+  font-size: 24px;
+  line-height: 32px;
+  padding: 8px 0 8px 20px;
+  overflow: hidden;
+}
+.user-constellation, .user-location{
+  height: 36px;
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  border-radius: 20px;
+  background: rgba(0,0,0,0.3);
+  margin-left: 10px;
+  flex-shrink: 0;
+  border: 2px solid rgba(255,255,255,0.3);
+  box-sizing: content-box;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+.user-location{
+  flex-shrink: 1;
+  overflow: hidden;
+}
+.user-location span{
+  width: 100%;
+  flex-grow: 0;
+  flex-shrink: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.vip-user{
+  width: 100%;
+  font-size: 24px;
+  font-weight: bold;
+  line-height: 40px;
+  padding-left: 30px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.vip-icon{
+  font-size: 24px;
+  margin-right: 8px;
+  color: #33C8FE;
+}
+.user-intro{
+  font-size: 24px;
+  line-height: 30px;
+  margin: 5px 0 5px 30px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  /*! autoprefixer: off */
+  -webkit-box-orient: vertical;
+  /* autoprefixer: on */
+}
+.follow-btn{
   width: 128px;
-  height: 48px;
-  line-height: 48px;
-  position: relative;
-  overflow: visible;
-  margin: 25px 0 5px;
-  transition: all 300ms;
+  height: 60px;
+  line-height: 60px;
+  transform-origin: 0 0;
+  border-radius: 30px;
+  font-size: 24px;
+  text-align: center;
+  transition: all 500ms;
+  color: #fff;
   &.follow-appear{
     transform: scale(0, 0);
     height: 0;
@@ -672,35 +955,121 @@ export default {
     height: 0;
   }
 }
-.follow-btn{
-  width: 300%;
-  height: 300%;
-  line-height: 132px;
-  transform: scale(0.3333, 0.3333);
-  transform-origin: 0 0;
+.follow-btn-icon{
+  font-size: 20px;
+  color: inherit;
+  margin-right: 6px;
+}
+
+.info-relationship{
+  background: #fff;
+}
+.gray-block{
+  height: 16px;
+  background: #F2F2F2;
+}
+.info-title{
+  position: relative;
+  text-indent: 50px;
+  height: 96px;
+  line-height: 96px;
+  font-size: 28px;
+  color: #111111;
+  font-weight: bold;
+  background: #fff;
+}
+.info-title:before{
+  content: "";
+  display: block;
+  width: 6px;
+  height: 24px;
+  border-radius: 3px;
+  background: #FEDE3B;
+  position: absolute;
+  left: 30px;
+  top: 50%;
+  margin-top: -12px;
+}
+.info-title .border-bottom{
+  width: 100%;
+  height: 2px;
+  background: #E5E5E5;
   position: absolute;
   left: 0;
-  top: 0;
-  border-style: solid;
-  border-width: 6px;
-  border-radius: 72px;
-  box-sizing: border-box;
-  font-size: 72px;
-  text-align: center;
-  transition: all 500ms;
+  bottom: 0;
+  transform: scale(1, 0.5);
 }
-.follow-btn-icon{
-  font-size: 60px;
-  color: inherit;
-  margin-right: 18px;
+.relationship-item{
+  margin-left: 30px;
+  font-size: 30px;
+  height: 102px;
+  line-height: 102px;
+  display: flex;
+  position: relative;
 }
-.nav-scroll-list-wrap{
+.relationship-item:before{
+  content: "";
+  display: block;
+  width: 100%;
+  height: 2px;
+  background: #E5E5E5;
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  transform: scale(1, 0.5);
+}
+.relationship-item:last-child:before{
+  display: none;
+}
+.relation-left{
+  width: 140px;
+  color: #111;
+  flex-shrink: 0;
+  flex-grow: 0;
+}
+.relation-right{
+  color: #666;
+  flex-grow: 1;
+  flex-shrink: 1;
+}
+.relation-right .icon-goforward{
+  font-size: 24px;
+}
+.relationship-space-between{
+  display: flex;
+  justify-content: space-between;
+}
+.space-between-flex1{
+  flex-shrink: 1;
+  flex-grow: 1;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.icon-goforward{
+  margin-right: 30px;
+}
+.space-between-flex0{
+  flex-shrink: 0;
+  flex-grow: 0;
+}
+.info-slogen-text{
+  font-size: 30px;
+  line-height: 36px;
+  padding: 34px 30px;
+  color: #666;
+}
+
+.nav-wrap{
   position: relative;
   background-color: #fff;
 }
+.nav-content{
+  background: #fff;
+}
 .tab-box{
   height: 88px;
-  padding: 0 4%;
+  padding: 0 21.33%;
   overflow: hidden;
 }
 .tab-slider{
@@ -730,28 +1099,27 @@ export default {
   transform-origin: 0 100%;
   background: #e5e5e5;
 }
-.cube-tab-bar{
-  justify-content: flex-start;
+body .cube-tab-bar{
+  justify-content: space-around;
 }
 .cube-tab{
-  flex: 0;
-  margin-left: 60px;
+  flex: 144px 0 0;
+  text-align: center;
   font-size: 36px;
   color: #666;
   white-space: nowrap;
 }
-.cube-tab:first-child{
-  margin-left: 0;
-}
 .cube-tab_active{
   color: #333;
+}
+.cube-tab_active /deep/ div{
   font-weight: bold;
 }
 .empty-box{
-  padding: 140px 0;
-  font-size: 28px;
+  padding: 130px 0 0 0;
+  font-size: 34px;
+  line-height: 58px;
   color: #999;
-  line-height: 68px;
   text-align: center;
 }
 .empty-image{
@@ -760,5 +1128,14 @@ export default {
   height: 240px;
   height: 240px;
   margin: 0 auto;
+}
+
+/* 吸顶效果 */
+.nav-fixed{
+  z-index: 9999;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
 }
 </style>

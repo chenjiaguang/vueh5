@@ -136,7 +136,7 @@ export default {
                 })
               } else {
                 // 如果是范团微信内容链接
-                // https://fanttest.fantuanlife.com/index.html#/article/detail?article_id=65
+                // https://fanttest.fantuan.cn/index.html#/article/detail?article_id=65
                 this.$nextTick(() => {
                   this.setContentFromFantuanWeixin(this.article.content)
                 })
@@ -218,7 +218,7 @@ export default {
     },
     setContent (data) {
       // 匹配一个不带?参数的图片url (?!\?)为负向零宽断言
-      data = data.replace(/(staticcdntest.fantuanlife.com\/uimage[^"]*?\.jpg)(?!\?)/g, '$1?x-oss-process=image/interlace,1/format,jpg')
+      data = data.replace(/(staticcdntest.fantuan.cn\/uimage[^"]*?\.jpg)(?!\?)/g, '$1?x-oss-process=image/interlace,1/format,jpg')
 
       document.getElementById('article-frame-weixin').remove()
       let div = document.getElementById('article-frame')
