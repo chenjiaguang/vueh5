@@ -26,7 +26,7 @@
           <div class="top-header-right">
             <div class="top-header-avatar" :style="{backgroundImage: 'url(' + user.avatar_url + ')', opacity: user.avatar_url ? 1 : 0}"></div>
             <transition v-if="!user.is_owner" appear appear-class="follow-appear">
-              <div @click="changeFollow" class="follow-btn" :style="{backgroundColor: followStatusText === '关注' ? '#1EB0FD' : 'rgba(0,0,0,0.3)'}"><i class="iconfont follow-btn-icon" :class="{'icon-add': followStatusText === '关注', 'icon-focused': followStatusText === '已关注', 'icon-transform': followStatusText === '互相关注'}"></i>关注</div>
+              <div @click="changeFollow" class="follow-btn" :style="{backgroundColor: followStatusText === '关注' ? '#1EB0FD' : 'rgba(0,0,0,0.3)', borderColor: followStatusText === '关注' ? '#1EB0FD' : '#fff'}"><i class="iconfont follow-btn-icon" :class="{'icon-add': followStatusText === '关注', 'icon-focused': followStatusText === '已关注', 'icon-transform': followStatusText === '互相关注'}"></i>关注</div>
             </transition>
           </div>
         </div>
@@ -938,10 +938,13 @@ export default {
   /* autoprefixer: on */
 }
 .follow-btn{
-  width: 128px;
-  height: 60px;
-  line-height: 60px;
+  width: 124px;
+  height: 56px;
+  line-height: 56px;
   transform-origin: 0 0;
+  box-sizing: content-box;
+  border-width: 2px;
+  border-style: solid;
   border-radius: 30px;
   font-size: 24px;
   text-align: center;
