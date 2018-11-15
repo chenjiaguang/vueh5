@@ -11,7 +11,7 @@
         <img v-if="itemData.is_circle_owner" :src="$assetsPublicPath + '/cwebassets/image/circle_owner.png'" class="user-tag fl" />
         <img v-if="itemData.is_top" :src="$assetsPublicPath + '/cwebassets/image/settop.png'" class="user-tag fl" />
       </div>
-      <div class="publish-time">{{itemData.time}}<i class="iconfont icon-dian"></i><i class="iconfont" :class="{'icon-dysign1': (itemData.range && (itemData.range.toString() === '0' || itemData.range.toString() === '3')), 'icon-dysign2': (itemData.range && itemData.range.toString() === '2'), 'icon-dysign3': (itemData.range && itemData.range.toString() === '1'), 'icon-dysign4': (itemData.range && itemData.range.toString() !== '0' && itemData.range.toString() !== '1' && itemData.range.toString() !== '2' && itemData.range.toString() !== '3')}"></i><span class="from-circle" v-if="itemData.circle_name">发布于<span @click.stop="goCircle" class="from-circle-text">{{itemData.circle_name}}</span></span></div>
+      <div class="publish-time">{{itemData.time}}<i class="iconfont icon-dian"></i><i class="iconfont" :class="dysignClass"></i><span class="from-circle" v-if="itemData.circle_name">发布于<span @click.stop="goCircle" class="from-circle-text">{{itemData.circle_name}}</span></span></div>
     </div>
     <show-hide-dynamic-content :content="(itemData.type && itemData.type.toString() === '18') ? itemData.title : (itemData.content || '')" :isLongDynamic="(itemData.type && itemData.type.toString() === '18') ? true : false" />
     <div class="dynamic-pinture" v-if="itemData.covers && itemData.covers.length > 0">
@@ -372,6 +372,21 @@ export default {
     commentNumber () {
       let num = parseInt(this.itemData.comment_num)
       return num > 999 ? '999+' : num
+    },
+    dysignClass () {
+      let _class = ''
+      if (this.itemData) {
+        if (this.itemData.range.toString() === '1') {
+          _class = 'icon-dysign3'
+        } else if (this.itemData.range.toString() === '2') {
+          _class = 'icon-dysign2'
+        } else if ((this.itemData.range.toString() === '0' && this.itemData.show_allways.toString() === '1') || this.itemData.range.toString() === '3') {
+          _class = 'icon-dysign1'
+        } else {
+          _class = 'icon-dysign4'
+        }
+      }
+      return _class || ''
     }
   },
   methods: {
