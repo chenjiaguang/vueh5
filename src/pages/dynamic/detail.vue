@@ -21,7 +21,7 @@
                     </div>
                     <!-- 下 -->
                     <div class="row">
-                      <div class="time">{{dynamic.time}}</div>
+                      <div class="time">{{dynamic.time}}<i class="iconfont icon-dian"></i><i class="iconfont" :class="{'icon-dysign1': (dynamic.range && (dynamic.range.toString() === '0' || dynamic.range.toString() === '3')), 'icon-dysign2': (dynamic.range && dynamic.range.toString() === '2'), 'icon-dysign3': (dynamic.range && dynamic.range.toString() === '1'), 'icon-dysign4': (dynamic.range && dynamic.range.toString() !== '0' && dynamic.range.toString() !== '3')}"></i></div>
                       <!-- <div class="fromPrefix" v-if="dynamic.fromQz">发布于</div>
                       <div class="fromQz" v-if="dynamic.fromQz" @click="clickQz(dynamic.circle_id)">{{dynamic.fromQz}}</div> -->
                     </div>
