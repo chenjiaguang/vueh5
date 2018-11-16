@@ -22,7 +22,7 @@ export default {
     },
     setContent (data) {
       let iframe = document.getElementById('content')
-      iframe.contentDocument.body.innerHTML = data
+      iframe.srcdoc = data
     }
   }
 }
