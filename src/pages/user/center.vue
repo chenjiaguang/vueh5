@@ -390,7 +390,8 @@ export default {
         pn: pn,
         snapshot: this.tabs[1].paging.snapshot || '',
         limit: 10,
-        lastYear: ''
+        lastYear: '',
+        version: '2.6.0'
       }
       this.tabs[1].fetching = true
       this.$ajax('/jv/anonymous/user/social/dynamic', {data: rData}).then(res => {
