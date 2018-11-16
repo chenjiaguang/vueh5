@@ -514,7 +514,7 @@ export default {
         }
       }
       let _initialData = JSON.parse(JSON.stringify(initialData))
-      let selectedIdx = parseInt(this.$route.query.jump_tab || 1)
+      let selectedIdx = parseInt(this.$route.query.jump_tab || 0)
       let selectedLabel = _initialData.tabs[parseInt(selectedIdx)].title
       let _this = this
       // let swiperOption = {
