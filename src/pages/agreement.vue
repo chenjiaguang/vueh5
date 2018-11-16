@@ -39,6 +39,10 @@ export default {
   },
   created () {
     let _type = this.$route.query && this.$route.query.type
+    if (this.$route.query.url) {
+      this.src = this.$route.query.url
+      return false
+    }
     if (_type) {
       this.src = this.srcObject[_type]
     }

@@ -21,7 +21,7 @@
                     </div>
                     <!-- 下 -->
                     <div class="row">
-                      <div class="time">{{dynamic.time}}</div>
+                      <div class="time">{{dynamic.time}}<i class="iconfont icon-dian"></i><i class="iconfont" :class="dysignClass"></i></div>
                       <!-- <div class="fromPrefix" v-if="dynamic.fromQz">发布于</div>
                       <div class="fromQz" v-if="dynamic.fromQz" @click="clickQz(dynamic.circle_id)">{{dynamic.fromQz}}</div> -->
                     </div>
@@ -291,7 +291,8 @@ export default {
       return {
         id: this.$route.query.id,
         showAll: false,
-        origin: 'H5'
+        origin: 'H5',
+        version: '2.6.0'
       }
     },
     replyData: function () {
@@ -299,6 +300,21 @@ export default {
         commentId: '',
         limit: '10'
       }
+    },
+    dysignClass () {
+      let _class = ''
+      if (this.dynamic) {
+        if (this.dynamic.range.toString() === '1') {
+          _class = 'icon-dysign3'
+        } else if (this.dynamic.range.toString() === '2') {
+          _class = 'icon-dysign2'
+        } else if ((this.dynamic.range.toString() === '0' && this.dynamic.show_allways.toString() === '1') || this.dynamic.range.toString() === '3') {
+          _class = 'icon-dysign1'
+        } else {
+          _class = 'icon-dysign4'
+        }
+      }
+      return _class || ''
     }
   },
   methods: {
@@ -636,6 +652,13 @@ export default {
   color: #999999;
   font-size: 24px;
   margin-right: 20px;
+}
+.icon-dian, .icon-dysign1, .icon-dysign2, .icon-dysign3, .icon-dysign4{
+  font-size: 24px;
+  color: #999;
+}
+.icon-dian{
+  margin: 0 -2px;
 }
 .fromPrefix {
   color: #999999;

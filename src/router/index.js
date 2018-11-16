@@ -24,6 +24,8 @@ const WeixinLoginJump = resolve => require(['@/pages/weixinLoginJump'], resolve)
 const PromotionIndex = resolve => require(['@/pages/promotion/index'], resolve)
 const NewsDetail = resolve => require(['@/pages/news/articleDetail'], resolve)
 const VideoMedia = resolve => require(['@/pages/media/video'], resolve)
+const CORS = resolve => require(['@/pages/CORS'], resolve)
+
 // import NotFoundPage from '@/pages/notFoundPage'
 // import Home from '@/pages/home'
 // import CircleDetail from '@/pages/circle/detail'
@@ -244,6 +246,13 @@ const router = new Router({
       component: CircleApply,
       meta: {
         title: '入圈申请'
+      }
+    },
+    {
+      path: prefix + '/CORS',
+      name: 'CORS',
+      component: CORS,
+      meta: {
       }
     }
   ],

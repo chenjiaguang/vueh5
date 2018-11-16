@@ -202,8 +202,8 @@ const initialData = {
   ],
   // swiperOption: {},
   tabBarHeight: parseInt((maxWidth / 750) * 88),
-  selectedLabel: '动态',
-  selectedIdx: 1,
+  selectedLabel: '资料',
+  selectedIdx: 0,
   tabSlideX: -window.innerWidth + 'px',
   timer: null,
   following: false,
@@ -216,7 +216,7 @@ export default {
   mixins: [MeScrollSupportArr, WeixinShareInKeepAlive],
   data () {
     let _initialData = JSON.parse(JSON.stringify(initialData))
-    let selectedIdx = parseInt(this.$route.query.jump_tab || 1)
+    let selectedIdx = parseInt(this.$route.query.jump_tab || 0)
     console.log('selectedIdx', selectedIdx)
     let selectedLabel = _initialData.tabs[parseInt(selectedIdx)].title
     let isShareOpen = this.$route.params.isShareOpen
@@ -329,10 +329,14 @@ export default {
       let rData = {
         id: this.$route.query.user_id
       }
-      this.tabs[0].fetching = true
+      if (islist) {
+        this.tabs[0].fetching = true
+      }
       this.$ajax('/jv/anonymous/user/social/data', {data: rData}).then(res => {
         console.log('fetchUserInfo.res', res)
-        this.tabs[0].fetching = false
+        if (islist) {
+          this.tabs[0].fetching = true
+        }
         if (res && !res.error && res.data) {
           if (this.$isApp) {
             let {id, is_news} = res.data.user
@@ -367,6 +371,9 @@ export default {
           }
         }
       }).catch(err => {
+        if (islist) {
+          this.tabs[0].fetching = true
+        }
         this.showTabbar = true
         this.$nextTick(this.setSticky)
         this.mescroll[0].endErr()
@@ -383,7 +390,8 @@ export default {
         pn: pn,
         snapshot: this.tabs[1].paging.snapshot || '',
         limit: 10,
-        lastYear: ''
+        lastYear: '',
+        version: '2.6.0'
       }
       this.tabs[1].fetching = true
       this.$ajax('/jv/anonymous/user/social/dynamic', {data: rData}).then(res => {
@@ -486,7 +494,7 @@ export default {
         clearInterval(this.timer)
       }
       this.timer = setInterval(() => {
-        const initialTab = parseInt(this.$route.query.jump_tab || 1)
+        const initialTab = parseInt(this.$route.query.jump_tab || 0)
         if (this.$refs['tabItem'] && this.$refs['tabItem'][initialTab]) {
           // console.log('initialTab', initialTab, this.$refs['tabItem'][initialTab])
           let appPos = document.getElementById('app').getBoundingClientRect()
@@ -506,7 +514,7 @@ export default {
         }
       }
       let _initialData = JSON.parse(JSON.stringify(initialData))
-      let selectedIdx = parseInt(this.$route.query.jump_tab || 1)
+      let selectedIdx = parseInt(this.$route.query.jump_tab || 0)
       let selectedLabel = _initialData.tabs[parseInt(selectedIdx)].title
       let _this = this
       // let swiperOption = {
@@ -546,9 +554,9 @@ export default {
       if (this.selectedIdx === 1) {
         this.fetchDynamicList(1)
       } else if (this.selectedIdx === 2) { // 拉取文章列表
-        this.fetchUserInfo(true)
-      } else if (this.selectedIdx === 0) { // 拉去用户资料
         this.fetchArticleList(1)
+      } else if (this.selectedIdx === 0) { // 拉去用户资料
+        this.fetchUserInfo(true)
       }
     },
     onPullingUp () {
@@ -644,10 +652,13 @@ export default {
       })
       this.mescroll[0] = new MeScroll('user-center', {down: _down, up: _up})
       if (this.$route.query.jump_tab && this.$route.query.jump_tab.toString() === '2') { // 初始tab为2
+        console.log('222')
         this.fetchArticleList(1)
-      } else if ((!this.$route.query.jump_tab) || (this.$route.query.jump_tab && this.$route.query.jump_tab.toString() === '1')) { // 初始tab为1
+      } else if ((this.$route.query.jump_tab && this.$route.query.jump_tab.toString() === '1')) { // 初始tab为1
+        console.log('111')
         this.fetchDynamicList(1)
-      } else if (this.$route.query.jump_tab && this.$route.query.jump_tab.toString() === '0') { // 初始tab为0
+      } else if ((!this.$route.query.jump_tab) || (this.$route.query.jump_tab && this.$route.query.jump_tab.toString() === '0')) { // 初始tab为0
+        console.log('000')
         this.fetchUserInfo(true)
       }
     },
