@@ -302,12 +302,12 @@ export default {
     },
     dysignClass () {
       let _class = ''
-      if (this.itemData) {
-        if (this.itemData.range.toString() === '1') {
+      if (this.dynamic) {
+        if (this.dynamic.range.toString() === '1') {
           _class = 'icon-dysign3'
-        } else if (this.itemData.range.toString() === '2') {
+        } else if (this.dynamic.range.toString() === '2') {
           _class = 'icon-dysign2'
-        } else if ((this.itemData.range.toString() === '0' && this.itemData.show_allways.toString() === '1') || this.itemData.range.toString() === '3') {
+        } else if ((this.dynamic.range.toString() === '0' && this.dynamic.show_allways.toString() === '1') || this.dynamic.range.toString() === '3') {
           _class = 'icon-dysign1'
         } else {
           _class = 'icon-dysign4'
