@@ -46,6 +46,9 @@ module.exports = {
 
     cssSourceMap: true
   },
+  test: {
+    assetsPublicPath: 'https://staticcdntest.fantuan.cn/h5/',
+  },
 
   build: {
     // Template for index.html
@@ -54,7 +57,7 @@ module.exports = {
     // Paths
     assetsRoot: path.resolve(__dirname, '../temp'),
     assetsSubDirectory: 'cwebassets',
-    assetsPublicPath: '/h5/',
+    assetsPublicPath: 'https://staticcdn.fantuan.cn/h5/',
 
     /**
      * Source Maps
