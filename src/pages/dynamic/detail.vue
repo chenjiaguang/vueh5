@@ -291,7 +291,8 @@ export default {
       return {
         id: this.$route.query.id,
         showAll: false,
-        origin: 'H5'
+        origin: 'H5',
+        version: '2.6.0'
       }
     },
     replyData: function () {

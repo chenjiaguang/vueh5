@@ -35,6 +35,9 @@ axios.interceptors.request.use(function (config) {
     config.headers['Content-Type'] = config.contentType
   }
   config.headers['version'] = '2.5.1'
+  if (config.data.version) {
+    config.headers.version = config.data.version
+  }
   return config
 }, function (error) {
   // 对请求错误做些什么

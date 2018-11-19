@@ -390,7 +390,8 @@ export default {
         pn: pn,
         snapshot: this.tabs[1].paging.snapshot || '',
         limit: 10,
-        lastYear: ''
+        lastYear: '',
+        version: '2.6.0'
       }
       this.tabs[1].fetching = true
       this.$ajax('/jv/anonymous/user/social/dynamic', {data: rData}).then(res => {
@@ -513,7 +514,7 @@ export default {
         }
       }
       let _initialData = JSON.parse(JSON.stringify(initialData))
-      let selectedIdx = parseInt(this.$route.query.jump_tab || 1)
+      let selectedIdx = parseInt(this.$route.query.jump_tab || 0)
       let selectedLabel = _initialData.tabs[parseInt(selectedIdx)].title
       let _this = this
       // let swiperOption = {
