@@ -21,7 +21,7 @@ import {
 if (process.env.NODE_ENV !== 'production') { // 非正式环境包，就实例化vconsole
   new VConsole() // 初始化
 }
-Vue.prototype.$assetsPublicPath = '/h5'
+Vue.prototype.$assetsPublicPath = process.env.ASSETS_PUBLIC_PATH
 Vue.prototype.$winWidth = window.innerWidth > 800 ? 800 : window.innerWidth
 Vue.prototype.$winHeight = window.innerHeight
 Vue.prototype.$tranScale = 1 / window.devicePixelRatio
