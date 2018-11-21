@@ -4,6 +4,7 @@
 </template>
 
 <script>
+import utils from '../lib/utils'
 export default {
   data () {
     return {}
@@ -22,7 +23,7 @@ export default {
           this.$store.commit('login/login', {
             token: res.data.token
           })
-          this.$router.back()
+          utils.loginBack()
         } else {
           // 后面绑定了手机后 才写入token
           this.$router.replace({

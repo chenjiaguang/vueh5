@@ -128,8 +128,7 @@ export default {
           this.$store.commit('login/login', {
             token: this.$route.params.token
           })
-          // 需要授权的操作-中转页-当前页
-          this.$router.back()
+          utils.loginBack()
         }
       } else {
         // login
@@ -138,8 +137,7 @@ export default {
           this.$store.commit('login/login', {
             token: res.data.token
           })
-          // 需要授权的操作-当前页
-          this.$router.back()
+          utils.loginBack()
         }
       }
       this.$ajax(url, { data: this.submitData })
