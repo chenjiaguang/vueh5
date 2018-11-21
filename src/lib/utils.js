@@ -18,7 +18,7 @@ export default {
     }
     if (browserUA.isWeixin()) {
       let APPID = 'wx0aa5b5708df88bd9'
-      let REDIRECT_URI = 'https://fant.fantuan.cn/jump.php?addr=' + process.env.WEIXINLOGINJUMP
+      let REDIRECT_URI = 'https://fant.fantuan.cn/jump.php?addr=' + window.location.origin + process.env.WEIXINLOGINJUMP
       // let REDIRECT_URI = 'http://192.168.11.166:8080/h5/weixinLoginJump'
       // 011Q8uGu0Phiab1jGDHu0fizGu0Q8uGt
       let SCOPE = 'snsapi_userinfo'
@@ -148,7 +148,7 @@ export default {
   },
   handleContentUrl: function (content) {
     var subStr = new RegExp('((http(s)?:)?//[a-zA-Z0-9\\.\\-]+(:\\d+)?(/[a-zA-Z0-9\\.\\-~!@|#$%^&*+?:_/=<>]*)?)', 'g')
-    content = content.replace(/[<>]/g, function (c) { return {'<': '&lt;', '>': '&gt;'}[c] })
+    content = content.replace(/[<>]/g, function (c) { return { '<': '&lt;', '>': '&gt;' }[c] })
     content = content.replace(subStr, `<a class="content-url" href="$1" onclick="event.stopPropagation()"><span class="iconfont icon-icon_lianjie_min"></span>网络链接</a>`)
 
     return content
@@ -238,7 +238,7 @@ export default {
           }
         },
         cancel: function () {
-        // 用户取消分享后执行的回调函数
+          // 用户取消分享后执行的回调函数
         }
       })
     })
