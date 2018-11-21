@@ -15,7 +15,7 @@ module.exports = {
     assetsPublicPath: JSON.parse(devEnv.ASSETS_PUBLIC_PATH),
     proxyTable: [{
       context: ['/jv', '/login', '/logout', 'uimage', '/upload', '/article', '/news', '/default', '/circle', '/dynamic', '/manager', '/user', '/check', '/special'],
-      target: 'http://fanttest.fantuan.cn',
+      target: 'https://fanttest.fantuan.cn',
       changeOrigin: true
     }],
 
