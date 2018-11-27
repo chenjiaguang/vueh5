@@ -521,6 +521,7 @@ export default {
       this.$ajax('/jv/qz/draft/activity/search', {data: rData}).then(res => { // 获取活动数据
         if (res && res.data && !res.error) {
           let contentObj = JSON.parse(res.data.content)
+          console.log('contentObj', contentObj)
           this.activity.id = 'preview'
           this.activity.banner = contentObj.form.cover.url
           this.activity.title = contentObj.form.name
@@ -543,10 +544,10 @@ export default {
               maxCost = item.price
             }
           })
-          if (maxCost.toString === 0) {
-            priceText = '免费'
+          if (maxCost.toString() === '0') {
+            priceText = '0'
           } else if (minCost === maxCost) {
-            priceText = minCost
+            priceText = minCost.toString()
           } else if (minCost !== maxCost) {
             priceText = minCost + '~' + maxCost
           }
