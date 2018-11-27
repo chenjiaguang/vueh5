@@ -56,7 +56,6 @@ axios.interceptors.response.use(function (res) {
     // 需要绑定手机
     window.localStorage.phone = ''
     utils.checkLogin(true)
-    toast(res.data.msg, 5000, () => { })
     return Promise.reject(loginText)
   }
   if (res.data.msg && res.data.error !== 0 && res.data.error !== '0') {
