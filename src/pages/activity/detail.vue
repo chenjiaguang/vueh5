@@ -16,7 +16,7 @@
         </div>
         <div class="info-item clearfix">
           <div class="fl left">时间</div>
-          <div class="fl">{{activity.date}}</div>
+          <div class="fl activity-time">{{activity.date}}</div>
         </div>
         <div class="info-item clearfix">
           <div class="fl left">费用</div>
@@ -131,6 +131,11 @@
   .left{
     width: 28.7%;
     color: #666;
+  }
+  .activity-time{
+    max-width: 71.3%;
+    line-height: 36px;
+    padding: 20px 0;
   }
   .info-item:before{
     content: "";
