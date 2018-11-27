@@ -1,29 +1,47 @@
 <template>
   <div class="container cloumn stretch">
     <div class="phone-box row center">
-      <div class="area-code">
-        +86
-      </div>
+      <div class="area-code">+86</div>
 
       <div class="phone-input-box row center relative">
-        <input type="number" maxlength="11" class="phone-input"  v-model="phone" placeholder="请输入手机号"  @input="(event)=>{handleNumberInput(event,11,(newValue)=>phone=newValue)}" @blur="phoneInputing=false" @focus="phoneInputing=true"/>
+        <input
+          type="number"
+          maxlength="11"
+          class="phone-input"
+          v-model="phone"
+          placeholder="请输入手机号"
+          @input="(event)=>{handleNumberInput(event,11,(newValue)=>phone=newValue)}"
+          @blur="phoneInputing=false"
+          @focus="phoneInputing=true"
+        >
         <i v-if="phone&&phoneInputing" class="iconfont icon-guanbi" @click="()=>phone=''"/>
       </div>
     </div>
 
     <div class="code-box row center">
       <div class="code-input-box row center relative">
-        <input type="number" maxlength="6" class="code-input" v-model="code" placeholder="请输入验证码" @input="(event)=>{handleNumberInput(event,6,(newValue)=>code=newValue)}" @blur="codeInputing=false" @focus="codeInputing=true"/>
-        <i v-if="code&&codeInputing" class="iconfont icon-guanbi" @click="()=>code=''" />
+        <input
+          type="number"
+          maxlength="6"
+          class="code-input"
+          v-model="code"
+          placeholder="请输入验证码"
+          @input="(event)=>{handleNumberInput(event,6,(newValue)=>code=newValue)}"
+          @blur="codeInputing=false"
+          @focus="codeInputing=true"
+        >
+        <i v-if="code&&codeInputing" class="iconfont icon-guanbi" @click="()=>code=''"/>
       </div>
-      <div :class="['send-btn',(sendBtnTime > 0|| isSending)?'send-btn-disable':null]" @click="sendCode">
-        {{sendBtnText}}
-      </div>
+      <div
+        :class="['send-btn',(sendBtnTime > 0|| isSending)?'send-btn-disable':null]"
+        @click="sendCode"
+      >{{sendBtnText}}</div>
     </div>
 
-    <div :class="['submit-btn',canSubmit?null:'submit-btn-disable']" @click="canSubmit&&submit()" >
-      {{texts.btnText}}
-    </div>
+    <div
+      :class="['submit-btn',canSubmit?null:'submit-btn-disable']"
+      @click="canSubmit&&submit()"
+    >{{texts.btnText}}</div>
   </div>
 </template>
 
@@ -120,16 +138,27 @@ export default {
     },
     submit () {
       let url = ''
+      let dontToast = false
       let callback = null
+      let errorCallback = () => {}
       if (this.type === 'bindPhone') {
-        url = '/jv/anonymous/user/phone/bind'
+        url = '/jv/user/phone/app/add'
+        dontToast = true
         callback = res => {
-          console.log(res)
           this.$store.commit('login/login', {
             token: this.$route.params.token,
             phone: this.phone
           })
           utils.loginBack()
+        }
+        errorCallback = res => {
+          if (res && res.data && res.data.msg && res.data.error.toString() == '1006') {
+            this.$modal.showAlert(res.data.msg, () => {})
+            this.phone = ''
+            this.code = ''
+          } else {
+            this.$toast(res.data.msg, 2000, () => { })
+          }
         }
       } else {
         // login
@@ -142,13 +171,11 @@ export default {
           utils.loginBack()
         }
       }
-      this.$ajax(url, { data: this.submitData })
+      this.$ajax(url, { data: this.submitData, dontToast: dontToast })
         .then(res => {
           callback(res)
         })
-        .catch(e => {
-          console.log(e)
-        })
+        .catch(errorCallback)
     }
   }
 }

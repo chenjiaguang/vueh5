@@ -9,6 +9,7 @@
 
 <script>
 import utils from './lib/utils'
+import browserUA from './lib/browserUA'
 //
 export default {
   name: 'App',
@@ -26,7 +27,9 @@ export default {
   },
   mounted () {
     if (window.location.pathname !== '/h5/weixinLoginJump' &&
-    window.location.pathname !== '/h5/smsCode') {
+    window.location.pathname !== '/h5/smsCode' &&
+    browserUA.isWeixin()
+    ) {
       if (!window.localStorage.token) {
         utils.checkLogin()
       }
