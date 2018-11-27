@@ -430,7 +430,7 @@ export default {
       }
     },
     orderSubmit () { // 验证并提交订单
-      if (!utils.checkLogin() || !this.agreement || this.submitting || !this.checkcode) { // 未登录终止
+      if (!utils.checkLogin(true) || !this.agreement || this.submitting || !this.checkcode) { // 未登录终止
         return false
       }
       if (this.exceed && this.applyId && this.checkcode) { // 有数据并且过期
@@ -466,7 +466,7 @@ export default {
       }
     },
     cancelOrder (callback) {
-      if (!utils.checkLogin() || this.exceed || this.canceling) { // 未登录或过期或正在提交时终止
+      if (!utils.checkLogin(true) || this.exceed || this.canceling) { // 未登录或过期或正在提交时终止
         return false
       }
       let rData = {

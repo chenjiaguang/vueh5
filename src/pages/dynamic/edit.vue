@@ -473,7 +473,7 @@ export default {
     },
     submitDynamic () {
       console.log('uploader_stats', this.$refs['uploader'].uploader.getStats(), Object.keys(this.$refs['uploader'].images).length)
-      if (!utils.checkLogin()) {
+      if (!utils.checkLogin(true)) {
         return false
       }
       let flat = false // 标记是否可提交,false可提交

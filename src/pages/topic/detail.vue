@@ -387,7 +387,7 @@ export default {
       })
     },
     goPublish () {
-      if (utils.checkLogin()) {
+      if (utils.checkLogin(true)) {
         let topicJson = JSON.stringify([{id: this.topicInfo.id, title: this.topicInfo.title}])
         this.$router.push({name: 'EditDynamic', query: {topic: topicJson, range: 0}, params: {resetData: true}})
       }

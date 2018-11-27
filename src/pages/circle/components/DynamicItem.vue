@@ -395,7 +395,7 @@ export default {
       this.$emit('changeLike', this.itemData)
     },
     addComment () {
-      if (utils.checkLogin()) {
+      if (utils.checkLogin(true)) {
         this.router.push({name: 'DynamicSendComment', query: {dy_id: this.itemData.id}, params: {dynamic: this.itemData}})
       }
     },
