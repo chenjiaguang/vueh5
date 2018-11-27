@@ -46,9 +46,16 @@ axios.interceptors.request.use(function (config) {
 axios.interceptors.response.use(function (res) {
   // 对响应数据做点什么
   // 如果返回403错误，则清空登录状态
-  if (res.data.error && (res.data.error.toString() === '403' || res.data.error.toString() === '401')) {
+  if (res.data.error && (res.data.error.toString() == '403' || res.data.error.toString() == '401')) {
     window.localStorage.token = ''
+    window.localStorage.phone = ''
     utils.checkLogin()
+    return Promise.reject(loginText)
+  }
+  if (res.data.error && (res.data.error.toString() == '1004')) {
+    // 需要绑定手机
+    window.localStorage.phone = ''
+    utils.checkLogin(true)
     return Promise.reject(loginText)
   }
   if (res.data.msg && res.data.error !== 0 && res.data.error !== '0') {
