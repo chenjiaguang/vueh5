@@ -12,34 +12,62 @@ export default {
       return true
     }
   },
-  checkLogin: function () {
-    if (window.localStorage.token) {
+  checkLogin: function (needPhone = false) {
+    if (window.localStorage.token &&
+      ((!needPhone) || window.localStorage.phone)
+    ) {
       return true
     }
-    window.localStorage.loginBackParam = JSON.stringify({
-      path: router.app.$route.path,
-      query: router.app.$route.query
-    })
-    if (browserUA.isWeixin()) {
-      let APPID = 'wx0aa5b5708df88bd9'
-      let backUrl = window.location.origin + process.env.WEIXINLOGINJUMP
-      let REDIRECT_URI = 'https://fant.fantuan.cn/jump.php?addr=' + encodeURIComponent(backUrl)
-      // let REDIRECT_URI = 'http://192.168.11.166:8080/h5/weixinLoginJump'
-      // 011Q8uGu0Phiab1jGDHu0fizGu0Q8uGt
-      let SCOPE = 'snsapi_userinfo'
-      window.location = `https://open.weixin.qq.com/connect/oauth2/authorize?appid=${APPID}&redirect_uri=${REDIRECT_URI}&response_type=code&scope=${SCOPE}#wechat_redirect`
+    if (router.history.pending) {
+      // 解决从App.js过来router.app.$route没有携带路由信息的问题
+      window.localStorage.loginBackParam = JSON.stringify({
+        path: router.history.pending.path,
+        query: router.history.pending.query,
+        needPhone: needPhone
+      })
     } else {
-      router.push({
-        name: 'SMSCode',
-        query: { type: 'login' }
+      window.localStorage.loginBackParam = JSON.stringify({
+        path: router.app.$route.path,
+        query: router.app.$route.query,
+        needPhone: needPhone
       })
     }
+
+    if (!window.localStorage.token) {
+      // 没有登录
+      if (browserUA.isWeixin()) {
+        let APPID = 'wx0aa5b5708df88bd9'
+        let backUrl = window.location.origin + process.env.WEIXINLOGINJUMP
+        let REDIRECT_URI = 'https://fant.fantuan.cn/jump.php?addr=' + encodeURIComponent(backUrl)
+        // let REDIRECT_URI = 'http://192.168.11.166:8080/h5/weixinLoginJump'
+        // 011Q8uGu0Phiab1jGDHu0fizGu0Q8uGt
+        let SCOPE = 'snsapi_userinfo'
+        window.location = `https://open.weixin.qq.com/connect/oauth2/authorize?appid=${APPID}&redirect_uri=${REDIRECT_URI}&response_type=code&scope=${SCOPE}#wechat_redirect`
+      } else {
+        router.push({
+          name: 'SMSCode',
+          query: { type: 'login' }
+        })
+      }
+    } else if (needPhone) {
+      // 需要绑定手机而又没有绑定手机
+      router.push({
+        name: 'SMSCode',
+        query: { type: 'bindPhone' },
+        params: { token: window.localStorage.token }
+      })
+    }
+
     return false
   },
   // 登录后返回登录之前的页面
   loginBack: function () {
     let loginBackParam = JSON.parse(window.localStorage.loginBackParam)
     router.replace(loginBackParam)
+  },
+  needPhone: function () {
+    let loginBackParam = JSON.parse(window.localStorage.loginBackParam)
+    return loginBackParam.needPhone
   },
   handleNumberInput: function (event, length, setter) {
     let value = ''

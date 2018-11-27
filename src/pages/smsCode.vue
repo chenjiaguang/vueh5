@@ -126,7 +126,8 @@ export default {
         callback = res => {
           console.log(res)
           this.$store.commit('login/login', {
-            token: this.$route.params.token
+            token: this.$route.params.token,
+            phone: this.phone
           })
           utils.loginBack()
         }
@@ -135,7 +136,8 @@ export default {
         url = '/jv/anonymous/login/vcode'
         callback = res => {
           this.$store.commit('login/login', {
-            token: res.data.token
+            token: res.data.token,
+            phone: this.phone
           })
           utils.loginBack()
         }

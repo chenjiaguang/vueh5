@@ -1,6 +1,5 @@
 <template>
-<div>
-</div>
+  <div></div>
 </template>
 
 <script>
@@ -19,18 +18,21 @@ export default {
       }
     })
       .then(res => {
-        if (res.data.phone) {
-          this.$store.commit('login/login', {
-            token: res.data.token
-          })
-          utils.loginBack()
-        } else {
-          // 后面绑定了手机后 才写入token
-          this.$router.replace({
+        if (utils.needPhone() && !res.data.phone) {
+          // 需要手机号而又没有手机号
+          this.$router.push({
             name: 'SMSCode',
             query: { type: 'bindPhone' },
             params: { token: res.data.token }
           })
+        } else {
+          // 需要手机号而又有手机号
+          // 不需要手机号
+          this.$store.commit('login/login', {
+            token: res.data.token,
+            phone: res.data.phone
+          })
+          utils.loginBack()
         }
       })
       .catch(e => {

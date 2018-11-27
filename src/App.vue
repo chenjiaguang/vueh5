@@ -8,6 +8,7 @@
 </template>
 
 <script>
+import utils from './lib/utils'
 //
 export default {
   name: 'App',
@@ -20,17 +21,17 @@ export default {
         LongDynamic: 4,
         '/h5/activity/detail': 5
       },
-      transitionName: 'none',
-      mounted () {
-        if (window.localStorage.token) {
-          this.$store.commit('login/login', {
-            token: window.localStorage.token
-          })
-        }
-      }
+      transitionName: 'none'
     }
   },
   mounted () {
+    if (window.location.pathname !== '/h5/weixinLoginJump' &&
+    window.location.pathname !== '/h5/smsCode') {
+      if (!window.localStorage.token) {
+        utils.checkLogin()
+      }
+    }
+
     // 获取地址中的参数
     let searchStr = window.location.search.replace('?', '')
     let searchArr = searchStr.split('&')

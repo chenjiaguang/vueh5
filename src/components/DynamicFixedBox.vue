@@ -109,7 +109,7 @@ export default {
       this.$emit('changeLike')
     },
     clickComment (id) {
-      if (!utils.checkLogin()) { // 未登陆或已加入均返回
+      if (!utils.checkLogin(true)) { // 未登陆或已加入均返回
         return false
       }
 
