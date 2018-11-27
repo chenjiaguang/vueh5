@@ -217,7 +217,7 @@ export default {
     joinCircle () {
       let {need_audit, followed} = this.circle
       let _rightText = need_audit ? '申请加入' : '立即加入'
-      if (followed || !utils.checkLogin()) { // 已加入或未登录均返回
+      if (followed || !utils.checkLogin(true)) { // 已加入或未登录均返回
         return false
       }
       if (this.following) { // 正在申请
@@ -538,7 +538,7 @@ export default {
       })
     },
     goPublish () {
-      if (utils.checkLogin()) { // 登陆后跳转
+      if (utils.checkLogin(true)) { // 登陆后跳转
         let circleJson = JSON.stringify({id: this.circle.id, title: this.circle.name})
         this.$router.push({name: 'EditDynamic', query: {circle: circleJson}, params: {resetData: true}})
       }

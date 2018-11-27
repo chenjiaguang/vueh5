@@ -483,7 +483,7 @@ export default {
     joinCircle () {
       let {need_audit, followed} = this.circle
       let _rightText = need_audit ? '申请加入' : '立即加入'
-      if (followed || !utils.checkLogin()) { // 已加入或未登录均返回
+      if (followed || !utils.checkLogin(true)) { // 已加入或未登录均返回
         return false
       }
       if (this.following) { // 正在申请
@@ -656,7 +656,7 @@ export default {
         this.joinCircle()
         return false
       }
-      if (utils.checkLogin()) {
+      if (utils.checkLogin(true)) {
         let circleJson = JSON.stringify({id: this.circle.id, title: this.circle.name})
         let activityJson = JSON.stringify({id: this.activity.id, title: this.activity.title})
         this.$router.push({name: 'EditDynamic', query: {circle: circleJson, activity: activityJson}, params: {resetData: true}})
@@ -691,7 +691,7 @@ export default {
       })
     },
     goOrder () {
-      if (this.$route.query.isPreview || this.activity.statusText !== '购票' || !utils.checkLogin() || this.submitting) { // 未登录或不可购票时终止,预览模式下不可点击
+      if (this.$route.query.isPreview || this.activity.statusText !== '购票' || !utils.checkLogin(true) || this.submitting) { // 未登录或不可购票时终止,预览模式下不可点击
         return false
       }
       let {followed} = this.circle

@@ -518,7 +518,7 @@ export default {
     joinCircle () {
       let {need_audit, followed} = this.dynamic.circleInfo
       let _rightText = need_audit ? '申请加入' : '立即加入'
-      if (followed || !utils.checkLogin()) { // 已加入或未登录均返回
+      if (followed || !utils.checkLogin(true)) { // 已加入或未登录均返回
         return false
       }
       if (this.following) { // 正在申请
@@ -541,7 +541,7 @@ export default {
         ],
         onSelect: (item, index) => {
           if (index === 0) {
-            if (!utils.checkLogin()) { // 未登陆返回
+            if (!utils.checkLogin(true)) { // 未登陆返回
               return false
             }
             if ((this.dynamic.show_allways.toString() !== '1') && this.dynamic.circleInfo && !this.dynamic.circleInfo.followed) { // 不可见且不加入
