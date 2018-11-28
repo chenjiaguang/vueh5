@@ -601,17 +601,22 @@ export default {
         this.activity.date = res.data.time_text
         this.activity.cost = res.data.money
         this.activity.deadline = res.data.deadline_text
-        this.activity.content = res.data.content.filter(item => item.type.toString() !== '0').map(item => {
-          return {
-            type: item.type,
-            content: item.type.toString() === '1' ? item.content : {
-              image: item.imageUrl,
-              description: item.des
-            },
-            width: item.width,
-            height: item.height
-          }
-        })
+        this.activity.rendering_type = res.data.rendering_type
+        if (res.data.rendering_type.toString() === '1') { // web发布的活动
+          this.activity.htmlContent = res.data.content
+        } else if (res.data.rendering_type.toString() === '0') { // app发布的活动
+          this.activity.content = res.data.content.filter(item => item.type.toString() !== '0').map(item => {
+            return {
+              type: item.type,
+              content: item.type.toString() === '1' ? item.content : {
+                image: item.imageUrl,
+                description: item.des
+              },
+              width: item.width,
+              height: item.height
+            }
+          })
+        }
         this.activity.joinTotal = res.data.joined_total
         this.activity.join = res.data.joined_users
         this.activity.activityHasDynamic = res.data.activity_has_dynamic
