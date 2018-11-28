@@ -785,7 +785,7 @@ export default {
   box-sizing: content-box;
   position: relative;
   display: flex;
-  background: rgba(0,0,0,0.1);
+  background: rgba(0,0,0,0.2);
 }
 .top-header-left{
   width: 68%;
@@ -796,7 +796,6 @@ export default {
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  background: rgba(0,0,0,0.1);
 }
 .top-header-right{
   width: 32%;
@@ -807,7 +806,6 @@ export default {
   flex-direction: column;
   align-items: center;
   overflow: hidden;
-  background: rgba(0,0,0,0.1);
 }
 .top-header-avatar{
   width: 172px;
