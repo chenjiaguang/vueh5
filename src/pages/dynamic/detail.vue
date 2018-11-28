@@ -116,7 +116,7 @@
                         <transition name="fade-slow">
                           <div v-if="comment.replys.list.length>0" class="comment-replies-box">
                             <transition-group name="fade-slow" tag="div">
-                              <div class="reply-box transition-quick" v-for="(reply) in comment.replys.list" :key="'replys'+reply.id" @click.stop="()=>showReplyActionSheet(comment,reply.username,reply.id)">
+                              <div class="reply-box transition-quick" v-for="(reply) in comment.replys.list" :key="'replys'+reply.id" @click.stop="()=>showReplyActionSheet(comment,reply.username,reply)">
                                 <span class="reply-from" v-if="reply.pusername" @click.stop="clickUser(reply.uid)">{{reply.username}}</span><span class="reply-from" v-if="!reply.pusername" @click.stop="clickUser(reply.uid)">{{reply.username}}:</span><span class="reply-reply" v-if="reply.pusername">回复</span><span class="reply-to" v-if="reply.pusername" @click.stop="clickUser(reply.puid)">{{reply.pusername}}:</span><span class="reply-content" v-html="handleContentUrl(reply.content)"></span>
                               </div>
                             </transition-group>
@@ -531,9 +531,20 @@ export default {
         console.log('cancel')
       })
     },
-    showReplyActionSheet (comment, replyName = '', pid = '') {
+    showReplyActionSheet (comment, replyName = '', reply = null) {
+      let pid = reply ? reply.id : ''
+      let delIsOwner = reply ? reply.is_owner : comment.is_owner
       this.$createActionSheet({
-        data: [
+        data: delIsOwner ? [
+          {
+            content: '回复',
+            class: 'action-sheet-item'
+          },
+          {
+            content: '删除',
+            class: 'action-sheet-item red'
+          }
+        ] : [
           {
             content: '回复',
             class: 'action-sheet-item'
@@ -560,6 +571,30 @@ export default {
                 comment: comment
               }
             })
+          } else if (index === 1) {
+            if (pid) {
+              // 删除回复
+              this.$ajax('/jv/qz/deleterecord', {data: {
+                type: 2,
+                type_id: pid
+              }}).then(res => {
+                let i = comment.replys.list.findIndex((_reply) => {
+                  return _reply.id == pid
+                })
+                comment.replys.list.splice(i, 1)
+              })
+            } else {
+              // 删除评论
+              this.$ajax('/jv/qz/deleterecord', {data: {
+                type: 0,
+                type_id: comment.id
+              }}).then(res => {
+                let i = this.dynamic.comment_list.findIndex((_comment) => {
+                  return _comment.id == comment.id
+                })
+                this.dynamic.comment_list.splice(i, 1)
+              })
+            }
           }
         }
       }).show()
