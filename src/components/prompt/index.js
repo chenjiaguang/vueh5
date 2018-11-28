@@ -5,11 +5,12 @@ let Main = Vue.extend(main)
 
 let Prompt = {
   showPrompt: (options, onConfirm, onCancel) => {
-    let {contentText, leftText, rightText} = options
+    let {titleText, contentText, leftText, rightText} = options
     let div = window.document.createElement('div')
     let _main = new Main({
       data: function () {
         return {
+          titleText,
           contentText,
           leftText,
           rightText,

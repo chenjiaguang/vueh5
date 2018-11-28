@@ -667,7 +667,7 @@ export default {
       if (this.beingFriend) { // 正在申请则不做任何回应
         return false
       }
-      this.$prompt.showPrompt({contentText: '向TA发送好友申请？', leftText: '取消', rightText: '发送'}, () => {
+      this.$prompt.showPrompt({titleText: '向TA发送好友申请？', leftText: '取消', rightText: '发送'}, () => {
         this.requestFriend()
       }, () => {
         console.log('cancel')
