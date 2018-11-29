@@ -33,7 +33,7 @@ export default {
       if (!window.localStorage.token) {
         setTimeout(() => {
           utils.checkLogin()
-        }, 2000)
+        }, 10000)
       }
     }
 
