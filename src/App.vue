@@ -31,9 +31,14 @@ export default {
     browserUA.isWeixin()
     ) {
       if (!window.localStorage.token) {
-        setTimeout(() => {
+        console.log('userAgent', window.navigator.userAgent)
+        if (browserUA.isWeixinMiniProgram) {
+          setTimeout(() => {
+            utils.checkLogin()
+          }, 1000)
+        } else {
           utils.checkLogin()
-        }, 10000)
+        }
       }
     }
 

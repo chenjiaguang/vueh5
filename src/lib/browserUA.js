@@ -7,6 +7,13 @@ export default {
       return false
     }
   },
+  isWeixinMiniProgram: function () {
+    if (window.navigator.userAgent.toLowerCase().match(/miniProgram/i) && window.navigator.userAgent.toLowerCase().match(/miniProgram/i).toString() === 'miniProgram') {
+      return true
+    } else {
+      return false
+    }
+  },
   isAndroid: function () {
     const ua = navigator.userAgent.toLowerCase()
     if (/android/.test(ua)) {
