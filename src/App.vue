@@ -26,13 +26,6 @@ export default {
     }
   },
   mounted () {
-    console.log('userAgent', window.navigator.userAgent)
-    if (browserUA.isWeixinMiniProgram()) {
-      console.log('mini')
-    } else {
-      console.log('nomini')
-    }
-
     if (window.location.pathname !== '/h5/weixinLoginJump' &&
     window.location.pathname !== '/h5/smsCode' &&
     browserUA.isWeixin()
