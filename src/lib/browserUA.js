@@ -8,7 +8,7 @@ export default {
     }
   },
   isWeixinMiniProgram: function () {
-    if (window.navigator.userAgent.toLowerCase().match(/miniProgram/i) && window.navigator.userAgent.toLowerCase().match(/miniProgram/i).toString() === 'miniProgram') {
+    if (window.navigator.userAgent.toLowerCase().match(/miniProgram/i) && window.navigator.userAgent.toLowerCase().match(/miniProgram/i).toString() === 'miniprogram') {
       return true
     } else {
       return false
