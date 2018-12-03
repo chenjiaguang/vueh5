@@ -504,7 +504,7 @@ export default {
     } else {
       if (!this.showPrompt) {
         this.showPrompt = true
-        this.$prompt.showPrompt({contentText: '离开后，您的订单将不再保留，确定要放弃订单？', leftText: '放弃订单', rightText: '继续支付'}, () => {
+        this.$prompt.showPrompt({titleText: '离开后，您的订单将不再保留，确定要放弃订单？', leftText: '放弃订单', rightText: '继续支付'}, () => {
           this.showPrompt = false
         }, () => {
           this.cancelOrder(() => {

@@ -2,7 +2,8 @@
   <transition appear appear-class="before-appear">
       <div :id="id" :style="'z-index:' + new Date().getTime()" class="modal-wrapper" @touchmove.prevent>
           <div class="modal-box" :class="os">
-            <div class="content-box" :class="os" v-html="text"></div>
+            <div class="title-box" :class="os" v-html="title"></div>
+            <div class="content-box" v-if="content" :class="os" v-html="content"></div>
             <div @click="hideAlert" class="button-box" :class="os">
                 <div class="main-btn" :class="os">{{btnText}}</div>
             </div>
@@ -17,7 +18,7 @@ export default {
   data () {
     return {
       id: '',
-      text: '',
+      title: '',
       onClose: function () {},
       btnText: '确定',
       os: browserUA.isAndroid() ? 'android' : 'ios'
@@ -71,19 +72,35 @@ export default {
         border-radius: 4px;
         margin-left: -325px;
     }
-    .content-box{
+    .title-box.ios{
         font-size: 34px;
         line-height: 48px;
         font-weight: 600;
         color: #030303;
+        text-align: center;
+        padding: 38px 30px 26px 30px;
+    }
+    .title-box.android{
+        font-size: 34px;
+        line-height: 34px;
+        font-weight: 600;
+        color: #030303;
+        text-align: left;
+        padding: 32px 30px 28px 30px;
     }
     .content-box.ios{
+        font-size: 26px;
+        line-height: 32px;
+        color: #030303;
         text-align: center;
-        padding: 20px 36px;
+        padding: 0px 30px 54px 30px;
     }
     .content-box.android{
-      text-align: left;
-      padding: 23px 30px;
+        font-size: 30px;
+        line-height: 36px;
+        color: #030303;
+        text-align: left;
+        padding: 0 30px 18px 30px ;
     }
     .button-box{
         position:relative;

@@ -4,12 +4,13 @@ import main from './Modal.vue'
 let Main = Vue.extend(main)
 
 let Modal = {
-  showAlert: (text, onClose, btnText) => {
+  showAlert: (title, onClose, btnText, content = '') => {
     let div = window.document.createElement('div')
     let _main = new Main({
       data: function () {
         return {
-          text: text,
+          title: title,
+          content: content,
           onClose: onClose || function () {},
           btnText: btnText || '确定'
         }

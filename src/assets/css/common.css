@@ -78,7 +78,15 @@
   line-height: 100px !important;
   font-size: 34px !important;
   color: #333333 !important;
+  border-top-width: 1px !important;
+  border-style:solid !important;
+  border-color: #E5E5E5 !important;
+
 }
+.action-sheet-item.red {
+  color:#ff5a50 !important;
+}
+
 .cube-action-sheet-space{
   height: 10px !important;
   background-color:#E1E1E1 !important;

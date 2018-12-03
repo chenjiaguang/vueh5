@@ -52,7 +52,7 @@ export default {
       }
     } else if (needPhone) {
       // 需要绑定手机而又没有绑定手机
-      prompt.showPrompt({contentText: '应国家法规对于账号实名的要求，需要你先完成手机绑定，再进行下一步操作。', leftText: '取消', rightText: '去绑定'}, () => {
+      prompt.showPrompt({titleText: '绑定手机号', contentText: '应国家法规对于账号实名的要求，需要你先完成手机绑定，再进行下一步操作。', leftText: '取消', rightText: '去绑定'}, () => {
         router.push({
           name: 'SMSCode',
           query: { type: 'bindPhone' },

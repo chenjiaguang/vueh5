@@ -2,7 +2,8 @@
   <transition appear appear-class="before-appear">
       <div :id="id" :style="'z-index:' + new Date().getTime()" class="prompt-wrapper" @touchmove.prevent>
           <div class="prompt-box" :class="os">
-            <div class="content-box" :class="os">{{contentText}}</div>
+            <div class="title-box" :class="os">{{titleText}}</div>
+            <div class="content-box" v-if="contentText" :class="os">{{contentText}}</div>
             <div class="button-box" :class="os">
               <div class="btn left-btn" @click.stop="onCancel" :class="os"><span>{{leftText || '取消'}}</span></div>
                 <div class="btn right-btn" @click.stop="onConfirm" :class="os"><span>{{rightText || '确定'}}</span></div>
@@ -74,19 +75,35 @@ export default {
         border-radius: 4px;
         margin-left: -325px;
     }
-    .content-box{
+    .content-box.ios{
+        font-size: 26px;
+        line-height: 32px;
+        color: #030303;
+        text-align: center;
+        padding: 0 30px 41px 30px;
+    }
+    .content-box.android{
+        font-size: 30px;
+        line-height: 36px;
+        color: #030303;
+        text-align: left;
+        padding: 0 30px 18px 30px;
+    }
+    .title-box.ios{
         font-size: 34px;
         line-height: 48px;
         font-weight: 600;
         color: #030303;
-    }
-    .content-box.ios{
         text-align: center;
-        padding: 20px 36px;
+        padding: 30px;
     }
-    .content-box.android{
-      text-align: left;
-      padding: 23px 30px;
+    .title-box.android{
+        font-size: 34px;
+        line-height: 34px;
+        font-weight: 600;
+        color: #030303;
+        text-align: left;
+        padding: 30px;
     }
     .button-box{
         position:relative;
