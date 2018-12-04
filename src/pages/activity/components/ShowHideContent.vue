@@ -3,7 +3,7 @@
       <div :style="{height: (contextHeight && !showMore && contextHeight > halfScreenHeight) ? (halfScreenHeight + 'px') : 'auto', position: 'relative', overflow: 'hidden'}">
         <div class="header">活动介绍</div>
         <div v-resize.initial="resize" class="content-context">
-          <div v-if="htmlContent" v-html="htmlContent"></div>
+          <div v-if="htmlContent" v-html="htmlContent" style="overflow-x:auto"></div>
           <template v-else v-for="(item, idx) in content">
             <p :key="idx" v-if="item.type === '1'" class="content-text">{{item.content}}</p>
             <div :key="idx" v-else-if="item.type === '2' && item.content" class="image-box">
@@ -35,6 +35,9 @@
   }
   .content-context{
     margin-bottom: 21px;
+  }
+  .content-context /deep/ .fant-image{
+    max-width: 100%;
   }
   .content-text{
     word-wrap: break-word;
