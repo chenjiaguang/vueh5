@@ -3,13 +3,13 @@
     <div class="user-overview">
       <div class="user-avatar-wrapper">
         <div class="user-avatar" @click.stop="goUser" :style="{backgroundImage: 'url(' + itemData.avatar + ')'}"></div>
-        <img v-if="itemData.is_vip_user" class="vip-icon" :src="$assetsPublicPath + '/cwebassets/image/vip.png'" />
+        <img v-if="itemData.is_vip_user" class="vip-icon" :src="$assetsFullPath + 'image/vip.png'" />
       </div>
       <div class="user-name clearfix">
         <span @click.stop="goUser" class="user-name-text fl">{{itemData.username}}</span>
-        <img v-if="itemData.is_circle_manager" :src="$assetsPublicPath + '/cwebassets/image/manager.png'" class="user-tag fl" />
-        <img v-if="itemData.is_circle_owner" :src="$assetsPublicPath + '/cwebassets/image/circle_owner.png'" class="user-tag fl" />
-        <img v-if="itemData.is_top" :src="$assetsPublicPath + '/cwebassets/image/settop.png'" class="user-tag fl" />
+        <img v-if="itemData.is_circle_manager" :src="$assetsFullPath + 'image/manager.png'" class="user-tag fl" />
+        <img v-if="itemData.is_circle_owner" :src="$assetsFullPath + 'image/circle_owner.png'" class="user-tag fl" />
+        <img v-if="itemData.is_top" :src="$assetsFullPath + 'image/settop.png'" class="user-tag fl" />
       </div>
       <div class="publish-time">{{itemData.time}}<i class="iconfont icon-dian"></i><i class="iconfont" :class="dysignClass"></i><span class="from-circle" v-if="itemData.circle_name">发布于<span @click.stop="goCircle" class="from-circle-text">{{itemData.circle_name}}</span></span></div>
     </div>

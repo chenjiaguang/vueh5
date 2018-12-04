@@ -5,6 +5,7 @@ import App from './App'
 import router from './router'
 import store from './store'
 import 'lib-flexible/flexible'
+import '../cwebassets/css/webuploader.css'
 
 Vue.config.productionTip = false
 

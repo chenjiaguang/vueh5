@@ -46,7 +46,7 @@
   </div>
   <!-- 加载完成并且无订单 -->
   <div class="activity-confirmOrder-empty" v-else-if="loaded && !feeId">
-    <div class="empty-icon" :style="{backgroundImage: 'url(' + $assetsPublicPath + '/cwebassets/image/empty_order.png'}"></div>
+    <div class="empty-icon" :style="{backgroundImage: 'url(' + $assetsFullPath + 'image/empty_order.png'}"></div>
     <div class="empty-text">订单已失效！</div>
   </div>
 </template>

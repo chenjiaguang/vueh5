@@ -11,7 +11,7 @@ module.exports = {
   dev: {
 
     // Paths
-    assetsSubDirectory: 'cwebassets',
+    assetsSubDirectory: JSON.parse(devEnv.ASSETS_SUBDIRECTORY),
     assetsPublicPath: JSON.parse(devEnv.ASSETS_PUBLIC_PATH),
     proxyTable: [{
       context: ['/jv', '/login', '/logout', 'uimage', '/upload', '/article', '/news', '/default', '/circle', '/dynamic', '/manager', '/user', '/check', '/special'],
@@ -49,9 +49,6 @@ module.exports = {
 
     cssSourceMap: true
   },
-  test: {
-    assetsPublicPath: JSON.parse(testEnv.ASSETS_PUBLIC_PATH),
-  },
 
   build: {
     // Template for index.html
@@ -59,14 +56,14 @@ module.exports = {
 
     // Paths
     assetsRoot: path.resolve(__dirname, '../temp'),
-    assetsSubDirectory: 'cwebassets',
-    assetsPublicPath: JSON.parse(prodEnv.ASSETS_PUBLIC_PATH),
+    assetsSubDirectory: process.env.NODE_ENV == 'test' ? JSON.parse(testEnv.ASSETS_SUBDIRECTORY) : JSON.parse(prodEnv.ASSETS_SUBDIRECTORY),
+    assetsPublicPath: process.env.NODE_ENV == 'test' ? JSON.parse(testEnv.ASSETS_PUBLIC_PATH) : JSON.parse(prodEnv.ASSETS_PUBLIC_PATH),
 
     /**
      * Source Maps
      */
 
-    productionSourceMap: true,
+    cssSourceMap: true,
     // https://webpack.js.org/configuration/devtool/#production
     devtool: '#source-map',
 

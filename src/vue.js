@@ -21,7 +21,7 @@ import {
 if (process.env.NODE_ENV !== 'production') { // 非正式环境包，就实例化vconsole
   new VConsole() // 初始化
 }
-Vue.prototype.$assetsPublicPath = process.env.ASSETS_PUBLIC_PATH
+Vue.prototype.$assetsFullPath = process.env.ASSETS_FULL_PATH
 Vue.prototype.$winWidth = window.innerWidth > 800 ? 800 : window.innerWidth
 Vue.prototype.$winHeight = window.innerHeight
 Vue.prototype.$tranScale = 1 / window.devicePixelRatio
@@ -37,8 +37,8 @@ Vue.prototype.$video = Video
 Vue.prototype.$appCall = appCall
 Vue.use(VueLazyload, {
   preLoad: 1.3,
-  error: '/h5/cwebassets/image/img_error.png',
-  loading: '/h5/cwebassets/image/img_loading.png',
+  error: Vue.prototype.$assetsFullPath + 'image/img_error.png',
+  loading: Vue.prototype.$assetsFullPath + 'image/img_loading.png',
   attempt: 1
 })
 window._max_width = 800

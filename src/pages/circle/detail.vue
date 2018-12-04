@@ -68,7 +68,7 @@
     <scroll-to-top v-if="mescroll && mescroll.length > 0" :visible="showBackTop" :position="{bottom: (maxWidth / 750) * 178, right: (maxWidth / 750) * 54}" :scroll="mescroll[0]"/>
     <i class="iconfont icon-camera publish-icon" :style="{marginRight: marginRight + 'px'}" v-if="circle.followed" @click="goPublish"></i>
     <div v-if="!circle.followed && circle.followed !== null" class="follow-box" :style="{height: followBoxHeight + 'px'}" @click="joinCircle">
-      <div class="follow-icon" :style="{backgroundImage: 'url(' + $assetsPublicPath + '/cwebassets/image/add_circle_icon.png)'}"></div>
+      <div class="follow-icon" :style="{backgroundImage: 'url(' + $assetsFullPath + 'image/add_circle_icon.png)'}"></div>
       <div class="follow-text">申请加入群组</div>
     </div>
   </div>

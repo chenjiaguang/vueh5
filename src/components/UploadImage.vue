@@ -127,8 +127,6 @@
 </style>
 
 <script>
-// import '@/../cwebassets/js/jQuery.3.3.1.min.js'
-// import '@/../cwebassets/js/webuploader.min.js'
 
 export default {
   data () {
@@ -186,7 +184,7 @@ export default {
       // 存在文件，自动上传
       auto: true,
       // swf文件路径
-      swf: this.$assetsPublicPath + '/cwebassets/Uploader.swf',
+      swf: this.$assetsFullPath + 'Uploader.swf',
 
       // 文件接收服务端。
       server: this.$apiDomain.replace('http', 'https') + '/jv/image/upload',

@@ -8,7 +8,7 @@
 <style lang="scss" scoped>
 .promotion-page{
   position: relative;
-  background-image: url('/h5/cwebassets/image/promotion_page1.jpg');
+  background-image: url("../../../cwebassets/image/promotion_page1.jpg");
   background-repeat: no-repeat;
   background-size: cover;
   background-position: 50% 55.065%;

@@ -2,7 +2,7 @@
   <div class="weixin-container" v-if="show" @click="hideTip">
     <div class="box">
       <div class="clearfix">
-        <img class="image fr" src='@/../cwebassets/image/throw_arrow.png' />
+        <img class="image fr" :src="$assetsFullPath +'image/throw_arrow.png'" />
       </div>
       <div class="text-box">
         <div class="tip-line">

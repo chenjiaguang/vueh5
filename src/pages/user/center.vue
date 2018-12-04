@@ -121,7 +121,7 @@
               <article-item v-for="item in tabs[index].data" :key="item.id" :itemData="item" />
             </div>
             <div v-else-if="tabs[index].paging.is_end && tabs[index].data && tabs[index].data.length === 0" class="empty-box">
-              <!-- <img :src="$assetsPublicPath + '/cwebassets/image/empty_dynamic.png'" class="empty-image" /> -->
+              <!-- <img :src="$assetsFullPath + 'image/empty_dynamic.png'" class="empty-image" /> -->
               TA很神秘，什么都没有发
             </div>
             <!-- <div v-else class="empty-box" :style="{minHeight: ($winHeight - ((tabs && tabs.length) > 1 ? tabBarHeight : 0)) + 1 + 'px'}">

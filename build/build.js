@@ -6,6 +6,8 @@ if (process.argv.length > 2 && process.argv[2] == 'test') {
 } else {
   process.env.NODE_ENV = 'production'
 }
+process.env.IS_BUILD = true
+global.time = (new Date()).getTime()
 
 const ora = require('ora')
 const rm = require('rimraf')

@@ -26,9 +26,9 @@ export default {
     return {
       src: '',
       srcObject: {
-        user: this.$assetsPublicPath + '/cwebassets/userAgreement.html',
-        author: this.$assetsPublicPath + '/cwebassets/authorAgreement.html',
-        activity: this.$assetsPublicPath + '/cwebassets/activityAgreement.html'
+        user: this.$assetsFullPath + 'userAgreement.html',
+        author: this.$assetsFullPath + 'authorAgreement.html',
+        activity: this.$assetsFullPath + 'activityAgreement.html'
       },
       titleObject: {
         user: '范团用户协议',
