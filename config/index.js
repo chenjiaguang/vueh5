@@ -63,7 +63,7 @@ module.exports = {
      * Source Maps
      */
 
-    sourceMap: true,
+    sourceMap: false,
     // https://webpack.js.org/configuration/devtool/#production
     devtool: '#source-map',
 
