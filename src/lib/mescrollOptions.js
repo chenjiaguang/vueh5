@@ -4,8 +4,8 @@ export default {
     let downOffset = (maxWidth / 750) * ($downOffset || 94)
     let upOffset = (maxWidth / 750) * ($upOffset || 100)
     let htmlContent = '<div class="pull-down-wrapper" style="height:' + downOffset + 'px">'
-    htmlContent += '<img class="pull-down-icon" src="' + this.$assetsFullPath + '/image/refresh_icon.png" />'
-    htmlContent += '<img class="pull-down-icon refreshing" src="' + this.$assetsFullPath + '/image/refreshing_icon.png" />'
+    htmlContent += '<img class="pull-down-icon" src="' + this.$assetsFullPath + 'image/refresh_icon.png" />'
+    htmlContent += '<img class="pull-down-icon refreshing" src="' + this.$assetsFullPath + 'image/refreshing_icon.png" />'
     htmlContent += '</div>'
     let options = {
       down: {
@@ -32,7 +32,7 @@ export default {
         offset: upOffset,
         callback: () => { },
         onScroll: () => { },
-        htmlLoading: '<div class="pull-up-wrapper" style="height:' + upOffset + 'px"><div class="loading-content"><img class="loading-icon" src="' + this.$assetsFullPath + '/image/loading_icon.png" />正在加载...</div></div>',
+        htmlLoading: '<div class="pull-up-wrapper" style="height:' + upOffset + 'px"><div class="loading-content"><img class="loading-icon" src="' + this.$assetsFullPath + 'image/loading_icon.png" />正在加载...</div></div>',
         htmlNodata: '<div class="pull-up-wrapper" style="height:' + upOffset + 'px"><div class="loading-content">再刷也没有了</div></div>'
       }
     }
