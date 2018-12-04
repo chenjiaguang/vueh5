@@ -3,7 +3,7 @@ const utils = require('./utils')
 const config = require('../config')
 const isBuild = process.env.IS_BUILD
 const sourceMapEnabled = isBuild
-  ? config.build.cssSourceMap
+  ? config.build.sourceMap
   : config.dev.cssSourceMap
 
 module.exports = {

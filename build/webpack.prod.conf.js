@@ -16,12 +16,12 @@ const env = require('../config/prod.env')
 const webpackConfig = merge(baseWebpackConfig, {
   module: {
     rules: utils.styleLoaders({
-      sourceMap: config.build.cssSourceMap,
+      sourceMap: config.build.sourceMap,
       extract: true,
       usePostCSS: true
     })
   },
-  devtool: config.build.cssSourceMap ? config.build.devtool : false,
+  devtool: config.build.sourceMap ? config.build.devtool : false,
   output: {
     path: config.build.assetsRoot,
     filename: utils.assetsPath('js/[name].[chunkhash].js'),
@@ -38,7 +38,7 @@ const webpackConfig = merge(baseWebpackConfig, {
           warnings: false
         }
       },
-      sourceMap: config.build.cssSourceMap,
+      sourceMap: config.build.sourceMap,
       parallel: true
     }),
     // extract css into its own file
@@ -53,7 +53,7 @@ const webpackConfig = merge(baseWebpackConfig, {
     // Compress extracted CSS. We are using this plugin so that possible
     // duplicated CSS from different components can be deduped.
     new OptimizeCSSPlugin({
-      cssProcessorOptions: config.build.cssSourceMap
+      cssProcessorOptions: config.build.sourceMap
         ? { safe: true, map: { inline: false } }
         : { safe: true }
     }),
