@@ -532,9 +532,9 @@ export default {
           this.activity.title = contentObj.form.name
           this.activity.sponsor.name = contentObj.form.sponsor_name
           this.activity.sponsor.tel = contentObj.form.sponsor_tel
-          this.activity.address.title = contentObj.form.address_data.location
-          this.activity.address.coordinate.lng = contentObj.form.address_data.lnglat[0]
-          this.activity.address.coordinate.lat = contentObj.form.address_data.lnglat[1]
+          this.activity.address.title = contentObj.form.address.toString() === '1' ? '线上活动' : contentObj.form.address_data.location
+          this.activity.address.coordinate.lng = (contentObj.form.address_data.lnglat && contentObj.form.address_data.lnglat[0]) ? contentObj.form.address_data.lnglat[0] : ''
+          this.activity.address.coordinate.lat = (contentObj.form.address_data.lnglat && contentObj.form.address_data.lnglat[1]) ? contentObj.form.address_data.lnglat[1] : ''
           let _start = new Date(contentObj.form.activity_time.start)
           let _end = new Date(contentObj.form.activity_time.end)
           this.activity.date = this.getTimeText(_start) + ' 至 ' + this.getTimeText(_end)
