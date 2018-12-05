@@ -17,7 +17,7 @@
     <div v-if="itemData.topicInfo && itemData.topicInfo.length > 0" class="topic-box clearfix">
       <div v-for="(item, idx) in itemData.topicInfo" :key="idx" @click.stop="goTopic(idx)" class="topic-item fl"><i class="iconfont icon-topic_v_2_5 relative-topic-icon"></i>{{item.title}}</div>
     </div>
-    <div class="dynamic-picture" v-if="itemData.covers && itemData.covers.length > 0">
+    <div class="dynamic-picture" v-if="itemData.covers && itemData.covers.length > 0 && !itemData.videoInfo">
       <image-container :images="itemData.covers" :router="router" :appearAnimation="false" :showDelete="false" />
     </div>
     <a @click.stop :href="itemData.newsArticle.article_url" v-if="itemData.newsArticle && itemData.newsArticle.id" class="with-article">
@@ -38,7 +38,7 @@
         <div class="with-article-title-text">{{itemData.linkInfo.title || itemData.linkInfo.url}}</div>
       </div>
     </a>
-    <DynamicContentVideoBox class="with-video" v-if="itemData.linkInfo && itemData.linkInfo.id && itemData.linkInfo.type==1" :dynamic="itemData" :from="1" :currentTime="itemData.videoPoint || 0"/>
+    <DynamicContentVideoBox class="with-video" v-if="(itemData.linkInfo && itemData.linkInfo.id && itemData.linkInfo.type==1)||itemData.videoInfo" :dynamic="itemData" :from="1" :currentTime="itemData.videoPoint || 0"/>
     <!-- <div v-if="itemData.activity" class="at-activity"><i class="iconfont icon-activity activity-sign"></i>{{itemData.activity.title}}</div> -->
     <!-- 活动模块 -->
     <div class="content-activity-box row center" v-if="itemData.activity && itemData.activity.id" @click.stop="goActivity(itemData.activity.id)">

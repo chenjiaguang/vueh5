@@ -1,17 +1,20 @@
-//动态固底交互
 <template>
-  <div class="content-video-box column" >
-    <div class="video-content" :style="`background-image:url(${dynamic.linkInfo.originalCover})`" @click.stop="jumpVideo">
+  <div v-if="dynamic" class="content-video-box column">
+    <div
+      class="video-content"
+      :style="`background-image:url(${showData.cover})`"
+      @click.stop="jumpVideo"
+    >
       <div class="video-content-button column center">
-          <i class='iconfont icon-play'></i>
+        <i class="iconfont icon-play"></i>
       </div>
       <!-- <div class="video-content-duration">
         02:38
-      </div> -->
+      </div>-->
     </div>
-    <a class="video-info column" :href="dynamic.linkInfo.url">
-      <div class="title">{{dynamic.linkInfo.title}}</div>
-      <div class="from">{{dynamic.linkInfo.from}}</div>
+    <a class="video-info column" :href="showData.url" v-if="showData.title&&showData.from">
+      <div class="title">{{showData.title}}</div>
+      <div class="from">{{showData.from}}</div>
     </a>
   </div>
 </template>
@@ -19,16 +22,21 @@
 export default {
   props: ['dynamic', 'currentTime', 'from'],
   data () {
-    return {}
+    return {
+      showData: {
+      }
+    }
   },
-  computed: {},
   components: {},
+  mounted () {
+    this.showData = this.getShowData()
+  },
   methods: {
     jumpVideo () {
       this.$router.push({
         name: 'VideoMedia',
-        query: { dynamic_id: this.dynamic.id, video_id: this.dynamic.linkInfo.id, like_num: this.dynamic.like_num, comment_num: this.dynamic.comment_num, has_like: this.dynamic.has_like, current_time: (this.dynamic.videoPoint || this.currentTime), from: (this.from || 2), video_duration: this.dynamic.linkInfo.duration },
-        params: { video_url: this.dynamic.linkInfo.videoAddress, poster_url: this.dynamic.linkInfo.originalCover, video_title: this.dynamic.content || this.dynamic.linkInfo.title }
+        query: this.getJumpQuery(),
+        params: this.getJumpParams()
       })
       // window._video.video.src('http://180.97.241.182/69742340BE14381AEEE2013792/03000A01005BA74AEFAF57145E3147B235BE07-6BFE-4965-82D5-45C9D04B2030.mp4?ccode=0501&duration=96&expire=18000&psid=8526f9f3ef86abc67816fdaac80da61a&ups_client_netip=3ad03118&ups_ts=1539142975&ups_userid=&utid=PmNEFJKjaBECAXFMEmvcD8cT&vid=XMzgzNDg3MDE4NA&vkey=Ace7b2b900c9261991a9e9d1c82c123e1&sp=')
       // window._video.video.play()
@@ -44,12 +52,70 @@ export default {
       // }).catch(err => {
       //   // this.pageData.show_error = true
       // })
+    },
+    getShowData () {
+      if (this.dynamic && this.dynamic.linkInfo) {
+        return {
+          cover: this.dynamic.linkInfo.originalCover,
+          url: this.dynamic.linkInfo.url,
+          title: this.dynamic.linkInfo.title,
+          from: this.dynamic.linkInfo.from
+        }
+      } else if (this.dynamic && this.dynamic.videoInfo) {
+        return {
+          cover: this.dynamic.videoInfo.covers[0].url,
+          url: '',
+          title: '',
+          from: ''
+        }
+      } else {
+        return {}
+      }
+    },
+    getJumpQuery () {
+      if (this.dynamic && this.dynamic.linkInfo) {
+        return {
+          dynamic_id: this.dynamic.id,
+          video_id: this.dynamic.linkInfo.id,
+          like_num: this.dynamic.like_num,
+          comment_num: this.dynamic.comment_num,
+          has_like: this.dynamic.has_like,
+          current_time: this.dynamic.videoPoint || this.currentTime,
+          from: this.from || 2,
+          video_duration: this.dynamic.linkInfo.duration
+        }
+      } else if (this.dynamic && this.dynamic.videoInfo) {
+        return {
+          dynamic_id: this.dynamic.id,
+          video_id: '',
+          like_num: this.dynamic.like_num,
+          comment_num: this.dynamic.comment_num,
+          has_like: this.dynamic.has_like,
+          current_time: this.dynamic.videoPoint || this.currentTime,
+          from: this.from || 2,
+          video_duration: this.dynamic.videoInfo.duration
+        }
+      } else {
+        return {}
+      }
+    },
+    getJumpParams () {
+      if (this.dynamic && this.dynamic.linkInfo) {
+        return {
+          video_url: this.dynamic.linkInfo.videoAddress,
+          poster_url: this.dynamic.linkInfo.originalCover,
+          video_title: this.dynamic.content || this.dynamic.linkInfo.title
+        }
+      } else if (this.dynamic && this.dynamic.videoInfo) {
+        return {
+          video_url: this.dynamic.videoInfo.play_url,
+          poster_url: this.dynamic.videoInfo.covers[0].url,
+          video_title: this.dynamic.content || ''
+        }
+      } else {
+        return {}
+      }
     }
-  },
-  mounted () {
-    // if (!window._video) {
-    //   this.$video.init({video_id: this.dynamic.linkInfo.id})
-    // }
   }
 }
 </script>
@@ -74,7 +140,7 @@ export default {
   bottom: 0;
   left: 0;
   right: 0;
-  justify-content:center;
+  justify-content: center;
 }
 .icon-play {
   color: #ffffff;
@@ -101,7 +167,7 @@ export default {
   line-height: 28px;
   margin-bottom: 8px;
 }
-.from{
+.from {
   line-height: 28px;
 }
 </style>

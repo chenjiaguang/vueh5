@@ -50,7 +50,7 @@
             <div v-if="dynamic&&!dynamic.isArticle" id="content-container" class="column">
               <div class="dynamic-content" v-html="handleContentUrl(dynamic.content)"></div>
               <TopicTagBox :topicInfo="dynamic.topicInfo" />
-              <DetailImageContainer class="detail-image-container"  :images="dynamic.covers" :router="$router" />
+              <DetailImageContainer class="detail-image-container" v-if="!dynamic.videoInfo" :images="dynamic.covers" :router="$router" />
               <a class="content-article-box row center" v-if="dynamic.aid" :href="dynamic.newsArticle.article_url">
                 <div v-if="dynamic.newsArticle.covers && dynamic.newsArticle.covers[0]" class="content-article-img" :style="`background-image:url(${dynamic.newsArticle.covers[0].compress || dynamic.newsArticle.covers[0].url})`"/>
                 <div v-else class="content-article-img">
@@ -65,7 +65,7 @@
                 </div>
                 <div class="content-article-content">{{dynamic.linkInfo.title || dynamic.linkInfo.url}}</div>
               </a>
-              <DynamicContentVideoBox class="content-video-box" v-if="dynamic.linkInfo && dynamic.linkInfo.id && dynamic.linkInfo.type==1" :dynamic="dynamic" :currentTime="videoPoint" :from="2"/>
+              <DynamicContentVideoBox class="content-video-box" v-if="(dynamic.linkInfo && dynamic.linkInfo.id && dynamic.linkInfo.type==1)||dynamic.videoInfo" :dynamic="dynamic" :currentTime="videoPoint" :from="2"/>
             </div>
 
             <div v-if="dynamic && (dynamic.actid || dynamic.location || dynamic.circle_name)" id="foot-container" class="column">

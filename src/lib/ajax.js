@@ -34,7 +34,7 @@ axios.interceptors.request.use(function (config) {
   if (config.contentType) {
     config.headers['Content-Type'] = config.contentType
   }
-  config.headers['version'] = '2.5.1'
+  config.headers['version'] = '2.7.0'
   if (config.data.version) {
     config.headers.version = config.data.version
   }

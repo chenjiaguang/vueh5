@@ -14,7 +14,7 @@
       <div class="publish-time">{{itemData.time}}<i class="iconfont icon-dian"></i><i class="iconfont" :class="dysignClass"></i></div>
     </div>
     <show-hide-content :content="(itemData.type && itemData.type.toString() === '18') ? itemData.title : (itemData.content || '')" :isLongDynamic="(itemData.type && itemData.type.toString() === '18') ? true : false" />
-    <div class="dynamic-pinture" v-if="itemData.covers && itemData.covers.length > 0">
+    <div class="dynamic-pinture" v-if="itemData.covers && itemData.covers.length > 0 && !itemData.videoInfo">
       <image-container :images="itemData.covers" :router="router" :appearAnimation="false" :showDelete="false" />
     </div>
     <a @click.stop :href="itemData.newsArticle.article_url" v-if="itemData.newsArticle && itemData.newsArticle.id" class="with-article">
@@ -35,7 +35,7 @@
         <div class="with-article-title-text">{{itemData.linkInfo.title || itemData.linkInfo.url}}</div>
       </div>
     </a>
-    <DynamicContentVideoBox class="with-video" v-if="itemData.linkInfo && itemData.linkInfo.id && itemData.linkInfo.type==1" :dynamic="itemData" :from="1" :currentTime="itemData.videoPoint || 0"/>
+    <DynamicContentVideoBox class="with-video" v-if="(itemData.linkInfo && itemData.linkInfo.id && itemData.linkInfo.type==1)||itemData.videoInfo" :dynamic="itemData" :from="1" :currentTime="itemData.videoPoint || 0"/>
     <!-- <div v-if="itemData.activity" class="at-activity"><i class="iconfont icon-activity activity-sign"></i>{{itemData.activity.title}}</div> -->
     <!-- 活动模块 -->
     <div class="content-activity-box row center" v-if="itemData.activity && itemData.activity.id" @click.stop="goActivity(itemData.activity.id)">
