@@ -29,7 +29,6 @@
   </div>
 </template>
 
-<style src="../../../cwebassets/css/webuploader.css"></style>
 <style lang="scss" type="text/scss" scoped>
 .edit-page{
   height: 100%;

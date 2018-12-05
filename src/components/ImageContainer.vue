@@ -200,7 +200,7 @@ export default {
   position: absolute;
   bottom: 10px;
   right: 10px;
-  background-image: url('/h5/cwebassets/image/is_gif.png');
+  background-image: url("../../cwebassets/image/is_gif.png");
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;

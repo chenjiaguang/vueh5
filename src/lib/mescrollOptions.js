@@ -4,8 +4,8 @@ export default {
     let downOffset = (maxWidth / 750) * ($downOffset || 94)
     let upOffset = (maxWidth / 750) * ($upOffset || 100)
     let htmlContent = '<div class="pull-down-wrapper" style="height:' + downOffset + 'px">'
-    htmlContent += '<img class="pull-down-icon" src="/h5/cwebassets/image/refresh_icon.png" />'
-    htmlContent += '<img class="pull-down-icon refreshing" src="/h5/cwebassets/image/refreshing_icon.png" />'
+    htmlContent += '<img class="pull-down-icon" src="' + process.env.ASSETS_FULL_PATH + 'image/refresh_icon.png" />'
+    htmlContent += '<img class="pull-down-icon refreshing" src="' + process.env.ASSETS_FULL_PATH + 'image/refreshing_icon.png" />'
     htmlContent += '</div>'
     let options = {
       down: {
@@ -25,14 +25,14 @@ export default {
         htmlContent: htmlContent,
         auto: false,
         autoShowLoading: true,
-        callback: () => {}
+        callback: () => { }
       },
       up: {
         auto: false,
         offset: upOffset,
-        callback: () => {},
-        onScroll: () => {},
-        htmlLoading: '<div class="pull-up-wrapper" style="height:' + upOffset + 'px"><div class="loading-content"><img class="loading-icon" src="/h5/cwebassets/image/loading_icon.png" />正在加载...</div></div>',
+        callback: () => { },
+        onScroll: () => { },
+        htmlLoading: '<div class="pull-up-wrapper" style="height:' + upOffset + 'px"><div class="loading-content"><img class="loading-icon" src="' + process.env.ASSETS_FULL_PATH + 'image/loading_icon.png" />正在加载...</div></div>',
         htmlNodata: '<div class="pull-up-wrapper" style="height:' + upOffset + 'px"><div class="loading-content">再刷也没有了</div></div>'
       }
     }

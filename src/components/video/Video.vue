@@ -32,7 +32,7 @@
         <i class="big-replay-icon iconfont icon-replay"></i>
         <div class="big-replay-text">重新播放</div>
       </div>
-      <div v-show="pageData.waiting" class="loading-box" :style="{backgroundImage: 'url(' + $assetsPublicPath + '/cwebassets/image/video_waiting.png)'}"></div>
+      <div v-show="pageData.waiting" class="loading-box" :style="{backgroundImage: 'url(' + $assetsFullPath + 'image/video_waiting.png)'}"></div>
     </div>
     <div v-show="!pageData.show_buttons && !pageData.show_error" :style="{zIndex: 3}" class="video-mask-wrapper"></div>
     <div v-if="pageData.show_error" :style="{zIndex: 4}" class="video-mask-wrapper error">

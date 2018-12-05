@@ -12,7 +12,7 @@
                 <div class="row">
                   <div class="avatar-wrapper">
                     <img class="avatar" :src="dynamic.avatar" @click="clickUser(dynamic.uid)" />
-                    <img v-if="dynamic.userInfo && dynamic.userInfo.vipUser" class="vip-icon" :src="$assetsPublicPath + '/cwebassets/image/vip.png'" />
+                    <img v-if="dynamic.userInfo && dynamic.userInfo.vipUser" class="vip-icon" :src="$assetsFullPath + 'image/vip.png'" />
                   </div>
                   <div class="flex column space-between">
                     <!-- 上 -->
@@ -103,7 +103,7 @@
                       <div class="column">
                         <div class="user-avatar-wrapper">
                           <img class="user-avatar" :src="comment.avatar" @click="clickUser(comment.uid)" />
-                          <img v-if="comment.userInfo && comment.userInfo.vipUser" class="vip-icon" :src="$assetsPublicPath + '/cwebassets/image/vip.png'" />
+                          <img v-if="comment.userInfo && comment.userInfo.vipUser" class="vip-icon" :src="$assetsFullPath + 'image/vip.png'" />
                         </div>
                       </div>
                       <div class="comment-right-box column" >
@@ -626,7 +626,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .dynamic-detail-page{
   background-color: #fff;
 }
@@ -795,7 +795,7 @@ export default {
   position: absolute;
   bottom: 25px;
   right: 10px;
-  background-image: url('/h5/cwebassets/image/is_gif.png');
+  background-image: url("../../../cwebassets/image/is_gif.png");
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;

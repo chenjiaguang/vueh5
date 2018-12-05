@@ -4,7 +4,9 @@ const prodEnv = require('./prod.env')
 
 module.exports = merge(prodEnv, {
   NODE_ENV: '"development"',
+  ASSETS_SUBDIRECTORY: '"cwebassets"',
   ASSETS_PUBLIC_PATH: '"/h5/"',
+  ASSETS_FULL_PATH: '"/h5/cwebassets/"',
   API_DOMAIN: '"https://fanttest.fantuan.cn"',
   WEIXINLOGINJUMP: '"/h5/weixinLoginJump"',
   LOCATION_DOMAIN: '"https://fanttest.fantuan.cn/cweb/index.html#"',

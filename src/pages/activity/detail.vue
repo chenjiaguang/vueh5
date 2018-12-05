@@ -40,7 +40,7 @@
         <div class="join-avatar fl" v-for="(item, idx) in activity.join" :key="idx" :style="{backgroundImage: 'url(' + item.avatar + ')'}">
           <div v-if="item.num && parseInt(item.num) > 1" class="join-num">x{{item.num}}</div>
         </div>
-        <img class="join-avatar fl" v-if="activity.joinTotal && parseInt(activity.joinTotal) > 40"  :src="$assetsPublicPath + '/cwebassets/image/more_avatar2.png'" style="border-radius:0" />
+        <img class="join-avatar fl" v-if="activity.joinTotal && parseInt(activity.joinTotal) > 40"  :src="$assetsFullPath + 'image/more_avatar2.png'" style="border-radius:0" />
       </div>
     </div>
     <div class="dynamic-wrapper" v-if="activity.activityHasDynamic">
@@ -282,7 +282,7 @@
     position: absolute;
     bottom: 10px;
     right: 10px;
-    background-image: url('/h5/cwebassets/image/is_gif.png');
+    background-image: url("../../../cwebassets/image/is_gif.png");
     background-position: center;
     background-size: contain;
     background-repeat: no-repeat;

@@ -1,6 +1,6 @@
 <template>
   <div class="loading-wrapper">
-    <div class="loading-content"><img class="loading-icon" :src="$assetsPublicPath + '/cwebassets/image/loading_icon.png'" />正在加载...</div>
+    <div class="loading-content"><img class="loading-icon" :src="$assetsFullPath + 'image/loading_icon.png'" />正在加载...</div>
   </div>
 </template>
 

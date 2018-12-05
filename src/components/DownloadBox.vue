@@ -2,7 +2,7 @@
   <div class="box">
     <div class="row space-between center">
       <div class="left row">
-        <img class="logo" :src="$assetsPublicPath + '/cwebassets/image/van_logo.png'" />
+        <img class="logo" :src="$assetsFullPath + 'image/van_logo.png'" />
         <div class="text-box title">有范又有趣的海南生活圈</div>
       </div>
       <div class="go" @click="openFantTuanC">立即打开</div>
